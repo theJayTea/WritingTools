@@ -12,7 +12,7 @@ Writing Tools is an Apple Intelligence-inspired application for Windows that sup
 - **Smarter AI**: Powered by Google's Gemini 1.5 Flash model, offering superior results compared to on-device models (such as the Apple Intelligence models).
 - **System-wide Functionality**: Works instantly in any application where you can select text. Does not overwrite your clipboard. Bloat-free & uses pretty much 0% of your CPU.
 - **Completely free and Open-source**: No subscriptions, no hidden costs.
-- **Privacy-focused**: Your API key and data stay on YOUR device.
+- **Privacy-focused**: Your API key and data stay on *your* device.
 - **User-friendly Interface**: A blurry gradient design that's intuitive and beautiful. But hey, I may be biased, I made it :P
 - **Customizable**: Set your own hotkey for quick access.
 
