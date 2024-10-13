@@ -1,6 +1,8 @@
 # Writing Tools
 
-https://github.com/theJayTea/WritingTools/blob/main/Demo.mov
+
+https://github.com/user-attachments/assets/0dd14cee-8307-4714-99f0-631fb6de1510
+
 
 ## 🚀 What is Writing Tools?
 
