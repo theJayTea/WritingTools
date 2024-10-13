@@ -90,7 +90,7 @@ Made with ❤️ by a high school student. Check out my other AI app, [Bliss AI]
 
 ## 📄 License
 
-Distributed under the MIT License.
+Distributed under the GNU General Public License v3.0.
 
 ---
 
