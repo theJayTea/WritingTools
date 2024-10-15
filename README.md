@@ -1,8 +1,6 @@
 # Writing Tools
 
-
 https://github.com/user-attachments/assets/0dd14cee-8307-4714-99f0-631fb6de1510
-
 
 ## 🚀 What is Writing Tools?
 
@@ -10,10 +8,12 @@ Writing Tools is an Apple Intelligence-inspired application for Windows that sup
 
 ### 🌟 Why Choose Writing Tools?
 
+Aside from being the only Windows program that works like Apple's Writing Tools:
+
 - **Smarter AI**: Powered by Google's Gemini 1.5 Flash model, offering superior results compared to on-device models (such as the Apple Intelligence models).
-- **System-wide Functionality**: Works instantly in any application where you can select text. Does not overwrite your clipboard. Bloat-free & uses pretty much 0% of your CPU.
+- **System-wide Functionality**: Works instantly in any application where you can select text. Does not overwrite or mess with your clipboard. Bloat-free & uses pretty much 0% of your CPU.
 - **Completely free and Open-source**: No subscriptions, no hidden costs.
-- **Privacy-focused**: Your API key and data stay on *your* device.
+- **Privacy-focused**: Your API key and config files stay on *your* device. NO logging, diagnostic collection, tracking, or ads. Invoked *only* on your command.
 - **User-friendly Interface**: A blurry gradient design that's intuitive and beautiful. But hey, I may be biased, I made it :P
 - **Customizable**: Set your own hotkey for quick access.
 
@@ -27,25 +27,70 @@ Writing Tools is an Apple Intelligence-inspired application for Windows that sup
 - **Create Tables**: Convert text data into structured tables.
 - **Custom Instructions**: Give specific directions for text modifications.
 
-## 🛠 Installation
-
-1. Go to the [Releases](https://github.com/theJayTea/WritingTools/releases) page and download the latest `Writing Tools for Windows.zip` file.
-2. Extract it where you want *(e.g. Program Files > Writing Tools*), run `Writing Tools.exe`, and enjoy! :D
-3. To let it automatically start when you boot your PC, add a shortcut of the `Writing Tools.exe` to the Windows Start-Up folder (Open Run and type `shell:startup` to get to this folder). 
-
-## 🔧 Setup
-
-1. Upon first launch, you'll be guided through a quick setup process.
-2. You'll need a free Google Gemini API key. The app will provide a link to obtain one.
-3. Enter your API key and choose a custom hotkey (default is Ctrl+Space).
-4. You can always customise this later and exit the app from its **system tray icon**.
-
 ## 🖱 How to Use
 
 1. Select any text in any application.
 2. Press your hotkey (default: Ctrl+Space).
 3. Choose an option from the popup menu or enter a custom instruction.
 4. Watch as your text is magically improved!
+
+## 🛠 Installation
+
+1. Go to the [Releases](https://github.com/theJayTea/WritingTools/releases) page and download the latest `Writing Tools for Windows.zip` file.
+2. Extract it where you want *(e.g. Program Files > Writing Tools*), run `Writing Tools.exe`, and enjoy! :D
+3. To let it automatically start when you boot your PC, add a shortcut of the `Writing Tools.exe` to the Windows Start-Up folder (Open Run and type `shell:startup` to get to this folder). 
+
+## A Quick Note on Antivirus Detections
+
+It turns out that some antivirus providers flag the compiled exe (on the releases page) as malware.
+
+![image](https://github.com/user-attachments/assets/ee2260d2-cfb6-4823-881a-c560186185d1)
+
+The Python to exe compiler I used is Nuitka, which is why it's getting flagged — it's a known issue.
+It happens to obfuscate/minify the exe (to make it optimized and small as it works with its C compiler), making it look suspicious.
+
+**In fact, the `main.py` file itself is safe to AVs ([here's its VirusTotal result](https://www.virustotal.com/gui/file/cc08cf4ffd25273f4248bb1747cf64189b623fd952a2df196a2707297d149231?nocache=1)) since the code isn't obfuscated with Nuitka's exe.**
+
+If you're interested, feel free to explore the source code file yourself; it's well-documented. Writing Tools also never requires elevation ("Run as administrator").
+
+You could easily run it directly from `main.py` with the instructions below :)
+
+## 👨‍💻 To run Writing Tools directly from the code
+
+If you prefer to run it directly from the `main.py` file:
+
+1. Download the code by clicking this button above:
+   ![image](https://github.com/user-attachments/assets/4c6cab79-4918-451c-9ad1-1bbcf8472275)
+
+2. You'll only have to do this once: Open the terminal, and type the below line to install the dependencies:
+   ```
+   pip install PySide6 google-generativeai keyboard pyperclip pywin32
+   ```
+   
+3. Any time you want to run the program, just right-click the folder of the code you downloaded, click Open in Terminal, and type `python main.py` in your terminal. That's it! 🎉
+
+## 🐞 Known Issues
+On some devices, the hotkey detection sometimes acts up or does not work correctly.
+
+To fix it, just restart Writing Tools (you can close it by right-clicking its taskbar tray icon and clicking Exit, or with Task Manager).
+
+This issue is being investigated — it seems to be due to an unreliable hotkey detection API.
+
+
+## 👨‍💻 To compile the application yourself:
+
+The following are instructions on how to compile it with Nuitka. While it results in the most optimised (size-wise) exe from a Python file, a known issue is that it'll get flagged by antivirus software. Feel free to use any other exe compiler too such as PyInstaller.
+
+1. Ensure you have Nuitka installed: `pip install nuitka`
+2. Run the build script: `python build_script.py`
+
+## 🔒 Privacy
+
+I believe strongly in protecting your privacy. Writing Tools:
+- Only stores your API key locally on your device.
+- Does not collect or store any of your writing data by itself. It doesn't even collect general logs, so it's super light and privacy-friendly.
+- Only sends text to Google (encrypted) when you *explicitly* use one of the options. If you have a paid API key, the text will never be used to train Gemini, but if you don't, Google may anonymise your text and use it to train their models.
+- You can explore the source code yourself, and even compile it yourself :D
 
 ## 💡 Tips
 
@@ -54,33 +99,9 @@ Writing Tools is an Apple Intelligence-inspired application for Windows that sup
 - "Summarize" is great for condensing long articles or documents.
 - Experiment with custom instructions for specific writing needs.
 
-## 🔒 Privacy
-
-I believe strongly in protecting your privacy. Writing Tools:
-- Only stores your API key locally on your device.
-- Only sends text to Google (encrypted) when you *explicitly* use one of the options.
-- Does not collect or store any of your writing data. It doesn't even collect general logs, so it's super light and privacy friendly.
-- You can explore the source code yourself, and even compile it yourself :D
-
 ## 🤝 Contributing
 
 I welcome contributions! If you'd like to improve Writing Tools, feel free to open a Pull Request.
-
-## 👨‍💻 For Advanced Users
-
-If you prefer to run from source:
-
-1. Download the repository
-2. Install dependencies (of course, you'll need Python installed!):
-   ```
-   pip install PySide6 google-generativeai keyboard pyperclip pywin32
-   ```
-3. Run `python main.py` in your terminal.
-
-To compile the application yourself:
-
-1. Ensure you have Nuitka installed: `pip install nuitka`
-2. Run the build script: `python build_script.py`
 
 ## 📬 Contact
 
