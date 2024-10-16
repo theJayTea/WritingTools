@@ -62,7 +62,7 @@ If you prefer to run it directly from the `main.py` file:
 1. Download the code by clicking this button above:
    ![image](https://github.com/user-attachments/assets/4c6cab79-4918-451c-9ad1-1bbcf8472275)
 
-2. You'll only have to do this once: Open the terminal, and type the below line to install the dependencies:
+2. You'll only have to do this once: [Install Python](https://www.python.org/downloads/) if you don't already have it installed. Then, open the terminal, and type the below line to install the dependencies:
    ```
    pip install PySide6 google-generativeai keyboard pyperclip pywin32
    ```
