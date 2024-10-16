@@ -36,8 +36,12 @@ Aside from being the only Windows program that works like Apple's Writing Tools:
 
 ## 🛠 Installation
 
-1. Go to the [Releases](https://github.com/theJayTea/WritingTools/releases) page and download the latest `Writing Tools for Windows.zip` file.
-2. Extract it where you want *(e.g. Program Files > Writing Tools*), run `Writing Tools.exe`, and enjoy! :D
+1. Go to the [Releases](https://github.com/theJayTea/WritingTools/releases) page and download the latest `Writing_Tools.zip` file.
+   
+2. Extract it where you want, run `Writing Tools.exe`, and enjoy! :D
+   
+   (Note: If you extract Writing Tools into a protected system folder like Program Files, you'll need to run it as administrator on the first launch or it won't be able to create its config file in the same folder as the exe)
+   
 3. To let it automatically start when you boot your PC, add a shortcut of the `Writing Tools.exe` to the Windows Start-Up folder (Open Run and type `shell:startup` to get to this folder). 
 
 ## A Quick Note on Antivirus Detections
