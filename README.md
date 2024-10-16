@@ -14,6 +14,7 @@ Aside from being the only Windows program that works like Apple's Writing Tools:
 - **System-wide Functionality**: Works instantly in any application where you can select text. Does not overwrite or mess with your clipboard. Bloat-free & uses pretty much 0% of your CPU.
 - **Completely free and Open-source**: No subscriptions, no hidden costs.
 - **Privacy-focused**: Your API key and config files stay on *your* device. NO logging, diagnostic collection, tracking, or ads. Invoked *only* on your command.
+- **Supports Many Languages**: Works with and can even *translate* text across many languages better than Google Translate due to its context-intelligent nature (type *"translate to x language"* in the `Describe your change...` box).
 - **User-friendly Interface**: A blurry gradient design that's intuitive and beautiful. But hey, I may be biased, I made it :P
 - **Customizable**: Set your own hotkey for quick access.
 
