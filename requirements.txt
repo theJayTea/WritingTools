@@ -1,0 +1,5 @@
+google-generative-ai  
+keyboard  
+pyperclip  
+pywin32  
+PySide6

@@ -6,9 +6,6 @@ def run_pyinstaller_build():
         "pyinstaller",
         "--onefile",
         "--windowed",
-        "--add-data", "icons;icons",
-        "--add-data", "background.png;.",
-        "--add-data", "background_popup.png;.",
         "--icon=icons/app_icon.ico",
         "main.py"
     ]
