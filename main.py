@@ -7,6 +7,7 @@ import threading
 import time
 import webbrowser
 
+import darkdetect
 import google.generativeai as genai
 import keyboard
 import pyperclip
@@ -22,16 +23,23 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %
 
 # Load user32.dll for Windows API calls
 user32 = ctypes.windll.user32
+colorMode = 'dark' if darkdetect.isDark() else 'light'
 
 class GradientBackground(QtWidgets.QWidget):
     """
     A custom widget that creates a gradient background for the application.
     """
-    def __init__(self, parent=None, background_image='background.png'):
+    def __init__(self, parent=None, background_image='background_light.png'):
         super().__init__(parent)
         self.setAttribute(QtCore.Qt.WA_StyledBackground, True)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        self.background_image = QtGui.QPixmap(os.path.join(os.path.dirname(sys.argv[0]), background_image))
+
+        if colorMode == 'dark':
+            self.background_image = QtGui.QPixmap(os.path.join(os.path.dirname(sys.argv[0]), 'background_popup_dark.png'))
+            self.gradient_color = QtGui.QColor(0, 0, 0, 80)
+        else:
+            self.background_image = QtGui.QPixmap(os.path.join(os.path.dirname(sys.argv[0]), 'background_popup_light.png'))
+            self.gradient_color = QtGui.QColor(0, 0, 0, 80)
 
     def paintEvent(self, event):
         """
@@ -39,7 +47,14 @@ class GradientBackground(QtWidgets.QWidget):
         """
         painter = QtGui.QPainter(self)
         painter.setRenderHint(QtGui.QPainter.RenderHint.SmoothPixmapTransform)
+        
+        # Draw the background image
         painter.drawPixmap(self.rect(), self.background_image)
+
+        gradient = QtGui.QLinearGradient(0, 0, 0, self.height())
+        gradient.setColorAt(0, self.gradient_color)
+        gradient.setColorAt(1, QtGui.QColor(0, 0, 0, 0))
+        painter.fillRect(self.rect(), gradient)
 
 class CustomPopupWindow(QtWidgets.QWidget):
     """
@@ -65,7 +80,11 @@ class CustomPopupWindow(QtWidgets.QWidget):
         main_layout.setContentsMargins(0, 0, 0, 0)
 
         # Gradient background
-        self.background = GradientBackground(self, 'background_popup.png')
+        if colorMode == 'dark':
+            self.background = GradientBackground(self, 'background_popup_dark.png')
+        else:
+            self.background = GradientBackground(self, 'background_popup_light.png')
+
         main_layout.addWidget(self.background)
 
         # Content layout
@@ -75,48 +94,49 @@ class CustomPopupWindow(QtWidgets.QWidget):
 
         # Close button
         close_button = QtWidgets.QPushButton("×")
-        close_button.setStyleSheet("""
-            QPushButton {
+        close_button.setStyleSheet(f"""
+            QPushButton {{
                 background-color: transparent;
-                color: #333;
+                color: {'#ffffff' if colorMode == 'dark' else '#333'};
                 font-size: 20px;
                 border: none;
-            }
-            QPushButton:hover {
+            }}
+            QPushButton:hover {{
                 color: #e74c3c;
-            }
+            }}
         """)
         close_button.clicked.connect(self.close)
         content_layout.addWidget(close_button, 0, QtCore.Qt.AlignmentFlag.AlignRight)
 
         # Custom change input and send button layout
         input_layout = QtWidgets.QHBoxLayout()
-        
+    
         self.custom_input = QtWidgets.QLineEdit()
         self.custom_input.setPlaceholderText("Describe your change...")
-        self.custom_input.setStyleSheet("""
-            QLineEdit {
+        self.custom_input.setStyleSheet(f"""
+            QLineEdit {{
                 padding: 8px;
-                border: 1px solid #ccc;
+                border: 1px solid {'#777' if colorMode == 'dark' else '#ccc'};
                 border-radius: 4px;
-                background-color: white;
-            }
+                background-color: {'#333' if colorMode == 'dark' else 'white'};
+                color: {'#ffffff' if colorMode == 'dark' else '#000000'};
+            }}
         """)
         self.custom_input.returnPressed.connect(self.on_custom_change)
         input_layout.addWidget(self.custom_input)
 
         send_button = QtWidgets.QPushButton()
-        send_button.setIcon(QtGui.QIcon(os.path.join(os.path.dirname(sys.argv[0]), 'icons', 'send.png')))
-        send_button.setStyleSheet("""
-            QPushButton {
-                background-color: #4CAF50;
+        send_button.setIcon(QtGui.QIcon(os.path.join(os.path.dirname(sys.argv[0]), 'icons', 'send' + ('_dark' if colorMode == 'dark' else '_light') + '.png')))
+        send_button.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {'#2e7d32' if colorMode == 'dark' else '#4CAF50'};
                 border: none;
                 border-radius: 4px;
                 padding: 5px;
-            }
-            QPushButton:hover {
-                background-color: #45a049;
-            }
+            }}
+            QPushButton:hover {{
+                background-color: {'#2e7d32' if colorMode == 'dark' else '#45a049'};
+            }}
         """)
         send_button.setFixedSize(self.custom_input.sizeHint().height(), self.custom_input.sizeHint().height())
         send_button.clicked.connect(self.on_custom_change)
@@ -129,30 +149,31 @@ class CustomPopupWindow(QtWidgets.QWidget):
         options_grid.setSpacing(10)
 
         options = [
-            ('Proofread', 'icons/magnifying-glass.png', self.on_proofread),
-            ('Rewrite', 'icons/rotate-left.png', self.on_rewrite),
-            ('Friendly', 'icons/smiley-face.png', self.on_friendly),
-            ('Professional', 'icons/briefcase.png', self.on_professional),
-            ('Concise', 'icons/concise.png', self.on_concise),
-            ('Summary', 'icons/summary.png', self.on_summary),
-            ('Key Points', 'icons/keypoints.png', self.on_keypoints),
-            ('Table', 'icons/table.png', self.on_table)
+            ('Proofread', 'icons/magnifying-glass' + ('_dark' if colorMode == 'dark' else '_light') + '.png', self.on_proofread),
+            ('Rewrite', 'icons/rotate-left' + ('_dark' if colorMode == 'dark' else '_light') + '.png', self.on_rewrite),
+            ('Friendly', 'icons/smiley-face' + ('_dark' if colorMode == 'dark' else '_light') + '.png', self.on_friendly),
+            ('Professional', 'icons/briefcase' + ('_dark' if colorMode == 'dark' else '_light') + '.png', self.on_professional),
+            ('Concise', 'icons/concise' + ('_dark' if colorMode == 'dark' else '_light') + '.png', self.on_concise),
+            ('Summary', 'icons/summary' + ('_dark' if colorMode == 'dark' else '_light') + '.png', self.on_summary),
+            ('Key Points', 'icons/keypoints' + ('_dark' if colorMode == 'dark' else '_light') + '.png', self.on_keypoints),
+            ('Table', 'icons/table' + ('_dark' if colorMode == 'dark' else '_light') + '.png', self.on_table)
         ]
 
         for i, (label, icon_path, callback) in enumerate(options):
             button = QtWidgets.QPushButton(label)
-            button.setStyleSheet("""
-                QPushButton {
-                    background-color: white;
-                    border: 1px solid #ccc;
+            button.setStyleSheet(f"""
+                QPushButton {{
+                    background-color: {'#444' if colorMode == 'dark' else 'white'};
+                    border: 1px solid {'#666' if colorMode == 'dark' else '#ccc'};
                     border-radius: 4px;
                     padding: 10px;
                     font-size: 14px;
                     text-align: left;
-                }
-                QPushButton:hover {
-                    background-color: #f0f0f0;
-                }
+                    color: {'#ffffff' if colorMode == 'dark' else '#000000'};
+                }}
+                QPushButton:hover {{
+                    background-color: {'#555' if colorMode == 'dark' else '#f0f0f0'};
+                }}
             """)
             icon_full_path = os.path.join(os.path.dirname(sys.argv[0]), icon_path)
             if os.path.exists(icon_full_path):
@@ -352,6 +373,10 @@ class WritingToolApp(QtWidgets.QApplication):
                 
                 logging.debug('Creating new popup window')
                 self.popup_window = CustomPopupWindow(self, selected_text)
+
+                # Set the window icon
+                icon_path = os.path.join(os.path.dirname(sys.argv[0]), 'icons', 'app_icon.png')
+                if os.path.exists(icon_path): self.setWindowIcon(QtGui.QIcon(icon_path))
                 
                 # Get the screen containing the cursor
                 cursor_pos = QCursor.pos()
@@ -550,7 +575,14 @@ class WritingToolApp(QtWidgets.QApplication):
             self.tray_icon = QtWidgets.QSystemTrayIcon(self)
         else:
             self.tray_icon = QtWidgets.QSystemTrayIcon(QtGui.QIcon(icon_path), self)
+        
+        # Set the tooltip (hover name) for the tray icon
+        self.tray_icon.setToolTip("WritingTools")    
+            
         tray_menu = QtWidgets.QMenu()
+
+        # Apply dark mode styles using darkdetect
+        self.apply_dark_mode_styles(tray_menu)
 
         settings_action = tray_menu.addAction('Settings')
         settings_action.triggered.connect(self.show_settings)
@@ -564,6 +596,26 @@ class WritingToolApp(QtWidgets.QApplication):
         self.tray_icon.setContextMenu(tray_menu)
         self.tray_icon.show()
         logging.debug('Tray icon displayed')
+
+    def apply_dark_mode_styles(self, menu):
+        """
+        Apply styles to the tray menu based on system theme using darkdetect.
+        """
+        is_dark_mode = darkdetect.isDark()
+        palette = menu.palette()
+
+        if is_dark_mode:
+            logging.debug('Tray icon dark')
+            # Dark mode colors
+            palette.setColor(QtGui.QPalette.Window, QtGui.QColor("#2d2d2d"))  # Dark background
+            palette.setColor(QtGui.QPalette.WindowText, QtGui.QColor("#ffffff"))  # White text
+        else:
+            logging.debug('Tray icon light')
+            # Light mode colors
+            palette.setColor(QtGui.QPalette.Window, QtGui.QColor("#ffffff"))  # Light background
+            palette.setColor(QtGui.QPalette.WindowText, QtGui.QColor("#000000"))  # Black text
+
+        menu.setPalette(palette)
 
     def show_settings(self):
         """
@@ -774,6 +826,10 @@ class SettingsWindow(QtWidgets.QWidget):
         """
         self.setWindowTitle('Settings')
         self.setGeometry(300, 300, 400, 300)
+
+        # Set the window icon
+        icon_path = os.path.join(os.path.dirname(sys.argv[0]), 'icons', 'app_icon.png')
+        if os.path.exists(icon_path): self.setWindowIcon(QtGui.QIcon(icon_path))
         
         main_layout = QtWidgets.QVBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
@@ -786,11 +842,21 @@ class SettingsWindow(QtWidgets.QWidget):
         content_layout.setSpacing(20)
 
         title_label = QtWidgets.QLabel("Settings")
-        title_label.setStyleSheet("font-size: 24px; font-weight: bold; color: #333;")
+
+        if colorMode == 'dark':
+            title_label.setStyleSheet("font-size: 24px; font-weight: bold; color: #ddd;")
+        else:
+            title_label.setStyleSheet("font-size: 24px; font-weight: bold; color: #333;")
+
         content_layout.addWidget(title_label, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
 
         shortcut_label = QtWidgets.QLabel("Shortcut key:")
-        shortcut_label.setStyleSheet("font-size: 16px; color: #333;")
+
+        if colorMode == 'dark':
+            shortcut_label.setStyleSheet("font-size: 16px; color: #ddd;")
+        else:
+            shortcut_label.setStyleSheet("font-size: 16px; color: #333;")
+
         content_layout.addWidget(shortcut_label)
 
         self.shortcut_input = QtWidgets.QLineEdit(self.app.config.get('shortcut', 'ctrl+space'))
@@ -798,7 +864,12 @@ class SettingsWindow(QtWidgets.QWidget):
         content_layout.addWidget(self.shortcut_input)
 
         api_key_label = QtWidgets.QLabel("API Key:")
-        api_key_label.setStyleSheet("font-size: 16px; color: #333;")
+
+        if colorMode == 'dark':
+            api_key_label.setStyleSheet("font-size: 16px; color: #ddd;")
+        else:
+            api_key_label.setStyleSheet("font-size: 16px; color: #333;")
+
         content_layout.addWidget(api_key_label)
 
         self.api_key_input = QtWidgets.QLineEdit(self.app.config.get('api_key', ''))
@@ -822,8 +893,19 @@ class SettingsWindow(QtWidgets.QWidget):
         save_button.clicked.connect(self.save_settings)
         content_layout.addWidget(save_button)
 
-        restart_notice = QtWidgets.QLabel("Please restart Writing Tools for changes to take effect.")
-        restart_notice.setStyleSheet("font-size: 15px; color: #555; font-style: italic;")
+        restart_text = """
+        <p style='text-align: center;'>
+        Please restart Writing Tools for changes to take effect.
+        </p>
+        """
+
+        restart_notice = QtWidgets.QLabel(restart_text)
+
+        if colorMode == 'dark':
+            restart_notice.setStyleSheet("font-size: 15px; color: #ddd; font-style: italic;")
+        else:
+            restart_notice.setStyleSheet("font-size: 15px; color: #555; font-style: italic;")
+
         restart_notice.setWordWrap(True)
         content_layout.addWidget(restart_notice)
 
@@ -855,6 +937,10 @@ class AboutWindow(QtWidgets.QWidget):
         self.setWindowTitle('About Writing Tools')
         self.setGeometry(300, 300, 400, 300)
         
+        # Set the window icon
+        icon_path = os.path.join(os.path.dirname(sys.argv[0]), 'icons', 'app_icon.png')
+        if os.path.exists(icon_path): self.setWindowIcon(QtGui.QIcon(icon_path))
+
         main_layout = QtWidgets.QVBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
 
@@ -866,7 +952,12 @@ class AboutWindow(QtWidgets.QWidget):
         content_layout.setSpacing(20)
 
         title_label = QtWidgets.QLabel("About Writing Tools")
-        title_label.setStyleSheet("font-size: 24px; font-weight: bold; color: #333;")
+
+        if colorMode == 'dark':
+            title_label.setStyleSheet("font-size: 24px; font-weight: bold; color: #ddd;")
+        else:
+            title_label.setStyleSheet("font-size: 24px; font-weight: bold; color: #333;")
+
         content_layout.addWidget(title_label, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
 
         about_text = """
@@ -889,7 +980,12 @@ class AboutWindow(QtWidgets.QWidget):
         """
 
         about_label = QtWidgets.QLabel(about_text)
-        about_label.setStyleSheet("font-size: 16px; color: #333;")
+
+        if colorMode == 'dark':
+            about_label.setStyleSheet("font-size: 16px; color: #ddd;")
+        else:
+            about_label.setStyleSheet("font-size: 16px; color: #333;")
+
         about_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         about_label.setWordWrap(True)
         content_layout.addWidget(about_label)
@@ -898,15 +994,8 @@ def main():
     """
     The main entry point of the application.
     """
-    # Disable dark mode support
-    QCoreApplication.setAttribute(Qt.AA_DisableHighDpiScaling)
-    QCoreApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
-    QCoreApplication.setAttribute(Qt.AA_DontUseNativeDialogs)
     
     app = WritingToolApp(sys.argv)
-    
-    # Ensure the application uses the light palette
-    app.setPalette(app.style().standardPalette())
     
     app.setQuitOnLastWindowClosed(False)
     sys.exit(app.exec())
