@@ -25,36 +25,23 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %
 user32 = ctypes.windll.user32
 colorMode = 'dark' if darkdetect.isDark() else 'light'
 
-class GradientBackground(QtWidgets.QWidget):
+class SolidBackground(QtWidgets.QWidget):
     """
-    A custom widget that creates a gradient background for the application.
+    A custom widget that creates a solid background for the application.
     """
-    def __init__(self, parent=None, background_image='background_light.png'):
+    def __init__(self, parent=None):
         super().__init__(parent)
         self.setAttribute(QtCore.Qt.WA_StyledBackground, True)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-
-        if colorMode == 'dark':
-            self.background_image = QtGui.QPixmap(os.path.join(os.path.dirname(sys.argv[0]), 'background_popup_dark.png'))
-            self.gradient_color = QtGui.QColor(0, 0, 0, 80)
-        else:
-            self.background_image = QtGui.QPixmap(os.path.join(os.path.dirname(sys.argv[0]), 'background_popup_light.png'))
-            self.gradient_color = QtGui.QColor(0, 0, 0, 80)
 
     def paintEvent(self, event):
         """
-        Override the paint event to draw the gradient background.
+        Override the paint event to fill the background with solid color.
         """
         painter = QtGui.QPainter(self)
-        painter.setRenderHint(QtGui.QPainter.RenderHint.SmoothPixmapTransform)
-        
-        # Draw the background image
-        painter.drawPixmap(self.rect(), self.background_image)
-
-        gradient = QtGui.QLinearGradient(0, 0, 0, self.height())
-        gradient.setColorAt(0, self.gradient_color)
-        gradient.setColorAt(1, QtGui.QColor(0, 0, 0, 0))
-        painter.fillRect(self.rect(), gradient)
+        if colorMode == 'dark':
+            painter.fillRect(self.rect(), QtGui.QColor(35, 35, 35))  # Dark mode color
+        else:
+            painter.fillRect(self.rect(), QtGui.QColor(222, 222, 222))  # Light mode color
 
 class CustomPopupWindow(QtWidgets.QWidget):
     """
@@ -79,30 +66,30 @@ class CustomPopupWindow(QtWidgets.QWidget):
         main_layout = QtWidgets.QVBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
 
-        # Gradient background
-        if colorMode == 'dark':
-            self.background = GradientBackground(self, 'background_popup_dark.png')
-        else:
-            self.background = GradientBackground(self, 'background_popup_light.png')
-
+        # Solid background
+        self.background = SolidBackground(self)
         main_layout.addWidget(self.background)
 
         # Content layout
         content_layout = QtWidgets.QVBoxLayout(self.background)
-        content_layout.setContentsMargins(20, 20, 20, 20)
+        content_layout.setContentsMargins(20, 0, 20, 20)
         content_layout.setSpacing(10)
 
         # Close button
         close_button = QtWidgets.QPushButton("×")
+        close_button.setMinimumWidth(40)
         close_button.setStyleSheet(f"""
             QPushButton {{
                 background-color: transparent;
-                color: {'#ffffff' if colorMode == 'dark' else '#333'};
+                color: {'#ffffff' if colorMode == 'dark' else '#333333'};
                 font-size: 20px;
                 border: none;
+                border-radius: 12px;
+                padding: 0px;
             }}
             QPushButton:hover {{
-                color: #e74c3c;
+                background-color: {'#333333' if colorMode == 'dark' else '#ebebeb'};
+                color: {'#ffffff' if colorMode == 'dark' else '#333333'};
             }}
         """)
         close_button.clicked.connect(self.close)
@@ -110,14 +97,14 @@ class CustomPopupWindow(QtWidgets.QWidget):
 
         # Custom change input and send button layout
         input_layout = QtWidgets.QHBoxLayout()
-    
+
         self.custom_input = QtWidgets.QLineEdit()
         self.custom_input.setPlaceholderText("Describe your change...")
         self.custom_input.setStyleSheet(f"""
             QLineEdit {{
                 padding: 8px;
                 border: 1px solid {'#777' if colorMode == 'dark' else '#ccc'};
-                border-radius: 4px;
+                border-radius: 8px;
                 background-color: {'#333' if colorMode == 'dark' else 'white'};
                 color: {'#ffffff' if colorMode == 'dark' else '#000000'};
             }}
@@ -131,7 +118,7 @@ class CustomPopupWindow(QtWidgets.QWidget):
             QPushButton {{
                 background-color: {'#2e7d32' if colorMode == 'dark' else '#4CAF50'};
                 border: none;
-                border-radius: 4px;
+                border-radius: 8px;
                 padding: 5px;
             }}
             QPushButton:hover {{
@@ -165,7 +152,7 @@ class CustomPopupWindow(QtWidgets.QWidget):
                 QPushButton {{
                     background-color: {'#444' if colorMode == 'dark' else 'white'};
                     border: 1px solid {'#666' if colorMode == 'dark' else '#ccc'};
-                    border-radius: 4px;
+                    border-radius: 8px;
                     padding: 10px;
                     font-size: 14px;
                     text-align: left;
@@ -662,7 +649,7 @@ class OnboardingWindow(QtWidgets.QWidget):
         main_layout = QtWidgets.QVBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.background = GradientBackground(self)
+        self.background = SolidBackground(self)
         main_layout.addWidget(self.background)
 
         self.content_layout = QtWidgets.QVBoxLayout()
@@ -834,7 +821,7 @@ class SettingsWindow(QtWidgets.QWidget):
         main_layout = QtWidgets.QVBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.background = GradientBackground(self)
+        self.background = SolidBackground(self)
         main_layout.addWidget(self.background)
 
         content_layout = QtWidgets.QVBoxLayout(self.background)
@@ -944,7 +931,7 @@ class AboutWindow(QtWidgets.QWidget):
         main_layout = QtWidgets.QVBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.background = GradientBackground(self)
+        self.background = SolidBackground(self)
         main_layout.addWidget(self.background)
 
         content_layout = QtWidgets.QVBoxLayout(self.background)
