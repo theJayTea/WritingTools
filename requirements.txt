@@ -1,5 +1,6 @@
-google-generative-ai  
-keyboard  
-pyperclip  
-pywin32  
+darkdetect
+google-generativeai
+keyboard
+pyperclip
+pywin32
 PySide6
