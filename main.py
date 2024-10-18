@@ -14,9 +14,9 @@ import pyperclip
 import win32clipboard
 from google.generativeai.types import HarmBlockThreshold, HarmCategory
 from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtCore import QCoreApplication, Qt, Signal, Slot
+from PySide6.QtCore import Signal, Slot
 from PySide6.QtGui import QCursor, QGuiApplication
-from PySide6.QtWidgets import QMessageBox
+from PySide6.QtWidgets import QHBoxLayout, QMessageBox, QRadioButton
 
 # Set up logging to console
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -25,23 +25,32 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %
 user32 = ctypes.windll.user32
 colorMode = 'dark' if darkdetect.isDark() else 'light'
 
-class SolidBackground(QtWidgets.QWidget):
+class ThemeBackground(QtWidgets.QWidget):
     """
-    A custom widget that creates a solid background for the application.
+    A custom widget that creates a background for the application based on the selected theme.
     """
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, theme='gradient', is_popup=False):
         super().__init__(parent)
         self.setAttribute(QtCore.Qt.WA_StyledBackground, True)
+        self.theme = theme
+        self.is_popup = is_popup
 
     def paintEvent(self, event):
         """
-        Override the paint event to fill the background with solid color.
+        Override the paint event to draw the background based on the selected theme.
         """
         painter = QtGui.QPainter(self)
-        if colorMode == 'dark':
-            painter.fillRect(self.rect(), QtGui.QColor(35, 35, 35))  # Dark mode color
+        if self.theme == 'gradient':
+            if self.is_popup:
+                background_image = QtGui.QPixmap(os.path.join(os.path.dirname(sys.argv[0]), 'background_popup_dark.png' if colorMode == 'dark' else 'background_popup.png'))
+            else:
+                background_image = QtGui.QPixmap(os.path.join(os.path.dirname(sys.argv[0]), 'background_dark.png' if colorMode == 'dark' else 'background.png'))
+            painter.drawPixmap(self.rect(), background_image)
         else:
-            painter.fillRect(self.rect(), QtGui.QColor(222, 222, 222))  # Light mode color
+            if colorMode == 'dark':
+                painter.fillRect(self.rect(), QtGui.QColor(35, 35, 35))  # Dark mode color
+            else:
+                painter.fillRect(self.rect(), QtGui.QColor(222, 222, 222))  # Light mode color
 
 class CustomPopupWindow(QtWidgets.QWidget):
     """
@@ -61,13 +70,16 @@ class CustomPopupWindow(QtWidgets.QWidget):
         logging.debug('Setting up CustomPopupWindow UI')
         self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.WindowStaysOnTopHint)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        
+        # Set the window title
+        self.setWindowTitle("Writing Tools")
 
         # Main layout
         main_layout = QtWidgets.QVBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
 
-        # Solid background
-        self.background = SolidBackground(self)
+        # Theme background
+        self.background = ThemeBackground(self, self.app.config.get('theme', 'gradient'), is_popup=True)
         main_layout.addWidget(self.background)
 
         # Content layout
@@ -122,7 +134,7 @@ class CustomPopupWindow(QtWidgets.QWidget):
                 padding: 5px;
             }}
             QPushButton:hover {{
-                background-color: {'#2e7d32' if colorMode == 'dark' else '#45a049'};
+                background-color: {'#1b5e20' if colorMode == 'dark' else '#45a049'};
             }}
         """)
         send_button.setFixedSize(self.custom_input.sizeHint().height(), self.custom_input.sizeHint().height())
@@ -172,6 +184,18 @@ class CustomPopupWindow(QtWidgets.QWidget):
 
         content_layout.addLayout(options_grid)
         logging.debug('CustomPopupWindow UI setup complete')
+
+        # Install event filter to handle focus out events
+        self.installEventFilter(self)
+
+    def eventFilter(self, obj, event):
+        """
+        Event filter to handle focus out events.
+        """
+        if event.type() == QtCore.QEvent.Type.WindowDeactivate:
+            self.hide()
+            return True
+        return super().eventFilter(obj, event)
 
     def showEvent(self, event):
         """
@@ -357,47 +381,36 @@ class WritingToolApp(QtWidgets.QApplication):
                         logging.debug('Closing existing visible popup window')
                         self.popup_window.close()
                     self.popup_window = None
-                
                 logging.debug('Creating new popup window')
                 self.popup_window = CustomPopupWindow(self, selected_text)
 
                 # Set the window icon
                 icon_path = os.path.join(os.path.dirname(sys.argv[0]), 'icons', 'app_icon.png')
                 if os.path.exists(icon_path): self.setWindowIcon(QtGui.QIcon(icon_path))
-                
                 # Get the screen containing the cursor
                 cursor_pos = QCursor.pos()
                 screen = QGuiApplication.screenAt(cursor_pos)
                 if screen is None:
                     screen = QGuiApplication.primaryScreen()
-                
                 screen_geometry = screen.geometry()
-                
                 logging.debug(f'Cursor is on screen: {screen.name()}')
                 logging.debug(f'Screen geometry: {screen_geometry}')
-                
                 # Show the popup to get its size
                 self.popup_window.show()
                 self.popup_window.adjustSize()
-                
                 popup_width = self.popup_window.width()
                 popup_height = self.popup_window.height()
-                
                 # Calculate position
                 x = cursor_pos.x()
                 y = cursor_pos.y() + 20  # 20 pixels below cursor
-                
                 # Adjust if the popup would go off the right edge of the screen
                 if x + popup_width > screen_geometry.right():
                     x = screen_geometry.right() - popup_width
-                
                 # Adjust if the popup would go off the bottom edge of the screen
                 if y + popup_height > screen_geometry.bottom():
                     y = cursor_pos.y() - popup_height - 10  # 10 pixels above cursor
-                
                 self.popup_window.move(x, y)
                 logging.debug(f'Popup window moved to position: ({x}, {y})')
-                
             except Exception as e:
                 logging.error(f'Error showing popup window: {e}', exc_info=True)
         else:
@@ -457,17 +470,43 @@ class WritingToolApp(QtWidgets.QApplication):
         logging.debug(f'Starting processing thread for option: {option}')
         try:
             option_prompts = {
-                'Proofread': ('Proofread this:\n\n', 'You are a grammar proofreading assistant. Do not make significant changes to the text structure or writing style. Output ONLY the corrected text without any additional comments. If the text is incompatible with proofreading (e.g., completely random gibberish), output exactly "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'),
-                'Rewrite': ('Rewrite this:\n\n', 'You are a writing assistant. Rewrite the text provided by the user. Output ONLY their rewritten text without any additional comments. If the text is incompatible with rewriting (e.g., completely random gibberish), output exactly "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'),
-                'Friendly': ('Make this more friendly:\n\n', 'You are a writing assistant. Rewrite the text provided by the user to be more friendly. Output ONLY the rewritten text without any additional comments. If the text is completely incompatible with this request (e.g., completely random gibberish), output exactly "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'),
-                'Professional': ('Make this more professional:\n\n', 'You are a writing assistant. Rewrite the text provided by the user to be more professional. Output ONLY the rewritten text without any additional comments. If the text is completely incompatible with this request (e.g., completely random gibberish), output exactly "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'),
-                'Concise': ('Make this more concise:\n\n', 'You are a writing assistant. Rewrite the text provided by the user to be more concise. Output ONLY the rewritten concise text without any additional comments. If the text is completely incompatible with this request (e.g., completely random gibberish), output exactly "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'),
-                'Summary': ('Summarize this:\n\n', 'You are a summarization assistant. Provide a concise summary of the text provided by the user. Output ONLY the summary without any additional comments. If the text is completely incompatible with summarization (e.g., completely random gibberish), output exactly "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'),
-                'Key Points': ('Extract key points from this:\n\n', 'You are an assistant that extracts key points from text. Provide a list of key points from the text provided by the user. Output ONLY the key points without any additional comments. If the text is completely incompatible with extracting key points (e.g., completely random gibberish), output exactly "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'),
-                'Table': ('Convert this into a table:\n\n', 'You are an assistant that converts text into a table format. Convert the text provided by the user into a table. Output ONLY the table without any additional comments. If the text is completely incompatible with conversion to a table, output exactly "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'),
-                'Custom': ('Make the following change to this text:\n\n', 'You are a writing assistant. Make the described change to the user\'s text. Output ONLY the appropriately changed text without any additional comments. If the text is completely incompatible with the requested change, output exactly "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".')
-            }
-
+    'Proofread': (
+        'Proofread this:\n\n',
+        'You are a grammar proofreading assistant. Output ONLY the corrected text without any additional comments. Maintain the original text structure and writing style. Respond in the same language as the input (e.g., English US, French). If the text is incompatible with this (e.g., random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+    ),
+    'Rewrite': (
+        'Rewrite this:\n\n',
+        'You are a writing assistant. Rewrite the text provided by the user to improve phrasing. Output ONLY the rewritten text without additional comments. Respond in the same language as the input (e.g., English US, French). If the text is incompatible with proofreading (e.g., random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+    ),
+    'Friendly': (
+        'Make this more friendly:\n\n',
+        'You are a writing assistant. Rewrite the text provided by the user to be more friendly. Output ONLY the revised text without additional comments. Respond in the same language as the input (e.g., English US, French). If the text is incompatible with rewriting (e.g., random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+    ),
+    'Professional': (
+        'Make this more professional:\n\n',
+        'You are a writing assistant. Rewrite the text provided by the user to sound more professional. Output ONLY the revised text without additional comments. Respond in the same language as the input (e.g., English US, French). If the text is incompatible with this (e.g., random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+    ),
+    'Concise': (
+        'Make this more concise:\n\n',
+        'You are a writing assistant. Rewrite the text provided by the user to be more concise. Output ONLY the concise version without additional comments. Respond in the same language as the input (e.g., English US, French). If the text is incompatible with this (e.g., random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+    ),
+    'Summary': (
+        'Summarize this:\n\n',
+        'You are a summarization assistant. Provide a concise summary of the text provided by the user. Output ONLY the summary without additional comments. Respond in the same language as the input (e.g., English US, French). If the text is incompatible with summarization (e.g., random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+    ),
+    'Key Points': (
+        'Extract key points from this:\n\n',
+        'You are an assistant that extracts key points from text provided by the user. Output ONLY the key points without additional comments. Respond in the same language as the input (e.g., English US, French). If the text is incompatible with with extracting key points (e.g., random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+    ),
+    'Table': (
+        'Convert this into a table:\n\n',
+        'You are an assistant that converts text provided by the user into a table. Output ONLY the table without additional comments. Respond in the same language as the input (e.g., English US, French). If the text is incompatible with this with conversion, output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+    ),
+    'Custom': (
+        'Make the following change to this text:\n\n',
+        'You are a writing assistant. You MUST make the user\'s described change to the text provided by the user. Output ONLY the appropriately modified text without additional comments. Respond in the same language as the input (e.g., English US, French). If the text is completely incompatible with the requested change, output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+    )
+}
             prompt_prefix, system_instruction = option_prompts.get(option, ('', ''))
             if option == 'Custom':
                 prompt = f"{prompt_prefix}Described change: {custom_change}\n\nText: {selected_text}"
@@ -562,10 +601,8 @@ class WritingToolApp(QtWidgets.QApplication):
             self.tray_icon = QtWidgets.QSystemTrayIcon(self)
         else:
             self.tray_icon = QtWidgets.QSystemTrayIcon(QtGui.QIcon(icon_path), self)
-        
         # Set the tooltip (hover name) for the tray icon
         self.tray_icon.setToolTip("WritingTools")    
-            
         tray_menu = QtWidgets.QMenu()
 
         # Apply dark mode styles using darkdetect
@@ -630,26 +667,28 @@ class WritingToolApp(QtWidgets.QApplication):
         self.quit()
 
 class OnboardingWindow(QtWidgets.QWidget):
-    """
-    The onboarding window shown to first-time users.
-    """
     def __init__(self, app):
         super().__init__()
         self.app = app
+        self.shortcut = 'ctrl+space'
+        self.theme = 'gradient'
+        self.onboarding_completed = False
         self.init_ui()
 
     def init_ui(self):
-        """
-        Initialize the user interface for the onboarding window.
-        """
         logging.debug('Initializing onboarding UI')
         self.setWindowTitle('Welcome to Writing Tools')
         self.resize(500, 400)
-        
+
+        # Set the window icon
+        icon_path = os.path.join(os.path.dirname(sys.argv[0]), 'icons', 'app_icon.png')
+        if os.path.exists(icon_path):
+            self.setWindowIcon(QtGui.QIcon(icon_path))
+
         main_layout = QtWidgets.QVBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.background = SolidBackground(self)
+        self.background = ThemeBackground(self, 'gradient')
         main_layout.addWidget(self.background)
 
         self.content_layout = QtWidgets.QVBoxLayout()
@@ -661,13 +700,10 @@ class OnboardingWindow(QtWidgets.QWidget):
         self.show_welcome_screen()
 
     def show_welcome_screen(self):
-        """
-        Show the welcome screen of the onboarding process.
-        """
         self.clear_layout(self.content_layout)
 
         title_label = QtWidgets.QLabel("Welcome to Writing Tools!")
-        title_label.setStyleSheet("font-size: 24px; font-weight: bold; color: #333;")
+        title_label.setStyleSheet(f"font-size: 24px; font-weight: bold; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
         self.content_layout.addWidget(title_label, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
 
         features_text = """
@@ -678,20 +714,41 @@ class OnboardingWindow(QtWidgets.QWidget):
         • Values your privacy
         """
         features_label = QtWidgets.QLabel(features_text)
-        features_label.setStyleSheet("font-size: 16px; color: #333;")
+        features_label.setStyleSheet(f"font-size: 16px; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
         features_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
         self.content_layout.addWidget(features_label)
 
         shortcut_label = QtWidgets.QLabel("Customize your shortcut key (default: ctrl+space):")
-        shortcut_label.setStyleSheet("font-size: 16px; color: #333;")
+        shortcut_label.setStyleSheet(f"font-size: 16px; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
         self.content_layout.addWidget(shortcut_label)
 
-        self.shortcut_input = QtWidgets.QLineEdit('ctrl+space')
-        self.shortcut_input.setStyleSheet("font-size: 16px; padding: 5px;")
+        self.shortcut_input = QtWidgets.QLineEdit(self.shortcut)
+        self.shortcut_input.setStyleSheet(f"""
+            font-size: 16px;
+            padding: 5px;
+            background-color: {'#444' if colorMode == 'dark' else 'white'};
+            color: {'#ffffff' if colorMode == 'dark' else '#000000'};
+            border: 1px solid {'#666' if colorMode == 'dark' else '#ccc'};
+        """)
         self.content_layout.addWidget(self.shortcut_input)
 
-        self.next_button = QtWidgets.QPushButton('Next')
-        self.next_button.setStyleSheet("""
+        theme_label = QtWidgets.QLabel("Choose your theme:")
+        theme_label.setStyleSheet(f"font-size: 16px; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
+        self.content_layout.addWidget(theme_label)
+
+        theme_layout = QHBoxLayout()
+        gradient_radio = QRadioButton("Gradient")
+        plain_radio = QRadioButton("Plain")
+        gradient_radio.setStyleSheet(f"color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
+        plain_radio.setStyleSheet(f"color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
+        gradient_radio.setChecked(self.theme == 'gradient')
+        plain_radio.setChecked(self.theme == 'plain')
+        theme_layout.addWidget(gradient_radio)
+        theme_layout.addWidget(plain_radio)
+        self.content_layout.addLayout(theme_layout)
+
+        next_button = QtWidgets.QPushButton('Next')
+        next_button.setStyleSheet("""
             QPushButton {
                 background-color: #4CAF50;
                 color: white;
@@ -704,30 +761,25 @@ class OnboardingWindow(QtWidgets.QWidget):
                 background-color: #45a049;
             }
         """)
-        self.next_button.clicked.connect(self.on_next_clicked)
-        self.content_layout.addWidget(self.next_button)
+        next_button.clicked.connect(lambda: self.on_next_clicked(gradient_radio.isChecked()))
+        self.content_layout.addWidget(next_button)
 
-    def on_next_clicked(self):
-        """
-        Handle the 'Next' button click in the welcome screen.
-        """
+    def on_next_clicked(self, is_gradient):
         self.shortcut = self.shortcut_input.text()
-        logging.debug(f'User selected shortcut: {self.shortcut}')
+        self.theme = 'gradient' if is_gradient else 'plain'
+        logging.debug(f'User selected shortcut: {self.shortcut}, theme: {self.theme}')
         self.show_api_key_input()
 
     def show_api_key_input(self):
-        """
-        Show the API key input screen of the onboarding process.
-        """
         logging.debug('Showing API key input')
         self.clear_layout(self.content_layout)
 
         title_label = QtWidgets.QLabel("Almost there!")
-        title_label.setStyleSheet("font-size: 24px; font-weight: bold; color: #333;")
+        title_label.setStyleSheet(f"font-size: 24px; font-weight: bold; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
         self.content_layout.addWidget(title_label, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
 
         instructions = QtWidgets.QLabel("Writing Tools needs a free Google Gemini API key to work.")
-        instructions.setStyleSheet("font-size: 16px; color: #333;")
+        instructions.setStyleSheet(f"font-size: 16px; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
         instructions.setWordWrap(True)
         self.content_layout.addWidget(instructions)
 
@@ -749,17 +801,23 @@ class OnboardingWindow(QtWidgets.QWidget):
         self.content_layout.addWidget(get_api_key_button)
 
         self.api_key_input = QtWidgets.QLineEdit()
-        self.api_key_input.setStyleSheet("font-size: 16px; padding: 5px;")
+        self.api_key_input.setStyleSheet(f"""
+            font-size: 16px;
+            padding: 5px;
+            background-color: {'#444' if colorMode == 'dark' else 'white'};
+            color: {'#ffffff' if colorMode == 'dark' else '#000000'};
+            border: 1px solid {'#666' if colorMode == 'dark' else '#ccc'};
+        """)
         self.api_key_input.setPlaceholderText("Enter your API key here")
         self.content_layout.addWidget(self.api_key_input)
 
         privacy_info = QtWidgets.QLabel("Your API key grants access to use Google's AI models. \nWriting Tools stores it locally ONLY on your device. \nWhen you use Writing Tools, on your invocation, it's sent encrypted to Google — SOLELY to improve your text with Gemini 1.5 Flash.")
-        privacy_info.setStyleSheet("font-size: 14px; color: #555;")
+        privacy_info.setStyleSheet(f"font-size: 14px; color: {'#cccccc' if colorMode == 'dark' else '#555555'};")
         privacy_info.setWordWrap(True)
         self.content_layout.addWidget(privacy_info)
 
-        self.finish_button = QtWidgets.QPushButton('Finish')
-        self.finish_button.setStyleSheet("""
+        finish_button = QtWidgets.QPushButton('Finish')
+        finish_button.setStyleSheet("""
             QPushButton {
                 background-color: #4CAF50;
                 color: white;
@@ -772,31 +830,37 @@ class OnboardingWindow(QtWidgets.QWidget):
                 background-color: #45a049;
             }
         """)
-        self.finish_button.clicked.connect(self.on_finish_clicked)
-        self.content_layout.addWidget(self.finish_button)
+        finish_button.clicked.connect(self.on_finish_clicked)
+        self.content_layout.addWidget(finish_button)
 
     def clear_layout(self, layout):
-        """
-        Clear all widgets from the given layout.
-        """
         while layout.count():
             child = layout.takeAt(0)
             if child.widget():
                 child.widget().deleteLater()
+            elif child.layout():
+                self.clear_layout(child.layout())
 
     def on_finish_clicked(self):
-        """
-        Handle the 'Finish' button click in the API key input screen.
-        """
         self.api_key = self.api_key_input.text()
         logging.debug('User entered API key')
         self.app.save_config({
             'shortcut': self.shortcut,
-            'api_key': self.api_key
+            'api_key': self.api_key,
+            'theme': self.theme
         })
+        self.onboarding_completed = True
         self.close()
-        self.app.create_tray_icon()
-        self.app.register_hotkey()
+
+    def closeEvent(self, event):
+        if not self.onboarding_completed:
+            logging.debug('Onboarding window closed before completion')
+            self.app.quit()
+        else:
+            logging.debug('Onboarding completed successfully')
+            self.app.create_tray_icon()
+            self.app.register_hotkey()
+            event.accept()
 
 class SettingsWindow(QtWidgets.QWidget):
     """
@@ -817,11 +881,10 @@ class SettingsWindow(QtWidgets.QWidget):
         # Set the window icon
         icon_path = os.path.join(os.path.dirname(sys.argv[0]), 'icons', 'app_icon.png')
         if os.path.exists(icon_path): self.setWindowIcon(QtGui.QIcon(icon_path))
-        
         main_layout = QtWidgets.QVBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.background = SolidBackground(self)
+        self.background = ThemeBackground(self, self.app.config.get('theme', 'gradient'))
         main_layout.addWidget(self.background)
 
         content_layout = QtWidgets.QVBoxLayout(self.background)
@@ -829,39 +892,52 @@ class SettingsWindow(QtWidgets.QWidget):
         content_layout.setSpacing(20)
 
         title_label = QtWidgets.QLabel("Settings")
-
-        if colorMode == 'dark':
-            title_label.setStyleSheet("font-size: 24px; font-weight: bold; color: #ddd;")
-        else:
-            title_label.setStyleSheet("font-size: 24px; font-weight: bold; color: #333;")
-
+        title_label.setStyleSheet(f"font-size: 24px; font-weight: bold; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
         content_layout.addWidget(title_label, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
 
         shortcut_label = QtWidgets.QLabel("Shortcut key:")
-
-        if colorMode == 'dark':
-            shortcut_label.setStyleSheet("font-size: 16px; color: #ddd;")
-        else:
-            shortcut_label.setStyleSheet("font-size: 16px; color: #333;")
-
+        shortcut_label.setStyleSheet(f"font-size: 16px; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
         content_layout.addWidget(shortcut_label)
 
         self.shortcut_input = QtWidgets.QLineEdit(self.app.config.get('shortcut', 'ctrl+space'))
-        self.shortcut_input.setStyleSheet("font-size: 16px; padding: 5px;")
+        self.shortcut_input.setStyleSheet(f"""
+            font-size: 16px;
+            padding: 5px;
+            background-color: {'#444' if colorMode == 'dark' else 'white'};
+            color: {'#ffffff' if colorMode == 'dark' else '#000000'};
+            border: 1px solid {'#666' if colorMode == 'dark' else '#ccc'};
+        """)
         content_layout.addWidget(self.shortcut_input)
 
         api_key_label = QtWidgets.QLabel("API Key:")
-
-        if colorMode == 'dark':
-            api_key_label.setStyleSheet("font-size: 16px; color: #ddd;")
-        else:
-            api_key_label.setStyleSheet("font-size: 16px; color: #333;")
-
+        api_key_label.setStyleSheet(f"font-size: 16px; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
         content_layout.addWidget(api_key_label)
 
         self.api_key_input = QtWidgets.QLineEdit(self.app.config.get('api_key', ''))
-        self.api_key_input.setStyleSheet("font-size: 16px; padding: 5px;")
+        self.api_key_input.setStyleSheet(f"""
+            font-size: 16px;
+            padding: 5px;
+            background-color: {'#444' if colorMode == 'dark' else 'white'};
+            color: {'#ffffff' if colorMode == 'dark' else '#000000'};
+            border: 1px solid {'#666' if colorMode == 'dark' else '#ccc'};
+        """)
         content_layout.addWidget(self.api_key_input)
+
+        theme_label = QtWidgets.QLabel("Theme:")
+        theme_label.setStyleSheet(f"font-size: 16px; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
+        content_layout.addWidget(theme_label)
+
+        theme_layout = QHBoxLayout()
+        self.gradient_radio = QRadioButton("Gradient")
+        self.plain_radio = QRadioButton("Plain")
+        self.gradient_radio.setStyleSheet(f"color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
+        self.plain_radio.setStyleSheet(f"color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
+        current_theme = self.app.config.get('theme', 'gradient')
+        self.gradient_radio.setChecked(current_theme == 'gradient')
+        self.plain_radio.setChecked(current_theme == 'plain')
+        theme_layout.addWidget(self.gradient_radio)
+        theme_layout.addWidget(self.plain_radio)
+        content_layout.addLayout(theme_layout)
 
         save_button = QtWidgets.QPushButton('Save')
         save_button.setStyleSheet("""
@@ -887,12 +963,7 @@ class SettingsWindow(QtWidgets.QWidget):
         """
 
         restart_notice = QtWidgets.QLabel(restart_text)
-
-        if colorMode == 'dark':
-            restart_notice.setStyleSheet("font-size: 15px; color: #ddd; font-style: italic;")
-        else:
-            restart_notice.setStyleSheet("font-size: 15px; color: #555; font-style: italic;")
-
+        restart_notice.setStyleSheet(f"font-size: 15px; color: {'#cccccc' if colorMode == 'dark' else '#555555'}; font-style: italic;")
         restart_notice.setWordWrap(True)
         content_layout.addWidget(restart_notice)
 
@@ -902,12 +973,22 @@ class SettingsWindow(QtWidgets.QWidget):
         """
         new_shortcut = self.shortcut_input.text()
         new_api_key = self.api_key_input.text()
+        new_theme = 'gradient' if self.gradient_radio.isChecked() else 'plain'
         self.app.save_config({
             'shortcut': new_shortcut,
-            'api_key': new_api_key
+            'api_key': new_api_key,
+            'theme': new_theme
         })
         self.app.register_hotkey()
         self.close()
+
+class AboutWindow(QtWidgets.QWidget):
+    """
+    The about window for the application.
+    """
+    def __init__(self):
+        super().__init__()
+        self.init_ui()
 
 class AboutWindow(QtWidgets.QWidget):
     """
@@ -922,8 +1003,7 @@ class AboutWindow(QtWidgets.QWidget):
         Initialize the user interface for the about window.
         """
         self.setWindowTitle('About Writing Tools')
-        self.setGeometry(300, 300, 400, 300)
-        
+        self.setGeometry(300, 300, 400, 400)  # Increased height to accommodate new content
         # Set the window icon
         icon_path = os.path.join(os.path.dirname(sys.argv[0]), 'icons', 'app_icon.png')
         if os.path.exists(icon_path): self.setWindowIcon(QtGui.QIcon(icon_path))
@@ -931,7 +1011,8 @@ class AboutWindow(QtWidgets.QWidget):
         main_layout = QtWidgets.QVBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.background = SolidBackground(self)
+        self.background = ThemeBackground(self, 'gradient')
+
         main_layout.addWidget(self.background)
 
         content_layout = QtWidgets.QVBoxLayout(self.background)
@@ -939,12 +1020,7 @@ class AboutWindow(QtWidgets.QWidget):
         content_layout.setSpacing(20)
 
         title_label = QtWidgets.QLabel("About Writing Tools")
-
-        if colorMode == 'dark':
-            title_label.setStyleSheet("font-size: 24px; font-weight: bold; color: #ddd;")
-        else:
-            title_label.setStyleSheet("font-size: 24px; font-weight: bold; color: #333;")
-
+        title_label.setStyleSheet(f"font-size: 24px; font-weight: bold; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
         content_layout.addWidget(title_label, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
 
         about_text = """
@@ -952,38 +1028,58 @@ class AboutWindow(QtWidgets.QWidget):
         <b>Writing Tools</b> is a free and lightweight application that helps you improve your writing with AI, similar to Apple's new Apple Intelligence feature.<br><br>
         It's completely free for you to use as you provide your own free Gemini API key.<br><br>
         The AI model used here, Gemini 1.5 Flash, offers significantly better performance than Apple's on-device model, resulting in more natural and less robotic text refinements.<br><br><br>
-  
         </p>
         <p style='text-align: center;'>
         <b>Made with love by Jesai, a high school student.</b><br><br>
-        Feel free to check out my other AI app, <b>Bliss AI</b>. It's a novel AI tutor that's free on the Google Play Store :)<br><br>
+        Feel free to check out my other AI app, <a href="https://play.google.com/store/apps/details?id=com.jesai.blissai">Bliss AI</a>. It's a novel AI tutor that's free on the Google Play Store :)<br><br>
+        </p>
+        <p style='text-align: center;'>
+        <b>Contributors:</b> <a href="https://github.com/Disneyhockey40">Disneyhockey40 (Soszust40)</a><br><br>
         </p>
         <p style='text-align: center;'>
         <b>Contact me:</b> jesaitarun@gmail.com<br><br>
         </p>
         <p style='text-align: center;'>
-        <b>Version:</b> 1.0 (Codename: Sorry_Apple)
+        <b>Version:</b> 2.0 (Codename: Enhanced_Elegance)
         </p>
         """
 
         about_label = QtWidgets.QLabel(about_text)
-
-        if colorMode == 'dark':
-            about_label.setStyleSheet("font-size: 16px; color: #ddd;")
-        else:
-            about_label.setStyleSheet("font-size: 16px; color: #333;")
-
+        about_label.setStyleSheet(f"font-size: 16px; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
         about_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         about_label.setWordWrap(True)
+        about_label.setOpenExternalLinks(True)  # Allow opening hyperlinks
         content_layout.addWidget(about_label)
+
+        # Add "Check for updates" button
+        update_button = QtWidgets.QPushButton('Check for updates')
+        update_button.setStyleSheet("""
+            QPushButton {
+                background-color: #4CAF50;
+                color: white;
+                padding: 10px;
+                font-size: 16px;
+                border: none;
+                border-radius: 5px;
+            }
+            QPushButton:hover {
+                background-color: #45a049;
+            }
+        """)
+        update_button.clicked.connect(self.check_for_updates)
+        content_layout.addWidget(update_button)
+
+    def check_for_updates(self):
+        """
+        Open the GitHub releases page to check for updates.
+        """
+        webbrowser.open("https://github.com/theJayTea/WritingTools/releases")
 
 def main():
     """
     The main entry point of the application.
     """
-    
     app = WritingToolApp(sys.argv)
-    
     app.setQuitOnLastWindowClosed(False)
     sys.exit(app.exec())
 
