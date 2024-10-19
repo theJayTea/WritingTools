@@ -80,11 +80,13 @@ If you prefer to run it directly from the `main.py` file:
 3. Any time you want to run the program, just type `pythonw main.py` in your terminal. That's it! 🎉
 
 ## 🐞 Known Issues
-On some devices, the hotkey detection or text selection detection sometimes acts up or does not work correctly.
+1. Launching Writing Tools for the first time might take a while — this seems to be because AV software extensively scans this new executable before letting it run. Once it launches and stays in the background in RAM, it works instantly as usual.
+   
+2. On some devices, the text selection detection may act up.
+   To fix it, simply restart Writing Tools.
+   This is being investigated.
 
-To fix it, just restart Writing Tools (you can close it by right-clicking its taskbar tray icon and clicking Exit, or with Task Manager).
-
-This issue is being investigated — it seems to be due to an unreliable hotkey detection API.
+3. If you change the hotkey from the default, and an app already uses that hotkey, Writing Tools may not be able to intercept that hotkey from that app.
 
 ## 👨‍💻 To compile the application yourself:
 
