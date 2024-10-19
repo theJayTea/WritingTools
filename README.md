@@ -18,6 +18,8 @@ Aside from being the only Windows program that works like Apple's Writing Tools:
 - 🆕 **Themes & Dark Mode**: Choose between **2 themes**: a blurry gradient theme and a plain theme that resembles the Windows + V pop-up! Also has full **dark mode support**.
 - **Customizable**: Set your own hotkey for quick access.
 
+Writing Tools has been featured on [Beebom](https://beebom.com/high-schooler-app-brings-apple-inteligence-writing-tools-windows/), [XDA](https://www.xda-developers.com/windows-pc-can-now-deliver-instant-free-writing-help-across-all-apps/), and [more](https://www.neowin.net/news/this-small-app-brings-some-apple-intelligence-features-to-windows/)!
+
 ## ✨ Features
 
 - **Proofread**: The smartest grammar and spelling corrector. Sorry not sorry, Grammarly Premium.
