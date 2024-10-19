@@ -66,6 +66,15 @@ I believe strongly in protecting your privacy. Writing Tools:
 - "Summarize" is great for condensing long articles or documents.
 - Experiment with custom instructions for specific writing needs.
 
+## 🐞 Known Issues
+1. The initial launch of the `Writing Tools.exe` might take unusually long — this seems to be because AV software extensively scans this new executable before letting it run. Once it launches into the background in RAM, it works instantly as usual.
+   
+2. On some devices, the text selection detection may act up.
+   To fix it, simply restart Writing Tools.
+   This is being investigated.
+
+3. If you change the hotkey from the default, and an app already uses that hotkey, Writing Tools may not be able to intercept that hotkey from that app.
+
 ## 👨‍💻 To run Writing Tools directly from the code
 
 If you prefer to run it directly from the `main.py` file:
@@ -78,15 +87,6 @@ If you prefer to run it directly from the `main.py` file:
    Of course, you'll need to have [Python installed!](https://www.python.org/downloads/).
 
 3. Any time you want to run the program, just type `pythonw main.py` in your terminal. That's it! 🎉
-
-## 🐞 Known Issues
-1. Launching Writing Tools for the first time might take a while — this seems to be because AV software extensively scans this new executable before letting it run. Once it launches and stays in the background in RAM, it works instantly as usual.
-   
-2. On some devices, the text selection detection may act up.
-   To fix it, simply restart Writing Tools.
-   This is being investigated.
-
-3. If you change the hotkey from the default, and an app already uses that hotkey, Writing Tools may not be able to intercept that hotkey from that app.
 
 ## 👨‍💻 To compile the application yourself:
 
