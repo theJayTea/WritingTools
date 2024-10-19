@@ -1,5 +1,6 @@
 darkdetect
 google-generativeai
+openai
 keyboard
 pyperclip
 pywin32
