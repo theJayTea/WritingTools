@@ -4,7 +4,7 @@ https://github.com/user-attachments/assets/0dd14cee-8307-4714-99f0-631fb6de1510
 
 ## 🚀 What is Writing Tools?
 
-Writing Tools is an Apple Intelligence-inspired application for Windows that supercharges your writing with AI. It lets you fix up grammar and more with one  hotkey press, system wide. It's currently the world's most intelligent system-wide grammar assistant.
+Writing Tools is an Apple Intelligence-inspired application for Windows that supercharges your writing with AI. It lets you fix up grammar and more with one  hotkey press, system-wide. It's currently the world's most intelligent system-wide grammar assistant.
 
 ### 🌟 Why Choose Writing Tools?
 
@@ -15,7 +15,7 @@ Aside from being the only Windows program that works like Apple's Writing Tools:
 - **Completely free and Open-source**: No subscriptions, no hidden costs. Bloat-free & uses pretty much 0% of your CPU.
 - **Privacy-focused**: Your API key and config files stay on *your* device. NO logging, diagnostic collection, tracking, or ads. Invoked *only* on your command.
 - 🆕 **Supports Many Languages**: Works for any language! It can even *translate* text across many languages better than Google Translate (type *"translate to x language"* in the `Describe your change...` box).
-- 🆕 **Themes & Dark Mode**: Choose between **2 themes**: a blurry gradient theme and a plain theme that resembles the Widnows + V pop-up! Also has full **dark mode support**.
+- 🆕 **Themes & Dark Mode**: Choose between **2 themes**: a blurry gradient theme and a plain theme that resembles the Windows + V pop-up! Also has full **dark mode support**.
 - **Customizable**: Set your own hotkey for quick access.
 
 ## ✨ Features
