@@ -41,7 +41,7 @@ class OnboardingWindow(QtWidgets.QWidget):
         features_text = """
         • Improves your writing with AI
         • Works in any application in just a click
-        • Usable with any OpenAI Compatible API
+        • Usable with Gemini 1.5 Flash, or any OpenAI Compatible API
         """
         features_label = QtWidgets.QLabel(features_text)
         features_label.setStyleSheet(f"font-size: 16px; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
