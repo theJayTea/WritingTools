@@ -14,7 +14,7 @@ Aside from being the only Windows program that works like Apple's Writing Tools:
 - **System-wide Functionality**: Works instantly in any application where you can select text. Does not overwrite or mess with your clipboard.
 - **Completely free and Open-source**: No subscriptions, no hidden costs. Bloat-free & uses pretty much 0% of your CPU.
 - **Privacy-focused**: Your API key and config files stay on *your* device. NO logging, diagnostic collection, tracking, or ads. Invoked *only* on your command.
-- 🆕 **Supports Many Languages**: Works for any language! It can even *translate* text across many languages better than Google Translate (type *"translate to x language"* in the `Describe your change...` box).
+- 🆕 **Supports Many Languages**: Works for any language! It can even *translate* text across languages better than Google Translate (type *"translate to [language]"* in the `Describe your change...` box).
 - 🆕 **Themes & Dark Mode**: Choose between **2 themes**: a blurry gradient theme and a plain theme that resembles the Windows + V pop-up! Also has full **dark mode support**.
 - **Customizable**: Set your own hotkey for quick access.
 
