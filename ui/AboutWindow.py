@@ -75,24 +75,6 @@ class AboutWindow(QtWidgets.QWidget):
         update_button.clicked.connect(self.check_for_updates)
         content_layout.addWidget(update_button)
 
-        # Add "Original App" button
-        original_app_button = QtWidgets.QPushButton('Original App')
-        original_app_button.setStyleSheet("""
-            QPushButton {
-                background-color: #4c5baf;
-                color: white;
-                padding: 10px;
-                font-size: 16px;
-                border: none;
-                border-radius: 5px;
-            }
-            QPushButton:hover {
-                background-color: #35407c;
-            }
-        """)
-        original_app_button.clicked.connect(self.original_app())
-        content_layout.addWidget(original_app_button)
-
     def check_for_updates(self):
         """
         Open the GitHub releases page to check for updates.
