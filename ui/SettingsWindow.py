@@ -222,14 +222,14 @@ class SettingsWindow(QtWidgets.QWidget):
 
         app = self.app
 
-        if not self.providers_only:
+        if self.providers_only:
+            app.create_tray_icon()
+        else:
             new_shortcut = self.shortcut_input.text()
             new_theme = 'gradient' if self.gradient_radio.isChecked() else 'plain'
 
             app.config['shortcut'] = new_shortcut
             app.config['theme'] = new_theme
-
-            app.create_tray_icon()
 
         app.config['provider'] = self.provider_dropdown.currentText()
 
