@@ -124,12 +124,20 @@ class AIProvider(ABC):
         """
         pass
 
+    @abstractmethod
+    def cancel(self):
+        """
+        Cancel the current request.
+        """
+        pass
+
 class Gemini15FlashProvider(AIProvider):
 
     def __init__(self, app):
         """
         Initialize the Gemini 1.5 Flash provider.
         """
+        self.close_requested = False
         self.model = None
 
         settings = [
@@ -137,11 +145,13 @@ class Gemini15FlashProvider(AIProvider):
         ]
         super().__init__(app, "Gemini 1.5 Flash", settings, "Gemini 1.5 Flash is a powerful AI model that has a free tier available (this comes with usage tracking for improvement by Google). Paid accounts are not subject to logging.", "gemini", "Get API Key", lambda: webbrowser.open("https://aistudio.google.com/app/apikey"))
 
-    def get_response(self, system_instruction: str, prompt: str) -> str:
+    def get_response(self, system_instruction: str, prompt: str):
+        self.close_requested = False
+
         response = self.model.generate_content(
-            contents=[system_instruction, prompt]
+            contents=[system_instruction, prompt],
+            stream=self.app.config.get("streaming", False)
         )
-        logging.debug('Received response from model')
 
         # Check if the response was blocked
         if response.prompt_feedback.block_reason:
@@ -150,19 +160,22 @@ class Gemini15FlashProvider(AIProvider):
                                           'The generated content was blocked due to safety settings.')
             return
 
-        output_text = response.text.strip()
-        logging.debug(f'Output text: {output_text}')
+        try:
+            for chunk in response:
+                if self.close_requested:
+                    break
+                else:
+                    self.app.output_ready_signal.emit(chunk.text)
+        except Exception as e:
+            logging.error(f"Error while streaming: {e}")
+            self.app.output_ready_signal.emit("An error occurred while streaming.")
+        finally:
+            self.close_requested = False
+            self.app.replace_text(True)
 
-        if output_text == "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST":
-            self.app.show_message_signal.emit('Incompatible Request',
-                                          'Sorry, Writing Tools could not do that with this text.')
-            return
-
-        return output_text
 
     def after_load(self):
         genai.configure(api_key=self.api_key)
-        logging.debug('Configured genai with API key')
 
         self.model = genai.GenerativeModel(
             model_name='gemini-1.5-flash-latest',
@@ -178,10 +191,12 @@ class Gemini15FlashProvider(AIProvider):
                 HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
             }
         )
-        logging.debug('Created generative model')
 
     def before_load(self):
         self.model = None
+
+    def cancel(self):
+        self.close_requested = True
 
 
 class OpenAICompatibleProvider(AIProvider):
@@ -189,6 +204,7 @@ class OpenAICompatibleProvider(AIProvider):
         """
         Initialize the OpenAI-compatible provider.
         """
+        self.close_requested = None
         self.client = None
 
         settings = [
@@ -201,22 +217,46 @@ class OpenAICompatibleProvider(AIProvider):
 
         super().__init__(app, "OpenAI Compatible", settings, "Connect to any Open-AI Compatible API, such as OpenAI, MistralAI, Anthropic, or locally hosted models via llama.cpp, KoboldCPP, TabbyAPI and vLLM. Please note, you must adhere to the connected service's Terms of Service, and your data will be processed by them as per their Privacy Policies etc.", "openai", "Get OpenAI API Key", lambda: webbrowser.open("https://platform.openai.com/account/api-keys"))
 
-    def get_response(self, system_instruction: str, prompt: str) -> str:
+    def get_response(self, system_instruction: str, prompt: str):
+        self.close_requested = False
+        streaming = self.app.config.get("streaming", False)
+
         response = self.client.chat.completions.create(
             model=self.api_model,
             messages=[
                 {"role": "system", "content": system_instruction},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.5
+            temperature=0.5,
+            stream=streaming
         )
 
-        output_text = response.choices[0].message.content.strip()
+        if streaming:
+            try:
+                for chunk in response:
+                    if self.close_requested:
+                        break
+                    else:
+                        self.app.output_ready_signal.emit(chunk.choices[0].delta.content)
 
-        return output_text
+            except Exception as e:
+                logging.error(f"Error while streaming: {e}")
+                self.app.output_ready_signal.emit("An error occurred while streaming.")
+
+            finally:
+                response.close()
+                self.close_requested = False
+                self.app.replace_text(True)
+
+        else:
+            self.app.output_ready_signal.emit(response.choices[0].message.content.strip())
+            self.app.replace_text(True)
 
     def after_load(self):
         self.client = OpenAI(api_key=self.api_key, base_url=self.api_base, organization=self.api_organisation, project=self.api_project)
 
     def before_load(self):
         self.client = None
+
+    def cancel(self):
+        self.close_requested = True
