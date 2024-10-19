@@ -10,23 +10,23 @@ Writing Tools is an Apple Intelligence-inspired application for Windows that sup
 
 Aside from being the only Windows program that works like Apple's Writing Tools:
 
-- **Smarter AI**: Powered by Google's Gemini 1.5 Flash model, offering superior results compared to on-device models (such as the Apple Intelligence models).
-- **System-wide Functionality**: Works instantly in any application where you can select text. Does not overwrite or mess with your clipboard. Bloat-free & uses pretty much 0% of your CPU.
-- **Completely free and Open-source**: No subscriptions, no hidden costs.
+- **Smarter AI**: Powered by Google's Gemini 1.5 Flash model, a >10x larger & more intelligent model than Apple Intelligence!
+- **System-wide Functionality**: Works instantly in any application where you can select text. Does not overwrite or mess with your clipboard.
+- **Completely free and Open-source**: No subscriptions, no hidden costs. Bloat-free & uses pretty much 0% of your CPU.
 - **Privacy-focused**: Your API key and config files stay on *your* device. NO logging, diagnostic collection, tracking, or ads. Invoked *only* on your command.
-- **Supports Many Languages**: Works with and can even *translate* text across many languages better than Google Translate due to its context-intelligent nature (type *"translate to x language"* in the `Describe your change...` box).
-- **User-friendly Interface**: A blurry gradient design that's intuitive and beautiful. But hey, I may be biased, I made it :P
+- 🆕 **Supports Many Languages**: Works for any language! It can even *translate* text across many languages better than Google Translate (type *"translate to x language"* in the `Describe your change...` box).
+- 🆕 **Themes & Dark Mode**: Choose between **2 themes**: a blurry gradient theme and a plain theme that resembles the Widnows + V pop-up! Also has full **dark mode support**.
 - **Customizable**: Set your own hotkey for quick access.
 
 ## ✨ Features
 
-- **Proofread**: Catch and correct grammar and spelling errors.
-- **Rewrite**: Rephrase your text for better clarity and impact.
+- **Proofread**: The smartest grammar and spelling corrector. Sorry not sorry, Grammarly Premium.
+- **Rewrite**: Improve the phrasing of your text.
 - **Make Friendly/Professional**: Adjust the tone of your writing.
 - **Summarize**: Create concise summaries of longer texts.
 - **Extract Key Points**: Highlight the most important information.
-- **Create Tables**: Convert text data into structured tables.
-- **Custom Instructions**: Give specific directions for text modifications.
+- **Create Tables**: Convert text into a structured Markdown table (use [Obsidian](https://obsidian.md/) or [Markdown-to-Excel](https://tableconvert.com/markdown-to-excel) to work with the markdown table).
+- **Custom Instructions**: Give specific directions for text modifications (e.g. `Translate to French`).
 
 ## 🖱 How to Use
 
@@ -67,15 +67,14 @@ If you prefer to run it directly from the `main.py` file:
 1. Download the code by clicking this button above:
    ![image](https://github.com/user-attachments/assets/4c6cab79-4918-451c-9ad1-1bbcf8472275)
 
-2. You'll only have to do this once: [Install Python](https://www.python.org/downloads/) if you don't already have it installed. Then, open the terminal, and type the below line to install the dependencies:
-   ```
-   pip install PySide6 google-generativeai keyboard pyperclip pywin32
-   ```
+2. Right-click the folder of the code you downloaded, and click Open in Terminal.
+   You'll only have to do this once: Type `pip install -r requirements.txt`.
+   Of course, you'll need to have [Python installed!](https://www.python.org/downloads/).
 
-3. Any time you want to run the program, just right-click the folder of the code you downloaded, click Open in Terminal, and type `pythonw main.py` in your terminal. That's it! 🎉
+3. Any time you want to run the program, just type `pythonw main.py` in your terminal. That's it! 🎉
 
 ## 🐞 Known Issues
-On some devices, the hotkey detection sometimes acts up or does not work correctly.
+On some devices, the hotkey detection or text selection detection sometimes acts up or does not work correctly.
 
 To fix it, just restart Writing Tools (you can close it by right-clicking its taskbar tray icon and clicking Exit, or with Task Manager).
 
@@ -83,10 +82,10 @@ This issue is being investigated — it seems to be due to an unreliable hotkey 
 
 ## 👨‍💻 To compile the application yourself:
 
-The following are instructions on how to compile it with Nuitka. While it results in the most optimised (size-wise) exe from a Python file, a known issue is that it'll get flagged by antivirus software. Feel free to use any other exe compiler too such as PyInstaller.
+Here's how to compile it with PyInstaller:
 
-1. Ensure you have Nuitka installed: `pip install nuitka`
-2. Run the build script: `python build_script.py`
+1. Install PyInstaller: `pip install pyinstaller`
+2. Run the build script: `pyinstaller-build-script.py`
 
 ## 🤝 Contributing
 
