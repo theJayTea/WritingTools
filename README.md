@@ -48,10 +48,14 @@ Aside from being the only Windows program that works like Apple's Writing Tools:
 ## 🔒 Privacy
 
 I believe strongly in protecting your privacy. Writing Tools:
+- Only sends text to Google (encrypted) when you *explicitly* use one of the options.
+
+   If you have a paid API key, the text will never be used to train Gemini (you can get $300 of paid API credits for free with Google Cloud's free trial! Just click "Set up Billing" to the right of your API key on the [AI Studio page](https://aistudio.google.com/app/apikey).
+
+   If you don't have the paid API, Google may anonymise your text and use it to train their models.
+
 - Only stores your API key locally on your device.
 - Does not collect or store any of your writing data by itself. It doesn't even collect general logs, so it's super light and privacy-friendly.
-- Only sends text to Google (encrypted) when you *explicitly* use one of the options. If you have a paid API key, the text will never be used to train Gemini, but if you don't, Google may anonymise your text and use it to train their models.
-- You can explore the source code yourself, and even compile it yourself :D
 
 ## 💡 Tips
 
