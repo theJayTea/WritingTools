@@ -96,7 +96,7 @@ Writing Tools would not be where it is today without its amazing contributors:
 
 1. [Cameron Redmore (CameronRedmore)](https://github.com/CameronRedmore): Extensively refactored Writing Tools and added OpenAI Compatible API support, streamed responses, and the chat mode when no text is selected.
 
-2. [Disneyhockey40 (Soszust40)](https://github.com/Soszust40): Helped add dark mode, the plain theme, tray menu fixes, and UI improvements.
+2. [Disneyhockey40 (Soszust40)](https://github.com/Disneyhockey40): Helped add dark mode, the plain theme, tray menu fixes, and UI improvements.
 
 ## 🤝 Contributing
 
