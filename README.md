@@ -4,19 +4,20 @@ https://github.com/user-attachments/assets/0dd14cee-8307-4714-99f0-631fb6de1510
 
 ## 🚀 What is Writing Tools?
 
-Writing Tools is an Apple Intelligence-inspired application for Windows that supercharges your writing with AI. It lets you fix up grammar and more with one  hotkey press, system-wide. It's currently the world's most intelligent system-wide grammar assistant.
+Writing Tools is an Apple Intelligence-inspired application for Windows that supercharges your writing with AI LLMs. It lets you fix up grammar and more with one hotkey press, system-wide. It's currently the world's most intelligent system-wide grammar assistant.
 
 ### 🌟 Why Choose Writing Tools?
 
 Aside from being the only Windows program that works like Apple's Writing Tools:
 
-- **Smarter AI**: Powered by Google's Gemini 1.5 Flash model, a >10x larger & more intelligent model than Apple Intelligence!
-- **System-wide Functionality**: Works instantly in any application where you can select text. Does not overwrite or mess with your clipboard.
-- **Completely free and Open-source**: No subscriptions, no hidden costs. Bloat-free & uses pretty much 0% of your CPU.
-- **Privacy-focused**: Your API key and config files stay on *your* device. NO logging, diagnostic collection, tracking, or ads. Invoked *only* on your command.
-- 🆕 **Supports Many Languages**: Works for any language! It can even *translate* text across languages better than Google Translate (type *"translate to [language]"* in the `Describe your change...` box).
-- 🆕 **Themes & Dark Mode**: Choose between **2 themes**: a blurry gradient theme and a plain theme that resembles the Windows + V pop-up! Also has full **dark mode support**.
-- **Customizable**: Set your own hotkey for quick access.
+- **Versatile AI LLM Support**: Jump in quickly with support for the **free Gemini API**, or use an extensive range of **local LLMs** (via llama.cpp, KoboldCPP, Ollama, TabbyAPI, vLLM, etc.) or **cloud-based LLMs** (ChatGPT, Mistral AI, Anthropic, etc.) with Writing Tools' OpenAI-API-Compatibility. 
+- **System-wide Functionality**: Works instantly in **any application** where you can select text. **Does not overwrite your clipboard**.
+- **Completely free and Open-source**: No subscriptions, no hidden costs. Bloat-free & uses pretty much **0% of your CPU**.
+- **Chat Mode**: Invoke Writing Tools with no text selected to enter a chat mode for quick queries and assistance.
+- **Privacy-focused**: Your API key and config files stay on *your* device. NO logging, diagnostic collection, tracking, or ads. Invoked *only* on your command. Local LLMs keep your data on your device & work without the internet.
+- **Supports Many Languages**: Works for any language! It can even *translate* text across languages better than Google Translate (type *"translate to [language]"* in "Describe your change...").
+- **Code Support**: Select code and ask Writing Tools to work on it (fix, improve, convert languages) through "Describe your change...".
+- **Themes, Dark Mode, & Customization**: Choose between **2 themes**: a blurry gradient theme and a plain theme that resembles the Windows + V pop-up! Also has full **dark mode** support. **Set your own hotkey** for quick access.
 
 Writing Tools has been featured on [Beebom](https://beebom.com/high-schooler-app-brings-apple-inteligence-writing-tools-windows/), [XDA](https://www.xda-developers.com/windows-pc-can-now-deliver-instant-free-writing-help-across-all-apps/), and [more](https://www.neowin.net/news/this-small-app-brings-some-apple-intelligence-features-to-windows/)!
 
@@ -30,41 +31,33 @@ Writing Tools has been featured on [Beebom](https://beebom.com/high-schooler-app
 - **Create Tables**: Convert text into a structured Markdown table (use [Obsidian](https://obsidian.md/) or [Markdown-to-Excel](https://tableconvert.com/markdown-to-excel) to work with the markdown table).
 - **Custom Instructions**: Give specific directions for text modifications (e.g. `Translate to French`).
 
+Invoke Writing Tools with no text selected to enter a chat mode.
+
 ## 🖱 How to Use
 
-1. Select any text in any application.
+1. Select any text in any application (or don't select any text to use chat mode).
 2. Press your hotkey (default: Ctrl+Space).
 3. Choose an option from the popup menu or enter a custom instruction.
 4. Watch as your text is magically improved!
 
 ## 🛠 Installation
 
-1. Go to the [Releases](https://github.com/theJayTea/WritingTools/releases) page and download the latest `Writing Tools.zip` file.
+1. Go to the [Releases](https://github.com/theJayTea/WritingTools/releases) page and download the latest `Writing.Tools.zip` file.
    
 2. Extract it where you want, run `Writing Tools.exe`, and enjoy! :D
 
-   *Note: If you extract Writing Tools into a protected system folder like Program Files, you'll need to run it as administrator on the first launch or it won't be able to create its config file (in the same folder as its exe).*
+   *Note: If you extract Writing Tools into a protected system folder like Program Files, you'll need to run it as administrator at least on the first launch or it won't be able to create/edit its config file (in the same folder as its exe).*
    
-4. To let it automatically start when you boot your PC, add a shortcut of the `Writing Tools.exe` to the Windows Start-Up folder (Open Run and type `shell:startup` to get to this folder). 
+3. To let it automatically start when you boot your PC, add a shortcut of the `Writing Tools.exe` to the Windows Start-Up folder (Open Run and type `shell:startup` to get to this folder). 
 
 ## 🔒 Privacy
 
 I believe strongly in protecting your privacy. Writing Tools:
-- Only sends text to Google (encrypted) when you *explicitly* use one of the options.
-
-   If you have a paid API key, the text will never be used to train Gemini (you can get $300 of paid API credits for free with Google Cloud's free trial! Just click "Set up Billing" to the right of your API key on the [AI Studio page](https://aistudio.google.com/app/apikey)).
-
-   If you don't have the paid API, Google may anonymise your text and use it to train their models.
-
+- Only sends text to the chosen AI provider (encrypted) when you *explicitly* use one of the options.
 - Only stores your API key locally on your device.
 - Does not collect or store any of your writing data by itself. It doesn't even collect general logs, so it's super light and privacy-friendly.
 
-## 💡 Tips
-
-- Use "Proofread" for quick grammar and spelling checks. Better than Grammarly premium can ever be :)
-- Try "Rewrite" when you want to improve the entire phrasing.
-- "Summarize" is great for condensing long articles or documents.
-- Experiment with custom instructions for specific writing needs.
+Note: Privacy policies may vary depending on the AI provider you choose. Please review the terms of service for your selected provider.
 
 ## 🐞 Known Issues
 1. The initial launch of the `Writing Tools.exe` might take unusually long — this seems to be because AV software extensively scans this new executable before letting it run. Once it launches into the background in RAM, it works instantly as usual.
@@ -73,7 +66,7 @@ I believe strongly in protecting your privacy. Writing Tools:
    To fix it, simply restart Writing Tools.
    This is being investigated.
 
-3. If you change the hotkey from the default, and an app already uses that hotkey, Writing Tools may not be able to intercept that hotkey from that app.
+3. If you change the hotkey from the default, and an app already uses that hotkey, Writing Tools may not be able to intercept that hotkey from that app. Good alternative hotkeys include **ctrl+`** or **ctrl+j**.
 
 ## 👨‍💻 To run Writing Tools directly from the code
 
@@ -86,7 +79,7 @@ If you prefer to run it directly from the `main.py` file:
    You'll only have to do this once: Type `pip install -r requirements.txt`.
    Of course, you'll need to have [Python installed!](https://www.python.org/downloads/).
 
-3. Any time you want to run the program, just type `pythonw main.py` in your terminal. That's it! 🎉
+3. Any time you want to run the program, just type `python main.py` in your terminal.
 
 ## 👨‍💻 To compile the application yourself:
 
@@ -95,9 +88,20 @@ Here's how to compile it with PyInstaller:
 1. Install PyInstaller: `pip install pyinstaller`
 2. Run the build script: `pyinstaller-build-script.py`
 
+Ideally, run this in a Python venv.
+
+## 🌟 Contributors
+
+Writing Tools would not be where it is today without its amazing contributors:
+
+1. [Cameron Redmore (CameronRedmore)](https://github.com/CameronRedmore): Extensively refactored Writing Tools and added OpenAI Compatible API support, streamed responses, and the chat mode when no text is selected.
+
+2. [Disneyhockey40 (Soszust40)](https://github.com/Soszust40): Helped add dark mode, the plain theme, tray menu fixes, and UI improvements.
+
 ## 🤝 Contributing
 
-I welcome contributions! If you'd like to improve Writing Tools, feel free to open a Pull Request.
+I welcome contributions! :D
+If you'd like to improve Writing Tools, feel free to open a Pull Request or get in touch with me.
 
 ## 📬 Contact
 
@@ -108,6 +112,3 @@ Made with ❤️ by a high school student. Check out my other AI app, [Bliss AI]
 ## 📄 License
 
 Distributed under the GNU General Public License v3.0.
-
----
-
