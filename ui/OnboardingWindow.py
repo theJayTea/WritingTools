@@ -1,12 +1,11 @@
 import logging
-import os
-import sys
 
-from PySide6 import QtWidgets, QtCore
+from PySide6 import QtCore, QtWidgets
 from PySide6.QtWidgets import QHBoxLayout, QRadioButton
 
 from ui.SettingsWindow import SettingsWindow
 from ui.UIUtils import UIUtils, colorMode
+
 
 class OnboardingWindow(QtWidgets.QWidget):
     def __init__(self, app):
@@ -40,8 +39,12 @@ class OnboardingWindow(QtWidgets.QWidget):
 
         features_text = """
         • Improves your writing with AI
+
         • Works in any application in just a click
-        • Usable with Gemini 1.5 Flash, or any OpenAI Compatible API
+        
+        • Supports an extensive range of AI models:
+            - Gemini 1.5 Flash
+            - ANY OpenAI Compatible API — including local LLMs!
         """
         features_label = QtWidgets.QLabel(features_text)
         features_label.setStyleSheet(f"font-size: 16px; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")

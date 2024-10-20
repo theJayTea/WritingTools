@@ -1,6 +1,6 @@
 import webbrowser
 
-from PySide6 import QtWidgets, QtCore
+from PySide6 import QtCore, QtWidgets
 
 from ui.UIUtils import UIUtils, colorMode
 
@@ -31,22 +31,24 @@ class AboutWindow(QtWidgets.QWidget):
 
         about_text = """
                 <p style='text-align: center;'>
-                <b>Writing Tools</b> is a free and lightweight application that helps you improve your writing with AI, similar to Apple's new Apple Intelligence feature.<br><br>
-                It's completely free for you to use as you provide your own free Gemini API key.<br><br>
-                The AI model used here, Gemini 1.5 Flash, offers significantly better performance than Apple's on-device model, resulting in more natural and less robotic text refinements.<br><br><br>
+                • Writing Tools is a free & lightweight tool that helps you improve your writing with AI, similar to Apple's new Apple Intelligence feature.<br>
+                • It works with an extensive range of AI LLMs, both online and locally run.<br>
+                • Almost any AI model you choose will perform significantly better than Apple's <i>tiny</i> 3B parameter model!<br><br>
                 </p>
                 <p style='text-align: center;'>
-                <b>Made with love by Jesai, a high school student.</b><br><br>
-                Feel free to check out my other AI app, <a href="https://play.google.com/store/apps/details?id=com.jesai.blissai">Bliss AI</a>. It's a novel AI tutor that's free on the Google Play Store :)<br><br>
-                </p>
-                <p style='text-align: center;'>
-                <b>Contributors:</b> <a href="https://github.com/Disneyhockey40">Disneyhockey40 (Soszust40)</a><br><br>
-                </p>
-                <p style='text-align: center;'>
+                <b>Created with care by Jesai, a high school student.</b><br><br>
+                Feel free to check out my other AI app, <a href="https://play.google.com/store/apps/details?id=com.jesai.blissai"><b>Bliss AI</b></a>. It's a novel AI tutor that's free on the Google Play Store :)<br><br>
                 <b>Contact me:</b> jesaitarun@gmail.com<br><br>
                 </p>
                 <p style='text-align: center;'>
-                <b>Version:</b> 2.0 (Codename: Enhanced_Elegance)
+                <b>⭐ Writing Tools would not be where it is today without its <u>amazing</u> contributors:</b><br><br>
+                <b>1. <a href="https://github.com/CameronRedmore">Cameron Redmore (CameronRedmore)</a>:</b><br>
+                <b>Extensively</b> refactored Writing Tools and added OpenAI Compatible API support, streamed responses, and the text generation mode when no text is selected.</b><br><br><br>
+                <b>2. <a href="https://github.com/Disneyhockey40">Disneyhockey40 (Soszust40)</a>:</b><br>
+                Helped add dark mode, the plain theme, tray menu fixes, and UI improvements.</b><br><br>
+                </p>
+                <p style='text-align: center;'>
+                <b>Version:</b> 3.0 (Codename: Radically_Refactored)
                 </p>
                 """
 

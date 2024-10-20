@@ -2,12 +2,13 @@ import logging
 import os
 import sys
 
-from PySide6 import QtWidgets, QtCore
+from aiprovider import AIProvider
+from PySide6 import QtCore, QtWidgets
 from PySide6.QtGui import QImage
 from PySide6.QtWidgets import QHBoxLayout, QRadioButton
 
-from aiprovider import AIProvider
 from ui.UIUtils import UIUtils, colorMode
+
 
 class SettingsWindow(QtWidgets.QWidget):
     """
@@ -125,7 +126,7 @@ class SettingsWindow(QtWidgets.QWidget):
             content_layout.addWidget(theme_label)
 
             theme_layout = QHBoxLayout()
-            self.gradient_radio = QRadioButton("Gradient")
+            self.gradient_radio = QRadioButton("Blurry Gradient")
             self.plain_radio = QRadioButton("Plain")
             self.gradient_radio.setStyleSheet(f"color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
             self.plain_radio.setStyleSheet(f"color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
@@ -136,24 +137,11 @@ class SettingsWindow(QtWidgets.QWidget):
             theme_layout.addWidget(self.plain_radio)
             content_layout.addLayout(theme_layout)
 
-        # Horizontal layout for checkboxes
-        checkbox_layout = QtWidgets.QHBoxLayout()
-
         # Checkbox for enabling streaming
-        self.streaming_checkbox = QtWidgets.QCheckBox("Enable Response Streaming")
+        self.streaming_checkbox = QtWidgets.QCheckBox("Enable Response Streaming (experimental, not recommended)")
         self.streaming_checkbox.setStyleSheet(f"font-size: 16px; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
         self.streaming_checkbox.setChecked(self.app.config.get('streaming', False))
-        self.streaming_checkbox.setToolTip("If enabled, Writing Tools will gradually display the response instead of typing it all at once.")
-        checkbox_layout.addWidget(self.streaming_checkbox)
-
-        # Checkbox for enabling typing vs pasting
-        self.typing_checkbox = QtWidgets.QCheckBox("Type Individual Letters")
-        self.typing_checkbox.setStyleSheet(f"font-size: 16px; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
-        self.typing_checkbox.setChecked(self.app.config.get('typing', False))
-        self.typing_checkbox.setToolTip("If enabled, Writing Tools will type out each letter instead of pasting chunks of the response.")
-        checkbox_layout.addWidget(self.typing_checkbox)
-
-        content_layout.addLayout(checkbox_layout)
+        content_layout.addWidget(self.streaming_checkbox)
 
         # Setup dropdown to select provider
         provider_label = QtWidgets.QLabel("Choose AI Provider:")
@@ -205,7 +193,7 @@ class SettingsWindow(QtWidgets.QWidget):
             self.init_provider_ui(self.app.providers[self.provider_dropdown.currentIndex()], self.provider_container)
         ))
 
-        save_button = QtWidgets.QPushButton("Setup Provider" if self.providers_only else "Save")
+        save_button = QtWidgets.QPushButton("Finish AI Setup" if self.providers_only else "Save")
         save_button.setStyleSheet("""
             QPushButton {
                 background-color: #4CAF50;
@@ -251,7 +239,6 @@ class SettingsWindow(QtWidgets.QWidget):
             app.config['theme'] = new_theme
 
         app.config['streaming'] = self.streaming_checkbox.isChecked()
-        app.config['typing'] = self.typing_checkbox.isChecked()
         app.config['provider'] = self.provider_dropdown.currentText()
 
         app.providers[self.provider_dropdown.currentIndex()].save_config()
@@ -269,4 +256,5 @@ class SettingsWindow(QtWidgets.QWidget):
 
         app.register_hotkey()
 
+        self.close()
         self.close()
