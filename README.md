@@ -10,7 +10,7 @@ Writing Tools is an Apple Intelligence-inspired application for Windows that sup
 
 Aside from being the only Windows program that works like Apple's Writing Tools:
 
-- **Versatile AI LLM Support**: Jump in quickly with support for the **free Gemini API**, or use an extensive range of **local LLMs** (via Ollama *[instructions below]*, llama.cpp, KoboldCPP, TabbyAPI, vLLM, etc.) or **cloud-based LLMs** (ChatGPT, Mistral AI, Anthropic, etc.) with Writing Tools' OpenAI-API-Compatibility.
+- **Versatile AI LLM Support**: Jump in quickly with support for the **free Gemini API**, or use an extensive range of **local LLMs** (via Ollama *[instructions below]*, llama.cpp, KoboldCPP, TabbyAPI, vLLM, etc.) or **cloud-based LLMs** (ChatGPT, Mistral AI, etc.) with Writing Tools' OpenAI-API-Compatibility.
 - **System-wide Functionality**: Works instantly in **any application** where you can select text. **Does not overwrite your clipboard**.
 - **Completely free and Open-source**: No subscriptions, no hidden costs. Bloat-free & uses pretty much **0% of your CPU**.
 - **Chat Mode**: Invoke Writing Tools with no text selected to enter a chat mode for quick queries and assistance.
