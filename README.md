@@ -10,14 +10,14 @@ Writing Tools is an Apple Intelligence-inspired application for Windows that sup
 
 Aside from being the only Windows program that works like Apple's Writing Tools:
 
-- **🎉 Versatile AI LLM Support**: Jump in quickly with support for the **free Gemini API**, or use an extensive range of **local LLMs** (via llama.cpp, KoboldCPP, Ollama, TabbyAPI, vLLM, etc.) or **cloud-based LLMs** (ChatGPT, Mistral AI, Anthropic, etc.) with Writing Tools' OpenAI-API-Compatibility. 
-- **⌨️ System-wide Functionality**: Works instantly in **any application** where you can select text. **Does not overwrite your clipboard**.
-- **💸 Completely free and Open-source**: No subscriptions, no hidden costs. Bloat-free & uses pretty much **0% of your CPU**.
-- **💬 Chat Mode**: Invoke Writing Tools with no text selected to enter a chat mode for quick queries and assistance.
-- **🔒 Privacy-focused**: Your API key and config files stay on *your* device. NO logging, diagnostic collection, tracking, or ads. Invoked *only* on your command. Local LLMs keep your data on your device & work without the internet.
-- **🌍 Supports Many Languages**: Works for any language! It can even *translate* text across languages better than Google Translate (type *"translate to [language]"* in "Describe your change...").
-- **🧑🏼‍💻 Code Support**: Select code and ask Writing Tools to work on it (fix, improve, convert languages) through "Describe your change...".
-- **🎨 Themes, Dark Mode, & Customization**: Choose between **2 themes**: a blurry gradient theme and a plain theme that resembles the Windows + V pop-up! Also has full **dark mode** support. **Set your own hotkey** for quick access.
+- **Versatile AI LLM Support**: Jump in quickly with support for the **free Gemini API**, or use an extensive range of **local LLMs** (via llama.cpp, KoboldCPP, Ollama, TabbyAPI, vLLM, etc.) or **cloud-based LLMs** (ChatGPT, Mistral AI, Anthropic, etc.) with Writing Tools' OpenAI-API-Compatibility.
+- **System-wide Functionality**: Works instantly in **any application** where you can select text. **Does not overwrite your clipboard**.
+- **Completely free and Open-source**: No subscriptions, no hidden costs. Bloat-free & uses pretty much **0% of your CPU**.
+- **Chat Mode**: Invoke Writing Tools with no text selected to enter a chat mode for quick queries and assistance.
+- **Privacy-focused**: Your API key and config files stay on *your* device. NO logging, diagnostic collection, tracking, or ads. Invoked *only* on your command. Local LLMs keep your data on your device & work without the internet.
+- **Supports Many Languages**: Works for any language! It can even *translate* text across languages better than Google Translate (type *"translate to [language]"* in "Describe your change...").
+- **Code Support**: Select code and ask Writing Tools to work on it (fix, improve, convert languages) through "Describe your change...".
+- **Themes, Dark Mode, & Customization**: Choose between **2 themes**: a blurry gradient theme and a plain theme that resembles the Windows + V pop-up! Also has full **dark mode** support. **Set your own hotkey** for quick access.
 
 Writing Tools has been featured on [Beebom](https://beebom.com/high-schooler-app-brings-apple-inteligence-writing-tools-windows/), [XDA](https://www.xda-developers.com/windows-pc-can-now-deliver-instant-free-writing-help-across-all-apps/), and [more](https://www.neowin.net/news/this-small-app-brings-some-apple-intelligence-features-to-windows/)!
 
