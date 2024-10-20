@@ -1,7 +1,6 @@
 import logging
 import webbrowser
 from abc import ABC, abstractmethod
-from platform import system
 from typing import List
 
 import google.generativeai as genai
@@ -11,6 +10,7 @@ from PySide6 import QtWidgets
 from PySide6.QtWidgets import QVBoxLayout
 
 from ui.UIUtils import colorMode
+
 
 class AIProviderSetting(ABC):
     def __init__(self, name: str, display_name: str = None, default_value: str = None, description: str = None):
@@ -141,9 +141,9 @@ class Gemini15FlashProvider(AIProvider):
         self.model = None
 
         settings = [
-            TextSetting(name = "api_key", display_name = "API Key", description = "API key for the Gemini 1.5 Flash API."),
+            TextSetting(name = "api_key", display_name = "API Key", description = "Paste your Gemini API key here"),
         ]
-        super().__init__(app, "Gemini 1.5 Flash", settings, "Gemini 1.5 Flash is a powerful AI model that has a free tier available (this comes with usage tracking for improvement by Google). Paid accounts are not subject to logging.", "gemini", "Get API Key", lambda: webbrowser.open("https://aistudio.google.com/app/apikey"))
+        super().__init__(app, "Gemini 1.5 Flash (Recommended)", settings, "• Gemini 1.5 Flash is a powerful AI model that has a free tier available.\n• Writing Tools needs an \"API key\" to connect to Gemini on your behalf.\n• Simply click Get API Key button below, copy your API key, and paste it below.\n• Note: With the free tier of the Gemini API, Google may anonymize & store the text that you send Writing Tools, for Gemini\'s improvement.", "gemini", "Get API Key", lambda: webbrowser.open("https://aistudio.google.com/app/apikey"))
 
     def get_response(self, system_instruction: str, prompt: str):
         self.close_requested = False
@@ -171,7 +171,7 @@ class Gemini15FlashProvider(AIProvider):
             self.app.output_ready_signal.emit("An error occurred while streaming.")
         finally:
             self.close_requested = False
-            self.app.queue_text(True)
+            self.app.replace_text(True)
 
 
     def after_load(self):
@@ -215,7 +215,7 @@ class OpenAICompatibleProvider(AIProvider):
             TextSetting("api_model", "API Model", "gpt-4o-mini", "Eg. gpt-4o-mini"),
         ]
 
-        super().__init__(app, "OpenAI Compatible", settings, "Connect to any Open-AI Compatible API, such as OpenAI, MistralAI, Anthropic, or locally hosted models via llama.cpp, KoboldCPP, TabbyAPI and vLLM. Please note, you must adhere to the connected service's Terms of Service, and your data will be processed by them as per their Privacy Policies etc.", "openai", "Get OpenAI API Key", lambda: webbrowser.open("https://platform.openai.com/account/api-keys"))
+        super().__init__(app, "OpenAI Compatible (For Experts)", settings, "• Connect to ANY Open-AI Compatible API, such as OpenAI, Mistral AI, Anthropic, or locally hosted models via llama.cpp, KoboldCPP, TabbyAPI, vLLM, etc.\n• Note: You must adhere to the connected service's Terms of Service, and your text will be processed as per their Privacy Policies etc.", "openai", "Get OpenAI API Key", lambda: webbrowser.open("https://platform.openai.com/account/api-keys"))
 
     def get_response(self, system_instruction: str, prompt: str):
         self.close_requested = False
@@ -246,11 +246,11 @@ class OpenAICompatibleProvider(AIProvider):
             finally:
                 response.close()
                 self.close_requested = False
-                self.app.queue_text(True)
+                self.app.replace_text(True)
 
         else:
             self.app.output_ready_signal.emit(response.choices[0].message.content.strip())
-            self.app.queue_text(True)
+            self.app.replace_text(True)
 
     def after_load(self):
         self.client = OpenAI(api_key=self.api_key, base_url=self.api_base, organization=self.api_organisation, project=self.api_project)

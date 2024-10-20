@@ -9,7 +9,7 @@ import darkdetect
 import keyboard
 import pyperclip
 import win32clipboard
-from PySide6 import QtWidgets, QtCore, QtGui
+from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Signal, Slot
 from PySide6.QtGui import QCursor, QGuiApplication
 from PySide6.QtWidgets import QMessageBox
@@ -31,7 +31,7 @@ class WritingToolApp(QtWidgets.QApplication):
     def __init__(self, argv):
         super().__init__(argv)
         logging.debug('Initializing WritingToolApp')
-        self.output_ready_signal.connect(self.queue_text)
+        self.output_ready_signal.connect(self.replace_text)
         self.show_message_signal.connect(self.show_message_box)  # Connect new signal
         self.load_config()
         self.onboarding_window = None
@@ -64,12 +64,6 @@ class WritingToolApp(QtWidgets.QApplication):
 
             self.create_tray_icon()
             self.register_hotkey()
-
-        # Setup timer to attempt to type the text, this disconnects the typing from the actual response improving reliability.
-        self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.type_queue)
-        self.timer.start((self.config.get("queue_interval", 10) / 1000) if self.config else 10)
-
 
     def load_config(self):
         """
@@ -197,7 +191,7 @@ class WritingToolApp(QtWidgets.QApplication):
         keyboard.press_and_release('ctrl+c')
 
         # Wait for the clipboard to update
-        time.sleep(0.5)
+        time.sleep(0.02)
 
         # Get the selected text
         selected_text = pyperclip.paste()
@@ -234,49 +228,58 @@ class WritingToolApp(QtWidgets.QApplication):
         logging.debug(f'Starting processing thread for option: {option}')
         try:
             option_prompts = {
-    'Proofread': (
-        'Proofread this:\n\n',
-        'You are a grammar proofreading assistant. Output ONLY the corrected text without any additional comments. Maintain the original text structure and writing style. Respond in the same language as the input (e.g., English US, French). If the text is incompatible with this (e.g., random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-    ),
-    'Rewrite': (
-        'Rewrite this:\n\n',
-        'You are a writing assistant. Rewrite the text provided by the user to improve phrasing. Output ONLY the rewritten text without additional comments. Respond in the same language as the input (e.g., English US, French). If the text is incompatible with proofreading (e.g., random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-    ),
-    'Friendly': (
-        'Make this more friendly:\n\n',
-        'You are a writing assistant. Rewrite the text provided by the user to be more friendly. Output ONLY the revised text without additional comments. Respond in the same language as the input (e.g., English US, French). If the text is incompatible with rewriting (e.g., random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-    ),
-    'Professional': (
-        'Make this more professional:\n\n',
-        'You are a writing assistant. Rewrite the text provided by the user to sound more professional. Output ONLY the revised text without additional comments. Respond in the same language as the input (e.g., English US, French). If the text is incompatible with this (e.g., random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-    ),
-    'Concise': (
-        'Make this more concise:\n\n',
-        'You are a writing assistant. Rewrite the text provided by the user to be more concise. Output ONLY the concise version without additional comments. Respond in the same language as the input (e.g., English US, French). If the text is incompatible with this (e.g., random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-    ),
-    'Summary': (
-        'Summarize this:\n\n',
-        'You are a summarization assistant. Provide a concise summary of the text provided by the user. Output ONLY the summary without additional comments. Respond in the same language as the input (e.g., English US, French). If the text is incompatible with summarization (e.g., random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-    ),
-    'Key Points': (
-        'Extract key points from this:\n\n',
-        'You are an assistant that extracts key points from text provided by the user. Output ONLY the key points without additional comments. Respond in the same language as the input (e.g., English US, French). If the text is incompatible with with extracting key points (e.g., random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-    ),
-    'Table': (
-        'Convert this into a table:\n\n',
-        'You are an assistant that converts text provided by the user into a table. Output ONLY the table without additional comments. Respond in the same language as the input (e.g., English US, French). If the text is incompatible with this with conversion, output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-    ),
-    'Custom': (
-        'Make the following change to this text:\n\n',
-        'You are a writing assistant. You MUST make the user\'s described change to the text provided by the user. Output ONLY the appropriately modified text without additional comments. Respond in the same language as the input (e.g., English US, French). If the text is completely incompatible with the requested change, output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-    )
-}
+                'Proofread': (
+                    'Proofread this:\n\n',
+                    'You are a grammar proofreading assistant. Output ONLY the corrected text without any additional comments. Maintain the original text structure and writing style. Respond in the same language as the input (e.g., English US, French). If the text is absolutely incompatible with this (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+                ),
+                'Rewrite': (
+                    'Rewrite this:\n\n',
+                    'You are a writing assistant. Rewrite the text provided by the user to improve phrasing. Output ONLY the rewritten text without additional comments. Respond in the same language as the input (e.g., English US, French). If the text is absolutely incompatible with proofreading (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+                ),
+                'Friendly': (
+                    'Make this more friendly:\n\n',
+                    'You are a writing assistant. Rewrite the text provided by the user to be more friendly. Output ONLY the revised text without additional comments. Respond in the same language as the input (e.g., English US, French). If the text is absolutely incompatible with rewriting (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+                ),
+                'Professional': (
+                    'Make this more professional:\n\n',
+                    'You are a writing assistant. Rewrite the text provided by the user to sound more professional. Output ONLY the revised text without additional comments. Respond in the same language as the input (e.g., English US, French). If the text is absolutely incompatible with this (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+                ),
+                'Concise': (
+                    'Make this more concise:\n\n',
+                    'You are a writing assistant. Rewrite the text provided by the user to be more concise. Output ONLY the concise version without additional comments. Respond in the same language as the input (e.g., English US, French). If the text is absolutely incompatible with this (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+                ),
+                'Summary': (
+                    'Summarize this:\n\n',
+                    'You are a summarization assistant. Provide a concise summary of the text provided by the user. Output ONLY the summary without additional comments. Respond in the same language as the input (e.g., English US, French). If the text is absolutely incompatible with summarization (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+                ),
+                'Key Points': (
+                    'Extract key points from this:\n\n',
+                    'You are an assistant that extracts key points from text provided by the user. Output ONLY the key points without additional comments. Respond in the same language as the input (e.g., English US, French). If the text is absolutely incompatible with with extracting key points (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+                ),
+                'Table': (
+                    'Convert this into a table:\n\n',
+                    'You are an assistant that converts text provided by the user into a table. Output ONLY the table without additional comments. Respond in the same language as the input (e.g., English US, French). If the text is absolutely incompatible with this with conversion, output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+                ),
+                'Custom': (
+                    'Make the following change to this text:\n\n',
+                    'You are a writing and coding assistant. You MUST make the user\'s described change to the text or code provided by the user. Output ONLY the appropriately modified text or code without additional comments. Respond in the same language as the input (e.g., English US, French). If the text or code is absolutely incompatible with the requested change, output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+                )
+            }
 
-            prompt_prefix, system_instruction = option_prompts.get(option, ('', ''))
-            if option == 'Custom':
-                prompt = f"{prompt_prefix}Described change: {custom_change}\n\nText: {selected_text}"
+            if selected_text.strip() == '':
+                # No selected text
+                if option == 'Custom':
+                    prompt = custom_change
+                    system_instruction = "You are a helpful assistant to the user. The user cannot follow-up with you after your single response to them, so do not ask them questions."
+                else:
+                    self.show_message_signal.emit('Error', 'Please select text to use this option.')
+                    return
             else:
-                prompt = f"{prompt_prefix}{selected_text}"
+                prompt_prefix, system_instruction = option_prompts.get(option, ('', ''))
+                if option == 'Custom':
+                    prompt = f"{prompt_prefix}Described change: {custom_change}\n\nText: {selected_text}"
+                else:
+                    prompt = f"{prompt_prefix}{selected_text}"
 
             self.output_queue = ""
 
@@ -286,6 +289,7 @@ class WritingToolApp(QtWidgets.QApplication):
             logging.error(f'An error occurred: {e}', exc_info=True)
             self.show_message_signal.emit('Error', f'An error occurred: {e}')
 
+
     @Slot(str, str)
     def show_message_box(self, title, message):
         """
@@ -293,38 +297,28 @@ class WritingToolApp(QtWidgets.QApplication):
         """
         QMessageBox.warning(None, title, message)
 
-    def queue_text(self, new_text):
+    def replace_text(self, new_text):
         """
         Replace the selected text with the new text generated by the AI.
         """
+
+        error_message = 'ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST'
+
         # Confirm new_text exists and is a string
         if new_text and isinstance(new_text, str):
             self.output_queue += new_text
 
-            logging.debug("Output queue: " + self.output_queue)
-        else:
-            logging.debug('No new text to replace')
+            # If the new text is the error message, show a message box
+            if self.output_queue == error_message:
+                self.show_message_signal.emit('Error', 'The text is incompatible with the requested change.')
+                return
 
-    def type_queue(self):
-        error_message = 'ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST'
+            # Check if the new text is approaching the error message
+            if self.output_queue in error_message:
+                return
 
-        # If the new text is the error message, show a message box
-        if self.output_queue == error_message or error_message in self.output_queue:
-            self.show_message_signal.emit('Error', 'The text is incompatible with the requested change.')
-            self.current_provider.cancel()
-
-            self.output_queue = ""
-            return
-
-        # Check if the new text is approaching the error message
-        if self.output_queue in error_message:
-            return
-
-        try:
-            if self.config.get("typing", False):
-                # Type the new text, instead of pasting.
-                keyboard.write(self.output_queue, delay=self.config.get("typing_delay", 0.01))
-            else:
+            logging.debug('Replacing text')
+            try:
                 # Backup the clipboard
                 clipboard_backup = pyperclip.paste()
 
@@ -336,14 +330,16 @@ class WritingToolApp(QtWidgets.QApplication):
                 keyboard.press_and_release('ctrl+v')
 
                 # Wait for the paste operation to complete
-                time.sleep(self.config.get("paste_delay", 0.1))
+                time.sleep(0.02)
 
                 # Restore the clipboard
                 pyperclip.copy(clipboard_backup)
 
-            self.output_queue = ""
-        except Exception as e:
-            logging.error(f'Error replacing text: {e}')
+                self.output_queue = ""
+            except Exception as e:
+                logging.error(f'Error replacing text: {e}')
+        else:
+            logging.debug('No new text to replace')
 
     def create_tray_icon(self):
         """
