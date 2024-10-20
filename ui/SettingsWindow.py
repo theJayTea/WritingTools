@@ -6,6 +6,7 @@ from aiprovider import AIProvider
 from PySide6 import QtCore, QtWidgets
 from PySide6.QtGui import QImage
 from PySide6.QtWidgets import QHBoxLayout, QRadioButton
+from PySide6.QtCore import QSettings
 
 from ui.UIUtils import UIUtils, colorMode
 
@@ -143,6 +144,13 @@ class SettingsWindow(QtWidgets.QWidget):
         self.streaming_checkbox.setChecked(self.app.config.get('streaming', False))
         content_layout.addWidget(self.streaming_checkbox)
 
+        # Checkbox for enabling start on boot
+        self.start_on_boot_checkbox = QtWidgets.QCheckBox("Start on boot")
+        self.start_on_boot_checkbox.setStyleSheet(f"font-size: 16px; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
+        self.start_on_boot_checkbox.setChecked(self.is_run_at_startup())
+        self.start_on_boot_checkbox.stateChanged.connect(self.toggle_run_at_startup)
+        content_layout.addWidget(self.start_on_boot_checkbox)
+
         # Setup dropdown to select provider
         provider_label = QtWidgets.QLabel("Choose AI Provider:")
         provider_label.setStyleSheet(f"font-size: 16px; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
@@ -258,3 +266,30 @@ class SettingsWindow(QtWidgets.QWidget):
 
         self.close()
         self.close()
+
+    def is_run_at_startup(self):
+        """
+        This Python function checks if a specific program is set to run at startup on a Windows system.
+        :return: The function `is_run_at_startup` is checking if a specific entry named "WritingTools"
+        exists in the Windows registry under the
+        "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run" key. If the entry exists, the
+        function will return `True`, indicating that the application is set to run at startup. If the
+        entry does not exist, the function will return `
+        """
+        settings = QSettings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings.NativeFormat)
+        return settings.contains("WritingTools")
+
+    def toggle_run_at_startup(self, state):
+        """
+        This Python function toggles a program to run at startup on Windows based on a specified state.
+        
+        :param state: The `state` parameter in the `toggle_run_at_startup` function is used to determine
+        whether a certain action should be taken based on its value. In this case, the function checks
+        if `state` is equal to 2 to determine if a certain setting should be enabled (Checked) or
+        disabled
+        """
+        settings = QSettings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings.NativeFormat)
+        if state == 2:  # Checked
+            settings.setValue("WritingTools", sys.executable + " " + __file__)
+        else:  # Unchecked
+            settings.remove("WritingTools")
