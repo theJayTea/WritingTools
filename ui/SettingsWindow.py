@@ -269,7 +269,7 @@ class SettingsWindow(QtWidgets.QWidget):
 
     def is_run_at_startup(self):
         """
-        This Python function checks if a specific program is set to run at startup on a Windows system.
+        This function checks if a specific program is set to run at startup on a Windows system.
         :return: The function `is_run_at_startup` is checking if a specific entry named "WritingTools"
         exists in the Windows registry under the
         "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run" key. If the entry exists, the
@@ -281,7 +281,7 @@ class SettingsWindow(QtWidgets.QWidget):
 
     def toggle_run_at_startup(self, state):
         """
-        This Python function toggles a program to run at startup on Windows based on a specified state.
+        This function toggles a program to run at startup on Windows based on a specified state.
         
         :param state: The `state` parameter in the `toggle_run_at_startup` function is used to determine
         whether a certain action should be taken based on its value. In this case, the function checks
