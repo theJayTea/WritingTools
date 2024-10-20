@@ -171,7 +171,7 @@ class Gemini15FlashProvider(AIProvider):
             self.app.output_ready_signal.emit("An error occurred while streaming.")
         finally:
             self.close_requested = False
-            self.app.replace_text(True)
+            self.app.queue_text(True)
 
 
     def after_load(self):
@@ -246,11 +246,11 @@ class OpenAICompatibleProvider(AIProvider):
             finally:
                 response.close()
                 self.close_requested = False
-                self.app.replace_text(True)
+                self.app.queue_text(True)
 
         else:
             self.app.output_ready_signal.emit(response.choices[0].message.content.strip())
-            self.app.replace_text(True)
+            self.app.queue_text(True)
 
     def after_load(self):
         self.client = OpenAI(api_key=self.api_key, base_url=self.api_base, organization=self.api_organisation, project=self.api_project)
