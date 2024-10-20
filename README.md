@@ -10,7 +10,7 @@ Writing Tools is an Apple Intelligence-inspired application for Windows that sup
 
 Aside from being the only Windows program that works like Apple's Writing Tools:
 
-- **Versatile AI LLM Support**: Jump in quickly with support for the **free Gemini API**, or use an extensive range of **local LLMs** (via llama.cpp, KoboldCPP, Ollama, TabbyAPI, vLLM, etc.) or **cloud-based LLMs** (ChatGPT, Mistral AI, Anthropic, etc.) with Writing Tools' OpenAI-API-Compatibility.
+- **Versatile AI LLM Support**: Jump in quickly with support for the **free Gemini API**, or use an extensive range of **local LLMs** (via Ollama, llama.cpp, KoboldCPP, TabbyAPI, vLLM, etc.) or **cloud-based LLMs** (ChatGPT, Mistral AI, Anthropic, etc.) with Writing Tools' OpenAI-API-Compatibility.
 - **System-wide Functionality**: Works instantly in **any application** where you can select text. **Does not overwrite your clipboard**.
 - **Completely free and Open-source**: No subscriptions, no hidden costs. Bloat-free & uses pretty much **0% of your CPU**.
 - **Chat Mode**: Invoke Writing Tools with no text selected to enter a chat mode for quick queries and assistance.
@@ -49,6 +49,12 @@ Invoke Writing Tools with no text selected to enter a chat mode.
    *Note: If you extract Writing Tools into a protected system folder like Program Files, you'll need to run it as administrator at least on the first launch or it won't be able to create/edit its config file (in the same folder as its exe).*
    
 3. To let it automatically start when you boot your PC, add a shortcut of the `Writing Tools.exe` to the Windows Start-Up folder (Open Run and type `shell:startup` to get to this folder). 
+
+## 🦙 (optional) Ollama Local LLM Instructions:
+1. [Download](https://ollama.com/download) and install Ollama.
+2. Choose the LLM you want to use form [here](https://ollama.com/library). Recommended: Llama 3.1 8B if you have ~8GB of RAM or VRAM.
+3. Open your terminal, and type `ollama run llama3.1:8b`. This will download and run Llama 3.1. That's it! Leave this running in the background.
+4. In Writing Tools, choose the `OpenAl Compatible` AI Provider, and set your API Key to `ollama`, your API Base URL to `http://localhost:11434/v1`, and your API Model to `llama3.1:8b`. Enjoy Writing Tools with _absolute_ privacy and no internet connection! 🎉
 
 ## 🔒 Privacy
 
