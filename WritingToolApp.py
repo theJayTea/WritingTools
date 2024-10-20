@@ -309,21 +309,25 @@ class WritingToolApp(QtWidgets.QApplication):
 
             logging.debug('Replacing text')
             try:
-                # Backup the clipboard
-                clipboard_backup = pyperclip.paste()
+                if self.config.get("typing", False):
+                    # Type the new text, instead of pasting.
+                    keyboard.write(self.output_queue)
+                else:
+                    # Backup the clipboard
+                    clipboard_backup = pyperclip.paste()
 
-                # Set the clipboard to the new text
-                pyperclip.copy(self.output_queue)
+                    # Set the clipboard to the new text
+                    pyperclip.copy(self.output_queue)
 
-                # Simulate Ctrl+V
-                logging.debug('Simulating Ctrl+V')
-                keyboard.press_and_release('ctrl+v')
+                    # Simulate Ctrl+V
+                    logging.debug('Simulating Ctrl+V')
+                    keyboard.press_and_release('ctrl+v')
 
-                # Wait for the paste operation to complete
-                time.sleep(0.1)
+                    # Wait for the paste operation to complete
+                    time.sleep(0.1)
 
-                # Restore the clipboard
-                pyperclip.copy(clipboard_backup)
+                    # Restore the clipboard
+                    pyperclip.copy(clipboard_backup)
 
                 self.output_queue = ""
             except Exception as e:
