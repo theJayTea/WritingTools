@@ -1,6 +1,6 @@
 # Writing Tools
 
-https://github.com/user-attachments/assets/f1a7ffd5-4776-4298-bdd0-9fbb4082914c
+https://github.com/user-attachments/assets/d3ce4694-b593-45ff-ae9a-892ce94b1dc8
 
 ## 🚀 What is Writing Tools?
 
