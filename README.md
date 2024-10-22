@@ -42,7 +42,7 @@ Invoke Writing Tools with no text selected to enter a chat mode.
 
 ## 🛠 Installation
 
-1. Go to the [Releases](https://github.com/theJayTea/WritingTools/releases) page and download the latest `Writing.Tools.zip` file.
+1. Go to the [Releases](https://github.com/theJayTea/WritingTools/releases) page and download the latest `Writing.Tools.zip` file. For Linux and macOS, run it from source with the instructions further below.
    
 2. Extract it where you want, run `Writing Tools.exe`, and enjoy! :D
 
@@ -76,18 +76,45 @@ Note: Privacy policies may vary depending on the AI provider you choose. Please 
 
 4. The initial launch of the `Writing Tools.exe` might take unusually long — this seems to be because AV software extensively scans this new executable before letting it run. Once it launches into the background in RAM, it works instantly as usual.
  
-## 👨‍💻 To run Writing Tools directly from the code
+## 👨‍💻 To Run Writing Tools Directly from the Source Code
 
-If you prefer to run it directly from the `main.py` file:
+If you prefer to run the program directly from the `main.py` file, follow these OS-specific instructions.
 
-1. Download the code by clicking this button above:
+The code in the macOS folder is more outdated, but will work on macOS. The code in the Windows_and_Linux folder is slightly improved, and has been refactored to be cross-platform so it may work on macOS too!
+
+**1. Download the Code**
+- Click the download button:
    ![image](https://github.com/user-attachments/assets/4c6cab79-4918-451c-9ad1-1bbcf8472275)
 
-2. Right-click the folder of the code you downloaded, and click Open in Terminal.
-   You'll only have to do this once: Type `pip install -r requirements.txt`.
-   Of course, you'll need to have [Python installed!](https://www.python.org/downloads/).
 
-3. Any time you want to run the program, just type `python main.py` in your terminal.
+**2. Install Dependencies**  
+After extracting the folder, open your **Terminal** (or **Command Prompt**) in the relevant directory.
+
+- Windows:
+   ```bash
+   cd path\to\Windows_and_Linux
+   pip install -r requirements.txt
+   ```
+
+- macOS/Linux:
+   ```bash
+   cd /path/to/Windows_and_Linux
+   pip3 install -r requirements.txt
+   ```
+
+Make sure [Python is installed](https://www.python.org/downloads/)!
+
+
+**3. Run the Program**
+- **Windows:**
+   ```bash
+   pythonw main.py
+   ```
+- **macOS/Linux:**
+   ```bash
+   python3 main.py
+   ```
+
 
 ## 👨‍💻 To compile the application yourself:
 
