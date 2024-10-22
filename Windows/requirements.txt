@@ -1,0 +1,7 @@
+darkdetect
+google-generativeai
+openai
+keyboard
+pyperclip
+pywin32
+PySide6
