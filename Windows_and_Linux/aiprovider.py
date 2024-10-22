@@ -165,7 +165,8 @@ class Gemini15FlashProvider(AIProvider):
                 if self.close_requested:
                     break
                 else:
-                    self.app.output_ready_signal.emit(chunk.text)
+                    # Strip any trailing newlines from chunks
+                    self.app.output_ready_signal.emit(chunk.text.rstrip('\n'))
         except Exception as e:
             logging.error(f"Error while streaming: {e}")
             self.app.output_ready_signal.emit("An error occurred while streaming.")
@@ -237,7 +238,9 @@ class OpenAICompatibleProvider(AIProvider):
                     if self.close_requested:
                         break
                     else:
-                        self.app.output_ready_signal.emit(chunk.choices[0].delta.content)
+                        # Strip any trailing newlines from chunks
+                        if chunk.choices[0].delta.content:
+                            self.app.output_ready_signal.emit(chunk.choices[0].delta.content.rstrip('\n'))
 
             except Exception as e:
                 logging.error(f"Error while streaming: {e}")
@@ -249,6 +252,7 @@ class OpenAICompatibleProvider(AIProvider):
                 self.app.replace_text(True)
 
         else:
+            # Strip any trailing newlines from the complete response
             self.app.output_ready_signal.emit(response.choices[0].message.content.strip())
             self.app.replace_text(True)
 

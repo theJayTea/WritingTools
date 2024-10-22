@@ -14,7 +14,9 @@ class SettingsWindow(QtWidgets.QWidget):
     """
     The settings window for the application.
     """
-    def __init__(self, app, providers_only = False):
+    close_signal = QtCore.Signal()
+
+    def __init__(self, app, providers_only=False):
         super().__init__()
         self.app = app
         self.current_provider_layout = None
@@ -32,19 +34,29 @@ class SettingsWindow(QtWidgets.QWidget):
 
         self.current_provider_layout = QtWidgets.QVBoxLayout(self.background)
 
+        # Create a horizontal layout for the logo and provider name
+        provider_header_layout = QtWidgets.QHBoxLayout()
+        provider_header_layout.setSpacing(10)
+        provider_header_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+
         if provider.logo:
             logo_path = os.path.join(os.path.dirname(sys.argv[0]), 'icons', f"provider_{provider.logo}.png")
             if os.path.exists(logo_path):
-                targetPixmap = UIUtils.resize_and_round_image(QImage(logo_path), 100, 50)
+                # Adjust the size of the icon to be smaller
+                targetPixmap = UIUtils.resize_and_round_image(QImage(logo_path), 30, 15)
 
                 logo_label = QtWidgets.QLabel()
                 logo_label.setPixmap(targetPixmap)
+                logo_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignVCenter)
 
-                self.current_provider_layout.addWidget(logo_label, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
+                provider_header_layout.addWidget(logo_label)
 
         provider_name_label = QtWidgets.QLabel(provider.provider_name)
-        provider_name_label.setStyleSheet(f"font-size: 24px; font-weight: bold; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
-        self.current_provider_layout.addWidget(provider_name_label, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
+        provider_name_label.setStyleSheet(f"font-size: 18px; font-weight: bold; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
+        provider_name_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignVCenter)
+        provider_header_layout.addWidget(provider_name_label)
+
+        self.current_provider_layout.addLayout(provider_header_layout)
 
         if provider.description:
             description_label = QtWidgets.QLabel(provider.description)
@@ -88,6 +100,7 @@ class SettingsWindow(QtWidgets.QWidget):
             setting.render_to_layout(self.current_provider_layout)
 
         layout.addLayout(self.current_provider_layout)
+
 
     def init_ui(self):
         """
@@ -255,6 +268,11 @@ class SettingsWindow(QtWidgets.QWidget):
         app.current_provider.load_config(app.config.get("providers", {}).get(provider_name, {}))
 
         app.register_hotkey()
+        self.providers_only = False  # this way we don't stop the main program
+        self.close()
 
-        self.close()
-        self.close()
+    def closeEvent(self, event):
+        # Emit the close signal
+        if self.providers_only:
+            self.close_signal.emit()
+        super().closeEvent(event)
