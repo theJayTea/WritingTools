@@ -102,9 +102,17 @@ Ideally, run this in a Python venv.
 
 Writing Tools would not be where it is today without its amazing contributors:
 
-1. [Cameron Redmore (CameronRedmore)](https://github.com/CameronRedmore): Extensively refactored Writing Tools and added OpenAI Compatible API support, streamed responses, and the chat mode when no text is selected.
+**1. [Cameron Redmore (CameronRedmore)](https://github.com/CameronRedmore):**
 
-2. [Disneyhockey40 (Soszust40)](https://github.com/Disneyhockey40): Helped add dark mode, the plain theme, tray menu fixes, and UI improvements.
+Extensively refactored Writing Tools and added OpenAI Compatible API support, streamed responses, and the chat mode when no text is selected.
+
+**2. [momokrono](https://github.com/momokrono):**
+
+Added Linux support, and switched to the pynput API to improve Windows stability. Fixed misc. bugs, such as handling quitting onboarding without completing it.
+                
+**3. [Disneyhockey40 (Soszust40)](https://github.com/Disneyhockey40):**
+
+Helped add dark mode, the plain theme, tray menu fixes, and UI improvements.
 
 ## 🤝 Contributing
 
