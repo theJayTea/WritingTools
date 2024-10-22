@@ -66,14 +66,15 @@ I believe strongly in protecting your privacy. Writing Tools:
 Note: Privacy policies may vary depending on the AI provider you choose. Please review the terms of service for your selected provider.
 
 ## 🐞 Known Issues
-1. On some devices, Writing Tools does not work correctly with the default hotkey.
+1. (Potential fix being investigated) On some devices, Writing Tools does not work correctly with the default hotkey.
    To fix it, simply change the hotkey to **ctrl+`** or **ctrl+j** and restart Writing Tools.
    PS: If a hotkey is already in use by a program or background process, Writing Tools may not be able to intercept it. The above hotkeys are usualy unused.
 
-2. If you lock and unlock your PC, Writing Tools may not be able to detect your hotkey unless you relaunch it. This is a [known issue](https://stackoverflow.com/questions/67505554/python-keyboard-module-add-hotkey-is-not-working-after-you-lock-windows-once-he) with its hotkey detection library.
-This will be fixed in the future by moving to a much more reliable hotkey library (which should also fix the first issue!). 
+2. (Fix almost ready!) If you lock and unlock your PC, Writing Tools may not be able to detect your hotkey unless you relaunch it.
 
-3. The initial launch of the `Writing Tools.exe` might take unusually long — this seems to be because AV software extensively scans this new executable before letting it run. Once it launches into the background in RAM, it works instantly as usual.
+3. (Fix almost ready!) Writing Tools may not work in Microsoft Word.
+
+4. The initial launch of the `Writing Tools.exe` might take unusually long — this seems to be because AV software extensively scans this new executable before letting it run. Once it launches into the background in RAM, it works instantly as usual.
  
 ## 👨‍💻 To run Writing Tools directly from the code
 
