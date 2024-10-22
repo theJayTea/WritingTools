@@ -31,9 +31,7 @@ class AboutWindow(QtWidgets.QWidget):
 
         about_text = """
                 <p style='text-align: center;'>
-                • Writing Tools is a free & lightweight tool that helps you improve your writing with AI, similar to Apple's new Apple Intelligence feature.<br>
-                • It works with an extensive range of AI LLMs, both online and locally run.<br>
-                • Almost any AI model you choose will perform significantly better than Apple's <i>tiny</i> 3B parameter model!<br><br>
+                Writing Tools is a free & lightweight tool that helps you improve your writing with AI, similar to Apple's new Apple Intelligence feature. It works with an extensive range of AI LLMs, both online and locally run.<br>
                 </p>
                 <p style='text-align: center;'>
                 <b>Created with care by Jesai, a high school student.</b><br><br>
@@ -43,12 +41,14 @@ class AboutWindow(QtWidgets.QWidget):
                 <p style='text-align: center;'>
                 <b>⭐ Writing Tools would not be where it is today without its <u>amazing</u> contributors:</b><br><br>
                 <b>1. <a href="https://github.com/CameronRedmore">Cameron Redmore (CameronRedmore)</a>:</b><br>
-                <b>Extensively</b> refactored Writing Tools and added OpenAI Compatible API support, streamed responses, and the text generation mode when no text is selected.</b><br><br><br>
-                <b>2. <a href="https://github.com/Disneyhockey40">Disneyhockey40 (Soszust40)</a>:</b><br>
+                Extensively refactored Writing Tools and added OpenAI Compatible API support, streamed responses, and the text generation mode when no text is selected.<br><br><br>
+                <b>2. <a href="https://github.com/momokrono">momokrono</a>:</b><br>
+                Added Linux support, and switched to the pynput API to improve Windows stability. Fixed misc. bugs, such as handling quitting onboarding without completing it.<br><br><br>
+                <b>3. <a href="https://github.com/Disneyhockey40">Disneyhockey40 (Soszust40)</a>:</b><br>
                 Helped add dark mode, the plain theme, tray menu fixes, and UI improvements.</b><br><br>
                 </p>
                 <p style='text-align: center;'>
-                <b>Version:</b> 3.0 (Codename: Radically_Refactored)
+                <b>Version:</b> 4.0 (Codename: Optimized_Output)
                 </p>
                 """
 
