@@ -81,7 +81,7 @@ class AboutWindow(QtWidgets.QWidget):
         """
         Open the GitHub releases page to check for updates.
         """
-        webbrowser.open("https://github.com/CameronRedmore/WritingTools/releases")
+        webbrowser.open("https://github.com/theJayTea/WritingTools/releases")
 
     def original_app(self):
         """
