@@ -8,7 +8,7 @@ Writing Tools is an Apple Intelligence-inspired application for Windows, Linux, 
 
 ### 🌟 Why Choose Writing Tools?
 
-Aside from being the only Windows program that works like Apple's Writing Tools:
+Aside from being the only Windows/Linux program that works like Apple's Writing Tools:
 
 - **Versatile AI LLM Support**: Jump in quickly with support for the **free Gemini API**, or use an extensive range of **local LLMs** (via Ollama *[instructions below]*, llama.cpp, KoboldCPP, TabbyAPI, vLLM, etc.) or **cloud-based LLMs** (ChatGPT, Mistral AI, etc.) with Writing Tools' OpenAI-API-Compatibility.
 - **System-wide Functionality**: Works instantly in **any application** where you can select text. **Does not overwrite your clipboard**.
