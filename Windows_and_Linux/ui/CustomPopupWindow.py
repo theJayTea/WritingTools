@@ -47,14 +47,14 @@ class CustomPopupWindow(QtWidgets.QWidget):
         close_button.setStyleSheet(f"""
             QPushButton {{
                 background-color: transparent;
-                color: {'#ffffff' if colorMode == 'dark' else '#333333'};
+                color: {'#1c1c1c' if colorMode == 'dark' else '#333333'};
                 font-size: 20px;
                 border: none;
                 border-radius: 12px;
                 padding: 0px;
             }}
             QPushButton:hover {{
-                background-color: {'#333333' if colorMode == 'dark' else '#ebebeb'};
+                background-color: {'#e81123' if colorMode == 'dark' else '#ebebeb'};
                 color: {'#ffffff' if colorMode == 'dark' else '#333333'};
             }}
         """)
