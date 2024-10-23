@@ -4,7 +4,7 @@ https://github.com/user-attachments/assets/d3ce4694-b593-45ff-ae9a-892ce94b1dc8
 
 ## 🚀 What is Writing Tools?
 
-Writing Tools is an Apple Intelligence-inspired application for Windows that supercharges your writing with AI LLMs. It lets you fix up grammar and more with one hotkey press, system-wide. It's currently the world's most intelligent system-wide grammar assistant.
+Writing Tools is an Apple Intelligence-inspired application for Windows, Linux, and macOS (alpha) that supercharges your writing with AI LLMs. It lets you fix up grammar and more with one hotkey press, system-wide. It's currently the world's most intelligent system-wide grammar assistant.
 
 ### 🌟 Why Choose Writing Tools?
 
