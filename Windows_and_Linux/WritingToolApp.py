@@ -464,8 +464,8 @@ class WritingToolApp(QtWidgets.QApplication):
         logging.debug('Showing settings window')
         # Always create a new settings window to handle providers_only correctly
         self.settings_window = SettingsWindow(self, providers_only=providers_only)
+        self.settings_window.close_signal.connect(self.exit_app)
         self.settings_window.show()
-
 
     def show_about(self):
         """
