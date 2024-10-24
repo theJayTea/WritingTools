@@ -33,7 +33,7 @@ class CustomPopupWindow(QtWidgets.QWidget):
         main_layout.setContentsMargins(0, 0, 0, 0)
 
         # Theme background
-        self.background = ThemeBackground(self, self.app.config.get('theme', 'gradient'), is_popup=True)
+        self.background = ThemeBackground(self, self.app.config.get('theme', 'gradient'), is_popup=True, border_radius=10)
         main_layout.addWidget(self.background)
 
         # Content layout
@@ -167,16 +167,6 @@ class CustomPopupWindow(QtWidgets.QWidget):
         """
         super().showEvent(event)
         logging.debug(f'CustomPopupWindow shown. Geometry: {self.geometry()}')
-
-    def paintEvent(self, event):
-        """
-        Override the paint event to create rounded corners for the window.
-        """
-        path = QtGui.QPainterPath()
-        path.addRoundedRect(QtCore.QRectF(self.rect()), 10, 10)
-        mask = QtGui.QRegion(path.toFillPolygon().toPolygon())
-        self.setMask(mask)
-        logging.debug(f'CustomPopupWindow paint event. Mask applied. Window visible: {self.isVisible()}')
 
     def on_custom_change(self):
         """
