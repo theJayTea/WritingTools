@@ -70,6 +70,6 @@ class ThemeBackground(QtWidgets.QWidget):
             painter.drawPixmap(self.rect(), background_image)
         else:
             if colorMode == 'dark':
-                painter.fillRect(self.rect(), QtGui.QColor(35, 35, 35))  # Dark mode color
+                painter.fillRect(self.rect(), QtGui.QColor(28, 28, 28))  # Dark mode color
             else:
                 painter.fillRect(self.rect(), QtGui.QColor(222, 222, 222))  # Light mode color

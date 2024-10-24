@@ -47,14 +47,14 @@ class CustomPopupWindow(QtWidgets.QWidget):
         close_button.setStyleSheet(f"""
             QPushButton {{
                 background-color: transparent;
-                color: {'#ffffff' if colorMode == 'dark' else '#333333'};
+                color: {'#1c1c1c' if colorMode == 'dark' else '#333333'};
                 font-size: 20px;
                 border: none;
                 border-radius: 12px;
                 padding: 0px;
             }}
             QPushButton:hover {{
-                background-color: {'#333333' if colorMode == 'dark' else '#ebebeb'};
+                background-color: {'#e81123' if colorMode == 'dark' else '#ebebeb'};
                 color: {'#ffffff' if colorMode == 'dark' else '#333333'};
             }}
         """)
@@ -121,7 +121,7 @@ class CustomPopupWindow(QtWidgets.QWidget):
                 button = QtWidgets.QPushButton(label)
                 button.setStyleSheet(f"""
                     QPushButton {{
-                        background-color: {'#444' if colorMode == 'dark' else 'white'};
+                        background-color: {'#282828' if colorMode == 'dark' else 'white'};
                         border: 1px solid {'#666' if colorMode == 'dark' else '#ccc'};
                         border-radius: 8px;
                         padding: 10px;
@@ -130,7 +130,7 @@ class CustomPopupWindow(QtWidgets.QWidget):
                         color: {'#ffffff' if colorMode == 'dark' else '#000000'};
                     }}
                     QPushButton:hover {{
-                        background-color: {'#555' if colorMode == 'dark' else '#f0f0f0'};
+                        background-color: {'#282828' if colorMode == 'dark' else '#f0f0f0'};
                     }}
                 """)
                 icon_full_path = os.path.join(os.path.dirname(sys.argv[0]), icon_path)
