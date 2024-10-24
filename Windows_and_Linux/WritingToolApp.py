@@ -14,7 +14,7 @@ from PySide6.QtCore import Signal, Slot
 from PySide6.QtGui import QCursor, QGuiApplication
 from PySide6.QtWidgets import QMessageBox
 
-from aiprovider import Gemini15FlashProvider, OpenAICompatibleProvider
+from aiprovider import Gemini15FlashProvider, OpenAICompatibleProvider, OllamaProvider
 from ui.AboutWindow import AboutWindow
 from ui.CustomPopupWindow import CustomPopupWindow
 from ui.OnboardingWindow import OnboardingWindow
@@ -53,7 +53,7 @@ class WritingToolApp(QtWidgets.QApplication):
         self.setup_ctrl_c_listener()
 
         # Setup available AI providers
-        self.providers = [Gemini15FlashProvider(self), OpenAICompatibleProvider(self)]
+        self.providers = [Gemini15FlashProvider(self), OpenAICompatibleProvider(self), OllamaProvider(self)]
 
         if not self.config:
             logging.debug('No config found, showing onboarding')

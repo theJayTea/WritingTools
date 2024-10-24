@@ -5,10 +5,10 @@ from typing import List
 
 import google.generativeai as genai
 from google.generativeai.types import HarmBlockThreshold, HarmCategory
+from ollama import Client as OllamaClient
 from openai import OpenAI
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QVBoxLayout
-
 from ui.UIUtils import colorMode
 
 
@@ -30,6 +30,7 @@ class AIProviderSetting(ABC):
     @abstractmethod
     def get_value(self):
         pass
+
 
 class TextSetting(AIProviderSetting):
     def __init__(self, name: str, display_name: str = None, default_value: str = None, description: str = None):
@@ -131,6 +132,7 @@ class AIProvider(ABC):
         """
         pass
 
+
 class Gemini15FlashProvider(AIProvider):
 
     def __init__(self, app):
@@ -173,7 +175,6 @@ class Gemini15FlashProvider(AIProvider):
         finally:
             self.close_requested = False
             self.app.replace_text(True)
-
 
     def after_load(self):
         genai.configure(api_key=self.api_key)
@@ -258,6 +259,64 @@ class OpenAICompatibleProvider(AIProvider):
 
     def after_load(self):
         self.client = OpenAI(api_key=self.api_key, base_url=self.api_base, organization=self.api_organisation, project=self.api_project)
+
+    def before_load(self):
+        self.client = None
+
+    def cancel(self):
+        self.close_requested = True
+
+
+class OllamaProvider(AIProvider):
+    def __init__(self, app):
+        """
+        Initialize the Local OpenAI-compatible provider.
+        """
+        self.close_requested = None
+        self.client = None
+        self.app = app
+        settings = [
+            TextSetting("api_base", "API Base URL", "http://localhost:11434", "Eg. http://localhost:11434"),
+            TextSetting("api_model", "API Model", "llama3.1:latest", "Eg. llama3.1:latest"),
+        ]
+
+        super().__init__(app, "Ollama (For Experts)", settings, "• Connect to an Ollama server.", "ollama", "Discover Ollama", lambda: webbrowser.open("https://ollama.com"))
+
+    def get_response(self, system_instruction: str, prompt: str):
+        self.close_requested = False
+        streaming = self.app.config.get("streaming", False)
+
+        messages = [
+            {"role": "system", "content": system_instruction},
+            {"role": "user", "content": prompt}
+        ]
+
+        if streaming:
+            try:
+                stream = self.client.chat(model=self.api_model, messages=messages, stream=streaming)
+                for chunk in stream:
+                    if self.close_requested:
+                        break
+                    self.app.output_ready_signal.emit(chunk['message']['content'].rstrip('\n'))
+
+            except Exception as e:
+                logging.error(f"Error while streaming: {e}")
+                self.app.output_ready_signal.emit("An error occurred while streaming.")
+                self.close_requested = True
+
+            finally:
+                self.app.replace_text(True)
+
+        else:
+            try:
+                response = self.client.chat(model=self.api_model, messages=messages)
+                self.app.output_ready_signal.emit(response['message']['content'].strip())
+                self.app.replace_text(True)
+            except Exception as e:
+                logging.error(f"Error during Ollama chat: {e}")
+
+    def after_load(self):
+        self.client = OllamaClient(host=self.api_base)
 
     def before_load(self):
         self.client = None
