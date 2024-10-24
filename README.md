@@ -52,9 +52,14 @@ Invoke Writing Tools with no text selected to enter a chat mode.
 
 ## 🦙 (optional) Ollama Local LLM Instructions:
 1. [Download](https://ollama.com/download) and install Ollama.
-2. Choose the LLM you want to use form [here](https://ollama.com/library). Recommended: Llama 3.1 8B if you have ~8GB of RAM or VRAM.
-3. Open your terminal, and type `ollama run llama3.1:8b`. This will download and run Llama 3.1. That's it! Leave this running in the background.
-4. In Writing Tools, choose the `OpenAl Compatible` AI Provider, and set your API Key to `ollama`, your API Base URL to `http://localhost:11434/v1`, and your API Model to `llama3.1:8b`. Enjoy Writing Tools with _absolute_ privacy and no internet connection! 🎉
+2. Choose the LLM you want to use form [here](https://ollama.com/library). Recommended: Llama 3.1 8B if you have ~8GB of RAM or VRAM. If instead you are below that, try Gemma2:2b.
+3. Open your terminal, and type `ollama serve` to start the server. Don't close the terminal, leave `ollama` running in the background.
+4. Download the model you want to use by running `ollama pull <model-name>` in another terminal, for example: `ollama pull llama3.1` or `ollama pull gemma2:2b`. This will download your model and make it available for use. That's it!
+5. In Writing Tools, choose the `OpenAl Compatible` AI Provider, and set your API Key to `ollama`, your API Base URL to `http://localhost:11434/v1`, and your API Model to `llama3.1:latest`. Enjoy Writing Tools with _absolute_ privacy and no internet connection! 🎉
+
+## 🖥️ (optional) Other Local OpenAI-compatible LLMs (for experts):
+1. In Writing Tools, choose the `OpenAl Compatible` AI Provider and as API Base URL enter your local server address.
+2. If your server provides an API key, like TabbyAPI, set it inside the API field. If it doesn't, like KoboldCpp, set the API key to a random string, even something like "a" will suffice.
 
 ## 🔒 Privacy
 
