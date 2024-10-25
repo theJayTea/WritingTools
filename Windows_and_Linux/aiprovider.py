@@ -174,7 +174,6 @@ class Gemini15FlashProvider(AIProvider):
             self.close_requested = False
             self.app.replace_text(True)
 
-
     def after_load(self):
         genai.configure(api_key=self.api_key)
 

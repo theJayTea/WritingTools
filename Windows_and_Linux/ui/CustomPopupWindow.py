@@ -13,6 +13,7 @@ class CustomPopupWindow(QtWidgets.QWidget):
     def __init__(self, app, selected_text):
         super().__init__()
         self.app = app
+        self.app.close_popup_signal.connect(self.processing_done)
         self.selected_text = selected_text
         logging.debug('Initializing CustomPopupWindow')
         self.init_ui()
@@ -37,9 +38,9 @@ class CustomPopupWindow(QtWidgets.QWidget):
         main_layout.addWidget(self.background)
 
         # Content layout
-        content_layout = QtWidgets.QVBoxLayout(self.background)
-        content_layout.setContentsMargins(20, 0, 20, 20)
-        content_layout.setSpacing(10)
+        self.content_layout = QtWidgets.QVBoxLayout(self.background)
+        self.content_layout.setContentsMargins(20, 0, 20, 20)
+        self.content_layout.setSpacing(10)
 
         # Close button
         close_button = QtWidgets.QPushButton("×")
@@ -59,7 +60,13 @@ class CustomPopupWindow(QtWidgets.QWidget):
             }}
         """)
         close_button.clicked.connect(self.close)
-        content_layout.addWidget(close_button, 0, QtCore.Qt.AlignmentFlag.AlignRight)
+        self.content_layout.addWidget(close_button, 0, QtCore.Qt.AlignmentFlag.AlignRight)
+
+        # Loader layout
+        self.loader_bar = QtWidgets.QProgressBar()
+        self.loader_bar.setRange(0, 0)
+        self.loader_bar.setVisible(False)
+        self.content_layout.addWidget(self.loader_bar)
 
         # Custom change input and send button layout
         input_layout = QtWidgets.QHBoxLayout()
@@ -78,12 +85,11 @@ class CustomPopupWindow(QtWidgets.QWidget):
             }}
         """)
         self.custom_input.returnPressed.connect(self.on_custom_change)
-
         input_layout.addWidget(self.custom_input)
 
-        send_button = QtWidgets.QPushButton()
-        send_button.setIcon(QtGui.QIcon(os.path.join(os.path.dirname(sys.argv[0]), 'icons', 'send' + ('_dark' if colorMode == 'dark' else '_light') + '.png')))
-        send_button.setStyleSheet(f"""
+        self.send_button = QtWidgets.QPushButton()
+        self.send_button.setIcon(QtGui.QIcon(os.path.join(os.path.dirname(sys.argv[0]), 'icons', 'send' + ('_dark' if colorMode == 'dark' else '_light') + '.png')))
+        self.send_button.setStyleSheet(f"""
             QPushButton {{
                 background-color: {'#2e7d32' if colorMode == 'dark' else '#4CAF50'};
                 border: none;
@@ -94,17 +100,17 @@ class CustomPopupWindow(QtWidgets.QWidget):
                 background-color: {'#1b5e20' if colorMode == 'dark' else '#45a049'};
             }}
         """)
-        send_button.setFixedSize(self.custom_input.sizeHint().height(), self.custom_input.sizeHint().height())
-        send_button.clicked.connect(self.on_custom_change)
-        input_layout.addWidget(send_button)
+        self.send_button.setFixedSize(self.custom_input.sizeHint().height(), self.custom_input.sizeHint().height())
+        self.send_button.clicked.connect(self.on_custom_change)
+        input_layout.addWidget(self.send_button)
 
-        content_layout.addLayout(input_layout)
+        self.content_layout.addLayout(input_layout)
 
+        self.options_grid = None
         if has_text:
-
             # Options grid
-            options_grid = QtWidgets.QGridLayout()
-            options_grid.setSpacing(10)
+            self.options_grid = QtWidgets.QGridLayout()
+            self.options_grid.setSpacing(10)
 
             options = [
                 ('Proofread', 'icons/magnifying-glass' + ('_dark' if colorMode == 'dark' else '_light') + '.png', self.on_proofread),
@@ -139,9 +145,9 @@ class CustomPopupWindow(QtWidgets.QWidget):
                 button.clicked.connect(callback)
                 row = i // 2
                 col = i % 2
-                options_grid.addWidget(button, row, col)
+                self.options_grid.addWidget(button, row, col)
 
-            content_layout.addLayout(options_grid)
+            self.content_layout.addLayout(self.options_grid)
         else:
             self.custom_input.setMinimumWidth(300)
 
@@ -176,7 +182,7 @@ class CustomPopupWindow(QtWidgets.QWidget):
         path.addRoundedRect(QtCore.QRectF(self.rect()), 10, 10)
         mask = QtGui.QRegion(path.toFillPolygon().toPolygon())
         self.setMask(mask)
-        logging.debug(f'CustomPopupWindow paint event. Mask applied. Window visible: {self.isVisible()}')
+        # logging.debug(f'CustomPopupWindow paint event. Mask applied. Window visible: {self.isVisible()}')
 
     def on_custom_change(self):
         """
@@ -185,63 +191,54 @@ class CustomPopupWindow(QtWidgets.QWidget):
         custom_change = self.custom_input.text()
         if custom_change:
             self.app.process_option('Custom', self.selected_text, custom_change)
-            self.close()
 
     def on_proofread(self):
         """
         Handle the proofread request.
         """
         self.app.process_option('Proofread', self.selected_text)
-        self.close()
 
     def on_rewrite(self):
         """
         Handle the rewrite request.
         """
         self.app.process_option('Rewrite', self.selected_text)
-        self.close()
 
     def on_friendly(self):
         """
         Handle the make friendly request.
         """
         self.app.process_option('Friendly', self.selected_text)
-        self.close()
 
     def on_professional(self):
         """
         Handle the make professional request.
         """
         self.app.process_option('Professional', self.selected_text)
-        self.close()
 
     def on_concise(self):
         """
         Handle the make concise request.
         """
         self.app.process_option('Concise', self.selected_text)
-        self.close()
 
     def on_summary(self):
         """
         Handle the summarize request.
         """
         self.app.process_option('Summary', self.selected_text)
-        self.close()
 
     def on_keypoints(self):
         """
         Handle the extract key points request.
         """
         self.app.process_option('Key Points', self.selected_text)
-        self.close()
 
     def on_table(self):
         """
         Handle the convert to table request.
         """
         self.app.process_option('Table', self.selected_text)
-        self.close()
 
     def keyPressEvent(self, event):
         """
@@ -251,3 +248,16 @@ class CustomPopupWindow(QtWidgets.QWidget):
             self.close()
         else:
             super().keyPressEvent(event)
+
+    def processing_option(self):
+        self.loader_bar.setVisible(True)
+        self.custom_input.setEnabled(False)
+        self.send_button.setEnabled(False)
+        if self.options_grid is not None:
+            for i in range(self.options_grid.count()):
+                widget = self.options_grid.itemAt(i).widget()
+                widget.setEnabled(False)
+
+    def processing_done(self):
+        logging.debug("processing done, closing")
+        self.close()
