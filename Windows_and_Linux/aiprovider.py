@@ -278,6 +278,7 @@ class OllamaProvider(AIProvider):
         settings = [
             TextSetting("api_base", "API Base URL", "http://localhost:11434", "Eg. http://localhost:11434"),
             TextSetting("api_model", "API Model", "llama3.1:latest", "Eg. llama3.1:latest"),
+            TextSetting("keep_alive", "Time to keep the model loaded in memory in minutes", "5", "Eg. 5")
         ]
 
         super().__init__(app, "Ollama (For Experts)", settings, "• Connect to an Ollama server.", "ollama", "Discover Ollama", lambda: webbrowser.open("https://ollama.com"))
@@ -293,7 +294,7 @@ class OllamaProvider(AIProvider):
 
         if streaming:
             try:
-                stream = self.client.chat(model=self.api_model, messages=messages, stream=streaming)
+                stream = self.client.chat(model=self.api_model, messages=messages, stream=streaming, keep_alive=f'{self.keep_alive}m')
                 for chunk in stream:
                     if self.close_requested:
                         break
