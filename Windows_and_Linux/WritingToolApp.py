@@ -166,7 +166,13 @@ class WritingToolApp(QtWidgets.QApplication):
         Show the popup window when the hotkey is pressed.
         """
         logging.debug('Showing popup window')
+        # First attempt with default sleep
         selected_text = self.get_selected_text()
+
+        # Retry with longer sleep if no text captured
+        if not selected_text:
+            logging.debug('No text captured, retrying with longer sleep')
+            selected_text = self.get_selected_text(sleep_duration=0.5)
 
         logging.debug(f'Selected text: "{selected_text}"')
         try:
@@ -213,20 +219,21 @@ class WritingToolApp(QtWidgets.QApplication):
         except Exception as e:
             logging.error(f'Error showing popup window: {e}', exc_info=True)
 
-    def get_selected_text(self):
+    def get_selected_text(self, sleep_duration=0.2):
         """
         Get the currently selected text from any application.
+        Args:
+            sleep_duration (float): Time to wait for clipboard update
         """
         # Backup the clipboard
         clipboard_backup = pyperclip.paste()
-        logging.debug(f'Clipboard backup: "{clipboard_backup}"')
+        logging.debug(f'Clipboard backup: "{clipboard_backup}" (sleep: {sleep_duration}s)')
 
         # Clear the clipboard
         self.clear_clipboard()
 
         # Simulate Ctrl+C
         logging.debug('Simulating Ctrl+C')
-
         kbrd = pykeyboard.Controller()
 
         def press_ctrl_c():
@@ -238,7 +245,8 @@ class WritingToolApp(QtWidgets.QApplication):
         press_ctrl_c()
 
         # Wait for the clipboard to update
-        time.sleep(0.2)
+        time.sleep(sleep_duration)
+        logging.debug(f'Waited {sleep_duration}s for clipboard')
 
         # Get the selected text
         selected_text = pyperclip.paste()
