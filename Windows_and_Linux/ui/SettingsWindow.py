@@ -150,11 +150,17 @@ class SettingsWindow(QtWidgets.QWidget):
             theme_layout.addWidget(self.plain_radio)
             content_layout.addLayout(theme_layout)
 
+
+        """
+        # This option to enable streaming has been commented out as steaming does not currently work correctly - it makes the response slower, as even after the full response is collected from the LLM, it outputs it part by part in a slow way.
+
         # Checkbox for enabling streaming
         self.streaming_checkbox = QtWidgets.QCheckBox("Enable Response Streaming (experimental, not recommended)")
         self.streaming_checkbox.setStyleSheet(f"font-size: 16px; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
         self.streaming_checkbox.setChecked(self.app.config.get('streaming', False))
         content_layout.addWidget(self.streaming_checkbox)
+        """
+
 
         # Setup dropdown to select provider
         provider_label = QtWidgets.QLabel("Choose AI Provider:")
@@ -251,7 +257,9 @@ class SettingsWindow(QtWidgets.QWidget):
             app.config['shortcut'] = new_shortcut
             app.config['theme'] = new_theme
 
-        app.config['streaming'] = self.streaming_checkbox.isChecked()
+        # Streaming is kept in config but defaults to False as it is still in development and doesn't work correctly
+        app.config['streaming'] = False  # Hardcoded to False since we removed the UI toggle
+
         app.config['provider'] = self.provider_dropdown.currentText()
 
         app.providers[self.provider_dropdown.currentIndex()].save_config()
