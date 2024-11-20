@@ -8,7 +8,6 @@ from google.generativeai.types import HarmBlockThreshold, HarmCategory
 from openai import OpenAI
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QVBoxLayout
-
 from ui.UIUtils import colorMode
 
 
@@ -132,7 +131,6 @@ class AIProvider(ABC):
         pass
 
 class Gemini15FlashProvider(AIProvider):
-
     def __init__(self, app):
         """
         Initialize the Gemini 1.5 Flash provider.
@@ -141,7 +139,18 @@ class Gemini15FlashProvider(AIProvider):
         self.model = None
 
         settings = [
-            TextSetting(name = "api_key", display_name = "API Key", description = "Paste your Gemini API key here"),
+            TextSetting(name="api_key", display_name="API Key", description="Paste your Gemini API key here"),
+            DropdownSetting(
+                name="model_name",
+                display_name="Model",
+                default_value="gemini-1.5-flash-8b-latest",
+                description="Select Gemini model to use",
+                options=[
+                    ("Gemini 1.5 Flash 8B (fast)", "gemini-1.5-flash-8b-latest"),
+                    ("Gemini 1.5 Flash (fast & more intelligent, recommended)", "gemini-1.5-flash-latest"),
+                    ("Gemini 1.5 Pro (very intelligent, but slower & lower rate limit)", "gemini-1.5-pro-latest")
+                ]
+            )
         ]
         super().__init__(app, "Gemini 1.5 Flash (Recommended)", settings, "• Gemini 1.5 Flash is a powerful AI model that has a free tier available.\n• Writing Tools needs an \"API key\" to connect to Gemini on your behalf.\n• Simply click Get API Key button below, copy your API key, and paste it below.\n• Note: With the free tier of the Gemini API, Google may anonymize & store the text that you send Writing Tools, for Gemini\'s improvement.", "gemini", "Get API Key", lambda: webbrowser.open("https://aistudio.google.com/app/apikey"))
 
@@ -174,12 +183,11 @@ class Gemini15FlashProvider(AIProvider):
             self.close_requested = False
             self.app.replace_text(True)
 
-
     def after_load(self):
         genai.configure(api_key=self.api_key)
 
         self.model = genai.GenerativeModel(
-            model_name='gemini-1.5-flash-latest',
+            model_name=self.model_name,
             generation_config=genai.types.GenerationConfig(
                 candidate_count=1,
                 max_output_tokens=1000,
@@ -198,6 +206,46 @@ class Gemini15FlashProvider(AIProvider):
 
     def cancel(self):
         self.close_requested = True
+
+class DropdownSetting(AIProviderSetting):
+    def __init__(self, name: str, display_name: str = None, default_value: str = None, description: str = None, options: list = None):
+        super().__init__(name, display_name, default_value, description)
+        self.options = options if options else []
+        self.internal_value = default_value
+        self.dropdown = None
+
+    def render_to_layout(self, layout: QVBoxLayout):
+        row_layout = QtWidgets.QHBoxLayout()
+        label = QtWidgets.QLabel(self.display_name)
+        label.setStyleSheet(f"font-size: 16px; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
+        row_layout.addWidget(label)
+
+        self.dropdown = QtWidgets.QComboBox()
+        self.dropdown.setStyleSheet(f"""
+            font-size: 16px;
+            padding: 5px;
+            background-color: {'#444' if colorMode == 'dark' else 'white'};
+            color: {'#ffffff' if colorMode == 'dark' else '#000000'};
+            border: 1px solid {'#666' if colorMode == 'dark' else '#ccc'};
+        """)
+        
+        for option, value in self.options:
+            self.dropdown.addItem(option, value)
+
+        # Set current value
+        for i in range(self.dropdown.count()):
+            if self.dropdown.itemData(i) == self.internal_value:
+                self.dropdown.setCurrentIndex(i)
+                break
+
+        row_layout.addWidget(self.dropdown)
+        layout.addLayout(row_layout)
+
+    def set_value(self, value):
+        self.internal_value = value
+
+    def get_value(self):
+        return self.dropdown.currentData()
 
 
 class OpenAICompatibleProvider(AIProvider):

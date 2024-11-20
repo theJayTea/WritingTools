@@ -5,3 +5,4 @@ pyperclip
 pynput
 PySide6
 protobuf
+markdown2

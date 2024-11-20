@@ -7,13 +7,12 @@ import time
 
 import darkdetect
 import pyperclip
+from aiprovider import Gemini15FlashProvider, OpenAICompatibleProvider
 from pynput import keyboard as pykeyboard
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Signal, Slot
 from PySide6.QtGui import QCursor, QGuiApplication
 from PySide6.QtWidgets import QMessageBox
-
-from aiprovider import Gemini15FlashProvider, OpenAICompatibleProvider
 from ui.AboutWindow import AboutWindow
 from ui.CustomPopupWindow import CustomPopupWindow
 from ui.OnboardingWindow import OnboardingWindow
@@ -272,7 +271,17 @@ class WritingToolApp(QtWidgets.QApplication):
         Process the selected writing option in a separate thread.
         """
         logging.debug(f'Processing option: {option}')
+        
+        # For Summary, Key Points, and Table, create response window first
+        if option in ['Summary', 'Key Points', 'Table']:
+            self.current_response_window = self.show_response_window(option, selected_text)
+        else:
+            # Clear any existing response window reference for non-window options
+            if hasattr(self, 'current_response_window'):
+                delattr(self, 'current_response_window')
+                
         threading.Thread(target=self.process_option_thread, args=(option, selected_text, custom_change), daemon=True).start()
+
 
     def process_option_thread(self, option, selected_text, custom_change=None):
         """
@@ -291,27 +300,27 @@ class WritingToolApp(QtWidgets.QApplication):
                 ),
                 'Friendly': (
                     'Make this more friendly:\n\n',
-                    'You are a writing assistant. Rewrite the text provided by the user to be more friendly. Output ONLY the revised text without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with rewriting (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+                    'You are a writing assistant. Rewrite the text provided by the user to be more friendly. Output ONLY the friendly text without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with rewriting (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
                 ),
                 'Professional': (
                     'Make this more professional:\n\n',
-                    'You are a writing assistant. Rewrite the text provided by the user to sound more professional. Output ONLY the revised text without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with this (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+                    'You are a writing assistant. Rewrite the text provided by the user to sound more professional. Output ONLY the professional text without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with this (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
                 ),
                 'Concise': (
                     'Make this more concise:\n\n',
-                    'You are a writing assistant. Rewrite the text provided by the user to be more concise. Output ONLY the concise version without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with this (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+                    'You are a writing assistant. Rewrite the text provided by the user to be slightly more concise in tone, thus making it just a bit shorter. Do not change the text too much or be too reductive. Output ONLY the concise version without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with this (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
                 ),
                 'Summary': (
                     'Summarize this:\n\n',
-                    'You are a summarization assistant. Provide a concise summary of the text provided by the user. Output ONLY the summary without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with summarization (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+                    'You are a summarisation assistant. Provide a succinct summary of the text provided by the user. The summary should be succinct yet encompass all the key insightful points. To make it quite legible and readable, you MUST use Markdown formatting (bold, italics, underline...). You should add line spacing between your paragraphs/lines. Only if appropriate, you could also use headings (only the very small ones), lists, tables, etc. Don\'t be repetitive or too verbose. Output ONLY the summary without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with summarisation (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
                 ),
                 'Key Points': (
                     'Extract key points from this:\n\n',
-                    'You are an assistant that extracts key points from text provided by the user. Output ONLY the key points without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with with extracting key points (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+                    'You are an assistant that extracts key points from text provided by the user. Output ONLY the key points without additional comments. You MUST use Markdown formatting (lists, bold, italics, underline, etc. as appropriate) to make it quite legible and readable. Don\'t be repetitive or too verbose. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with extracting key points (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
                 ),
                 'Table': (
                     'Convert this into a table:\n\n',
-                    'You are an assistant that converts text provided by the user into a table. Output ONLY the table without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with this with conversion, output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+                    'You are an assistant that converts text provided by the user into a Markdown table. Output ONLY the table without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is completely incompatible with this with conversion, output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
                 ),
                 'Custom': (
                     'Make the following change to this text:\n\n',
@@ -349,9 +358,19 @@ class WritingToolApp(QtWidgets.QApplication):
         """
         QMessageBox.warning(None, title, message)
 
+    def show_response_window(self, option, text):
+        """
+        Show the response in a new window instead of pasting it.
+        """
+        from ui.ResponseWindow import ResponseWindow
+        response_window = ResponseWindow(self, f"{option} Result")
+        response_window.selected_text = text  # Store the text for regeneration
+        response_window.show()
+        return response_window
+
     def replace_text(self, new_text):
         """
-        Replace the selected text with the new text generated by the AI.
+        Replaces the text by pasting in the LLM generated text. With "Key Points" and "Summary", invokes a window with the output instead.
         """
         error_message = 'ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST'
 
@@ -366,47 +385,41 @@ class WritingToolApp(QtWidgets.QApplication):
                 return
 
             # Check if we're building up to the error message (to prevent partial pasting)
-            # Only do this check if the current output length is less than error message
             if len(current_output) <= len(error_message):
-                # Remove all whitespace for comparison to handle any format
                 clean_current = ''.join(current_output.split())
                 clean_error = ''.join(error_message.split())
                 if clean_current == clean_error[:len(clean_current)]:
                     return
 
-            logging.debug('Replacing text')
+            logging.debug('Processing output text')
             try:
-                # Backup the clipboard
-                clipboard_backup = pyperclip.paste()
+                # For Summary and Key Points, show in response window
+                if hasattr(self, 'current_response_window'):
+                    self.current_response_window.append_text(new_text)
+                else:
+                    # For other options, use the original clipboard-based replacement
+                    clipboard_backup = pyperclip.paste()
+                    cleaned_text = self.output_queue.rstrip('\n')
+                    pyperclip.copy(cleaned_text)
+                    
+                    kbrd = pykeyboard.Controller()
+                    def press_ctrl_v():
+                        kbrd.press(pykeyboard.Key.ctrl.value)
+                        kbrd.press('v')
+                        kbrd.release('v')
+                        kbrd.release(pykeyboard.Key.ctrl.value)
 
-                # Clean the output text and set the clipboard
-                cleaned_text = self.output_queue.rstrip('\n')  # Remove trailing newlines
-                pyperclip.copy(cleaned_text)
+                    press_ctrl_v()
+                    time.sleep(0.2)
+                    pyperclip.copy(clipboard_backup)
 
-                # Simulate Ctrl+V
-                logging.debug('Simulating Ctrl+V')
+                if not hasattr(self, 'current_response_window'):
+                    self.output_queue = ""
 
-                kbrd = pykeyboard.Controller()
-
-                def press_ctrl_v():
-                    kbrd.press(pykeyboard.Key.ctrl.value)
-                    kbrd.press('v')
-                    kbrd.release('v')
-                    kbrd.release(pykeyboard.Key.ctrl.value)
-
-                press_ctrl_v()
-
-                # Wait for the paste operation to complete
-                time.sleep(0.2)
-
-                # Restore the clipboard
-                pyperclip.copy(clipboard_backup)
-
-                self.output_queue = ""
             except Exception as e:
-                logging.error(f'Error replacing text: {e}')
+                logging.error(f'Error processing output: {e}')
         else:
-            logging.debug('No new text to replace')
+            logging.debug('No new text to process')
 
     def create_tray_icon(self):
         """
