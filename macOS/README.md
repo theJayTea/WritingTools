@@ -1,5 +1,7 @@
 # macOS Folder
 
+### [not currently being actively maintained, and many versions behind. Please use the Windows/Linux version instead — it's cross platform and should work on macOS]
+
 This folder contains code specific to the macOS port of Writing Tools.
 
 ## Credits
