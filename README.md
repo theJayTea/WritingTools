@@ -26,9 +26,9 @@ Writing Tools has been featured on [Beebom](https://beebom.com/high-schooler-app
 - **Proofread**: The smartest grammar and spelling corrector. Sorry not sorry, Grammarly Premium.
 - **Rewrite**: Improve the phrasing of your text.
 - **Make Friendly/Professional**: Adjust the tone of your writing.
-- **Summarize**: Create concise summaries of longer texts.
-- **Extract Key Points**: Highlight the most important information.
-- **Create Tables**: Convert text into a structured Markdown table (use [Obsidian](https://obsidian.md/) or [Markdown-to-Excel](https://tableconvert.com/markdown-to-excel) to work with the markdown table).
+- **Summarize**: Create concise summaries of articles or long text. 🆕 It shows in its own pop-up window!
+- **Extract Key Points**: Highlight the most important information. 🆕 It shows in its own pop-up window!
+- **Create Tables**: Convert text into a structured table. 🆕 It shows in its own pop-up window! You can copy it into Word, etc.
 - **Custom Instructions**: Give specific directions for text modifications (e.g. `Translate to French`).
 
 Invoke Writing Tools with no text selected to enter a chat mode.
@@ -54,7 +54,8 @@ Invoke Writing Tools with no text selected to enter a chat mode.
 1. [Download](https://ollama.com/download) and install Ollama.
 2. Choose the LLM you want to use form [here](https://ollama.com/library). Recommended: Llama 3.1 8B if you have ~8GB of RAM or VRAM.
 3. Open your terminal, and type `ollama run llama3.1:8b`. This will download and run Llama 3.1. That's it! Leave this running in the background.
-4. In Writing Tools, choose the `OpenAl Compatible` AI Provider, and set your API Key to `ollama`, your API Base URL to `http://localhost:11434/v1`, and your API Model to `llama3.1:8b`. Enjoy Writing Tools with _absolute_ privacy and no internet connection! 🎉
+4. In Writing Tools, choose the `OpenAl Compatible` AI Provider, and set your API Key to `ollama`, your API Base URL to `http://localhost:11434/v1`, and your API Model to `llama3.1:8b`.
+5. That's it! Enjoy Writing Tools with _absolute_ privacy and no internet connection! 🎉 From now on, you'll simply need to launch Ollama and Writing Tools into the background for it to work.
 
 ## 🔒 Privacy
 
@@ -70,15 +71,13 @@ Note: Privacy policies may vary depending on the AI provider you choose. Please 
    To fix it, simply change the hotkey to **ctrl+`** or **ctrl+j** and restart Writing Tools.
    PS: If a hotkey is already in use by a program or background process, Writing Tools may not be able to intercept it. The above hotkeys are usualy unused.
 
-2. (Fix almost ready!) On some devices, Writing Tools may not work in Microsoft Word.
-
-3. The initial launch of the `Writing Tools.exe` might take unusually long — this seems to be because AV software extensively scans this new executable before letting it run. Once it launches into the background in RAM, it works instantly as usual.
+2. The initial launch of the `Writing Tools.exe` might take unusually long — this seems to be because AV software extensively scans this new executable before letting it run. Once it launches into the background in RAM, it works instantly as usual.
  
 ## 👨‍💻 To Run Writing Tools Directly from the Source Code
 
 If you prefer to run the program directly from the `main.py` file, follow these OS-specific instructions.
 
-The code in the macOS folder is more outdated, but will work on macOS. The code in the Windows_and_Linux folder is slightly improved, and has been refactored to be cross-platform so it may work on macOS too!
+The code in the macOS folder is outdated, but will work on macOS. The code in the Windows_and_Linux folder is actively supported and significantly improved, and has been refactored to be cross-platform so it may work on macOS too!
 
 **1. Download the Code**
 - Click the download button:
@@ -116,12 +115,33 @@ Make sure [Python is installed](https://www.python.org/downloads/)!
 
 ## 👨‍💻 To compile the application yourself:
 
-Here's how to compile it with PyInstaller:
+Here's how to compile it with PyInstaller and a virtual environmentL
 
-1. Install PyInstaller: `pip install pyinstaller`
-2. Run the build script: `pyinstaller-build-script.py`
+1. First, create and activate a virtual environment:
+```bash
+# Install virtualenv if you haven't already
+pip install virtualenv
 
-Ideally, run this in a Python venv.
+# Create a new virtual environment
+virtualenv myvenv
+
+# Activate it
+# On Windows:
+myvenv\Scripts\activate
+# On Linux/Mac:
+source myvenv/bin/activate
+```
+
+2. Once activated, install the required packages:
+
+```bash
+pip install -r requirements.txt
+```
+
+3. Build Writing Tools:
+```bash
+python pyinstaller-build-script.py
+```
 
 ## 🌟 Contributors
 
@@ -138,6 +158,15 @@ Added Linux support and switched to the pynput API to improve Windows stability.
 **3. [Disneyhockey40 (Soszust40)](https://github.com/Disneyhockey40):**
 
 Helped add dark mode, the plain theme, tray menu fixes, and UI improvements.
+
+**4. [Alok Saboo (arsaboo)](https://github.com/arsaboo):**
+
+Helped improve the reliability of text selection.
+
+**5. [raghavdhingra24](https://github.com/raghavdhingra24):**
+
+Made the rounded corners anti-aliased & prettier.
+
 
 ## 🤝 Contributing
 
