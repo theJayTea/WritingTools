@@ -1,6 +1,14 @@
 # Writing Tools
 
+**Instantly proofread & optimise your writing system-wide:**
+
 https://github.com/user-attachments/assets/d3ce4694-b593-45ff-ae9a-892ce94b1dc8
+
+**Summarise webpages in a click:**
+
+https://github.com/user-attachments/assets/ad9729ab-75fb-404d-a2cf-a2c7b94351c3
+
+
 
 ## 🚀 What is Writing Tools?
 
