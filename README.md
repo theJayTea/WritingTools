@@ -12,7 +12,7 @@ https://github.com/user-attachments/assets/ad9729ab-75fb-404d-a2cf-a2c7b94351c3
 
 ## 🚀 What is Writing Tools?
 
-Writing Tools is an Apple Intelligence-inspired application for Windows, Linux, and macOS (alpha) that supercharges your writing with AI LLMs. It lets you fix up grammar and more with one hotkey press, system-wide. It's currently the world's most intelligent system-wide grammar assistant.
+Writing Tools is an Apple Intelligence-inspired application for Windows and Linux that supercharges your writing with AI LLMs. It lets you fix up grammar and more with one hotkey press, system-wide. It's currently the world's most intelligent system-wide grammar assistant.
 
 ### 🌟 Why Choose Writing Tools?
 
@@ -85,8 +85,6 @@ Note: Privacy policies may vary depending on the AI provider you choose. Please 
 
 If you prefer to run the program directly from the `main.py` file, follow these OS-specific instructions.
 
-The code in the macOS folder is outdated, but will work on macOS. The code in the Windows_and_Linux folder is actively supported and significantly improved, and has been refactored to be cross-platform so it may work on macOS too!
-
 **1. Download the Code**
 - Click the download button:
    ![image](https://github.com/user-attachments/assets/4c6cab79-4918-451c-9ad1-1bbcf8472275)
@@ -101,7 +99,7 @@ After extracting the folder, open your **Terminal** (or **Command Prompt**) in t
    pip install -r requirements.txt
    ```
 
-- macOS/Linux:
+- Linux:
    ```bash
    cd /path/to/Windows_and_Linux
    pip3 install -r requirements.txt
@@ -115,7 +113,7 @@ Make sure [Python is installed](https://www.python.org/downloads/)!
    ```bash
    pythonw main.py
    ```
-- **macOS/Linux:**
+- **Linux:**
    ```bash
    python3 main.py
    ```
@@ -136,7 +134,7 @@ virtualenv myvenv
 # Activate it
 # On Windows:
 myvenv\Scripts\activate
-# On Linux/Mac:
+# On Linux:
 source myvenv/bin/activate
 ```
 
