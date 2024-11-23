@@ -30,7 +30,7 @@ class AboutWindow(QtWidgets.QWidget):
         UIUtils.setup_window_and_layout(self)
 
         # Disable minimize button and icon in title bar
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowMinimizeButtonHint & ~QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.WindowTitleHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowMinimizeButtonHint & ~QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowStaysOnTopHint)
 
         # Remove window icon. Has to be done after UIUtils.setup_window_and_layout().
         pixmap = QtGui.QPixmap(32, 32)
