@@ -1,6 +1,7 @@
 import webbrowser
 
 from PySide6 import QtCore, QtWidgets, QtGui
+from PySide6.QtCore import Qt
 
 from ui.UIUtils import UIUtils, colorMode
 
@@ -81,7 +82,7 @@ class AboutWindow(QtWidgets.QWidget):
         scroll_area = QtWidgets.QScrollArea()
         scroll_area.setWidget(about_label)
         scroll_area.setWidgetResizable(True)
-        scroll_area.setStyleSheet("background: transparent;")  # Keep the gradient background
+        scroll_area.setStyleSheet("background: transparent;")
 
         content_layout.addWidget(scroll_area)
 
@@ -100,6 +101,7 @@ class AboutWindow(QtWidgets.QWidget):
                 background-color: #45a049;
             }
         """)
+        update_button.mousePressEvent = self.disable_right_click
         update_button.clicked.connect(self.check_for_updates)
         content_layout.addWidget(update_button)
 
@@ -114,3 +116,9 @@ class AboutWindow(QtWidgets.QWidget):
         Open the original app GitHub page.
         """
         webbrowser.open("https://github.com/TheJayTea/WritingTools")
+
+    def disable_right_click(self, event):
+        if event.button() == Qt.RightButton:
+            event.ignore()
+        else:
+            super(QtWidgets.QPushButton, self.update_button).mousePressEvent(event)
