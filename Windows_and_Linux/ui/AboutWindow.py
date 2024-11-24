@@ -30,7 +30,7 @@ class AboutWindow(QtWidgets.QWidget):
         UIUtils.setup_window_and_layout(self)
 
         # Disable minimize button and icon in title bar
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowMinimizeButtonHint & ~QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowStaysOnTopHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowMinimizeButtonHint & ~QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.WindowTitleHint)
 
         # Remove window icon. Has to be done after UIUtils.setup_window_and_layout().
         pixmap = QtGui.QPixmap(32, 32)
@@ -101,7 +101,6 @@ class AboutWindow(QtWidgets.QWidget):
                 background-color: #45a049;
             }
         """)
-        update_button.mousePressEvent = self.disable_right_click
         update_button.clicked.connect(self.check_for_updates)
         content_layout.addWidget(update_button)
 
@@ -116,9 +115,3 @@ class AboutWindow(QtWidgets.QWidget):
         Open the original app GitHub page.
         """
         webbrowser.open("https://github.com/TheJayTea/WritingTools")
-
-    def disable_right_click(self, event):
-        if event.button() == Qt.RightButton:
-            event.ignore()
-        else:
-            super(QtWidgets.QPushButton, self.update_button).mousePressEvent(event)
