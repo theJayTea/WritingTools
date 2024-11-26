@@ -36,8 +36,8 @@ Since the `.xcodeproj` file is excluded, you can still build the project manuall
 2. **Clone the Repository**
    - Clone this repository to your local machine:
      ```bash
-     git clone https://github.com/Aryamirsepasi/writing-tools-mac.git
-     cd writing-tools-mac
+     git clone https://github.com/theJayTea/WritingTools.git
+     cd WritingTools
      ```
 
 3. **Open the Project in Xcode**
