@@ -1,9 +1,0 @@
-build
-dist
-
-config.json
-main.spec
-
-.idea
-
-__pycache__
