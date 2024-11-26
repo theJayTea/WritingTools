@@ -23,6 +23,17 @@ struct AboutView: View {
             
             Divider()
             
+            VStack(spacing: 10) {
+                Text("The macOS version is created by Arya Mirsepasi")
+                    .bold()
+                
+                Link("Email: developer@aryamirsepasi.com",
+                     destination: URL(string: "mailto:developer@aryamirsepasi.com")!)
+                
+            }
+            
+            Divider()
+
             Text("Version: 5.0 (Codename: Impressively Improved)")
                 .font(.caption)
             
