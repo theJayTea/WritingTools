@@ -80,7 +80,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private func updateHotKey() {
         hotKey = nil
         
-        let shortcutText = UserDefaults.standard.string(forKey: "shortcut") ?? "⌥ D"
+        let shortcutText = UserDefaults.standard.string(forKey: "shortcut") ?? "⌥ Space"
         
         var modifiers: NSEvent.ModifierFlags = []
         var keyCode: UInt32 = 0

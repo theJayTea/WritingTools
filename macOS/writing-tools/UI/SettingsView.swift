@@ -76,7 +76,7 @@ struct ShortcutRecorderView: View {
 
 struct SettingsView: View {
     @ObservedObject var appState: AppState
-    @State private var shortcutText = UserDefaults.standard.string(forKey: "shortcut") ?? "⌘ Space"
+    @State private var shortcutText = UserDefaults.standard.string(forKey: "shortcut") ?? "⌥ Space"
     @State private var useGradientTheme = UserDefaults.standard.bool(forKey: "use_gradient_theme")
     @State private var apiKey = UserDefaults.standard.string(forKey: "gemini_api_key") ?? ""
     @State private var selectedModel = GeminiModel(rawValue: UserDefaults.standard.string(forKey: "gemini_model") ?? "gemini-1.5-flash-latest") ?? .flash
