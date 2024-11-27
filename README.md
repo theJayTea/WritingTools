@@ -10,7 +10,7 @@ https://github.com/user-attachments/assets/ad9729ab-75fb-404d-a2cf-a2c7b94351c3
 
 ## ✨ What is Writing Tools?
 
-Writing Tools is an **Apple Intelligence-inspired application for Windows, Linux, and macOS that supercharges your writing with an AI LLM (cloud-based or local)**.
+Writing Tools is an **Apple Intelligence-inspired application for Windows, Linux, and macOS that supercharges your writing with an AI LLM** (cloud-based or local).
 
 With one hotkey press system-wide, it lets you fix grammar, optimize text according to your instructions, summarize content (webpages, YouTube videos, etc.), and more.
 
@@ -37,7 +37,7 @@ Aside from being the only Windows/Linux program like Apple's Writing Tools, and 
 
 - **More intelligent than Apple's Writing Tools and Grammarly Premium:** Apple uses a tiny 3B parameter model, while Writing Tools lets you use much more advanced models for free (e.g., Gemini 1.5 Flash [~25B]). Grammarly's rule-based NLP can't compete with LLMs.
 - **Completely free and open-source:** No subscriptions or hidden costs. Bloat-free and uses **0% of your CPU** when idle.
-- **Versatile AI LLM support:** Jump in quickly with the **free Gemini API**, or an extensive range of **local LLMs** (via Ollama, llama.cpp, KoboldCPP, TabbyAPI, vLLM, etc.) or **cloud-based LLMs** (ChatGPT, Mistral AI, etc.) through Writing Tools' OpenAI-API-compatibility.
+- **Versatile AI LLM support:** Jump in quickly with the **free Gemini API**, or an extensive range of **local LLMs** (via Ollama [[instructions]](https://github.com/theJayTea/WritingTools?tab=readme-ov-file#-optional-ollama-local-llm-instructions), llama.cpp, KoboldCPP, TabbyAPI, vLLM, etc.) or **cloud-based LLMs** (ChatGPT, Mistral AI, etc.) through Writing Tools' OpenAI-API-compatibility.
 - **Does not mess with your clipboard, and works system-wide.**
 - **Privacy-focused**: Your API key and config files stay on *your* device. NO logging, diagnostic collection, tracking, or ads. Invoked *only* on your command. Local LLMs keep your data on your device & work without the internet.
 - **Supports multiple languages:** Works with any language and translates text better than Google Translate (type "translate to [language]" in `Describe your change...`).
