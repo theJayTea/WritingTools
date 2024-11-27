@@ -59,8 +59,10 @@ Writing Tools has been featured on [Beebom](https://beebom.com/high-schooler-app
 ### Linux:
 Run it from the source code (instructions below).
 
-### macOS:
+### macOS (beta):
 The macOS version is a **native Swift port**, developed by [Aryamirsepasi](https://github.com/Aryamirsepasi).
+
+View the [README inside the macOS folder](https://github.com/theJayTea/WritingTools/tree/main/macOS) to learn more.
 
 _(macOS installation instructions coming soon!)_
 
