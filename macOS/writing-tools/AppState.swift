@@ -12,6 +12,10 @@ class AppState: ObservableObject {
     @Published var isProcessing: Bool = false
     @Published var previousApplication: NSRunningApplication?
     
+    var activeProvider: (any AIProvider) {
+        currentProvider == "openai" ? openAIProvider as any AIProvider : geminiProvider as any AIProvider
+    }
+    
     private init() {
         // Initialize Gemini
         let geminiApiKey = UserDefaults.standard.string(forKey: "gemini_api_key")?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""

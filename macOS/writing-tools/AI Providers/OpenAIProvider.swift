@@ -14,16 +14,20 @@ struct OpenAIConfig: Codable {
 enum OpenAIModel: String, CaseIterable {
     case gpt4 = "gpt-4"
     case gpt35Turbo = "gpt-3.5-turbo"
+    case gpt4o = "gpt-4o"
+    case gpt4oMini = "gpt-4o-mini"
     
     var displayName: String {
         switch self {
         case .gpt4: return "GPT-4 (Most Capable)"
         case .gpt35Turbo: return "GPT-3.5 Turbo (Faster)"
+        case .gpt4o: return "GPT-4o (Optimized)"
+        case .gpt4oMini: return "GPT-4o Mini (Lightweight)"
         }
     }
 }
 
-class OpenAIProvider: ObservableObject {
+class OpenAIProvider: ObservableObject, AIProvider {
     @Published var isProcessing = false
     private var config: OpenAIConfig
     private var currentTask: URLSessionDataTask?
@@ -32,7 +36,7 @@ class OpenAIProvider: ObservableObject {
         self.config = config
     }
     
-    func processText(systemPrompt: String, userPrompt: String) async throws -> String {
+    func processText(systemPrompt: String? = "You are a helpful writing assistant.", userPrompt: String) async throws -> String {
         guard !config.apiKey.isEmpty else {
             throw NSError(domain: "OpenAIAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "API key is missing."])
         }
@@ -45,7 +49,7 @@ class OpenAIProvider: ObservableObject {
         let requestBody: [String: Any] = [
             "model": config.model,
             "messages": [
-                ["role": "system", "content": systemPrompt],
+                ["role": "system", "content": systemPrompt ?? "You are a helpful writing assistant."],
                 ["role": "user", "content": userPrompt]
             ],
             "temperature": 0.5

@@ -19,7 +19,7 @@ enum GeminiModel: String, CaseIterable {
     }
 }
 
-class GeminiProvider: ObservableObject {
+class GeminiProvider: ObservableObject, AIProvider {
     @Published var isProcessing = false
     private var config: GeminiConfig
     private var currentTask: URLSessionDataTask?
@@ -28,7 +28,10 @@ class GeminiProvider: ObservableObject {
         self.config = config
     }
     
-    func processText(userPrompt: String) async throws -> String {
+    func processText(systemPrompt: String? = "You are a helpful writing assistant.", userPrompt: String) async throws -> String {
+        
+        let finalPrompt = systemPrompt.map { "\($0)\n\n\(userPrompt)" } ?? userPrompt
+        
         guard !config.apiKey.isEmpty else {
             throw NSError(domain: "GeminiAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "API key is missing."])
         }
@@ -41,7 +44,7 @@ class GeminiProvider: ObservableObject {
             "contents": [
                 [
                     "parts": [
-                        ["text": userPrompt]
+                        ["text": finalPrompt]
                     ]
                 ]
             ]
@@ -56,29 +59,24 @@ class GeminiProvider: ObservableObject {
             isProcessing = true
             let (data, response) = try await URLSession.shared.data(for: request)
             
-            // Check for valid HTTP response
             guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
                 throw NSError(domain: "GeminiAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Server returned an error."])
             }
             
-            // Parse and handle JSON response
             guard let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
                 throw NSError(domain: "GeminiAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to parse JSON response."])
             }
             
-            // Extract candidates
             guard let candidates = json["candidates"] as? [[String: Any]], !candidates.isEmpty else {
                 throw NSError(domain: "GeminiAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "No candidates found in the response."])
             }
             
-            // Navigate to content -> parts -> text
             if let content = candidates.first?["content"] as? [String: Any],
                let parts = content["parts"] as? [[String: Any]],
                let text = parts.first?["text"] as? String {
                 return text
             }
             
-            // Fallback if no useful data is found
             throw NSError(domain: "GeminiAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "No valid content in response."])
         } catch {
             isProcessing = false
