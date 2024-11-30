@@ -15,16 +15,18 @@ final class ResponseViewModel: ObservableObject {
     }
 
     func regenerateContent() async {
-        do {
-            let prompt = "\(option.systemPrompt):\n\n\(selectedText)"
-            let result = try await AppState.shared.geminiProvider.processText(userPrompt: prompt)
-            await MainActor.run {
-                self.content = result
+            do {
+                let result = try await AppState.shared.activeProvider.processText(
+                    systemPrompt: option.systemPrompt,
+                    userPrompt: selectedText
+                )
+                await MainActor.run {
+                    self.content = result
+                }
+            } catch {
+                print("Error regenerating content: \(error.localizedDescription)")
             }
-        } catch {
-            print("Error regenerating content: \(error.localizedDescription)")
         }
-    }
 }
 
 /// Main ResponseView

@@ -64,7 +64,43 @@ The macOS version is a **native Swift port**, developed by [Aryamirsepasi](https
 
 View the [README inside the macOS folder](https://github.com/theJayTea/WritingTools/tree/main/macOS) to learn more.
 
-_(macOS installation instructions coming soon!)_
+#### Installation Instructions:
+
+1. **Install via .dmg file**  
+   - Download the `.dmg` file from the [Releases](https://github.com/theJayTea/WritingTools/releases) page.  
+   - Open the `.dmg` file and drag the `writing-tools.app` into the Applications folder.
+
+2. **Run via building the project**  
+   If you'd like to build the project manually, follow these steps:
+
+   1. **Install Xcode**  
+      - Ensure you have Xcode installed on your macOS system.  
+      - Download it from the [Mac App Store](https://apps.apple.com/us/app/xcode/id497799835).  
+
+   2. **Clone the Repository**  
+      - Clone this repository to your local machine:
+        ```bash
+        git clone https://github.com/theJayTea/WritingTools.git
+        cd WritingTools
+        ```
+
+   3. **Open the Project in Xcode**  
+      - Open Xcode.  
+      - Select **File > Open** from the menu bar.  
+      - Navigate to the `macOS` folder and select it.  
+
+   4. **Generate the Project File**  
+      - Run the following command to generate the `.xcodeproj` file:
+        ```bash
+        swift package generate-xcodeproj
+        ```
+
+   5. **Build the Project**  
+      - Select your target device as **My Mac** in Xcode.  
+      - Build the project by clicking the **Play** button (or pressing `Command + R`).  
+
+   6. **Run the App**  
+      - After the build is successful, the app will launch automatically.
 
 ## ✨ Options Explained
 

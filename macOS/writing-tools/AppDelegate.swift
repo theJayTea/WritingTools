@@ -185,7 +185,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
     
     private func showPopup() {
-        appState.geminiProvider.cancel()
+        appState.activeProvider.cancel()
         
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
@@ -217,7 +217,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 guard !selectedText.isEmpty else {
                     print("No text selected.")
                     return
-                } 
+                }
                 
                 let window = PopupWindow(appState: self.appState)
                 window.delegate = self

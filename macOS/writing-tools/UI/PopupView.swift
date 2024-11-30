@@ -81,9 +81,10 @@ struct PopupView: View {
 
         Task {
             do {
-                let prompt = "\(option.systemPrompt):\n\n\(appState.selectedText)"
-
-                let result = try await appState.geminiProvider.processText(userPrompt: prompt)
+                let result = try await appState.activeProvider.processText(
+                    systemPrompt: option.systemPrompt,
+                    userPrompt: appState.selectedText
+                )
 
                 if [.summary, .keyPoints, .table].contains(option) {
                     await MainActor.run {
@@ -113,18 +114,23 @@ struct PopupView: View {
 
         Task {
             do {
-                let prompt = """
+                let systemPrompt = """
                 You are a writing and coding assistant. Your sole task is to apply the user's specified changes to the provided text.
                 Output ONLY the modified text without any comments, explanations, or analysis.
                 Do not include additional suggestions or formatting in your response.
-
+                """
+                
+                let userPrompt = """
                 User's instruction: \(instruction)
 
                 Text:
                 \(appState.selectedText)
                 """
 
-                let result = try await appState.geminiProvider.processText(userPrompt: prompt)
+                let result = try await appState.activeProvider.processText(
+                    systemPrompt: systemPrompt,
+                    userPrompt: userPrompt
+                )
 
                 NSPasteboard.general.clearContents()
                 NSPasteboard.general.setString(result, forType: .string)
