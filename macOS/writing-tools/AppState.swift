@@ -55,19 +55,19 @@ class AppState: ObservableObject {
         geminiProvider = GeminiProvider(config: config)
     }
     
-    func saveOpenAIConfig(apiKey: String, baseURL: String, organization: String?, project: String?, model: OpenAIModel) {
+    func saveOpenAIConfig(apiKey: String, baseURL: String, organization: String?, project: String?, model: String) {
         UserDefaults.standard.setValue(apiKey, forKey: "openai_api_key")
         UserDefaults.standard.setValue(baseURL, forKey: "openai_base_url")
         UserDefaults.standard.setValue(organization, forKey: "openai_organization")
         UserDefaults.standard.setValue(project, forKey: "openai_project")
-        UserDefaults.standard.setValue(model.rawValue, forKey: "openai_model")
+        UserDefaults.standard.setValue(model, forKey: "openai_model")
         
         let config = OpenAIConfig(
             apiKey: apiKey,
             baseURL: baseURL,
             organization: organization,
             project: project,
-            model: model.rawValue
+            model: model
         )
         openAIProvider = OpenAIProvider(config: config)
     }

@@ -8,7 +8,7 @@ struct OpenAIConfig: Codable {
     var model: String
     
     static let defaultBaseURL = "https://api.openai.com/v1"
-    static let defaultModel = "gpt-4"
+    static let defaultModel = "gpt-4o"
 }
 
 enum OpenAIModel: String, CaseIterable {

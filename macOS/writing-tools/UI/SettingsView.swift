@@ -89,9 +89,33 @@ struct SettingsView: View {
     @State private var openAIBaseURL = UserDefaults.standard.string(forKey: "openai_base_url") ?? OpenAIConfig.defaultBaseURL
     @State private var openAIOrganization = UserDefaults.standard.string(forKey: "openai_organization") ?? ""
     @State private var openAIProject = UserDefaults.standard.string(forKey: "openai_project") ?? ""
-    @State private var selectedOpenAIModel = OpenAIModel(rawValue: UserDefaults.standard.string(forKey: "openai_model") ?? "gpt-4") ?? .gpt4
+    @State private var openAIModelName = UserDefaults.standard.string(forKey: "openai_model") ?? OpenAIConfig.defaultModel
+    
     
     var showOnlyApiSetup: Bool = false
+    
+    struct LinkText: View {
+        var body: some View {
+            HStack(spacing: 4) {
+                Text("Local LLMs: use instructions at")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                
+                Text("GitHub Guide")
+                    .font(.caption)
+                    .foregroundColor(.blue)
+                    .underline()
+                    .onTapGesture {
+                        NSWorkspace.shared.open(URL(string: "https://github.com/theJayTea/WritingTools?tab=readme-ov-file#-optional-ollama-local-llm-instructions")!)
+                    }
+                
+                Text(".")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+
     
     var body: some View {
         Form {
@@ -104,7 +128,7 @@ struct SettingsView: View {
                 Section("AI Provider") {
                     Picker("Provider", selection: $selectedProvider) {
                         Text("Gemini AI").tag("gemini")
-                        Text("OpenAI").tag("openai")
+                        Text("OpenAI / Local LLM").tag("openai")
                     }
                 }
             }
@@ -125,12 +149,21 @@ struct SettingsView: View {
                     }
                 }
             } else {
-                Section("OpenAI Settings") {
+                Section("OpenAI / Local LLM Settings") {
                     TextField("API Key", text: $openAIApiKey)
                         .textFieldStyle(.roundedBorder)
                     
-                    TextField("Base URL (Optional)", text: $openAIBaseURL)
+                    TextField("Base URL", text: $openAIBaseURL)
                         .textFieldStyle(.roundedBorder)
+                    
+                    TextField("Model Name", text: $openAIModelName)
+                        .textFieldStyle(.roundedBorder)
+                    
+                    Text("OpenAI models include: gpt-4o, gpt-3.5-turbo")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    LinkText()
                     
                     TextField("Organization ID (Optional)", text: $openAIOrganization)
                         .textFieldStyle(.roundedBorder)
@@ -138,14 +171,14 @@ struct SettingsView: View {
                     TextField("Project ID (Optional)", text: $openAIProject)
                         .textFieldStyle(.roundedBorder)
                     
-                    Picker("Model", selection: $selectedOpenAIModel) {
-                        ForEach(OpenAIModel.allCases, id: \.self) { model in
-                            Text(model.displayName).tag(model)
+                    HStack {
+                        Button("Get OpenAI API Key") {
+                            NSWorkspace.shared.open(URL(string: "https://platform.openai.com/account/api-keys")!)
                         }
-                    }
-                    
-                    Button("Get API Key") {
-                        NSWorkspace.shared.open(URL(string: "https://platform.openai.com/account/api-keys")!)
+                        
+                        Button("Ollama Documentation") {
+                            NSWorkspace.shared.open(URL(string: "https://ollama.ai/download")!)
+                        }
                     }
                 }
             }
@@ -157,6 +190,7 @@ struct SettingsView: View {
         }
         .padding()
         .frame(width: 500)
+        .windowBackground(useGradient: useGradientTheme)
     }
     
     private func saveSettings() {
@@ -174,7 +208,7 @@ struct SettingsView: View {
                 baseURL: openAIBaseURL,
                 organization: openAIOrganization,
                 project: openAIProject,
-                model: selectedOpenAIModel
+                model: openAIModelName
             )
         }
         
