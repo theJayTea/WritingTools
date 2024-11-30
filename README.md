@@ -60,47 +60,11 @@ Writing Tools has been featured on [Beebom](https://beebom.com/high-schooler-app
 Run it from the source code (instructions below).
 
 ### macOS (beta):
-The macOS version is a **native Swift port**, developed by [Aryamirsepasi](https://github.com/Aryamirsepasi).
+The macOS version is a **native Swift port**, developed by [Aryamirsepasi](https://github.com/Aryamirsepasi). View the [README inside the macOS folder](https://github.com/theJayTea/WritingTools/tree/main/macOS) to learn more.
 
-View the [README inside the macOS folder](https://github.com/theJayTea/WritingTools/tree/main/macOS) to learn more.
-
-#### Installation Instructions:
-
-1. **Install via .dmg file**  
-   - Download the `.dmg` file from the [Releases](https://github.com/theJayTea/WritingTools/releases) page.  
-   - Open the `.dmg` file and drag the `writing-tools.app` into the Applications folder.
-
-2. **Run via building the project**  
-   If you'd like to build the project manually, follow these steps:
-
-   1. **Install Xcode**  
-      - Ensure you have Xcode installed on your macOS system.  
-      - Download it from the [Mac App Store](https://apps.apple.com/us/app/xcode/id497799835).  
-
-   2. **Clone the Repository**  
-      - Clone this repository to your local machine:
-        ```bash
-        git clone https://github.com/theJayTea/WritingTools.git
-        cd WritingTools
-        ```
-
-   3. **Open the Project in Xcode**  
-      - Open Xcode.  
-      - Select **File > Open** from the menu bar.  
-      - Navigate to the `macOS` folder and select it.  
-
-   4. **Generate the Project File**  
-      - Run the following command to generate the `.xcodeproj` file:
-        ```bash
-        swift package generate-xcodeproj
-        ```
-
-   5. **Build the Project**  
-      - Select your target device as **My Mac** in Xcode.  
-      - Build the project by clicking the **Play** button (or pressing `Command + R`).  
-
-   6. **Run the App**  
-      - After the build is successful, the app will launch automatically.
+To install it:
+1. Go to the [Releases](https://github.com/theJayTea/WritingTools/releases) page and download the latest `.dmg` file.
+2. Open the `.dmg` file and drag the `writing-tools.app` into the Applications folder. That's it!
 
 ## ✨ Options Explained
 
@@ -176,6 +140,7 @@ Of course, you'll need to have [Python installed](https://www.python.org/downloa
 
 ## 👨‍💻 To compile the application yourself:
 
+### Windows and Linux Version build instructions:
 Here's how to compile it with PyInstaller and a virtual environment:
 
 1. First, create and activate a virtual environment:
@@ -203,6 +168,37 @@ pip install -r requirements.txt
 ```bash
 python pyinstaller-build-script.py
 ```
+
+### macOS Version (by [Aryamirsepasi](https://github.com/Aryamirsepasi)) build instructions:
+
+1. **Install Xcode**
+- Ensure you have Xcode installed on your macOS system.
+- Download it from the [Mac App Store](https://apps.apple.com/us/app/xcode/id497799835).  
+
+2. **Clone the Repository to your local machine**
+```bash
+git clone https://github.com/theJayTea/WritingTools.git
+cd WritingTools
+ ```
+
+3. **Open the Project in Xcode**
+- Open Xcode.
+- Select **File > Open** from the menu bar.
+- Navigate to the `macOS` folder and select it.  
+
+4. **Generate the Project File**
+Run the following command to generate the `.xcodeproj` file:
+```bash
+swift package generate-xcodeproj
+```
+
+5. **Build the Project**
+- Select your target device as **My Mac** in Xcode.
+- Build the project by clicking the **Play** button (or pressing `Command + R`).  
+
+6. **Run the App**
+- After the build is successful, the app will launch automatically.
+
 
 ## 🌟 Contributors
 
