@@ -128,36 +128,43 @@ class PopupWindow: NSWindow {
     
     
     // MARK: - Window Positioning
+    
+    // Find the screen where the mouse cursor is located
+    func screenAt(point: NSPoint) -> NSScreen? {
+        for screen in NSScreen.screens {
+            if screen.frame.contains(point) {
+                return screen
+            }
+        }
+        return nil
+    }
+    
     func positionNearMouse() {
-        guard let screen = NSScreen.main else { return }
-        
-        // Get the mouse location and screen dimensions
         let mouseLocation = NSEvent.mouseLocation
+        
+        guard let screen = screenAt(point: mouseLocation) else { return }
+        
         let screenFrame = screen.visibleFrame
         let padding: CGFloat = 10
         var windowFrame = frame
         
         windowFrame.origin.x = mouseLocation.x + padding
-        windowFrame.origin.y = screenFrame.maxY - mouseLocation.y - windowFrame.height - padding
+        windowFrame.origin.y = mouseLocation.y - windowFrame.height - padding
         
         if windowFrame.maxX > screenFrame.maxX {
             windowFrame.origin.x = mouseLocation.x - windowFrame.width - padding
         }
         
         if windowFrame.minY < screenFrame.minY {
-            windowFrame.origin.y = screenFrame.maxY - mouseLocation.y + padding
+            windowFrame.origin.y = mouseLocation.y + padding
         }
         
-        windowFrame.origin.x = max(screenFrame.minX + padding,
-                                   min(windowFrame.origin.x,
-                                       screenFrame.maxX - windowFrame.width - padding))
-        windowFrame.origin.y = max(screenFrame.minY + padding,
-                                   min(windowFrame.origin.y,
-                                       screenFrame.maxY - windowFrame.height - padding))
+        windowFrame.origin.x = max(screenFrame.minX + padding, min(windowFrame.origin.x, screenFrame.maxX - windowFrame.width - padding))
+        windowFrame.origin.y = max(screenFrame.minY + padding, min(windowFrame.origin.y, screenFrame.maxY - windowFrame.height - padding))
         
-        // Apply the calculated frame
         setFrame(windowFrame, display: true)
     }
+    
 }
 
 extension PopupWindow: NSWindowDelegate {
