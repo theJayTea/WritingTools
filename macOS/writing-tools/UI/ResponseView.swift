@@ -33,7 +33,7 @@ final class ResponseViewModel: ObservableObject {
 struct ResponseView: View {
     @StateObject private var viewModel: ResponseViewModel
     @Environment(\.colorScheme) var colorScheme
-
+    @AppStorage("use_gradient_theme") private var useGradientTheme = false
 
     init(content: String, selectedText: String, option: WritingOption) {
         self._viewModel = StateObject(wrappedValue: ResponseViewModel(
@@ -82,6 +82,6 @@ struct ResponseView: View {
             }
             .padding()
         }
-        .background(colorScheme == .dark ? Color(.windowBackgroundColor) : Color(.windowBackgroundColor))
+        .windowBackground(useGradient: useGradientTheme)
     }
 }

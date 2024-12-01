@@ -34,7 +34,7 @@ struct AboutView: View {
             
             Divider()
 
-            Text("Version: 5.0 (Codename: Impressively Improved)")
+            Text("Version: 5.0 Beta 3")
                 .font(.caption)
             
             Button("Check for Updates") {
