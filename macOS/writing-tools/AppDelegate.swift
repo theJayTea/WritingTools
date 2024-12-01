@@ -214,16 +214,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                     pasteboard.setString(oldContents, forType: .string)
                 }
                 
-                guard !selectedText.isEmpty else {
-                    print("No text selected.")
-                    return
-                }
-                
+                // Create window even if no text is selected
                 let window = PopupWindow(appState: self.appState)
                 window.delegate = self
                 
                 self.appState.selectedText = selectedText
                 self.popupWindow = window
+                
+                if selectedText.isEmpty {
+                    window.setContentSize(NSSize(width: 400, height: 100))
+                }
                 
                 window.positionNearMouse()
                 window.makeKeyAndOrderFront(nil)

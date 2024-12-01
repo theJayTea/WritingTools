@@ -41,6 +41,10 @@ class PopupWindow: NSWindow {
         let hostingView = NSHostingView(rootView: popupView)
         contentView = hostingView
         retainedHostingView = hostingView
+        
+        if appState.selectedText.isEmpty {
+            setContentSize(NSSize(width: 400, height: 100))
+        }
     }
     
     private func setupTrackingArea() {
