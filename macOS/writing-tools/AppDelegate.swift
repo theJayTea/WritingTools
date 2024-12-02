@@ -3,7 +3,19 @@ import HotKey
 import Carbon.HIToolbox
 
 class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
-    var statusBarItem: NSStatusItem!
+    private static var sharedStatusItem: NSStatusItem?
+    var statusBarItem: NSStatusItem! {
+        get {
+            if AppDelegate.sharedStatusItem == nil {
+                AppDelegate.sharedStatusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+                configureStatusBarItem()
+            }
+            return AppDelegate.sharedStatusItem
+        }
+        set {
+            AppDelegate.sharedStatusItem = newValue
+        }
+    }
     var hotKey: HotKey?
     let appState = AppState.shared
     private var settingsWindow: NSWindow?
@@ -14,18 +26,67 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private let windowAccessQueue = DispatchQueue(label: "com.example.writingtools.windowQueue")
     
     func applicationDidFinishLaunching(_ notification: Notification) {
-        setupMenuBar()
-        setupHotKey()
-        
-        if !UserDefaults.standard.bool(forKey: "has_completed_onboarding") {
-            showOnboarding()
+        DispatchQueue.main.async { [weak self] in
+            self?.setupMenuBar()
+            self?.setupHotKey()
+            
+            if self?.statusBarItem == nil {
+                self?.recreateStatusBarItem()
+            }
+            
+            if !UserDefaults.standard.bool(forKey: "has_completed_onboarding") {
+                self?.showOnboarding()
+            }
+            
+            self?.requestAccessibilityPermissions()
         }
-        
-        requestAccessibilityPermissions()
     }
     
     func applicationWillTerminate(_ notification: Notification) {
         WindowManager.shared.cleanupWindows()
+    }
+    
+    private func recreateStatusBarItem() {
+        AppDelegate.sharedStatusItem = nil
+        _ = self.statusBarItem
+    }
+    
+    private func configureStatusBarItem() {
+        guard let button = statusBarItem?.button else { return }
+        button.image = NSImage(systemSymbolName: "pencil.circle", accessibilityDescription: "Writing Tools")
+    }
+    
+    private func setupMenuBar() {
+        guard let statusBarItem = self.statusBarItem else {
+            print("Failed to create status bar item")
+            return
+        }
+        
+        let menu = NSMenu()
+        menu.addItem(NSMenuItem(title: "Settings", action: #selector(showSettings), keyEquivalent: ","))
+        menu.addItem(NSMenuItem(title: "About", action: #selector(showAbout), keyEquivalent: "i"))
+        menu.addItem(NSMenuItem(title: "Reset App", action: #selector(resetApp), keyEquivalent: "r"))
+        menu.addItem(NSMenuItem.separator())
+        menu.addItem(NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+        
+        statusBarItem.menu = menu
+    }
+    
+    @objc private func resetApp() {
+        hotKey = nil
+        WindowManager.shared.cleanupWindows()
+        
+        recreateStatusBarItem()
+        setupMenuBar()
+        
+        setupHotKey()
+        
+        let alert = NSAlert()
+        alert.messageText = "App Reset Complete"
+        alert.informativeText = "The app has been reset. If you're still experiencing issues, try restarting the app."
+        alert.alertStyle = .informational
+        alert.addButton(withTitle: "OK")
+        alert.runModal()
     }
     
     private func requestAccessibilityPermissions() {
@@ -44,25 +105,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         }
     }
     
-    private func setupMenuBar() {
-        statusBarItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        
-        if let button = statusBarItem.button {
-            button.image = NSImage(systemSymbolName: "pencil.circle", accessibilityDescription: "Writing Tools")
-        }
-        
-        let menu = NSMenu()
-        menu.addItem(NSMenuItem(title: "Settings", action: #selector(showSettings), keyEquivalent: ","))
-        menu.addItem(NSMenuItem(title: "About", action: #selector(showAbout), keyEquivalent: ""))
-        menu.addItem(NSMenuItem.separator())
-        menu.addItem(NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
-        
-        statusBarItem.menu = menu
-    }
-    
     private func setupHotKey() {
         updateHotKey()
         
+        NotificationCenter.default.removeObserver(self, name: UserDefaults.didChangeNotification, object: nil)
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(shortcutChanged),
@@ -72,12 +118,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
     
     @objc private func shortcutChanged() {
-        if UserDefaults.standard.string(forKey: "shortcut") != nil {
-            updateHotKey()
+        DispatchQueue.main.async { [weak self] in
+            if UserDefaults.standard.string(forKey: "shortcut") != nil {
+                self?.updateHotKey()
+            }
         }
     }
     
     private func updateHotKey() {
+        // Remove existing hotkey first
         hotKey = nil
         
         let shortcutText = UserDefaults.standard.string(forKey: "shortcut") ?? "⌥ Space"
@@ -103,8 +152,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             }
         }
         
-        guard keyCode != 0 else { return }
-    
+        guard keyCode != 0 else {
+            print("Invalid key code, resetting to default shortcut")
+            UserDefaults.standard.set("⌥ Space", forKey: "shortcut")
+            updateHotKey()
+            return
+        }
+        
         hotKey = HotKey(keyCombo: KeyCombo(carbonKeyCode: keyCode, carbonModifiers: modifiers.carbonFlags))
         hotKey?.keyDownHandler = { [weak self] in
             DispatchQueue.main.async {

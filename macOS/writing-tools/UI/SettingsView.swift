@@ -37,40 +37,73 @@ struct ShortcutRecorderView: View {
     }
     
     private func handleKeyEvent(_ event: NSEvent) {
-        var components: [String] = []
         
-        let flags = event.modifierFlags
-        
-        if flags.contains(.command) { components.append("⌘") }
-        if flags.contains(.option) { components.append("⌥") }
-        if flags.contains(.control) { components.append("⌃") }
-        if flags.contains(.shift) { components.append("⇧") }
-        
-        // Add key character if it's a key down event
         if event.type == .keyDown {
+            var components: [String] = []
+            
+            let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+            
+            if flags.contains(.control) { components.append("⌃") }
+            if flags.contains(.option) { components.append("⌥") }
+            if flags.contains(.shift) { components.append("⇧") }
+            if flags.contains(.command) { components.append("⌘") }
+            
             if let specialKey = specialKeyMapping[event.keyCode] {
                 components.append(specialKey)
-            } else if let character = event.charactersIgnoringModifiers?.uppercased(),
-                      !character.isEmpty {
-                components.append(character)
+            } else {
+                if let keyChar = virtualKeyCodeToChar[event.keyCode] {
+                    components.append(keyChar)
+                }
             }
             
-            shortcutText = components.joined(separator: " ")
-            isRecording = false
-            isFocused = false
+            if !components.isEmpty {
+                print("Final components: \(components)")
+                shortcutText = components.joined(separator: " ")
+                isRecording = false
+                isFocused = false
+            }
         }
     }
     
     private let specialKeyMapping: [UInt16: String] = [
-        0x31: "Space",
-        0x35: "Esc",
-        0x33: "Delete",
-        0x30: "Tab",
-        0x24: "Return",
-        0x7E: "↑",
-        0x7D: "↓",
-        0x7B: "←",
-        0x7C: "→"
+        UInt16(kVK_Space): "Space",
+        UInt16(kVK_Escape): "Esc",
+        UInt16(kVK_Delete): "Delete",
+        UInt16(kVK_Tab): "Tab",
+        UInt16(kVK_Return): "Return",
+        UInt16(kVK_UpArrow): "↑",
+        UInt16(kVK_DownArrow): "↓",
+        UInt16(kVK_LeftArrow): "←",
+        UInt16(kVK_RightArrow): "→"
+    ]
+    
+    private let virtualKeyCodeToChar: [UInt16: String] = [
+        UInt16(kVK_ANSI_A): "A",
+        UInt16(kVK_ANSI_B): "B",
+        UInt16(kVK_ANSI_C): "C",
+        UInt16(kVK_ANSI_D): "D",
+        UInt16(kVK_ANSI_E): "E",
+        UInt16(kVK_ANSI_F): "F",
+        UInt16(kVK_ANSI_G): "G",
+        UInt16(kVK_ANSI_H): "H",
+        UInt16(kVK_ANSI_I): "I",
+        UInt16(kVK_ANSI_J): "J",
+        UInt16(kVK_ANSI_K): "K",
+        UInt16(kVK_ANSI_L): "L",
+        UInt16(kVK_ANSI_M): "M",
+        UInt16(kVK_ANSI_N): "N",
+        UInt16(kVK_ANSI_O): "O",
+        UInt16(kVK_ANSI_P): "P",
+        UInt16(kVK_ANSI_Q): "Q",
+        UInt16(kVK_ANSI_R): "R",
+        UInt16(kVK_ANSI_S): "S",
+        UInt16(kVK_ANSI_T): "T",
+        UInt16(kVK_ANSI_U): "U",
+        UInt16(kVK_ANSI_V): "V",
+        UInt16(kVK_ANSI_W): "W",
+        UInt16(kVK_ANSI_X): "X",
+        UInt16(kVK_ANSI_Y): "Y",
+        UInt16(kVK_ANSI_Z): "Z"
     ]
 }
 
@@ -115,7 +148,7 @@ struct SettingsView: View {
             }
         }
     }
-
+    
     
     var body: some View {
         Form {
