@@ -16,7 +16,7 @@ Core functionality works well, and it is still an ongoing work in progress.
 ---
 
 ## Not Yet Available
-- More refined positioning logic for the popup window to follow the cursor correctly.
+- All of the original port's features are now available; however, more optimizations and improvements are coming soon.
 
 ---
 
