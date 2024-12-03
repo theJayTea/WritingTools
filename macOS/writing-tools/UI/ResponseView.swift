@@ -4,29 +4,43 @@ import MarkdownUI
 final class ResponseViewModel: ObservableObject {
     @Published var content: String
     @Published var fontSize: CGFloat = 14
-
+    @Published var showCopyConfirmation: Bool = false
+    
     let selectedText: String
     let option: WritingOption
-
+    
     init(content: String, selectedText: String, option: WritingOption) {
         self.content = content
         self.selectedText = selectedText
         self.option = option
     }
-
+    
     func regenerateContent() async {
-            do {
-                let result = try await AppState.shared.activeProvider.processText(
-                    systemPrompt: option.systemPrompt,
-                    userPrompt: selectedText
-                )
-                await MainActor.run {
-                    self.content = result
-                }
-            } catch {
-                print("Error regenerating content: \(error.localizedDescription)")
+        do {
+            let result = try await AppState.shared.activeProvider.processText(
+                systemPrompt: option.systemPrompt,
+                userPrompt: selectedText
+            )
+            await MainActor.run {
+                self.content = result
             }
+        } catch {
+            print("Error regenerating content: \(error.localizedDescription)")
         }
+    }
+    
+    func copyContent() {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(content, forType: .string)
+        
+        // Show confirmation
+        showCopyConfirmation = true
+        
+        // Hide confirmation after 2 seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            self.showCopyConfirmation = false
+        }
+    }
 }
 
 /// Main ResponseView
@@ -54,12 +68,22 @@ struct ResponseView: View {
             }
 
             HStack {
-                Button(action: {
-                    Task {
-                        await viewModel.regenerateContent()
+                HStack(spacing: 12) {
+                    Button(action: {
+                        Task {
+                            await viewModel.regenerateContent()
+                        }
+                    }) {
+                        Label("Regenerate", systemImage: "arrow.clockwise")
                     }
-                }) {
-                    Label("Regenerate", systemImage: "arrow.clockwise")
+                    
+                    Button(action: {
+                        viewModel.copyContent()
+                    }) {
+                        Label(viewModel.showCopyConfirmation ? "Copied!" : "Copy",
+                              systemImage: viewModel.showCopyConfirmation ? "checkmark" : "doc.on.doc")
+                    }
+                    .animation(.easeInOut, value: viewModel.showCopyConfirmation)
                 }
 
                 Spacer()

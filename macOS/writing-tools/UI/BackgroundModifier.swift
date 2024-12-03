@@ -36,7 +36,6 @@ struct WindowBackground: ViewModifier {
                         Color(.windowBackgroundColor)
                     }
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 12))
             )
     }
 }

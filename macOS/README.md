@@ -8,6 +8,7 @@ Core functionality works well, and it is still an ongoing work in progress.
 
 ## Working Features
 - All of the tools, including the new response windows and the manual chat option.
+- Input Window even when no text is selected
 - Gemini, OpenAI and Local LLM Support.
 - The Gradient Theme (Dark Mode and Light Mode are supported).
 - Initial Setup, Settings, and About pages.
@@ -15,8 +16,7 @@ Core functionality works well, and it is still an ongoing work in progress.
 ---
 
 ## Not Yet Available
-- Opening the Input Window when no text is selected
-- More refined positioning logic for the popup window to follow the cursor correctly.
+- All of the original port's features are now available; however, more optimizations and improvements are coming soon.
 
 ---
 

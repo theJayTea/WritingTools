@@ -22,10 +22,11 @@ struct PopupView: View {
                 .padding(.top, 8)
                 .padding(.trailing, 8)
             }
+            
             // Custom input with send button
             HStack(spacing: 8) {
                 TextField(
-                    appState.selectedText.isEmpty ? "Please enter an instruction..." : "Describe your change...",
+                    appState.selectedText.isEmpty ? "Enter your instruction..." : "Describe your change...",
                     text: $customText
                 )
                 .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -45,6 +46,7 @@ struct PopupView: View {
             }
             .padding(.horizontal)
             
+            // Only show options grid if text is selected
             if !appState.selectedText.isEmpty {
                 LazyVGrid(columns: [
                     GridItem(.flexible()),
