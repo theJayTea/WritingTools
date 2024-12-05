@@ -98,7 +98,7 @@ class PopupWindow: NSWindow {
     }
     
     override func mouseDragged(with event: NSEvent) {
-        guard let contentView = contentView,
+        guard let _ = contentView,
               let initialLocation = initialLocation,
               let screen = screen else { return }
         

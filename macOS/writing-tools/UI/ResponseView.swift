@@ -15,6 +15,7 @@ final class ResponseViewModel: ObservableObject {
         self.option = option
     }
     
+    // Regenerate content using AI provider
     func regenerateContent() async {
         do {
             let result = try await AppState.shared.activeProvider.processText(
@@ -29,6 +30,7 @@ final class ResponseViewModel: ObservableObject {
         }
     }
     
+    // Copy content to clipboard
     func copyContent() {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(content, forType: .string)
@@ -48,7 +50,8 @@ struct ResponseView: View {
     @StateObject private var viewModel: ResponseViewModel
     @Environment(\.colorScheme) var colorScheme
     @AppStorage("use_gradient_theme") private var useGradientTheme = false
-
+    @State private var isRegenerating: Bool = false
+    
     init(content: String, selectedText: String, option: WritingOption) {
         self._viewModel = StateObject(wrappedValue: ResponseViewModel(
             content: content,
@@ -56,26 +59,44 @@ struct ResponseView: View {
             option: option
         ))
     }
-
+    
     var body: some View {
         VStack(spacing: 16) {
             ScrollView {
-                Markdown(viewModel.content)
-                    .font(.system(size: viewModel.fontSize))
-                    .textSelection(.enabled)
+                if isRegenerating {
+                    VStack {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: Color.aiPink))
+                            .scaleEffect(1.2)
+                        Text("Regenerating...")
+                            .foregroundColor(.aiPink)
+                            .padding(.top, 8)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
+                } else {
+                    Markdown(viewModel.content)
+                        .font(.system(size: viewModel.fontSize))
+                        .textSelection(.enabled)
+                        .padding()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
 
+            }
+            
             HStack {
                 HStack(spacing: 12) {
                     Button(action: {
+                        isRegenerating = true
                         Task {
                             await viewModel.regenerateContent()
+                            isRegenerating = false
                         }
                     }) {
                         Label("Regenerate", systemImage: "arrow.clockwise")
+                            .foregroundColor(isRegenerating ? .aiPink : nil)
                     }
+                    .disabled(isRegenerating)
                     
                     Button(action: {
                         viewModel.copyContent()
@@ -85,19 +106,19 @@ struct ResponseView: View {
                     }
                     .animation(.easeInOut, value: viewModel.showCopyConfirmation)
                 }
-
+                
                 Spacer()
-
+                
                 HStack(spacing: 8) {
                     Button(action: { viewModel.fontSize = max(10, viewModel.fontSize - 2) }) {
                         Image(systemName: "minus.magnifyingglass")
                     }
                     .disabled(viewModel.fontSize <= 10)
-
+                    
                     Button(action: { viewModel.fontSize = 14 }) {
                         Image(systemName: "arrow.clockwise")
                     }
-
+                    
                     Button(action: { viewModel.fontSize = min(24, viewModel.fontSize + 2) }) {
                         Image(systemName: "plus.magnifyingglass")
                     }

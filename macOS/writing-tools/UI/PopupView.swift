@@ -7,6 +7,8 @@ struct PopupView: View {
     let closeAction: () -> Void
     @AppStorage("use_gradient_theme") private var useGradientTheme = false
     @State private var customText: String = ""
+    @State private var loadingOptions: Set<WritingOption> = []
+    @State private var isCustomLoading: Bool = false
     
     var body: some View {
         VStack(spacing: 16) {
@@ -30,10 +32,10 @@ struct PopupView: View {
                     text: $customText
                 )
                 .textFieldStyle(RoundedBorderTextFieldStyle())
+                .loadingBorder(isLoading: isCustomLoading)
                 .onSubmit {
                     processCustomChange()
                 }
-                
                 Button(action: processCustomChange) {
                     Image(systemName: "paperplane.fill")
                         .foregroundColor(.white)
@@ -46,16 +48,17 @@ struct PopupView: View {
             }
             .padding(.horizontal)
             
-            // Only show options grid if text is selected
             if !appState.selectedText.isEmpty {
                 LazyVGrid(columns: [
                     GridItem(.flexible()),
                     GridItem(.flexible())
                 ], spacing: 16) {
                     ForEach(WritingOption.allCases) { option in
-                        OptionButton(option: option) {
-                            processOption(option)
-                        }
+                        OptionButton(
+                            option: option,
+                            action: { processOption(option) },
+                            isLoading: loadingOptions.contains(option)
+                        )
                     }
                 }
                 .padding(.horizontal)
@@ -71,15 +74,23 @@ struct PopupView: View {
         .shadow(color: Color.black.opacity(0.2), radius: 10, y: 5)
     }
     
+    // Process custom text changes
     private func processCustomChange() {
         guard !customText.isEmpty else { return }
+        isCustomLoading = true
         processCustomInstruction(customText)
     }
     
+    // Process predefined writing options
     private func processOption(_ option: WritingOption) {
+        loadingOptions.insert(option)
         appState.isProcessing = true
         
         Task {
+            defer {
+                loadingOptions.remove(option)
+                appState.isProcessing = false
+            }
             do {
                 let result = try await appState.activeProvider.processText(
                     systemPrompt: option.systemPrompt,
@@ -108,6 +119,7 @@ struct PopupView: View {
         }
     }
     
+    // Process custom instructions
     private func processCustomInstruction(_ instruction: String) {
         guard !instruction.isEmpty else { return }
         appState.isProcessing = true
@@ -148,6 +160,7 @@ struct PopupView: View {
         }
     }
     
+    // Show response window for certain options
     private func showResponseWindow(for option: WritingOption, with result: String) {
         DispatchQueue.main.async {
             let window = ResponseWindow(
@@ -165,6 +178,7 @@ struct PopupView: View {
         }
     }
     
+    // Simulate paste command
     private func simulatePaste() {
         guard let source = CGEventSource(stateID: .hidSystemState) else { return }
         
@@ -185,6 +199,7 @@ struct PopupView: View {
 struct OptionButton: View {
     let option: WritingOption
     let action: () -> Void
+    let isLoading: Bool
     
     var body: some View {
         Button(action: action) {
@@ -197,6 +212,7 @@ struct OptionButton: View {
             .background(Color(.controlBackgroundColor))
             .cornerRadius(8)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(LoadingButtonStyle(isLoading: isLoading))
+        .disabled(isLoading)
     }
 }

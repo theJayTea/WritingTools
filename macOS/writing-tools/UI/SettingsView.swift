@@ -130,11 +130,11 @@ struct SettingsView: View {
     struct LinkText: View {
         var body: some View {
             HStack(spacing: 4) {
-                Text("Local LLMs: use instructions at")
+                Text("Local LLMs: use the instructions on")
                     .font(.caption)
                     .foregroundColor(.secondary)
                 
-                Text("GitHub Guide")
+                Text("GitHub Page")
                     .font(.caption)
                     .foregroundColor(.blue)
                     .underline()
@@ -192,7 +192,7 @@ struct SettingsView: View {
                     TextField("Model Name", text: $openAIModelName)
                         .textFieldStyle(.roundedBorder)
                     
-                    Text("OpenAI models include: gpt-4o, gpt-3.5-turbo")
+                    Text("OpenAI models include: gpt-4o, gpt-3.5-turbo, etc.")
                         .font(.caption)
                         .foregroundColor(.secondary)
                     

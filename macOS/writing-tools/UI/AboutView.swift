@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct AboutView: View {
+    @State private var useGradientTheme = UserDefaults.standard.bool(forKey: "use_gradient_theme")
+
     var body: some View {
         VStack(spacing: 20) {
             Text("About Writing Tools")
@@ -34,7 +36,7 @@ struct AboutView: View {
             
             Divider()
 
-            Text("Version: Beta 4 (Based on Windows Port version 5.0)")
+            Text("Version: 1.0 (Based on Windows Port version 5.0)")
                 .font(.caption)
             
             Button("Check for Updates") {
@@ -44,5 +46,6 @@ struct AboutView: View {
         }
         .padding()
         .frame(width: 400, height: 400)
+        .windowBackground(useGradient: useGradientTheme)
     }
 }

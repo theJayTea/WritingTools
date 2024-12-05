@@ -47,6 +47,7 @@ class AppState: ObservableObject {
         }
     }
     
+    // Save Gemini API configuration
     func saveGeminiConfig(apiKey: String, model: GeminiModel) {
         UserDefaults.standard.setValue(apiKey, forKey: "gemini_api_key")
         UserDefaults.standard.setValue(model.rawValue, forKey: "gemini_model")
@@ -55,6 +56,7 @@ class AppState: ObservableObject {
         geminiProvider = GeminiProvider(config: config)
     }
     
+    // Save OpenAI API configuration
     func saveOpenAIConfig(apiKey: String, baseURL: String, organization: String?, project: String?, model: String) {
         UserDefaults.standard.setValue(apiKey, forKey: "openai_api_key")
         UserDefaults.standard.setValue(baseURL, forKey: "openai_base_url")
@@ -72,6 +74,7 @@ class AppState: ObservableObject {
         openAIProvider = OpenAIProvider(config: config)
     }
     
+    // Update the current AI provider
     func setCurrentProvider(_ provider: String) {
         currentProvider = provider
         UserDefaults.standard.setValue(provider, forKey: "current_provider")
