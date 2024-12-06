@@ -1,94 +1,116 @@
 # Writing Tools
 
-**Instantly proofread & optimise your writing system-wide:**
+**Instantly proofread and optimize your writing system-wide with AI:**
 
 https://github.com/user-attachments/assets/d3ce4694-b593-45ff-ae9a-892ce94b1dc8
 
-**Summarise webpages in a click:**
+**Summarize content (webpages, YouTube videos, documents...) in a click:**
 
 https://github.com/user-attachments/assets/ad9729ab-75fb-404d-a2cf-a2c7b94351c3
 
+## ✨ What is Writing Tools?
 
+Writing Tools is an **Apple Intelligence-inspired application for Windows, Linux, and macOS that supercharges your writing with an AI LLM** (cloud-based or local).
 
-## 🚀 What is Writing Tools?
+With one hotkey press system-wide, it lets you fix grammar, optimize text according to your instructions, summarize content (webpages, YouTube videos, etc.), and more.
 
-Writing Tools is an Apple Intelligence-inspired application for Windows and Linux that supercharges your writing with AI LLMs. It lets you fix up grammar and more with one hotkey press, system-wide. It's currently the world's most intelligent system-wide grammar assistant.
+It's currently the **world's most intelligent system-wide grammar assistant** and works in almost any language!
 
-### 🌟 Why Choose Writing Tools?
+## ⚡ What can I do with it, exactly?
 
-Aside from being the only Windows/Linux program that works like Apple's Writing Tools:
+### 1️⃣ Hyper-intelligent Writing Tools:
+- Select _any_ text on your PC and invoke Writing Tools with `ctrl+space`.
+- Choose **Proofread**, **Rewrite**, **Friendly**, **Professional**, **Concise**, or even enter **custom instructions** (e.g., _"add comments to this code"_, _"make it title case"_, _"translate to French"_).
+- Your text will instantly be replaced with the AI-optimized version. Use `ctrl+z` to revert.
 
-- **Versatile AI LLM Support**: Jump in quickly with support for the **free Gemini API**, or use an extensive range of **local LLMs** (via Ollama *[instructions below]*, llama.cpp, KoboldCPP, TabbyAPI, vLLM, etc.) or **cloud-based LLMs** (ChatGPT, Mistral AI, etc.) with Writing Tools' OpenAI-API-Compatibility.
-- **System-wide Functionality**: Works instantly in **any application** where you can select text. **Does not overwrite your clipboard**.
-- **Completely free and Open-source**: No subscriptions, no hidden costs. Bloat-free & uses pretty much **0% of your CPU**.
-- **Chat Mode**: Invoke Writing Tools with no text selected to enter a chat mode for quick queries and assistance.
+### 2️⃣ Powerful content summarization:
+- Select all text in any webpage, document, email, etc., with `ctrl+a`, or select the transcript of a YouTube video (from its description).
+- Choose **Summary**, **Key Points**, or **Table** after invoking Writing Tools.
+- Get a pop-up summary with clear and beautiful formatting (with Markdown rendering), saving you hours.
+
+### 3️⃣ LLM chat mode:
+- Press `ctrl+space` without selecting text to open a tiny prompt box and ask the LLM anything (e.g., _"give me a template for my LLM notes"_). The response will be typed into your textbox.
+
+## 🌟 Why Choose Writing Tools?
+
+Aside from being the only Windows/Linux program like Apple's Writing Tools, and the only way to use them on an Intel Mac:
+
+- **More intelligent than Apple's Writing Tools and Grammarly Premium:** Apple uses a tiny 3B parameter model, while Writing Tools lets you use much more advanced models for free (e.g., Gemini 1.5 Flash [~25B]). Grammarly's rule-based NLP can't compete with LLMs.
+- **Completely free and open-source:** No subscriptions or hidden costs. Bloat-free and uses **0% of your CPU** when idle.
+- **Versatile AI LLM support:** Jump in quickly with the **free Gemini API**, or an extensive range of **local LLMs** (via Ollama [[instructions]](https://github.com/theJayTea/WritingTools?tab=readme-ov-file#-optional-ollama-local-llm-instructions), llama.cpp, KoboldCPP, TabbyAPI, vLLM, etc.) or **cloud-based LLMs** (ChatGPT, Mistral AI, etc.) through Writing Tools' OpenAI-API-compatibility.
+- **Does not mess with your clipboard, and works system-wide.**
 - **Privacy-focused**: Your API key and config files stay on *your* device. NO logging, diagnostic collection, tracking, or ads. Invoked *only* on your command. Local LLMs keep your data on your device & work without the internet.
-- **Supports Many Languages**: Works for any language! It can even *translate* text across languages better than Google Translate (type *"translate to [language]"* in "Describe your change...").
-- **Code Support**: Select code and ask Writing Tools to work on it (fix, improve, convert languages) through "Describe your change...".
+- **Supports multiple languages:** Works with any language and translates text better than Google Translate (type "translate to [language]" in `Describe your change...`).
+- **Code support:** Fix, improve, translate, or add comments to code with `Describe your change...`."
 - **Themes, Dark Mode, & Customization**: Choose between **2 themes**: a blurry gradient theme and a plain theme that resembles the Windows + V pop-up! Also has full **dark mode** support. **Set your own hotkey** for quick access.
 
-Writing Tools has been featured on [Beebom](https://beebom.com/high-schooler-app-brings-apple-inteligence-writing-tools-windows/), [XDA](https://www.xda-developers.com/windows-pc-can-now-deliver-instant-free-writing-help-across-all-apps/), [Neowin](https://www.neowin.net/news/this-small-app-brings-some-apple-intelligence-features-to-windows/), [and](https://tinhte.vn/thread/mang-apple-intelligence-len-windows-chay-gemini-1-5-flash-thong-minh-hon-ho-tro-san-tieng-viet.3840902/) [more](https://www.computer-wd.com/2024/10/new-computer-programs-to-try-now.html)!
+Writing Tools has been featured on [Beebom](https://beebom.com/high-schooler-app-brings-apple-inteligence-writing-tools-windows/), [XDA](https://www.xda-developers.com/windows-pc-can-now-deliver-instant-free-writing-help-across-all-apps/), [Neowin](https://www.neowin.net/news/this-small-app-brings-some-apple-intelligence-features-to-windows/), [and](https://www.windowscentral.com/software-apps/can-apple-catch-up-apple-intelligence-just-shipped-yet-free-apple-writing-tools-on-github-for-windows-and-linux-make-a-better-alternative) [numerous](https://tinhte.vn/thread/mang-apple-intelligence-len-windows-chay-gemini-1-5-flash-thong-minh-hon-ho-tro-san-tieng-viet.3840902/) [others](https://www.computer-wd.com/2024/10/new-computer-programs-to-try-now.html)!
 
-## ✨ Features
+## ✅ Installation
 
-- **Proofread**: The smartest grammar and spelling corrector. Sorry not sorry, Grammarly Premium.
-- **Rewrite**: Improve the phrasing of your text.
-- **Make Friendly/Professional**: Adjust the tone of your writing.
-- **Summarize**: Create concise summaries of articles or long text. 🆕 It shows in its own pop-up window!
-- **Extract Key Points**: Highlight the most important information. 🆕 It shows in its own pop-up window!
-- **Create Tables**: Convert text into a structured table. 🆕 It shows in its own pop-up window! You can copy it into Word, etc.
-- **Custom Instructions**: Give specific directions for text modifications (e.g. `Translate to French`).
+### Windows:
+1. Go to the [Releases](https://github.com/theJayTea/WritingTools/releases) page and download the latest `Writing.Tools.zip` file.
+2. Extract it to your desired location, run `Writing Tools.exe`, and enjoy! :D
 
-Invoke Writing Tools with no text selected to enter a chat mode.
+*Note: Writing Tools is a portable app. If you extract it into a protected folder (e.g., Program Files), run it as administrator on first launch so it can create/edit its config file (in the same folder as its exe).*
 
-## 🖱 How to Use
+3. To auto-start Writing Tools on boot, add a shortcut of `Writing Tools.exe` to the Windows Start-Up folder (type `shell:startup` in Run to get there).
 
-1. Select any text in any application (or don't select any text to use chat mode).
-2. Press your hotkey (default: Ctrl+Space).
-3. Choose an option from the popup menu or enter a custom instruction.
-4. Watch as your text is magically improved!
+### Linux:
+Run it from the source code (instructions below).
 
-## 🛠 Installation
+### macOS (beta):
+The macOS version is a **native Swift port**, developed by [Aryamirsepasi](https://github.com/Aryamirsepasi). View the [README inside the macOS folder](https://github.com/theJayTea/WritingTools/tree/main/macOS) to learn more.
 
-1. Go to the [Releases](https://github.com/theJayTea/WritingTools/releases) page and download the latest `Writing.Tools.zip` file. For Linux and macOS, run it from source with the instructions further below.
-   
-2. Extract it where you want, run `Writing Tools.exe`, and enjoy! :D
+To install it:
+1. Go to the [Releases](https://github.com/theJayTea/WritingTools/releases) page and download the latest `.dmg` file.
+2. Open the `.dmg` file and drag the `writing-tools.app` into the Applications folder. That's it!
 
-   *Note: If you extract Writing Tools into a protected system folder like Program Files, you'll need to run it as administrator at least on the first launch or it won't be able to create/edit its config file (in the same folder as its exe).*
-   
-3. To let it automatically start when you boot your PC, add a shortcut of the `Writing Tools.exe` to the Windows Start-Up folder (Open Run and type `shell:startup` to get to this folder). 
+## ✨ Options Explained
 
-## 🦙 (optional) Ollama Local LLM Instructions:
-1. [Download](https://ollama.com/download) and install Ollama.
-2. Choose the LLM you want to use form [here](https://ollama.com/library). Recommended: Llama 3.1 8B if you have ~8GB of RAM or VRAM.
-3. Open your terminal, and type `ollama run llama3.1:8b`. This will download and run Llama 3.1. That's it! Leave this running in the background.
-4. In Writing Tools, choose the `OpenAl Compatible` AI Provider, and set your API Key to `ollama`, your API Base URL to `http://localhost:11434/v1`, and your API Model to `llama3.1:8b`.
-5. That's it! Enjoy Writing Tools with _absolute_ privacy and no internet connection! 🎉 From now on, you'll simply need to launch Ollama and Writing Tools into the background for it to work.
+- **Proofread:** The smartest grammar & spelling corrector. Sorry not sorry, Grammarly Premium.
+- **Rewrite:** Improve the phrasing of your text.
+- **Make Friendly/Professional:** Adjust the tone of your text.
+- **Custom Instructions:** Tailor your request (e.g., "Translate to French") through `Describe your change...`.
+
+The following options respond in a pop-up window (with markdown rendering, selectable text, and a zoom level that saves & applies on app restarts):
+- **Summarize:** Create clear and concise summaries.
+- **Extract Key Points:** Highlight the most important points.
+- **Create Tables:** Convert text into a formatted table. PS: You can copy & paste the table into MS Word.
 
 ## 🔒 Privacy
 
 I believe strongly in protecting your privacy. Writing Tools:
+- Does not collect or store any of your writing data by itself. It doesn't even collect general logs, so it's super light and privacy-friendly.
+- Lets you use local LLMs to process your text entirely on-device.
 - Only sends text to the chosen AI provider (encrypted) when you *explicitly* use one of the options.
 - Only stores your API key locally on your device.
-- Does not collect or store any of your writing data by itself. It doesn't even collect general logs, so it's super light and privacy-friendly.
 
-Note: Privacy policies may vary depending on the AI provider you choose. Please review the terms of service for your selected provider.
+Note: If you choose to use a cloud based LLM, refer to the AI provider's privacy policy and terms of service.
+
+## 🦙 (Optional) Ollama Local LLM Instructions:
+1. [Download](https://ollama.com/download) and install Ollama.
+2. Choose an LLM from [here](https://ollama.com/library). Recommended: Llama 3.1 8B (~8GB RAM or VRAM required).
+3. Run `ollama run llama3.1:8b` in your terminal to download and launch Llama 3.1.
+4. In Writing Tools, set the `OpenAI-Compatible` provider with:
+   - API Key: `ollama`
+   - API Base URL: `http://localhost:11434/v1`
+   - API Model: `llama3.1:8b`
+5. That's it! Enjoy Writing Tools with _absolute_ privacy and no internet connection! 🎉 From now on, you'll simply need to launch Ollama and Writing Tools into the background for it to work.
 
 ## 🐞 Known Issues
 1. (Being investigated) On some devices, Writing Tools does not work correctly with the default hotkey.
-   To fix it, simply change the hotkey to **ctrl+`** or **ctrl+j** and restart Writing Tools.
-   PS: If a hotkey is already in use by a program or background process, Writing Tools may not be able to intercept it. The above hotkeys are usualy unused.
+   
+   To fix it, simply change the hotkey to **ctrl+`** or **ctrl+j** and restart Writing Tools. PS: If a hotkey is already in use by a program or background process, Writing Tools may not be able to intercept it. The above hotkeys are usualy unused.
 
 2. The initial launch of the `Writing Tools.exe` might take unusually long — this seems to be because AV software extensively scans this new executable before letting it run. Once it launches into the background in RAM, it works instantly as usual.
- 
+
 ## 👨‍💻 To Run Writing Tools Directly from the Source Code
 
 If you prefer to run the program directly from the `main.py` file, follow these OS-specific instructions.
 
 **1. Download the Code**
-- Click the download button:
-   ![image](https://github.com/user-attachments/assets/4c6cab79-4918-451c-9ad1-1bbcf8472275)
-
+- Click the green `<> Code ▼` button toward the very top of this page, and click `Download ZIP`.
 
 **2. Install Dependencies**  
 After extracting the folder, open your **Terminal** (or **Command Prompt**) in the relevant directory.
@@ -104,9 +126,7 @@ After extracting the folder, open your **Terminal** (or **Command Prompt**) in t
    cd /path/to/Windows_and_Linux
    pip3 install -r requirements.txt
    ```
-
-Make sure [Python is installed](https://www.python.org/downloads/)!
-
+Of course, you'll need to have [Python installed](https://www.python.org/downloads/)!
 
 **3. Run the Program**
 - **Windows:**
@@ -118,10 +138,10 @@ Make sure [Python is installed](https://www.python.org/downloads/)!
    python3 main.py
    ```
 
-
 ## 👨‍💻 To compile the application yourself:
 
-Here's how to compile it with PyInstaller and a virtual environmentL
+### Windows and Linux Version build instructions:
+Here's how to compile it with PyInstaller and a virtual environment:
 
 1. First, create and activate a virtual environment:
 ```bash
@@ -149,10 +169,42 @@ pip install -r requirements.txt
 python pyinstaller-build-script.py
 ```
 
+### macOS Version (by [Aryamirsepasi](https://github.com/Aryamirsepasi)) build instructions:
+
+1. **Install Xcode**
+- Ensure you have Xcode installed on your macOS system.
+- Download it from the [Mac App Store](https://apps.apple.com/us/app/xcode/id497799835).  
+
+2. **Clone the Repository to your local machine**
+```bash
+git clone https://github.com/theJayTea/WritingTools.git
+cd WritingTools
+ ```
+
+3. **Open the Project in Xcode**
+- Open Xcode.
+- Select **File > Open** from the menu bar.
+- Navigate to the `macOS` folder and select it.  
+
+4. **Generate the Project File**
+Run the following command to generate the `.xcodeproj` file:
+```bash
+swift package generate-xcodeproj
+```
+
+5. **Build the Project**
+- Select your target device as **My Mac** in Xcode.
+- Build the project by clicking the **Play** button (or pressing `Command + R`).  
+
+6. **Run the App**
+- After the build is successful, the app will launch automatically.
+
+
 ## 🌟 Contributors
 
 Writing Tools would not be where it is today without its amazing contributors:
 
+### Windows & Linux version:
 **1. [Cameron Redmore (CameronRedmore)](https://github.com/CameronRedmore):**
 
 Extensively refactored Writing Tools and added OpenAI Compatible API support, streamed responses, and the chat mode when no text is selected.
@@ -174,16 +226,22 @@ Helped improve the reliability of text selection.
 Made the rounded corners anti-aliased & prettier.
 
 
+### macOS version:
+#### A native Swift port created entirely by **[Aryamirsepasi](https://github.com/Aryamirsepasi)**! This was a big endeavour and they've done an amazing job. We're grateful to have them as a contributor. 🫡
+
 ## 🤝 Contributing
 
 I welcome contributions! :D
-If you'd like to improve Writing Tools, feel free to open a Pull Request or get in touch with me.
+
+If you'd like to improve Writing Tools, please feel free to open a Pull Request or get in touch with me.
+
+If there are major changes on your mind, it may be a good idea to get in touch before working on it.
 
 ## 📬 Contact
 
-My email: jesaitarun@gmail.com
+Email: jesaitarun@gmail.com
 
-Made with ❤️ by a high school student. Check out my other AI app, [Bliss AI](https://play.google.com/store/apps/details?id=com.jesai.blissai), a novel AI tutor free on the Google Play Store!
+Made with ❤️ by a high school student. Check out my other app, [Bliss AI](https://play.google.com/store/apps/details?id=com.jesai.blissai), a free AI tutor!
 
 ## 📄 License
 
