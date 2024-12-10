@@ -94,7 +94,6 @@ struct ResponseView: View {
                         }
                     }) {
                         Label("Regenerate", systemImage: "arrow.clockwise")
-                            .foregroundColor(isRegenerating ? .aiPink : nil)
                     }
                     .disabled(isRegenerating)
                     

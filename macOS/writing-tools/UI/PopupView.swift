@@ -4,17 +4,29 @@ import ApplicationServices
 struct PopupView: View {
     @ObservedObject var appState: AppState
     @Environment(\.colorScheme) var colorScheme
+    @StateObject private var commandsManager = CustomCommandsManager()
     let closeAction: () -> Void
     @AppStorage("use_gradient_theme") private var useGradientTheme = false
     @State private var customText: String = ""
-    @State private var loadingOptions: Set<WritingOption> = []
+    @State private var loadingOptions: Set<String> = []
     @State private var isCustomLoading: Bool = false
+    @State private var showingCustomCommands = false
     
     var body: some View {
         VStack(spacing: 16) {
-            // Close button
+            // Top bar with close and add buttons
             HStack {
+                Button(action: { showingCustomCommands = true }) {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.title2)
+                        .foregroundColor(.secondary)
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 8)
+                .padding(.leading, 8)
+                
                 Spacer()
+                
                 Button(action: closeAction) {
                     Image(systemName: "xmark.circle.fill")
                         .font(.title2)
@@ -49,16 +61,28 @@ struct PopupView: View {
             .padding(.horizontal)
             
             if !appState.selectedText.isEmpty {
-                LazyVGrid(columns: [
-                    GridItem(.flexible()),
-                    GridItem(.flexible())
-                ], spacing: 16) {
-                    ForEach(WritingOption.allCases) { option in
-                        OptionButton(
-                            option: option,
-                            action: { processOption(option) },
-                            isLoading: loadingOptions.contains(option)
-                        )
+                ScrollView {
+                    LazyVGrid(columns: [
+                        GridItem(.flexible()),
+                        GridItem(.flexible())
+                    ], spacing: 16) {
+                        // Built-in options
+                        ForEach(WritingOption.allCases) { option in
+                            OptionButton(
+                                option: option,
+                                action: { processOption(option) },
+                                isLoading: loadingOptions.contains(option.id)
+                            )
+                        }
+                        
+                        // Custom commands
+                        ForEach(commandsManager.commands) { command in
+                            CustomOptionButton(
+                                command: command,
+                                action: { processCustomCommand(command) },
+                                isLoading: loadingOptions.contains(command.id.uuidString)
+                            )
+                        }
                     }
                 }
                 .padding(.horizontal)
@@ -72,7 +96,41 @@ struct PopupView: View {
         )
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(color: Color.black.opacity(0.2), radius: 10, y: 5)
+        .sheet(isPresented: $showingCustomCommands) {
+            CustomCommandsView(commandsManager: commandsManager)
+        }
     }
+    
+    private func processCustomCommand(_ command: CustomCommand) {
+        loadingOptions.insert(command.id.uuidString)
+        appState.isProcessing = true
+        
+        Task {
+            defer {
+                loadingOptions.remove(command.id.uuidString)
+                appState.isProcessing = false
+            }
+            
+            do {
+                let result = try await appState.activeProvider.processText(
+                    systemPrompt: command.prompt,
+                    userPrompt: appState.selectedText
+                )
+                
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(result, forType: .string)
+                
+                closeAction()
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    simulatePaste()
+                }
+            } catch {
+                print("Error processing custom command: \(error.localizedDescription)")
+            }
+        }
+    }
+    
     
     // Process custom text changes
     private func processCustomChange() {
@@ -83,12 +141,12 @@ struct PopupView: View {
     
     // Process predefined writing options
     private func processOption(_ option: WritingOption) {
-        loadingOptions.insert(option)
+        loadingOptions.insert(option.id)
         appState.isProcessing = true
         
         Task {
             defer {
-                loadingOptions.remove(option)
+                loadingOptions.remove(option.id)
                 appState.isProcessing = false
             }
             do {
@@ -206,6 +264,27 @@ struct OptionButton: View {
             HStack {
                 Image(systemName: option.icon)
                 Text(option.rawValue)
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(Color(.controlBackgroundColor))
+            .cornerRadius(8)
+        }
+        .buttonStyle(LoadingButtonStyle(isLoading: isLoading))
+        .disabled(isLoading)
+    }
+}
+
+struct CustomOptionButton: View {
+    let command: CustomCommand
+    let action: () -> Void
+    let isLoading: Bool
+    
+    var body: some View {
+        Button(action: action) {
+            HStack {
+                Image(systemName: command.emoji)
+                Text(command.name)
             }
             .frame(maxWidth: .infinity)
             .padding()
