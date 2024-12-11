@@ -5,6 +5,7 @@ final class ResponseViewModel: ObservableObject {
     @Published var content: String
     @Published var fontSize: CGFloat = 14
     @Published var showCopyConfirmation: Bool = false
+    @Published var additionalPrompt: String = ""
     
     let selectedText: String
     let option: WritingOption
@@ -18,12 +19,24 @@ final class ResponseViewModel: ObservableObject {
     // Regenerate content using AI provider
     func regenerateContent() async {
         do {
+            let combinedPrompt = if !additionalPrompt.isEmpty {
+                """
+                Original System Prompt: \(option.systemPrompt)
+                Additional Instructions: \(additionalPrompt)
+                
+                Apply both the original system prompt and the additional instructions to process the following text.
+                """
+            } else {
+                option.systemPrompt
+            }
+            
             let result = try await AppState.shared.activeProvider.processText(
-                systemPrompt: option.systemPrompt,
+                systemPrompt: combinedPrompt,
                 userPrompt: selectedText
             )
             await MainActor.run {
                 self.content = result
+                self.additionalPrompt = ""
             }
         } catch {
             print("Error regenerating content: \(error.localizedDescription)")
@@ -45,7 +58,6 @@ final class ResponseViewModel: ObservableObject {
     }
 }
 
-/// Main ResponseView
 struct ResponseView: View {
     @StateObject private var viewModel: ResponseViewModel
     @Environment(\.colorScheme) var colorScheme
@@ -81,47 +93,61 @@ struct ResponseView: View {
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
-
             }
             
-            HStack {
-                HStack(spacing: 12) {
-                    Button(action: {
-                        isRegenerating = true
-                        Task {
-                            await viewModel.regenerateContent()
-                            isRegenerating = false
-                        }
-                    }) {
-                        Label("Regenerate", systemImage: "arrow.clockwise")
-                    }
-                    .disabled(isRegenerating)
+            // Control bar
+            VStack(spacing: 12) {
+                // Additional Prompt Input
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Additional Instructions (optional):")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                     
-                    Button(action: {
-                        viewModel.copyContent()
-                    }) {
-                        Label(viewModel.showCopyConfirmation ? "Copied!" : "Copy",
-                              systemImage: viewModel.showCopyConfirmation ? "checkmark" : "doc.on.doc")
-                    }
-                    .animation(.easeInOut, value: viewModel.showCopyConfirmation)
+                    TextField("Enter additional instructions for regeneration...", text: $viewModel.additionalPrompt)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .font(.system(size: 12))
                 }
                 
-                Spacer()
-                
-                HStack(spacing: 8) {
-                    Button(action: { viewModel.fontSize = max(10, viewModel.fontSize - 2) }) {
-                        Image(systemName: "minus.magnifyingglass")
+                HStack {
+                    HStack(spacing: 12) {
+                        Button(action: {
+                            isRegenerating = true
+                            Task {
+                                await viewModel.regenerateContent()
+                                isRegenerating = false
+                            }
+                        }) {
+                            Label("Regenerate", systemImage: "arrow.clockwise")
+                                .frame(minWidth: 100)
+                        }
+                        .disabled(isRegenerating)
+                        
+                        Button(action: {
+                            viewModel.copyContent()
+                        }) {
+                            Label(viewModel.showCopyConfirmation ? "Copied!" : "Copy",
+                                  systemImage: viewModel.showCopyConfirmation ? "checkmark" : "doc.on.doc")
+                        }
+                        .animation(.easeInOut, value: viewModel.showCopyConfirmation)
                     }
-                    .disabled(viewModel.fontSize <= 10)
                     
-                    Button(action: { viewModel.fontSize = 14 }) {
-                        Image(systemName: "arrow.clockwise")
-                    }
+                    Spacer()
                     
-                    Button(action: { viewModel.fontSize = min(24, viewModel.fontSize + 2) }) {
-                        Image(systemName: "plus.magnifyingglass")
+                    HStack(spacing: 8) {
+                        Button(action: { viewModel.fontSize = max(10, viewModel.fontSize - 2) }) {
+                            Image(systemName: "minus.magnifyingglass")
+                        }
+                        .disabled(viewModel.fontSize <= 10)
+                        
+                        Button(action: { viewModel.fontSize = 14 }) {
+                            Image(systemName: "arrow.clockwise")
+                        }
+                        
+                        Button(action: { viewModel.fontSize = min(24, viewModel.fontSize + 2) }) {
+                            Image(systemName: "plus.magnifyingglass")
+                        }
+                        .disabled(viewModel.fontSize >= 24)
                     }
-                    .disabled(viewModel.fontSize >= 24)
                 }
             }
             .padding()

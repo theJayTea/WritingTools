@@ -16,8 +16,9 @@ struct PopupView: View {
         VStack(spacing: 16) {
             // Top bar with close and add buttons
             HStack {
-                Button(action: { showingCustomCommands = true }) {
-                    Image(systemName: "plus.circle.fill")
+                
+                Button(action: closeAction) {
+                    Image(systemName: "xmark.circle.fill")
                         .font(.title2)
                         .foregroundColor(.secondary)
                 }
@@ -27,8 +28,8 @@ struct PopupView: View {
                 
                 Spacer()
                 
-                Button(action: closeAction) {
-                    Image(systemName: "xmark.circle.fill")
+                Button(action: { showingCustomCommands = true }) {
+                    Image(systemName: "plus.circle.fill")
                         .font(.title2)
                         .foregroundColor(.secondary)
                 }
@@ -40,8 +41,8 @@ struct PopupView: View {
             // Custom input with send button
             HStack(spacing: 8) {
                 TextField(
-                    appState.selectedText.isEmpty ? "Enter your instruction..." : "Describe your change...",
-                    text: $customText
+                          appState.selectedText.isEmpty ? "Enter your instruction..." : "Describe your change...",
+                          text: $customText
                 )
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .loadingBorder(isLoading: isCustomLoading)
@@ -283,7 +284,7 @@ struct CustomOptionButton: View {
     var body: some View {
         Button(action: action) {
             HStack {
-                Image(systemName: command.emoji)
+                Image(systemName: command.icon)
                 Text(command.name)
             }
             .frame(maxWidth: .infinity)

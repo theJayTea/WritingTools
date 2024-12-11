@@ -26,18 +26,11 @@ struct CustomCommandsView: View {
             // List of commands
             List {
                 ForEach(commandsManager.commands) { command in
-                    CustomCommandRow(command: command)
-                        .contextMenu {
-                            Button("Edit") {
-                                editingCommand = command
-                            }
-                            Button("Delete", role: .destructive) {
-                                commandsManager.deleteCommand(command)
-                            }
-                        }
-                        .onTapGesture {
-                            selectedCommand = command
-                        }
+                    CustomCommandRow(
+                        command: command,
+                        onEdit: { editingCommand = $0 },
+                        onDelete: { commandsManager.deleteCommand($0) }
+                    )
                 }
             }
             
@@ -75,13 +68,17 @@ struct CustomCommandsView: View {
 
 struct CustomCommandRow: View {
     let command: CustomCommand
-    
+    var onEdit: (CustomCommand) -> Void
+    var onDelete: (CustomCommand) -> Void
+
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: command.emoji)
+            // Icon
+            Image(systemName: command.icon)
                 .font(.title2)
                 .frame(width: 30)
             
+            // Command Details
             VStack(alignment: .leading, spacing: 4) {
                 Text(command.name)
                     .font(.headline)
@@ -90,6 +87,24 @@ struct CustomCommandRow: View {
                     .foregroundColor(.secondary)
                     .lineLimit(2)
             }
+            Spacer()
+            
+            // Edit Button
+            Button(action: { onEdit(command) }) {
+                Image(systemName: "pencil")
+                    .font(.title2)
+            }
+            .buttonStyle(.plain)
+            .padding(.horizontal, 4)
+            
+            // Delete Button
+            Button(action: { onDelete(command) }) {
+                Image(systemName: "trash")
+                    .font(.title2)
+                    .foregroundColor(.red)
+            }
+            .buttonStyle(.plain)
+            .padding(.horizontal, 4)
         }
         .padding(.vertical, 8)
     }
@@ -115,7 +130,7 @@ struct CustomCommandEditor: View {
         if let command = editingCommand {
             _name = State(initialValue: command.name)
             _prompt = State(initialValue: command.prompt)
-            _selectedIcon = State(initialValue: command.emoji)
+            _selectedIcon = State(initialValue: command.icon)
         }
     }
     
@@ -137,31 +152,33 @@ struct CustomCommandEditor: View {
             
             ScrollView {
                 VStack(spacing: 20) {
-                    // Name field
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Name")
-                            .font(.headline)
-                        TextField("Command Name", text: $name)
-                            .textFieldStyle(.roundedBorder)
-                    }
-                    
-                    // Icon selector
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Icon")
-                            .font(.headline)
-                        Button(action: { showingIconPicker = true }) {
-                            HStack {
-                                Image(systemName: selectedIcon)
-                                    .font(.title2)
-                                    .foregroundColor(.accentColor)
-                                Text("Change Icon")
-                                    .foregroundColor(.accentColor)
-                            }
-                            .padding(8)
-                            .background(Color(.controlBackgroundColor))
-                            .cornerRadius(6)
+                    HStack(alignment: .top, spacing: 16) {
+                        // Name field
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Name")
+                                .font(.headline)
+                            TextField("Command Name", text: $name)
+                                .textFieldStyle(.roundedBorder)
                         }
-                        .buttonStyle(.plain)
+                        
+                        // Icon selector
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Icon")
+                                .font(.headline)
+                            Button(action: { showingIconPicker = true }) {
+                                HStack {
+                                    Image(systemName: selectedIcon)
+                                        .font(.title2)
+                                        .foregroundColor(.accentColor)
+                                    Text("Change Icon")
+                                        .foregroundColor(.accentColor)
+                                }
+                                .padding(8)
+                                .background(Color(.controlBackgroundColor))
+                                .cornerRadius(6)
+                            }
+                            .buttonStyle(.plain)
+                        }
                     }
                     
                     // Prompt field
@@ -199,7 +216,7 @@ struct CustomCommandEditor: View {
                         id: editingCommand?.id ?? UUID(),
                         name: name,
                         prompt: prompt,
-                        emoji: selectedIcon
+                        icon: selectedIcon
                     )
                     
                     if editingCommand != nil {
