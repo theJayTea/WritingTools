@@ -233,10 +233,9 @@ class DropdownSetting(AIProviderSetting):
             self.dropdown.addItem(option, value)
 
         # Set current value
-        for i in range(self.dropdown.count()):
-            if self.dropdown.itemData(i) == self.internal_value:
-                self.dropdown.setCurrentIndex(i)
-                break
+        index = self.dropdown.findData(self.internal_value)
+        if index != -1:
+            self.dropdown.setCurrentIndex(index)
 
         row_layout.addWidget(self.dropdown)
         layout.addLayout(row_layout)
