@@ -11,12 +11,11 @@ class PopupWindow: NSWindow {
         self.appState = appState
         self.commandsManager = CustomCommandsManager()
         
-        // Initialize with minimum size first
         super.init(
             contentRect: NSRect(x: 0, y: 0, width: 400, height: 100),
             styleMask: [.borderless],
             backing: .buffered,
-            defer: true // Change to true to defer window creation
+            defer: true
         )
         
         self.isReleasedWhenClosed = false
@@ -66,7 +65,7 @@ class PopupWindow: NSWindow {
         let baseHeight: CGFloat = 100 // Height for header and input field
         let buttonHeight: CGFloat = 55 // Height for each button row
         let spacing: CGFloat = 16 // Vertical spacing between elements
-        let padding: CGFloat = 16 // Bottom padding
+        let padding: CGFloat = 20 // Bottom padding
         
         let numBuiltInOptions = WritingOption.allCases.count
         let numCustomOptions = commandsManager.commands.count

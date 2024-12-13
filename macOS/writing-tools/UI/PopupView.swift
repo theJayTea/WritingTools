@@ -41,23 +41,15 @@ struct PopupView: View {
             // Custom input with send button
             HStack(spacing: 8) {
                 TextField(
-                          appState.selectedText.isEmpty ? "Enter your instruction..." : "Describe your change...",
-                          text: $customText
+                    appState.selectedText.isEmpty ? "Describe your change..." : "Describe your change...",
+                    text: $customText
                 )
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .loadingBorder(isLoading: isCustomLoading)
-                .onSubmit {
-                    processCustomChange()
-                }
-                Button(action: processCustomChange) {
-                    Image(systemName: "paperplane.fill")
-                        .foregroundColor(.white)
-                        .padding(6)
-                        .background(Color.blue)
-                        .clipShape(Circle())
-                }
-                .buttonStyle(.plain)
-                .disabled(customText.isEmpty)
+                .textFieldStyle(.plain)
+                .appleStyleTextField(
+                    text: customText,
+                    isLoading: isCustomLoading,
+                    onSubmit: processCustomChange
+                )
             }
             .padding(.horizontal)
             
