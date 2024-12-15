@@ -19,7 +19,7 @@ class AboutWindow(QtWidgets.QWidget):
         Initialize the user interface for the about window.
         """
         self.setWindowTitle(' ') # Hack to hide the title bar text. TODO: Find a better solution later.
-        self.setGeometry(300, 300, 500, 490)  # Set the window size
+        self.setGeometry(300, 300, 500, 528)  # Set the window size
 
         # Center the window on the screen. I'm not aware of any methods in UIUtils to do this, so I'll be doing it manually.
         screen = QtWidgets.QApplication.primaryScreen().geometry()
