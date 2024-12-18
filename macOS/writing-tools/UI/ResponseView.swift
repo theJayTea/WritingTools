@@ -81,7 +81,6 @@ struct ResponseView: View {
                             .progressViewStyle(CircularProgressViewStyle(tint: Color.aiPink))
                             .scaleEffect(1.2)
                         Text("Regenerating...")
-                            .foregroundColor(.aiPink)
                             .padding(.top, 8)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
