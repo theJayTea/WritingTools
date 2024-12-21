@@ -1,6 +1,7 @@
 import webbrowser
 
-from PySide6 import QtCore, QtWidgets
+from PySide6 import QtCore, QtWidgets, QtGui
+from PySide6.QtCore import Qt
 
 from ui.UIUtils import UIUtils, colorMode
 
@@ -17,9 +18,24 @@ class AboutWindow(QtWidgets.QWidget):
         """
         Initialize the user interface for the about window.
         """
-        self.setWindowTitle('About Writing Tools')
-        self.setGeometry(300, 300, 400, 400)  # Increased height to accommodate new content
+        self.setWindowTitle(' ') # Hack to hide the title bar text. TODO: Find a better solution later.
+        self.setGeometry(300, 300, 500, 528)  # Set the window size
+
+        # Center the window on the screen. I'm not aware of any methods in UIUtils to do this, so I'll be doing it manually.
+        screen = QtWidgets.QApplication.primaryScreen().geometry()
+        x = (screen.width() - self.width()) // 2
+        y = (screen.height() - self.height()) // 2
+        self.move(x, y)
+
         UIUtils.setup_window_and_layout(self)
+
+        # Disable minimize button and icon in title bar
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowMinimizeButtonHint & ~QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.WindowTitleHint)
+
+        # Remove window icon. Has to be done after UIUtils.setup_window_and_layout().
+        pixmap = QtGui.QPixmap(32, 32)
+        pixmap.fill(QtCore.Qt.transparent)
+        self.setWindowIcon(QtGui.QIcon(pixmap))
 
         content_layout = QtWidgets.QVBoxLayout(self.background)
         content_layout.setContentsMargins(30, 30, 30, 30)
@@ -54,6 +70,7 @@ class AboutWindow(QtWidgets.QWidget):
                 <p style='text-align: center;'>
                 <b>Version:</b> 5.0 (Codename: Impressively Improved)
                 </p>
+                <p />
                 """
 
         about_label = QtWidgets.QLabel(about_text)
@@ -61,7 +78,13 @@ class AboutWindow(QtWidgets.QWidget):
         about_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         about_label.setWordWrap(True)
         about_label.setOpenExternalLinks(True)  # Allow opening hyperlinks
-        content_layout.addWidget(about_label)
+
+        scroll_area = QtWidgets.QScrollArea()
+        scroll_area.setWidget(about_label)
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setStyleSheet("background: transparent;")
+
+        content_layout.addWidget(scroll_area)
 
         # Add "Check for updates" button
         update_button = QtWidgets.QPushButton('Check for updates')
