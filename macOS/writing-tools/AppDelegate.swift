@@ -178,46 +178,41 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     
     // Updates the active keyboard shortcut based on settings
     private func updateHotKey() {
-        // Remove existing hotkey first
+        // Clear any existing hotKey
         hotKey = nil
         
-        let shortcutText = UserDefaults.standard.string(forKey: "shortcut") ?? "⌥ Space"
+        // Retrieve raw code & modifiers from UserDefaults
+        let rawKeyCode = UserDefaults.standard.integer(forKey: "hotKey_keyCode")
+        let rawModifiers = UserDefaults.standard.integer(forKey: "hotKey_modifiers")
         
-        var modifiers: NSEvent.ModifierFlags = []
-        var keyCode: UInt32 = 0
-        
-        let components = shortcutText.components(separatedBy: " ")
-        for component in components {
-            switch component {
-            case "⌘": modifiers.insert(.command)
-            case "⌥": modifiers.insert(.option)
-            case "⌃": modifiers.insert(.control)
-            case "⇧": modifiers.insert(.shift)
-            case "Space": keyCode = UInt32(kVK_Space)
-            case "Return": keyCode = UInt32(kVK_Return)
-            case "D": keyCode = UInt32(kVK_ANSI_D)
-            default:
-                if let firstChar = component.first,
-                   let asciiValue = firstChar.uppercased().first?.asciiValue {
-                    keyCode = UInt32(asciiValue) - UInt32(0x41) + UInt32(kVK_ANSI_A)
-                }
-            }
+        // If user never recorded anything, set a default.
+        if rawKeyCode == 0 && rawModifiers == 0 {
+            // Provide default if needed
+            let defaultKeyCode = kVK_ANSI_D
+            let defaultFlags   = NSEvent.ModifierFlags.control.carbonFlags
+            
+            UserDefaults.standard.set(Int(defaultKeyCode), forKey: "hotKey_keyCode")
+            UserDefaults.standard.set(Int(defaultFlags), forKey: "hotKey_modifiers")
+            
+            // Re-read from UserDefaults so code proceeds
+            return updateHotKey()
         }
         
-        guard keyCode != 0 else {
-            print("Invalid key code, resetting to default shortcut")
-            UserDefaults.standard.set("⌥ Space", forKey: "shortcut")
-            updateHotKey()
-            return
-        }
+        // Construct the HotKey from those raw integers
+        let carbonKeyCode = UInt32(rawKeyCode)
+        let carbonModifiers = UInt32(rawModifiers)
         
-        hotKey = HotKey(keyCombo: KeyCombo(carbonKeyCode: keyCode, carbonModifiers: modifiers.carbonFlags))
+        // Create the HotKey instance
+        hotKey = HotKey(keyCombo: KeyCombo(
+            carbonKeyCode: carbonKeyCode,
+            carbonModifiers: carbonModifiers
+        ))
+        
         hotKey?.keyDownHandler = { [weak self] in
             DispatchQueue.main.async {
                 if let frontmostApp = NSWorkspace.shared.frontmostApplication {
                     self?.appState.previousApplication = frontmostApp
                 }
-                
                 self?.showPopup()
             }
         }

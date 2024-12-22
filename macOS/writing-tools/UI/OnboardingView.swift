@@ -147,7 +147,7 @@ struct OnboardingView: View {
                 Text("Set your keyboard shortcut:")
                     .font(.headline)
                 
-                ShortcutRecorderView(shortcutText: $shortcutText)
+                ShortcutRecorderView()
                     .frame(maxWidth: .infinity)
                 
                 Text("Important: For reliable shortcuts, try:")

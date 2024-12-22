@@ -98,11 +98,11 @@ struct ResponseView: View {
             VStack(spacing: 12) {
                 // Additional Prompt Input
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Additional Instructions (optional):")
+                    Text("Follow-up question(optional):")
                         .font(.caption)
                         .foregroundColor(.secondary)
                     
-                    TextField("Enter additional instructions for regeneration...", text: $viewModel.additionalPrompt)
+                    TextField("Ask a follow-up question / describe a change", text: $viewModel.additionalPrompt)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .font(.system(size: 12))
                 }
