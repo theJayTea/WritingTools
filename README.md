@@ -8,6 +8,18 @@ https://github.com/user-attachments/assets/d3ce4694-b593-45ff-ae9a-892ce94b1dc8
 
 https://github.com/user-attachments/assets/76d13eb9-168e-4459-ada4-62e0586ae58c
 
+---
+
+Hi! I'm Jesai, and I develop and maintain Writing Tools (Windows & Linux) with help from our amazing contributors.
+
+Writing Tools will always remain completely free and open-source.
+
+If you find value in it, it would mean the world to me if you could support my continued development of it ❤️
+
+<a href="https://www.buymeacoffee.com/jesaitarun" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+
+---
+
 ## ✨ What is Writing Tools?
 
 Writing Tools is an **Apple Intelligence-inspired application for Windows, Linux, and macOS that supercharges your writing with an AI LLM** (cloud-based or local).
