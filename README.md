@@ -225,6 +225,13 @@ Helped improve the reliability of text selection.
 
 Made the rounded corners anti-aliased & prettier.
 
+**6. [ErrorCatDev](https://github.com/ErrorCatDev):**
+
+Significantly improved the About window, making it scrollable and cleaning things up. Also improved our .gitignore & requirements.txt.
+
+**7. [Vadim Karpenko](https://github.com/Vadim-Karpenko):**
+
+Helped add the start-on-boot setting!
 
 ### macOS version:
 #### A native Swift port created entirely by **[Aryamirsepasi](https://github.com/Aryamirsepasi)**! This was a big endeavour and they've done an amazing job. We're grateful to have them as a contributor. 🫡
