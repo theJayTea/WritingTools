@@ -1,7 +1,6 @@
 import webbrowser
 
-from PySide6 import QtCore, QtWidgets, QtGui
-from PySide6.QtCore import Qt
+from PySide6 import QtCore, QtGui, QtWidgets
 
 from ui.UIUtils import UIUtils, colorMode
 
@@ -19,7 +18,7 @@ class AboutWindow(QtWidgets.QWidget):
         Initialize the user interface for the about window.
         """
         self.setWindowTitle(' ') # Hack to hide the title bar text. TODO: Find a better solution later.
-        self.setGeometry(300, 300, 500, 528)  # Set the window size
+        self.setGeometry(300, 300, 650, 720)  # Set the window size
 
         # Center the window on the screen. I'm not aware of any methods in UIUtils to do this, so I'll be doing it manually.
         screen = QtWidgets.QApplication.primaryScreen().geometry()
@@ -66,9 +65,13 @@ class AboutWindow(QtWidgets.QWidget):
                 Helped improve the reliability of text selection.</b><br>
                 <b>5. <a href="https://github.com/raghavdhingra24">raghavdhingra24</a>:</b><br>
                 Made the rounded corners anti-aliased & prettier.</b><br>
+                <b>6. <a href="https://github.com/ErrorCatDev">ErrorCatDev</a>:</b><br>
+                Significantly improved the About window, making it scrollable and cleaning things up. Also improved our .gitignore & requirements.txt.</b><br>
+                <b>7. <a href="https://github.com/Vadim-Karpenko">Vadim Karpenko</a>:</b><br>
+                Helped add the start-on-boot setting!</b><br>
                 </p>
                 <p style='text-align: center;'>
-                <b>Version:</b> 5.0 (Codename: Impressively Improved)
+                <b>Version:</b> 6.0 (Codename: Radically Refined)
                 </p>
                 <p />
                 """

@@ -68,7 +68,7 @@ class CustomPopupWindow(QtWidgets.QWidget):
         has_text = not not self.selected_text.strip()
 
         self.custom_input = QtWidgets.QLineEdit()
-        self.custom_input.setPlaceholderText("Describe your change..." if has_text else "Please enter an instruction...")
+        self.custom_input.setPlaceholderText("Describe your change..." if has_text else "Ask your AI...")
         self.custom_input.setStyleSheet(f"""
             QLineEdit {{
                 padding: 8px;
@@ -145,6 +145,14 @@ class CustomPopupWindow(QtWidgets.QWidget):
             content_layout.addLayout(options_grid)
         else:
             self.custom_input.setMinimumWidth(300)
+            
+        # Add update notice if available
+        if self.app.config.get("update_available", False):
+            update_label = QtWidgets.QLabel()
+            update_label.setOpenExternalLinks(True)
+            update_label.setText('<a href="https://github.com/theJayTea/WritingTools/releases" style="color:rgb(255, 0, 0); text-decoration: underline; font-weight: bold;">There\'s an update! :D Download now.</a>')
+            update_label.setStyleSheet("margin-top: 10px;")
+            content_layout.addWidget(update_label, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
 
         logging.debug('CustomPopupWindow UI setup complete')
 
