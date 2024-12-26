@@ -6,7 +6,19 @@ https://github.com/user-attachments/assets/d3ce4694-b593-45ff-ae9a-892ce94b1dc8
 
 **Summarize content (webpages, YouTube videos, documents...) in a click:**
 
-https://github.com/user-attachments/assets/ad9729ab-75fb-404d-a2cf-a2c7b94351c3
+https://github.com/user-attachments/assets/76d13eb9-168e-4459-ada4-62e0586ae58c
+
+---
+
+Hi! I'm Jesai, and I develop and maintain Writing Tools (Windows & Linux) with help from our amazing contributors.
+
+Writing Tools will always remain completely free and open-source.
+
+If you find value in it, it would mean the world to me if you could support my continued development of it ❤️
+
+<a href="https://www.buymeacoffee.com/jesaitarun" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+
+---
 
 ## ✨ What is Writing Tools?
 
@@ -23,21 +35,22 @@ It's currently the **world's most intelligent system-wide grammar assistant** an
 - Choose **Proofread**, **Rewrite**, **Friendly**, **Professional**, **Concise**, or even enter **custom instructions** (e.g., _"add comments to this code"_, _"make it title case"_, _"translate to French"_).
 - Your text will instantly be replaced with the AI-optimized version. Use `ctrl+z` to revert.
 
-### 2️⃣ Powerful content summarization:
+### 2️⃣ Powerful content summarization that you can chat with:
 - Select all text in any webpage, document, email, etc., with `ctrl+a`, or select the transcript of a YouTube video (from its description).
 - Choose **Summary**, **Key Points**, or **Table** after invoking Writing Tools.
 - Get a pop-up summary with clear and beautiful formatting (with Markdown rendering), saving you hours.
+- Chat with the summary if you'd like to learn more or have questions.
 
-### 3️⃣ LLM chat mode:
-- Press `ctrl+space` without selecting text to open a tiny prompt box and ask the LLM anything (e.g., _"give me a template for my LLM notes"_). The response will be typed into your textbox.
+### 3️⃣ Chat with an LLM anytime in a click:
+- Press `ctrl+space` without selecting text to start a conversation with your LLM _(for privacy, chat history is deleted when you close the window)_.
 
 ## 🌟 Why Choose Writing Tools?
 
 Aside from being the only Windows/Linux program like Apple's Writing Tools, and the only way to use them on an Intel Mac:
 
-- **More intelligent than Apple's Writing Tools and Grammarly Premium:** Apple uses a tiny 3B parameter model, while Writing Tools lets you use much more advanced models for free (e.g., Gemini 1.5 Flash [~25B]). Grammarly's rule-based NLP can't compete with LLMs.
+- **More intelligent than Apple's Writing Tools and Grammarly Premium:** Apple uses a tiny 3B parameter model, while Writing Tools lets you use much more advanced models for free (e.g., Gemini 2.0 Flash [~30B]). Grammarly's rule-based NLP can't compete with LLMs.
 - **Completely free and open-source:** No subscriptions or hidden costs. Bloat-free and uses **0% of your CPU** when idle.
-- **Versatile AI LLM support:** Jump in quickly with the **free Gemini API**, or an extensive range of **local LLMs** (via Ollama [[instructions]](https://github.com/theJayTea/WritingTools?tab=readme-ov-file#-optional-ollama-local-llm-instructions), llama.cpp, KoboldCPP, TabbyAPI, vLLM, etc.) or **cloud-based LLMs** (ChatGPT, Mistral AI, etc.) through Writing Tools' OpenAI-API-compatibility.
+- **Versatile AI LLM support:** Jump in quickly with the **free Gemini API & Gemini 2.0**, or an extensive range of **local LLMs** (via Ollama [[instructions]](https://github.com/theJayTea/WritingTools?tab=readme-ov-file#-optional-ollama-local-llm-instructions), llama.cpp, KoboldCPP, TabbyAPI, vLLM, etc.) or **cloud-based LLMs** (ChatGPT, Mistral AI, etc.) through Writing Tools' OpenAI-API-compatibility.
 - **Does not mess with your clipboard, and works system-wide.**
 - **Privacy-focused**: Your API key and config files stay on *your* device. NO logging, diagnostic collection, tracking, or ads. Invoked *only* on your command. Local LLMs keep your data on your device & work without the internet.
 - **Supports multiple languages:** Works with any language and translates text better than Google Translate (type "translate to [language]" in `Describe your change...`).
@@ -52,9 +65,9 @@ Writing Tools has been featured on [Beebom](https://beebom.com/high-schooler-app
 1. Go to the [Releases](https://github.com/theJayTea/WritingTools/releases) page and download the latest `Writing.Tools.zip` file.
 2. Extract it to your desired location, run `Writing Tools.exe`, and enjoy! :D
 
-*Note: Writing Tools is a portable app. If you extract it into a protected folder (e.g., Program Files), run it as administrator on first launch so it can create/edit its config file (in the same folder as its exe).*
+*Note: Writing Tools is a portable app. If you extract it into a protected folder (e.g., Program Files), run it as administrator at least on first launch so it can create/edit its config file (in the same folder as its exe).*
 
-3. To auto-start Writing Tools on boot, add a shortcut of `Writing Tools.exe` to the Windows Start-Up folder (type `shell:startup` in Run to get there).
+**PS:** Go to Writing Tools' Settings (from its tray icon at the bottom right of the taskbar) to enable starting Writing Tools on boot.
 
 ### Linux:
 Run it from the source code (instructions below).
@@ -65,6 +78,17 @@ The macOS version is a **native Swift port**, developed by [Aryamirsepasi](https
 To install it:
 1. Go to the [Releases](https://github.com/theJayTea/WritingTools/releases) page and download the latest `.dmg` file.
 2. Open the `.dmg` file and drag the `writing-tools.app` into the Applications folder. That's it!
+
+## 👀 Tips
+
+#### 1️⃣ Summarise a YouTube video from its transcript:
+
+https://github.com/user-attachments/assets/dd4780d4-7cdb-4bdb-9a64-e93520ab61be
+
+#### 2️⃣ Make Writing Tools work better in MS Word: the `ctrl+space` keyboard shortcut is mapped to "Clear Formatting", making you lose paragraph indentation. Here's how to improve this:
+P.S.: Word's rich-text formatting (bold, italics, underline, colours...) will be lost on using Writing Tools. A Markdown editor such as [Obsidian](https://obsidian.md/) has no such issue.
+
+https://github.com/user-attachments/assets/42a3d8c7-18ac-4282-9478-16aab935f35e
 
 ## ✨ Options Explained
 
@@ -101,7 +125,7 @@ Note: If you choose to use a cloud based LLM, refer to the AI provider's privacy
 ## 🐞 Known Issues
 1. (Being investigated) On some devices, Writing Tools does not work correctly with the default hotkey.
    
-   To fix it, simply change the hotkey to **ctrl+`** or **ctrl+j** and restart Writing Tools. PS: If a hotkey is already in use by a program or background process, Writing Tools may not be able to intercept it. The above hotkeys are usualy unused.
+   To fix it, simply change the hotkey to **ctrl+`** or **ctrl+j** and restart Writing Tools. PS: If a hotkey is already in use by a program or background process, Writing Tools may not be able to intercept it. The above hotkeys are usually unused.
 
 2. The initial launch of the `Writing Tools.exe` might take unusually long — this seems to be because AV software extensively scans this new executable before letting it run. Once it launches into the background in RAM, it works instantly as usual.
 
@@ -225,6 +249,13 @@ Helped improve the reliability of text selection.
 
 Made the rounded corners anti-aliased & prettier.
 
+**6. [ErrorCatDev](https://github.com/ErrorCatDev):**
+
+Significantly improved the About window, making it scrollable and cleaning things up. Also improved our .gitignore & requirements.txt.
+
+**7. [Vadim Karpenko](https://github.com/Vadim-Karpenko):**
+
+Helped add the start-on-boot setting!
 
 ### macOS version:
 #### A native Swift port created entirely by **[Aryamirsepasi](https://github.com/Aryamirsepasi)**! This was a big endeavour and they've done an amazing job. We're grateful to have them as a contributor. 🫡

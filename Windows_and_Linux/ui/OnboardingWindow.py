@@ -3,7 +3,6 @@ import logging
 from PySide6 import QtCore, QtWidgets
 from PySide6.QtWidgets import QHBoxLayout, QRadioButton
 
-from ui.SettingsWindow import SettingsWindow
 from ui.UIUtils import UIUtils, colorMode
 
 
@@ -42,12 +41,15 @@ class OnboardingWindow(QtWidgets.QWidget):
         self.content_layout.addWidget(title_label, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
 
         features_text = """
-        • Improves your writing with AI
+        • Instantly optimize your writing with AI by selecting your text and invoking Writing Tools with "ctrl+space", anywhere. 
 
-        • Works in any application in just a click
+        • Get a summary you can chat with of articles, YouTube videos, or documents by select all text with "ctrl+a"
+          (or select the YouTube transcript from its description), invoking Writing Tools, and choosing Summary.
+
+        • Chat with AI anytime by invoking Writing Tools without selecting any text.
 
         • Supports an extensive range of AI models:
-            - Gemini 1.5 Flash
+            - Gemini 2.0
             - ANY OpenAI Compatible API — including local LLMs!
         """
         features_label = QtWidgets.QLabel(features_text)
@@ -55,7 +57,7 @@ class OnboardingWindow(QtWidgets.QWidget):
         features_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
         self.content_layout.addWidget(features_label)
 
-        shortcut_label = QtWidgets.QLabel("Customize your shortcut key (default: ctrl+space):")
+        shortcut_label = QtWidgets.QLabel("Customize your shortcut key (default: \"ctrl+space\"):")
         shortcut_label.setStyleSheet(f"font-size: 16px; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
         self.content_layout.addWidget(shortcut_label)
 
