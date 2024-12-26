@@ -70,7 +70,7 @@ struct CustomCommandRow: View {
     let command: CustomCommand
     var onEdit: (CustomCommand) -> Void
     var onDelete: (CustomCommand) -> Void
-
+    
     var body: some View {
         HStack(spacing: 12) {
             // Icon
@@ -120,6 +120,7 @@ struct CustomCommandEditor: View {
     @State private var name: String = ""
     @State private var prompt: String = ""
     @State private var selectedIcon: String = "star.fill"
+    @State private var useResponseWindow: Bool = false
     @State private var showingIconPicker = false
     
     init(commandsManager: CustomCommandsManager, isPresented: Binding<Bool>, editingCommand: CustomCommand? = nil) {
@@ -131,6 +132,7 @@ struct CustomCommandEditor: View {
             _name = State(initialValue: command.name)
             _prompt = State(initialValue: command.prompt)
             _selectedIcon = State(initialValue: command.icon)
+            _useResponseWindow = State(initialValue: command.useResponseWindow)
         }
     }
     
@@ -196,6 +198,14 @@ struct CustomCommandEditor: View {
                                     .stroke(Color.gray.opacity(0.2), lineWidth: 1)
                             )
                     }
+                    // Add Response Window Toggle
+                    Toggle("Show Response in Chat Window", isOn: $useResponseWindow)
+                        .padding(.horizontal)
+                    
+                    Text("When enabled, responses will appear in a chat window instead of replacing the selected text.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal)
                 }
                 .padding()
             }
@@ -216,7 +226,8 @@ struct CustomCommandEditor: View {
                         id: editingCommand?.id ?? UUID(),
                         name: name,
                         prompt: prompt,
-                        icon: selectedIcon
+                        icon: selectedIcon,
+                        useResponseWindow: useResponseWindow
                     )
                     
                     if editingCommand != nil {
@@ -229,6 +240,7 @@ struct CustomCommandEditor: View {
                 }
                 .keyboardShortcut(.return, modifiers: [.command])
                 .disabled(name.isEmpty || prompt.isEmpty)
+                .padding()
             }
             .padding()
         }
