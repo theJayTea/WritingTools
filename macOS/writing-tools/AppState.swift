@@ -19,7 +19,7 @@ class AppState: ObservableObject {
     private init() {
         // Initialize Gemini
         let geminiApiKey = UserDefaults.standard.string(forKey: "gemini_api_key")?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        let geminiModelName = UserDefaults.standard.string(forKey: "gemini_model") ?? GeminiModel.twoflash.rawValue
+        let geminiModelName = UserDefaults.standard.string(forKey: "gemini_model") ?? GeminiModel.oneflash.rawValue
         let geminiConfig = GeminiConfig(apiKey: geminiApiKey, modelName: geminiModelName)
         self.geminiProvider = GeminiProvider(config: geminiConfig)
         
