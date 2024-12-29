@@ -42,13 +42,14 @@ This guide will help you properly set up the Writing Tools macOS project in Xcod
    - Launch Xcode once installed and complete any additional component installations
 
 2. **Clone the Repository**
+   - Open Terminal and navigate to a directory you want the project to be in:
    ```bash
    git clone https://github.com/theJayTea/WritingTools.git
    cd WritingTools
    ```
 
 3. **Create Xcode Project**
-   - Open Terminal and navigate to the project's macOS directory:
+   - Navigate to the project's macOS directory:
      ```bash
      cd macOS
      ```

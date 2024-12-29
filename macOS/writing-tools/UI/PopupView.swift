@@ -110,14 +110,31 @@ struct PopupView: View {
                     userPrompt: appState.selectedText
                 )
                 
-                NSPasteboard.general.clearContents()
-                NSPasteboard.general.setString(result, forType: .string)
+                if command.useResponseWindow {
+                    // Show response in a new window
+                    await MainActor.run {
+                        let window = ResponseWindow(
+                            title: command.name,
+                            content: result,
+                            selectedText: appState.selectedText,
+                            option: .proofread // Using proofread as default since this is a custom command
+                        )
+                        
+                        WindowManager.shared.addResponseWindow(window)
+                        window.makeKeyAndOrderFront(nil)
+                        window.orderFrontRegardless()
+                    }
+                } else {
+                    // Use inline replacement
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(result, forType: .string)
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        simulatePaste()
+                    }
+                }
                 
                 closeAction()
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    simulatePaste()
-                }
             } catch {
                 print("Error processing custom command: \(error.localizedDescription)")
             }
@@ -178,35 +195,56 @@ struct PopupView: View {
         Task {
             do {
                 let systemPrompt = """
-                You are a writing and coding assistant. Your sole task is to apply the user's specified changes to the provided text.
-                Output ONLY the modified text without any comments, explanations, or analysis.
-                Do not include additional suggestions or formatting in your response.
+                You are a writing and coding assistant. Your sole task is to respond to the user's instruction thoughtfully and comprehensively.
+                If the instruction is a question, provide a detailed answer.
+                If it's a request for help, provide clear guidance and examples where appropriate.
+                Use Markdown formatting to make your response more readable.
                 """
                 
-                let userPrompt = """
-                User's instruction: \(instruction)
-                
-                Text:
-                \(appState.selectedText)
-                """
+                let userPrompt = appState.selectedText.isEmpty ?
+                    instruction :
+                    """
+                    User's instruction: \(instruction)
+                    
+                    Text:
+                    \(appState.selectedText)
+                    """
                 
                 let result = try await appState.activeProvider.processText(
                     systemPrompt: systemPrompt,
                     userPrompt: userPrompt
                 )
                 
-                NSPasteboard.general.clearContents()
-                NSPasteboard.general.setString(result, forType: .string)
+                if appState.selectedText.isEmpty {
+                    // Show response in a new window
+                    await MainActor.run {
+                        let window = ResponseWindow(
+                            title: "AI Response",
+                            content: result,
+                            selectedText: instruction,
+                            option: .proofread // Using proofread as default, but the response window will adapt based on content
+                        )
+                        
+                        WindowManager.shared.addResponseWindow(window)
+                        window.makeKeyAndOrderFront(nil)
+                        window.orderFrontRegardless()
+                    }
+                } else {
+                    // For selected text, continue with the existing inline replacement behavior
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(result, forType: .string)
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        simulatePaste()
+                    }
+                }
                 
                 closeAction()
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    simulatePaste()
-                }
             } catch {
                 print("Error processing text: \(error.localizedDescription)")
             }
             
+            isCustomLoading = false
             appState.isProcessing = false
         }
     }
