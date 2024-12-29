@@ -30,13 +30,15 @@ enum OpenAIModel: String, CaseIterable {
 class OpenAIProvider: ObservableObject, AIProvider {
     @Published var isProcessing = false
     private var config: OpenAIConfig
-    private var currentTask: URLSessionDataTask?
     
     init(config: OpenAIConfig) {
         self.config = config
     }
     
     func processText(systemPrompt: String? = "You are a helpful writing assistant.", userPrompt: String) async throws -> String {
+        isProcessing = true
+        defer { isProcessing = false }
+        
         guard !config.apiKey.isEmpty else {
             throw NSError(domain: "OpenAIAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "API key is missing."])
         }
@@ -66,32 +68,24 @@ class OpenAIProvider: ObservableObject, AIProvider {
         
         request.httpBody = try JSONSerialization.data(withJSONObject: requestBody)
         
-        do {
-            isProcessing = true
-            let (data, response) = try await URLSession.shared.data(for: request)
-            
-            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                throw NSError(domain: "OpenAIAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Server returned an error."])
-            }
-            
-            guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-                  let choices = json["choices"] as? [[String: Any]],
-                  let firstChoice = choices.first,
-                  let message = firstChoice["message"] as? [String: Any],
-                  let content = message["content"] as? String else {
-                throw NSError(domain: "OpenAIAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to parse response."])
-            }
-            
-            return content
-            
-        } catch {
-            isProcessing = false
-            throw NSError(domain: "OpenAIAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Error processing text: \(error.localizedDescription)"])
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw NSError(domain: "OpenAIAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Server returned an error."])
         }
+        
+        guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let choices = json["choices"] as? [[String: Any]],
+              let firstChoice = choices.first,
+              let message = firstChoice["message"] as? [String: Any],
+              let content = message["content"] as? String else {
+            throw NSError(domain: "OpenAIAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to parse response."])
+        }
+        
+        return content
     }
     
     func cancel() {
-        currentTask?.cancel()
         isProcessing = false
     }
 }

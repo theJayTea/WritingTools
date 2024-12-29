@@ -215,28 +215,18 @@ struct PopupView: View {
                     userPrompt: userPrompt
                 )
                 
-                if appState.selectedText.isEmpty {
-                    // Show response in a new window
-                    await MainActor.run {
-                        let window = ResponseWindow(
-                            title: "AI Response",
-                            content: result,
-                            selectedText: instruction,
-                            option: .proofread // Using proofread as default, but the response window will adapt based on content
-                        )
-                        
-                        WindowManager.shared.addResponseWindow(window)
-                        window.makeKeyAndOrderFront(nil)
-                        window.orderFrontRegardless()
-                    }
-                } else {
-                    // For selected text, continue with the existing inline replacement behavior
-                    NSPasteboard.general.clearContents()
-                    NSPasteboard.general.setString(result, forType: .string)
+                // Always show response in a new window
+                await MainActor.run {
+                    let window = ResponseWindow(
+                        title: "AI Response",
+                        content: result,
+                        selectedText: appState.selectedText.isEmpty ? instruction : appState.selectedText,
+                        option: .proofread // Using proofread as default, the response window will adapt based on content
+                    )
                     
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        simulatePaste()
-                    }
+                    WindowManager.shared.addResponseWindow(window)
+                    window.makeKeyAndOrderFront(nil)
+                    window.orderFrontRegardless()
                 }
                 
                 closeAction()

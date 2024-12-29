@@ -105,6 +105,8 @@ struct OnboardingView: View {
             VStack(alignment: .center, spacing: 10) {
                 Text("• Improves your writing with AI")
                 Text("• Works in any application")
+                Text("• Helps you write with clarity and confidence")
+                Text("• Support Custom Commands for anything you want")
             }
             .font(.title3)
         }
