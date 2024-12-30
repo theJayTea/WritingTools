@@ -1,7 +1,8 @@
 import logging
 import sys
-import winreg
 
+if sys.platform.startswith("win32"):
+    import winreg
 
 class AutostartManager:
     """
