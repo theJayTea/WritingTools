@@ -4,7 +4,7 @@ import SwiftUI
 class ResponseWindow: NSWindow {
     init(title: String, content: String, selectedText: String, option: WritingOption) {
         super.init(
-            contentRect: NSRect(x: 0, y: 0, width: 600, height: 400),
+            contentRect: NSRect(x: 0, y: 0, width: 600, height: 500),
             styleMask: [.titled, .closable, .resizable, .miniaturizable],
             backing: .buffered,
             defer: false

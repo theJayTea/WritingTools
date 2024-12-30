@@ -77,7 +77,7 @@ The macOS version is a **native Swift port**, developed by [Aryamirsepasi](https
 
 To install it:
 1. Go to the [Releases](https://github.com/theJayTea/WritingTools/releases) page and download the latest `.dmg` file.
-2. Open the `.dmg` file and drag the `writing-tools.app` into the Applications folder. That's it!
+2. Open the `.dmg` file, also open a Finder Window, and drag the `writing-tools.app` into the Applications folder. That's it!
 
 ## 👀 Tips
 
@@ -196,32 +196,59 @@ python pyinstaller-build-script.py
 ### macOS Version (by [Aryamirsepasi](https://github.com/Aryamirsepasi)) build instructions:
 
 1. **Install Xcode**
-- Ensure you have Xcode installed on your macOS system.
-- Download it from the [Mac App Store](https://apps.apple.com/us/app/xcode/id497799835).  
+   - Download and install Xcode from the App Store
+   - Launch Xcode once installed and complete any additional component installations
 
-2. **Clone the Repository to your local machine**
-```bash
-git clone https://github.com/theJayTea/WritingTools.git
-cd WritingTools
- ```
+2. **Clone the Repository**
+   - Open Terminal and navigate to a directory you want the project to be in:
+   ```bash
+   git clone https://github.com/theJayTea/WritingTools.git
+   cd WritingTools
+   ```
 
-3. **Open the Project in Xcode**
-- Open Xcode.
-- Select **File > Open** from the menu bar.
-- Navigate to the `macOS` folder and select it.  
+3. **Create Xcode Project**
+   - Navigate to the project's macOS directory:
+     ```bash
+     cd macOS
+     ```
+   - Create a new Xcode project:
+     ```bash
+     xcodebuild -project writing-tools.xcodeproj
+     ```
 
-4. **Generate the Project File**
-Run the following command to generate the `.xcodeproj` file:
-```bash
-swift package generate-xcodeproj
-```
+4. **Open in Xcode**
+   - Double-click the generated `writing-tools.xcodeproj` file
+   - Or open Xcode and select "Open a Project or File"
+   - Navigate to the `WritingTools/macOS/writing-tools.xcodeproj` file
 
-5. **Build the Project**
-- Select your target device as **My Mac** in Xcode.
-- Build the project by clicking the **Play** button (or pressing `Command + R`).  
+5. **Configure Project Settings**
+   - In Xcode, select the project in the navigator
+   - Under "Targets", select "writing-tools"
+   - Set the following:
+     - Deployment Target: macOS 14.0
+     - Signing & Capabilities: Add your development team
 
-6. **Run the App**
-- After the build is successful, the app will launch automatically.
+6. **Install Dependencies**
+   - In Terminal, run:
+     ```bash
+     cd macOS
+     swift package resolve
+     ```
+
+7. **Build and Run**
+   - In Xcode, select "My Mac" as the run destination
+   - Click the Play button or press ⌘R to build and run
+
+## Troubleshooting
+
+If you encounter the "Could not open file" error:
+1. Ensure you're opening the `.xcodeproj` file, not the folder
+2. If the error persists, try:
+   ```bash
+   cd WritingTools/macOS
+   rm -rf writing-tools.xcodeproj
+   xcodebuild -project writing-tools.xcodeproj
+   ```
 
 
 ## 🌟 Contributors

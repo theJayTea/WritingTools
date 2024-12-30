@@ -4,17 +4,32 @@ import ApplicationServices
 struct PopupView: View {
     @ObservedObject var appState: AppState
     @Environment(\.colorScheme) var colorScheme
+    @StateObject private var commandsManager = CustomCommandsManager()
     let closeAction: () -> Void
     @AppStorage("use_gradient_theme") private var useGradientTheme = false
     @State private var customText: String = ""
+    @State private var loadingOptions: Set<String> = []
+    @State private var isCustomLoading: Bool = false
+    @State private var showingCustomCommands = false
     
     var body: some View {
         VStack(spacing: 16) {
-            // Close button
+            // Top bar with close and add buttons
             HStack {
-                Spacer()
+                
                 Button(action: closeAction) {
                     Image(systemName: "xmark.circle.fill")
+                        .font(.title2)
+                        .foregroundColor(.secondary)
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 8)
+                .padding(.leading, 8)
+                
+                Spacer()
+                
+                Button(action: { showingCustomCommands = true }) {
+                    Image(systemName: "plus.circle.fill")
                         .font(.title2)
                         .foregroundColor(.secondary)
                 }
@@ -26,35 +41,40 @@ struct PopupView: View {
             // Custom input with send button
             HStack(spacing: 8) {
                 TextField(
-                    appState.selectedText.isEmpty ? "Enter your instruction..." : "Describe your change...",
+                    appState.selectedText.isEmpty ? "Describe your change..." : "Describe your change...",
                     text: $customText
                 )
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .onSubmit {
-                    processCustomChange()
-                }
-                
-                Button(action: processCustomChange) {
-                    Image(systemName: "paperplane.fill")
-                        .foregroundColor(.white)
-                        .padding(6)
-                        .background(Color.blue)
-                        .clipShape(Circle())
-                }
-                .buttonStyle(.plain)
-                .disabled(customText.isEmpty)
+                .textFieldStyle(.plain)
+                .appleStyleTextField(
+                    text: customText,
+                    isLoading: isCustomLoading,
+                    onSubmit: processCustomChange
+                )
             }
             .padding(.horizontal)
             
-            // Only show options grid if text is selected
             if !appState.selectedText.isEmpty {
-                LazyVGrid(columns: [
-                    GridItem(.flexible()),
-                    GridItem(.flexible())
-                ], spacing: 16) {
-                    ForEach(WritingOption.allCases) { option in
-                        OptionButton(option: option) {
-                            processOption(option)
+                ScrollView {
+                    LazyVGrid(columns: [
+                        GridItem(.flexible()),
+                        GridItem(.flexible())
+                    ], spacing: 16) {
+                        // Built-in options
+                        ForEach(WritingOption.allCases) { option in
+                            OptionButton(
+                                option: option,
+                                action: { processOption(option) },
+                                isLoading: loadingOptions.contains(option.id)
+                            )
+                        }
+                        
+                        // Custom commands
+                        ForEach(commandsManager.commands) { command in
+                            CustomOptionButton(
+                                command: command,
+                                action: { processCustomCommand(command) },
+                                isLoading: loadingOptions.contains(command.id.uuidString)
+                            )
                         }
                     }
                 }
@@ -69,17 +89,76 @@ struct PopupView: View {
         )
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(color: Color.black.opacity(0.2), radius: 10, y: 5)
+        .sheet(isPresented: $showingCustomCommands) {
+            CustomCommandsView(commandsManager: commandsManager)
+        }
     }
     
-    private func processCustomChange() {
-        guard !customText.isEmpty else { return }
-        processCustomInstruction(customText)
-    }
-    
-    private func processOption(_ option: WritingOption) {
+    private func processCustomCommand(_ command: CustomCommand) {
+        loadingOptions.insert(command.id.uuidString)
         appState.isProcessing = true
         
         Task {
+            defer {
+                loadingOptions.remove(command.id.uuidString)
+                appState.isProcessing = false
+            }
+            
+            do {
+                let result = try await appState.activeProvider.processText(
+                    systemPrompt: command.prompt,
+                    userPrompt: appState.selectedText
+                )
+                
+                if command.useResponseWindow {
+                    // Show response in a new window
+                    await MainActor.run {
+                        let window = ResponseWindow(
+                            title: command.name,
+                            content: result,
+                            selectedText: appState.selectedText,
+                            option: .proofread // Using proofread as default since this is a custom command
+                        )
+                        
+                        WindowManager.shared.addResponseWindow(window)
+                        window.makeKeyAndOrderFront(nil)
+                        window.orderFrontRegardless()
+                    }
+                } else {
+                    // Use inline replacement
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(result, forType: .string)
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        simulatePaste()
+                    }
+                }
+                
+                closeAction()
+            } catch {
+                print("Error processing custom command: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    
+    // Process custom text changes
+    private func processCustomChange() {
+        guard !customText.isEmpty else { return }
+        isCustomLoading = true
+        processCustomInstruction(customText)
+    }
+    
+    // Process predefined writing options
+    private func processOption(_ option: WritingOption) {
+        loadingOptions.insert(option.id)
+        appState.isProcessing = true
+        
+        Task {
+            defer {
+                loadingOptions.remove(option.id)
+                appState.isProcessing = false
+            }
             do {
                 let result = try await appState.activeProvider.processText(
                     systemPrompt: option.systemPrompt,
@@ -108,6 +187,7 @@ struct PopupView: View {
         }
     }
     
+    // Process custom instructions
     private func processCustomInstruction(_ instruction: String) {
         guard !instruction.isEmpty else { return }
         appState.isProcessing = true
@@ -115,39 +195,51 @@ struct PopupView: View {
         Task {
             do {
                 let systemPrompt = """
-                You are a writing and coding assistant. Your sole task is to apply the user's specified changes to the provided text.
-                Output ONLY the modified text without any comments, explanations, or analysis.
-                Do not include additional suggestions or formatting in your response.
+                You are a writing and coding assistant. Your sole task is to respond to the user's instruction thoughtfully and comprehensively.
+                If the instruction is a question, provide a detailed answer.
+                If it's a request for help, provide clear guidance and examples where appropriate.
+                Use Markdown formatting to make your response more readable.
                 """
                 
-                let userPrompt = """
-                User's instruction: \(instruction)
-                
-                Text:
-                \(appState.selectedText)
-                """
+                let userPrompt = appState.selectedText.isEmpty ?
+                    instruction :
+                    """
+                    User's instruction: \(instruction)
+                    
+                    Text:
+                    \(appState.selectedText)
+                    """
                 
                 let result = try await appState.activeProvider.processText(
                     systemPrompt: systemPrompt,
                     userPrompt: userPrompt
                 )
                 
-                NSPasteboard.general.clearContents()
-                NSPasteboard.general.setString(result, forType: .string)
+                // Always show response in a new window
+                await MainActor.run {
+                    let window = ResponseWindow(
+                        title: "AI Response",
+                        content: result,
+                        selectedText: appState.selectedText.isEmpty ? instruction : appState.selectedText,
+                        option: .proofread // Using proofread as default, the response window will adapt based on content
+                    )
+                    
+                    WindowManager.shared.addResponseWindow(window)
+                    window.makeKeyAndOrderFront(nil)
+                    window.orderFrontRegardless()
+                }
                 
                 closeAction()
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    simulatePaste()
-                }
             } catch {
                 print("Error processing text: \(error.localizedDescription)")
             }
             
+            isCustomLoading = false
             appState.isProcessing = false
         }
     }
     
+    // Show response window for certain options
     private func showResponseWindow(for option: WritingOption, with result: String) {
         DispatchQueue.main.async {
             let window = ResponseWindow(
@@ -165,6 +257,7 @@ struct PopupView: View {
         }
     }
     
+    // Simulate paste command
     private func simulatePaste() {
         guard let source = CGEventSource(stateID: .hidSystemState) else { return }
         
@@ -185,6 +278,7 @@ struct PopupView: View {
 struct OptionButton: View {
     let option: WritingOption
     let action: () -> Void
+    let isLoading: Bool
     
     var body: some View {
         Button(action: action) {
@@ -197,6 +291,28 @@ struct OptionButton: View {
             .background(Color(.controlBackgroundColor))
             .cornerRadius(8)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(LoadingButtonStyle(isLoading: isLoading))
+        .disabled(isLoading)
+    }
+}
+
+struct CustomOptionButton: View {
+    let command: CustomCommand
+    let action: () -> Void
+    let isLoading: Bool
+    
+    var body: some View {
+        Button(action: action) {
+            HStack {
+                Image(systemName: command.icon)
+                Text(command.name)
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(Color(.controlBackgroundColor))
+            .cornerRadius(8)
+        }
+        .buttonStyle(LoadingButtonStyle(isLoading: isLoading))
+        .disabled(isLoading)
     }
 }

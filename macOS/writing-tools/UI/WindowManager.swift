@@ -11,6 +11,7 @@ class WindowManager: NSObject, NSWindowDelegate {
     private var popupWindow = NSMapTable<PopupWindow, NSHostingView<PopupView>>.strongToWeakObjects()
     private var responseWindows = NSHashTable<ResponseWindow>.weakObjects()
     
+    // Execute operation on main thread
     private func performOnMainThread(_ operation: @escaping () -> Void) {
         if Thread.isMainThread {
             operation()
@@ -19,6 +20,7 @@ class WindowManager: NSObject, NSWindowDelegate {
         }
     }
     
+    // Execute operation on window queue
     private func performOnWindowQueue(_ operation: @escaping () -> Void) {
         windowQueue.async { [weak self] in
             guard self != nil else { return }
@@ -26,6 +28,7 @@ class WindowManager: NSObject, NSWindowDelegate {
         }
     }
     
+    // Add a new response window
     func addResponseWindow(_ window: ResponseWindow) {
         performOnMainThread { [weak self] in
             guard let self = self, !window.isReleasedWhenClosed else {
@@ -40,6 +43,7 @@ class WindowManager: NSObject, NSWindowDelegate {
         }
     }
     
+    // Remove a response window
     func removeResponseWindow(_ window: ResponseWindow) {
         performOnMainThread { [weak self] in
             guard let self = self else { return }
@@ -47,6 +51,7 @@ class WindowManager: NSObject, NSWindowDelegate {
         }
     }
     
+    // Transition from onboarding to settings window
     func transitonFromOnboardingToSettings(appState: AppState) {
         performOnMainThread { [weak self] in
             guard let self = self else { return }
@@ -77,6 +82,7 @@ class WindowManager: NSObject, NSWindowDelegate {
         }
     }
     
+    // Set up onboarding window
     func setOnboardingWindow(_ window: NSWindow, hostingView: NSHostingView<OnboardingView>) {
         performOnMainThread { [weak self] in
             guard let self = self else { return }
@@ -90,7 +96,7 @@ class WindowManager: NSObject, NSWindowDelegate {
         }
     }
     
-    
+    // Handle window becoming key
     func windowDidBecomeKey(_ notification: Notification) {
         guard let window = notification.object as? NSWindow else { return }
         
@@ -101,6 +107,7 @@ class WindowManager: NSObject, NSWindowDelegate {
         }
     }
     
+    // Clean up all windows
     func cleanupWindows() {
         performOnWindowQueue { [weak self] in
             guard let self = self else { return }
@@ -114,6 +121,7 @@ class WindowManager: NSObject, NSWindowDelegate {
         }
     }
     
+    // Get all managed windows
     private func getAllWindows() -> [NSWindow] {
         var windows: [NSWindow] = []
         
@@ -133,6 +141,7 @@ class WindowManager: NSObject, NSWindowDelegate {
         return windows
     }
     
+    // Clear all window references
     private func clearAllWindows() {
         performOnMainThread { [weak self] in
             self?.onboardingWindow.removeAllObjects()

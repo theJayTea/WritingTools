@@ -5,21 +5,37 @@ class PopupWindow: NSWindow {
     private var retainedHostingView: NSHostingView<PopupView>?
     private var trackingArea: NSTrackingArea?
     private let appState: AppState
+    private let commandsManager: CustomCommandsManager
     
     init(appState: AppState) {
         self.appState = appState
+        self.commandsManager = CustomCommandsManager()
         
         super.init(
-            contentRect: NSRect(x: 0, y: 0, width: 400, height: 300),
+            contentRect: NSRect(x: 0, y: 0, width: 400, height: 100),
             styleMask: [.borderless],
             backing: .buffered,
-            defer: false
+            defer: true
         )
         
         self.isReleasedWhenClosed = false
         
+        // Configure window after init
         configureWindow()
         setupTrackingArea()
+        
+        // Calculate and set correct size immediately
+        DispatchQueue.main.async { [weak self] in
+            self?.updateWindowSize()
+        }
+        
+        // Listen for changes in custom commands
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(updateWindowSize),
+            name: UserDefaults.didChangeNotification,
+            object: nil
+        )
     }
     
     private func configureWindow() {
@@ -42,9 +58,46 @@ class PopupWindow: NSWindow {
         contentView = hostingView
         retainedHostingView = hostingView
         
-        if appState.selectedText.isEmpty {
-            setContentSize(NSSize(width: 400, height: 100))
+        updateWindowSize()
+    }
+    
+    @objc private func updateWindowSize() {
+        let baseHeight: CGFloat = 100 // Height for header and input field
+        let buttonHeight: CGFloat = 55 // Height for each button row
+        let spacing: CGFloat = 16 // Vertical spacing between elements
+        let padding: CGFloat = 20 // Bottom padding
+        
+        let numBuiltInOptions = WritingOption.allCases.count
+        let numCustomOptions = commandsManager.commands.count
+        let totalOptions = appState.selectedText.isEmpty ? 0 : (numBuiltInOptions + numCustomOptions)
+        let numRows = ceil(Double(totalOptions) / 2.0) // 2 columns
+        
+        let contentHeight = appState.selectedText.isEmpty ?
+        baseHeight :
+        baseHeight + (buttonHeight * CGFloat(numRows)) + spacing + padding
+        
+        // Set size on main thread
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.setContentSize(NSSize(width: 400, height: contentHeight))
+            
+            // Maintain window position relative to the mouse
+            if let screen = self.screen {
+                var frame = self.frame
+                frame.size.height = contentHeight
+                
+                // Ensure window stays within screen bounds
+                if frame.maxY > screen.visibleFrame.maxY {
+                    frame.origin.y = screen.visibleFrame.maxY - frame.height
+                }
+                
+                self.setFrame(frame, display: true)
+            }
         }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     private func setupTrackingArea() {
@@ -98,7 +151,7 @@ class PopupWindow: NSWindow {
     }
     
     override func mouseDragged(with event: NSEvent) {
-        guard let contentView = contentView,
+        guard let _ = contentView,
               let initialLocation = initialLocation,
               let screen = screen else { return }
         
@@ -127,7 +180,7 @@ class PopupWindow: NSWindow {
     }
     
     
-    // MARK: - Window Positioning
+    // Window Positioning
     
     // Find the screen where the mouse cursor is located
     func screenAt(point: NSPoint) -> NSScreen? {
