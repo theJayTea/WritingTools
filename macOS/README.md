@@ -35,7 +35,7 @@ This guide will help you properly set up the Writing Tools macOS project in Xcod
 - Xcode 15.0 or later
 - Git
 
-## Installation Steps
+## Manual Build Steps
 
 1. **Install Xcode**
    - Download and install Xcode from the App Store
