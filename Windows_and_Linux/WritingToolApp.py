@@ -4,6 +4,7 @@ import os
 import sys
 import threading
 import time
+import signal
 
 import darkdetect
 import pyperclip
@@ -48,6 +49,10 @@ class WritingToolApp(QtWidgets.QApplication):
         self.output_queue = ""
         self.last_replace = 0
         self.hotkey_listener = None
+
+        # Initialize the ctrl+c hotkey listener
+        self.ctrl_c_timer = None
+        self.setup_ctrl_c_listener()
 
         # Setup available AI providers
         self.providers = [GeminiProvider(self), OpenAICompatibleProvider(self)]
@@ -708,6 +713,26 @@ class WritingToolApp(QtWidgets.QApplication):
         if not self.about_window:
             self.about_window = AboutWindow()
         self.about_window.show()
+
+    def setup_ctrl_c_listener(self):
+        """
+        Listener for Ctrl+C to exit the app.
+        """
+        signal.signal(signal.SIGINT, lambda signum, frame: self.handle_sigint(signum, frame))
+        # This empty timer is needed to make sure that the sigint handler gets checked inside the main loop:
+        # without it, the sigint handle would trigger only when an event is triggered, either by a hotkey combination
+        # or by another GUI event like spawning a new window. With this we trigger it every 100ms with an empy lambda
+        # so that the signal handler gets checked regularly.
+        self.ctrl_c_timer = QtCore.QTimer()
+        self.ctrl_c_timer.start(100)
+        self.ctrl_c_timer.timeout.connect(lambda: None)
+    def handle_sigint(self, signum, frame):
+        """
+        Handle the SIGINT signal (Ctrl+C) to exit the app gracefully.
+        """
+        logging.info("Received SIGINT. Exiting...")
+        self.exit_app()
+
 
     def exit_app(self):
         """
