@@ -342,44 +342,8 @@ class WritingToolApp(QtWidgets.QApplication):
             """
             logging.debug(f'Starting processing thread for option: {option}')
             try:
-                option_prompts = {
-                    'Proofread': (
-                        'Proofread this:\n\n',
-                        'You are a grammar proofreading assistant. Output ONLY the corrected text without any additional comments. Maintain the original text structure and writing style. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with this (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                    ),
-                    'Rewrite': (
-                        'Rewrite this:\n\n',
-                        'You are a writing assistant. Rewrite the text provided by the user to improve phrasing. Output ONLY the rewritten text without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with proofreading (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                    ),
-                    'Friendly': (
-                        'Make this more friendly:\n\n',
-                        'You are a writing assistant. Rewrite the text provided by the user to be more friendly. Output ONLY the friendly text without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with rewriting (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                    ),
-                    'Professional': (
-                        'Make this more professional:\n\n',
-                        'You are a writing assistant. Rewrite the text provided by the user to sound more professional. Output ONLY the professional text without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with this (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                    ),
-                    'Concise': (
-                        'Make this more concise:\n\n',
-                        'You are a writing assistant. Rewrite the text provided by the user to be slightly more concise in tone, thus making it just a bit shorter. Do not change the text too much or be too reductive. Output ONLY the concise version without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with this (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                    ),
-                    'Summary': (
-                        'Summarize this:\n\n',
-                        'You are a summarisation assistant. Provide a succinct summary of the text provided by the user. The summary should be succinct yet encompass all the key insightful points. To make it quite legible and readable, you MUST use Markdown formatting (bold, italics, underline...). You should add line spacing between your paragraphs/lines. Only if appropriate, you could also use headings (only the very small ones), lists, tables, etc. Don\'t be repetitive or too verbose. Output ONLY the summary without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with summarisation (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                    ),
-                    'Key Points': (
-                        'Extract key points from this:\n\n',
-                        'You are an assistant that extracts key points from text provided by the user. Output ONLY the key points without additional comments. You MUST use Markdown formatting (lists, bold, italics, underline, etc. as appropriate) to make it quite legible and readable. Don\'t be repetitive or too verbose. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with extracting key points (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                    ),
-                    'Table': (
-                        'Convert this into a table:\n\n',
-                        'You are an assistant that converts text provided by the user into a Markdown table. Output ONLY the table without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is completely incompatible with this with conversion, output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                    ),
-                    'Custom': (
-                        'Make the following change to this text:\n\n',
-                        'You are a writing and coding assistant. You MUST make the user\'s described change to the text or code provided by the user. Output ONLY the appropriately modified text or code without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text or code is absolutely incompatible with the requested change, output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                    )
-                }
+                with open('options.json', 'r') as file:
+                    option_prompts = json.load(file)
 
                 if selected_text.strip() == '':
                     # No selected text
@@ -390,7 +354,9 @@ class WritingToolApp(QtWidgets.QApplication):
                         self.show_message_signal.emit('Error', 'Please select text to use this option.')
                         return
                 else:
-                    prompt_prefix, system_instruction = option_prompts.get(option, ('', ''))
+                    selected_prompt = option_prompts.get(option, ('', ''))
+                    prompt_prefix = selected_prompt['prefix']
+                    system_instruction = selected_prompt['instruction']
                     if option == 'Custom':
                         prompt = f"{prompt_prefix}Described change: {custom_change}\n\nText: {selected_text}"
                     else:
