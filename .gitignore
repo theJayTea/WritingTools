@@ -2,3 +2,6 @@
 
 .DS_Store
 Windows_and_Linux/config.json
+
+.idea
+**/__pycache__
