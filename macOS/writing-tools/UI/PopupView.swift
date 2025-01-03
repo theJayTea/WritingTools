@@ -196,8 +196,8 @@ struct PopupView: View {
             do {
                 let systemPrompt = """
                 You are a writing and coding assistant. Your sole task is to respond to the user's instruction thoughtfully and comprehensively.
-                If the instruction is a question, provide a detailed answer.
-                If it's a request for help, provide clear guidance and examples where appropriate.
+                If the instruction is a question, provide a detailed answer. But always return the best and most accurate answer and not different options. 
+                If it's a request for help, provide clear guidance and examples where appropriate. Make sure tu use the language used or specified by the user instruction.
                 Use Markdown formatting to make your response more readable.
                 """
                 

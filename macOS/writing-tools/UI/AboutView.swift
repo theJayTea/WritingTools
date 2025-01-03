@@ -36,7 +36,7 @@ struct AboutView: View {
             
             Divider()
 
-            Text("Version: Beta 5 (Based on Windows Port version 6.0)")
+            Text("Version: Beta 6 (Based on Windows Port version 6.0)")
                 .font(.caption)
             
             Button("Check for Updates") {

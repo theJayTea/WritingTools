@@ -70,6 +70,7 @@ struct ResponseView: View {
                         ForEach(viewModel.messages) { message in
                             ChatMessageView(message: message, fontSize: viewModel.fontSize)
                                 .id(message.id)
+                                .frame(maxWidth: .infinity, alignment: message.role == "user" ? .trailing : .leading)
                         }
                     }
                     .padding()
@@ -118,6 +119,7 @@ struct ResponseView: View {
 struct ChatMessageView: View {
     let message: ChatMessage
     let fontSize: CGFloat
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         HStack(alignment: .top) {
@@ -126,13 +128,15 @@ struct ChatMessageView: View {
             }
             
             VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: 4) {
-                Markdown(message.content)
-                    .font(.system(size: fontSize))
-                    .textSelection(.enabled)
-                    .padding()
-                    .frame(maxWidth: 280, alignment: .leading) // Always left-align the text
-                    .background(message.role == "user" ? Color.accentColor.opacity(0.1) : Color(.controlBackgroundColor))
-                    .cornerRadius(12)
+                ViewThatFits(in: .horizontal) {
+                    Markdown(message.content)
+                        .font(.system(size: fontSize))
+                        .textSelection(.enabled)
+                        .padding()
+                        .frame(minWidth: 100, idealWidth: 450, maxWidth: 600, alignment: .leading)
+                        .background(message.role == "user" ? Color.accentColor.opacity(0.1) : Color(.controlBackgroundColor))
+                        .cornerRadius(12)
+                }
                 
                 Text(message.timestamp.formatted(.dateTime.hour().minute()))
                     .font(.caption2)
@@ -145,6 +149,7 @@ struct ChatMessageView: View {
         }
     }
 }
+
 
 extension View {
     func maxWidth(_ width: CGFloat) -> some View {
@@ -200,10 +205,10 @@ final class ResponseViewModel: ObservableObject {
                 
                 let result = try await AppState.shared.activeProvider.processText(
                     systemPrompt: """
-                    You are a helpful AI assistant continuing a conversation. You have access to the entire conversation history and should maintain context when responding.
-                    Provide clear and direct responses, maintaining the same format and style as your previous responses.
-                    If appropriate, use Markdown formatting to make your response more readable.
-                    Consider all previous messages when formulating your response.
+                    You are a writing and coding assistant. Your sole task is to respond to the user's instruction thoughtfully and comprehensively.
+                    If the instruction is a question, provide a detailed answer. But always return the best and most accurate answer and not different options. 
+                    If it's a request for help, provide clear guidance and examples where appropriate. Make sure tu use the language used or specified by the user instruction.
+                    Use Markdown formatting to make your response more readable.
                     """,
                     userPrompt: contextualPrompt
                 )
