@@ -1,9 +1,4 @@
-build
-dist
+# macOS system files
 
-config.json
-main.spec
-
-.idea
-
-**/__pycache__/
+.DS_Store
+Windows_and_Linux/config.json

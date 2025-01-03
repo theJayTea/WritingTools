@@ -4,21 +4,20 @@ import os
 import sys
 import threading
 import time
-import signal
 
 import darkdetect
 import pyperclip
+from aiprovider import GeminiProvider, OpenAICompatibleProvider
 from pynput import keyboard as pykeyboard
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Signal, Slot
 from PySide6.QtGui import QCursor, QGuiApplication
 from PySide6.QtWidgets import QMessageBox
-
-from aiprovider import Gemini15FlashProvider, OpenAICompatibleProvider
 from ui.AboutWindow import AboutWindow
 from ui.CustomPopupWindow import CustomPopupWindow
 from ui.OnboardingWindow import OnboardingWindow
 from ui.SettingsWindow import SettingsWindow
+from update_checker import UpdateChecker
 
 
 class WritingToolApp(QtWidgets.QApplication):
@@ -26,9 +25,10 @@ class WritingToolApp(QtWidgets.QApplication):
     The main application class for Writing Tools.
     """
     output_ready_signal = Signal(str)
-    show_message_signal = Signal(str, str)  # New signal for showing message boxes
+    show_message_signal = Signal(str, str)  # a signal for showing message boxes
     hotkey_triggered_signal = Signal()
-    close_popup_signal = Signal()
+    followup_response_signal = Signal(str)
+
 
     def __init__(self, argv):
         super().__init__(argv)
@@ -49,12 +49,8 @@ class WritingToolApp(QtWidgets.QApplication):
         self.last_replace = 0
         self.hotkey_listener = None
 
-        # Initialize the ctrl+c hotkey listener
-        self.ctrl_c_timer = None
-        self.setup_ctrl_c_listener()
-
         # Setup available AI providers
-        self.providers = [Gemini15FlashProvider(self), OpenAICompatibleProvider(self)]
+        self.providers = [GeminiProvider(self), OpenAICompatibleProvider(self)]
 
         if not self.config:
             logging.debug('No config found, showing onboarding')
@@ -62,8 +58,8 @@ class WritingToolApp(QtWidgets.QApplication):
         else:
             logging.debug('Config found, setting up hotkey and tray icon')
 
-            # Initialize the current provider, defaulting to Gemini 1.5 Flash
-            provider_name = self.config.get('provider', 'Gemini 1.5 Flash')
+            # Initialize the current provider, defaulting to Gemini
+            provider_name = self.config.get('provider', 'Gemini')
 
             self.current_provider = next((provider for provider in self.providers if provider.provider_name == provider_name), None)
             if not self.current_provider:
@@ -74,6 +70,31 @@ class WritingToolApp(QtWidgets.QApplication):
 
             self.create_tray_icon()
             self.register_hotkey()
+            
+            # Initialize update checker
+            self.update_checker = UpdateChecker(self)
+            self.update_checker.check_updates_async()
+
+        self.recent_triggers = []  # Track recent hotkey triggers
+        self.TRIGGER_WINDOW = 1.5  # Time window in seconds
+        self.MAX_TRIGGERS = 3  # Max allowed triggers in window
+
+    def check_trigger_spam(self):
+        """
+        Check if hotkey is being triggered too frequently (3+ times in 1.5 seconds).
+        Returns True if spam is detected.
+        """
+        current_time = time.time()
+        
+        # Add current trigger
+        self.recent_triggers.append(current_time)
+        
+        # Remove old triggers outside the window
+        self.recent_triggers = [t for t in self.recent_triggers 
+                            if current_time - t <= self.TRIGGER_WINDOW]
+        
+        # Check if we have too many triggers in the window
+        return len(self.recent_triggers) >= self.MAX_TRIGGERS
 
     def load_config(self):
         """
@@ -158,7 +179,14 @@ class WritingToolApp(QtWidgets.QApplication):
         Handle the hotkey press event.
         """
         logging.debug('Hotkey pressed')
-
+        
+        # Check for spam triggers
+        if self.check_trigger_spam():
+            logging.warning('Hotkey spam detected - quitting application')
+            self.exit_app()
+            return
+            
+        # Original hotkey handling continues...
         if self.current_provider:
             logging.debug("Cancelling current provider's request")
             self.current_provider.cancel()
@@ -172,7 +200,13 @@ class WritingToolApp(QtWidgets.QApplication):
         Show the popup window when the hotkey is pressed.
         """
         logging.debug('Showing popup window')
+        # First attempt with default sleep
         selected_text = self.get_selected_text()
+
+        # Retry with longer sleep if no text captured
+        if not selected_text:
+            logging.debug('No text captured, retrying with longer sleep')
+            selected_text = self.get_selected_text(sleep_duration=0.5)
 
         logging.debug(f'Selected text: "{selected_text}"')
         try:
@@ -219,20 +253,21 @@ class WritingToolApp(QtWidgets.QApplication):
         except Exception as e:
             logging.error(f'Error showing popup window: {e}', exc_info=True)
 
-    def get_selected_text(self):
+    def get_selected_text(self, sleep_duration=0.2):
         """
         Get the currently selected text from any application.
+        Args:
+            sleep_duration (float): Time to wait for clipboard update
         """
         # Backup the clipboard
         clipboard_backup = pyperclip.paste()
-        logging.debug(f'Clipboard backup: "{clipboard_backup}"')
+        logging.debug(f'Clipboard backup: "{clipboard_backup}" (sleep: {sleep_duration}s)')
 
         # Clear the clipboard
         self.clear_clipboard()
 
         # Simulate Ctrl+C
         logging.debug('Simulating Ctrl+C')
-
         kbrd = pykeyboard.Controller()
 
         def press_ctrl_c():
@@ -244,7 +279,8 @@ class WritingToolApp(QtWidgets.QApplication):
         press_ctrl_c()
 
         # Wait for the clipboard to update
-        time.sleep(0.2)
+        time.sleep(sleep_duration)
+        logging.debug(f'Waited {sleep_duration}s for clipboard')
 
         # Get the selected text
         selected_text = pyperclip.paste()
@@ -270,76 +306,124 @@ class WritingToolApp(QtWidgets.QApplication):
         Process the selected writing option in a separate thread.
         """
         logging.debug(f'Processing option: {option}')
+        
+        # For Summary, Key Points, Table, and empty text custom prompts, create response window
+        if option in ['Summary', 'Key Points', 'Table'] or (option == 'Custom' and not selected_text.strip()):
+            window_title = "Chat" if (option == 'Custom' and not selected_text.strip()) else option
+            self.current_response_window = self.show_response_window(window_title, selected_text)
+            
+            # Initialize chat history with text/prompt
+            if option == 'Custom' and not selected_text.strip():
+                # For direct AI queries, don't include empty text
+                self.current_response_window.chat_history = []
+            else:
+                # For other options, include the original text
+                self.current_response_window.chat_history = [
+                    {
+                        "role": "user",
+                        "content": f"Original text to {option.lower()}:\n\n{selected_text}"
+                    }
+                ]
+        else:
+            # Clear any existing response window reference for non-window options
+            if hasattr(self, 'current_response_window'):
+                delattr(self, 'current_response_window')
+                
         threading.Thread(target=self.process_option_thread, args=(option, selected_text, custom_change), daemon=True).start()
 
     def process_option_thread(self, option, selected_text, custom_change=None):
-        """
-        Thread function to process the selected writing option using the AI model.
-        """
-        logging.debug(f'Starting processing thread for option: {option}')
-        self.popup_window.processing_option()
-        try:
-            option_prompts = {
-                'Proofread': (
-                    'Proofread this:\n\n',
-                    'You are a grammar proofreading assistant. Output ONLY the corrected text without any additional comments. Maintain the original text structure and writing style. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with this (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                ),
-                'Rewrite': (
-                    'Rewrite this:\n\n',
-                    'You are a writing assistant. Rewrite the text provided by the user to improve phrasing. Output ONLY the rewritten text without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with proofreading (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                ),
-                'Friendly': (
-                    'Make this more friendly:\n\n',
-                    'You are a writing assistant. Rewrite the text provided by the user to be more friendly. Output ONLY the revised text without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with rewriting (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                ),
-                'Professional': (
-                    'Make this more professional:\n\n',
-                    'You are a writing assistant. Rewrite the text provided by the user to sound more professional. Output ONLY the revised text without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with this (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                ),
-                'Concise': (
-                    'Make this more concise:\n\n',
-                    'You are a writing assistant. Rewrite the text provided by the user to be more concise. Output ONLY the concise version without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with this (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                ),
-                'Summary': (
-                    'Summarize this:\n\n',
-                    'You are a summarization assistant. Provide a concise summary of the text provided by the user. Output ONLY the summary without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with summarization (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                ),
-                'Key Points': (
-                    'Extract key points from this:\n\n',
-                    'You are an assistant that extracts key points from text provided by the user. Output ONLY the key points without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with with extracting key points (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                ),
-                'Table': (
-                    'Convert this into a table:\n\n',
-                    'You are an assistant that converts text provided by the user into a table. Output ONLY the table without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with this with conversion, output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                ),
-                'Custom': (
-                    'Make the following change to this text:\n\n',
-                    'You are a writing and coding assistant. You MUST make the user\'s described change to the text or code provided by the user. Output ONLY the appropriately modified text or code without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text or code is absolutely incompatible with the requested change, output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                )
-            }
+            """
+            Thread function to process the selected writing option using the AI model.
+            """
+            logging.debug(f'Starting processing thread for option: {option}')
+            try:
+                option_prompts = {
+                    'Proofread': (
+                        'Proofread this:\n\n',
+                        'You are a grammar proofreading assistant. Output ONLY the corrected text without any additional comments. Maintain the original text structure and writing style. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with this (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+                    ),
+                    'Rewrite': (
+                        'Rewrite this:\n\n',
+                        'You are a writing assistant. Rewrite the text provided by the user to improve phrasing. Output ONLY the rewritten text without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with proofreading (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+                    ),
+                    'Friendly': (
+                        'Make this more friendly:\n\n',
+                        'You are a writing assistant. Rewrite the text provided by the user to be more friendly. Output ONLY the friendly text without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with rewriting (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+                    ),
+                    'Professional': (
+                        'Make this more professional:\n\n',
+                        'You are a writing assistant. Rewrite the text provided by the user to sound more professional. Output ONLY the professional text without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with this (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+                    ),
+                    'Concise': (
+                        'Make this more concise:\n\n',
+                        'You are a writing assistant. Rewrite the text provided by the user to be slightly more concise in tone, thus making it just a bit shorter. Do not change the text too much or be too reductive. Output ONLY the concise version without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with this (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+                    ),
+                    'Summary': (
+                        'Summarize this:\n\n',
+                        'You are a summarisation assistant. Provide a succinct summary of the text provided by the user. The summary should be succinct yet encompass all the key insightful points. To make it quite legible and readable, you MUST use Markdown formatting (bold, italics, underline...). You should add line spacing between your paragraphs/lines. Only if appropriate, you could also use headings (only the very small ones), lists, tables, etc. Don\'t be repetitive or too verbose. Output ONLY the summary without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with summarisation (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+                    ),
+                    'Key Points': (
+                        'Extract key points from this:\n\n',
+                        'You are an assistant that extracts key points from text provided by the user. Output ONLY the key points without additional comments. You MUST use Markdown formatting (lists, bold, italics, underline, etc. as appropriate) to make it quite legible and readable. Don\'t be repetitive or too verbose. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with extracting key points (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+                    ),
+                    'Table': (
+                        'Convert this into a table:\n\n',
+                        'You are an assistant that converts text provided by the user into a Markdown table. Output ONLY the table without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is completely incompatible with this with conversion, output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+                    ),
+                    'Custom': (
+                        'Make the following change to this text:\n\n',
+                        'You are a writing and coding assistant. You MUST make the user\'s described change to the text or code provided by the user. Output ONLY the appropriately modified text or code without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text or code is absolutely incompatible with the requested change, output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
+                    )
+                }
 
-            if selected_text.strip() == '':
-                # No selected text
-                if option == 'Custom':
-                    prompt = custom_change
-                    system_instruction = "You are a helpful assistant to the user. The user cannot follow-up with you after your single response to them, so do not ask them questions."
+                if selected_text.strip() == '':
+                    # No selected text
+                    if option == 'Custom':
+                        prompt = custom_change
+                        system_instruction = "You are a helpful assistant to the user. The user cannot follow-up with you after your single response to them, so do not ask them questions."
+                    else:
+                        self.show_message_signal.emit('Error', 'Please select text to use this option.')
+                        return
                 else:
-                    self.show_message_signal.emit('Error', 'Please select text to use this option.')
-                    return
-            else:
-                prompt_prefix, system_instruction = option_prompts.get(option, ('', ''))
-                if option == 'Custom':
-                    prompt = f"{prompt_prefix}Described change: {custom_change}\n\nText: {selected_text}"
+                    prompt_prefix, system_instruction = option_prompts.get(option, ('', ''))
+                    if option == 'Custom':
+                        prompt = f"{prompt_prefix}Described change: {custom_change}\n\nText: {selected_text}"
+                    else:
+                        prompt = f"{prompt_prefix}{selected_text}"
+
+                self.output_queue = ""
+
+                logging.debug(f'Getting response from provider for option: {option}')
+                
+                if option in ['Summary', 'Key Points', 'Table'] or (option == 'Custom' and not selected_text.strip()):
+                    logging.debug('Getting response for window display')
+                    response = self.current_provider.get_response(system_instruction, prompt, return_response=True)
+                    logging.debug(f'Got response of length: {len(response) if response else 0}')
+                    
+                    # For custom prompts with no text, add question to chat history
+                    if option == 'Custom' and not selected_text.strip():
+                        self.current_response_window.chat_history.append({
+                            "role": "user",
+                            "content": custom_change
+                        })
+                    
+                    # Set initial response using QMetaObject.invokeMethod to ensure thread safety
+                    if hasattr(self, 'current_response_window'):
+                        QtCore.QMetaObject.invokeMethod(
+                            self.current_response_window,
+                            'set_text',
+                            QtCore.Qt.ConnectionType.QueuedConnection,
+                            QtCore.Q_ARG(str, response)
+                        )
+                        logging.debug('Invoked set_text on response window')
                 else:
-                    prompt = f"{prompt_prefix}{selected_text}"
+                    logging.debug('Getting response for direct replacement')
+                    self.current_provider.get_response(system_instruction, prompt)
+                    logging.debug('Response processed')
 
-            self.output_queue = ""
-
-            self.current_provider.get_response(system_instruction, prompt)
-
-        except Exception as e:
-            logging.error(f'An error occurred: {e}', exc_info=True)
-            self.show_message_signal.emit('Error', f'An error occurred: {e}')
+            except Exception as e:
+                logging.error(f'An error occurred: {e}', exc_info=True)
+                self.show_message_signal.emit('Error', f'An error occurred: {e}')
 
     @Slot(str, str)
     def show_message_box(self, title, message):
@@ -348,13 +432,22 @@ class WritingToolApp(QtWidgets.QApplication):
         """
         QMessageBox.warning(None, title, message)
 
+    def show_response_window(self, option, text):
+        """
+        Show the response in a new window instead of pasting it.
+        """
+        from ui.ResponseWindow import ResponseWindow
+        response_window = ResponseWindow(self, f"{option} Result")
+        response_window.selected_text = text  # Store the text for regeneration
+        response_window.show()
+        return response_window
+
     def replace_text(self, new_text):
         """
-        Replace the selected text with the new text generated by the AI.
+        Replaces the text by pasting in the LLM generated text. With "Key Points" and "Summary", invokes a window with the output instead.
         """
         error_message = 'ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST'
-        self.close_popup_signal.emit()
-        time.sleep(0.5)
+
         # Confirm new_text exists and is a string
         if new_text and isinstance(new_text, str):
             self.output_queue += new_text
@@ -366,47 +459,48 @@ class WritingToolApp(QtWidgets.QApplication):
                 return
 
             # Check if we're building up to the error message (to prevent partial pasting)
-            # Only do this check if the current output length is less than error message
             if len(current_output) <= len(error_message):
-                # Remove all whitespace for comparison to handle any format
                 clean_current = ''.join(current_output.split())
                 clean_error = ''.join(error_message.split())
                 if clean_current == clean_error[:len(clean_current)]:
                     return
 
-            logging.debug('Replacing text')
+            logging.debug('Processing output text')
             try:
-                # Backup the clipboard
-                clipboard_backup = pyperclip.paste()
+                # For Summary and Key Points, show in response window
+                if hasattr(self, 'current_response_window'):
+                    self.current_response_window.append_text(new_text)
+                    
+                    # If this is the initial response, add it to chat history
+                    if len(self.current_response_window.chat_history) == 1:  # Only original text exists
+                        self.current_response_window.chat_history.append({
+                            "role": "assistant",
+                            "content": self.output_queue.rstrip('\n')
+                        })
+                else:
+                    # For other options, use the original clipboard-based replacement
+                    clipboard_backup = pyperclip.paste()
+                    cleaned_text = self.output_queue.rstrip('\n')
+                    pyperclip.copy(cleaned_text)
+                    
+                    kbrd = pykeyboard.Controller()
+                    def press_ctrl_v():
+                        kbrd.press(pykeyboard.Key.ctrl.value)
+                        kbrd.press('v')
+                        kbrd.release('v')
+                        kbrd.release(pykeyboard.Key.ctrl.value)
 
-                # Clean the output text and set the clipboard
-                cleaned_text = self.output_queue.rstrip('\n')  # Remove trailing newlines
-                pyperclip.copy(cleaned_text)
+                    press_ctrl_v()
+                    time.sleep(0.2)
+                    pyperclip.copy(clipboard_backup)
 
-                # Simulate Ctrl+V
-                logging.debug('Simulating Ctrl+V')
+                if not hasattr(self, 'current_response_window'):
+                    self.output_queue = ""
 
-                kbrd = pykeyboard.Controller()
-
-                def press_ctrl_v():
-                    kbrd.press(pykeyboard.Key.ctrl.value)
-                    kbrd.press('v')
-                    kbrd.release('v')
-                    kbrd.release(pykeyboard.Key.ctrl.value)
-
-                press_ctrl_v()
-
-                # Wait for the paste operation to complete
-                time.sleep(0.2)
-
-                # Restore the clipboard
-                pyperclip.copy(clipboard_backup)
-
-                self.output_queue = ""
             except Exception as e:
-                logging.error(f'Error replacing text: {e}')
+                logging.error(f'Error processing output: {e}')
         else:
-            logging.debug('No new text to replace')
+            logging.debug('No new text to process')
 
     def create_tray_icon(self):
         """
@@ -465,15 +559,145 @@ class WritingToolApp(QtWidgets.QApplication):
 
         menu.setPalette(palette)
 
+
+    """
+    The function below (process_followup_question) processes follow-up questions in the chat interface for Summary, Key Points, and Table operations.
+
+    This method handles the complex interaction between the UI, chat history, and AI providers:
+
+    1. Chat History Management:
+    - Maintains a list of all messages (original text, summary, follow-ups)
+    - Properly formats roles (user/assistant) for each message
+    - Preserves conversation context across multiple questions (until the Window is closed)
+
+    2. Provider-Specific Handling:
+    a) Gemini:
+        - Converts internal roles to Gemini's user/model format
+        - Uses chat sessions with proper history formatting
+        - Maintains context through chat.send_message()
+    
+    b) OpenAI-compatible:
+        - Uses standard OpenAI message array format
+        - Includes system instruction and full conversation history
+        - Properly maps internal roles to OpenAI roles
+
+    3. Flow:
+    a) User asks follow-up question
+    b) Question is added to chat history
+    c) Full history is formatted for the current provider
+    d) Response is generated while maintaining context
+    e) Response is displayed in chat UI
+    f) New response is added to history for future context
+
+    4. Threading:
+    - Runs in a separate thread to prevent UI freezing
+    - Uses signals to safely update UI from background thread
+    - Handles errors too
+
+    Args:
+        response_window: The ResponseWindow instance managing the chat UI
+        question: The follow-up question from the user
+
+    This implementation is a bit convoluted, but it allows us to manage chat history & model roles across both providers! :3
+    """
+
+    def process_followup_question(self, response_window, question):
+        """
+        Process a follow-up question in the chat window.
+        """
+        logging.debug(f'Processing follow-up question: {question}')
+        
+        def process_thread():
+            logging.debug('Starting follow-up processing thread')
+            try:
+                if not response_window.chat_history:
+                    logging.error("No chat history found")
+                    self.show_message_signal.emit('Error', 'Chat history not found')
+                    return
+
+                # Add current question to chat history
+                response_window.chat_history.append({
+                    "role": "user",
+                    "content": question
+                })
+                
+                # Get chat history
+                history = response_window.chat_history.copy()
+                
+                # System instruction based on original option
+                system_instruction = "You are a helpful AI assistant. Provide clear and direct responses, maintaining the same format and style as your previous responses. If appropriate, use Markdown formatting to make your response more readable."
+                
+                logging.debug('Sending request to AI provider')
+                
+                # Format conversation differently based on provider
+                if isinstance(self.current_provider, GeminiProvider):
+                    # For Gemini, use the proper history format with roles
+                    chat_messages = []
+                    
+                    # Convert our roles to Gemini's expected roles
+                    for msg in history:
+                        gemini_role = "model" if msg["role"] == "assistant" else "user"
+                        chat_messages.append({
+                            "role": gemini_role,
+                            "parts": msg["content"]
+                        })
+                    
+                    # Start chat with history
+                    chat = self.current_provider.model.start_chat(history=chat_messages)
+                    
+                    # Get response using the chat
+                    response = chat.send_message(question)
+                    response_text = response.text
+                    
+                else:
+                    # For OpenAI/compatible providers, prepare messages array
+                    messages = []
+                    
+                    # Add system message
+                    messages.append({"role": "system", "content": system_instruction})
+                    
+                    # Add history messages (including latest question)
+                    for msg in history:
+                        # Convert 'assistant' role to 'assistant' for OpenAI
+                        role = "assistant" if msg["role"] == "assistant" else "user"
+                        messages.append({"role": role, "content": msg["content"]})
+                    
+                    # Get response by passing the full messages array
+                    response_text = self.current_provider.get_response(
+                        system_instruction,
+                        messages,  # Pass messages array directly
+                        return_response=True
+                    )
+
+                logging.debug(f'Got response of length: {len(response_text)}')
+                
+                # Add response to chat history
+                response_window.chat_history.append({
+                    "role": "assistant",
+                    "content": response_text
+                })
+                
+                # Emit response via signal
+                self.followup_response_signal.emit(response_text)
+
+            except Exception as e:
+                logging.error(f'Error processing follow-up question: {e}', exc_info=True)
+                self.show_message_signal.emit('Error', f'An error occurred: {e}')
+                self.followup_response_signal.emit("An error occurred while processing your question.")
+                
+        # Start the thread
+        threading.Thread(target=process_thread, daemon=True).start()
+
     def show_settings(self, providers_only=False):
+
         """
         Show the settings window.
         """
         logging.debug('Showing settings window')
         # Always create a new settings window to handle providers_only correctly
         self.settings_window = SettingsWindow(self, providers_only=providers_only)
-        self.settings_window.close_signal.connect(self.exit_app)
         self.settings_window.show()
+
 
     def show_about(self):
         """
@@ -483,27 +707,6 @@ class WritingToolApp(QtWidgets.QApplication):
         if not self.about_window:
             self.about_window = AboutWindow()
         self.about_window.show()
-
-    def setup_ctrl_c_listener(self):
-        """
-        Listener for Ctrl+C to exit the app.
-        """
-        signal.signal(signal.SIGINT, lambda signum, frame: self.handle_sigint(signum, frame))
-
-        # This empty timer is needed to make sure that the sigint handler gets checked inside the main loop:
-        # without it, the sigint handle would trigger only when an event is triggered, either by a hotkey combination
-        # or by another GUI event like spawning a new window. With this we trigger it every 100ms with an empy lambda
-        # so that the signal handler gets checked regularly.
-        self.ctrl_c_timer = QtCore.QTimer()
-        self.ctrl_c_timer.start(100)
-        self.ctrl_c_timer.timeout.connect(lambda: None)
-
-    def handle_sigint(self, signum, frame):
-        """
-        Handle the SIGINT signal (Ctrl+C) to exit the app gracefully.
-        """
-        logging.info("Received SIGINT. Exiting...")
-        self.exit_app()
 
     def exit_app(self):
         """

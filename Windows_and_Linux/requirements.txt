@@ -4,4 +4,5 @@ openai
 pyperclip
 pynput
 PySide6
-protobuf
+markdown2
+pyinstaller
