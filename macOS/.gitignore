@@ -48,8 +48,8 @@ fastlane/test_output
 
 # Personal settings
 *.plist
-*.xcodeproj
 *.xcodeproj/project.xcworkspace
 *.xcodeproj/xcuserdata/
+*.xcodeproj/xcshareddata/
 *.xcodeproj/xcuserdata/**/*.xcuserdatad
 *.xcodeproj/xcuserdata/**/*.xccheckout
