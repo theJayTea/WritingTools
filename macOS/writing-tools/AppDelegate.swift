@@ -1,4 +1,5 @@
 import SwiftUI
+import KeyboardShortcuts
 import HotKey
 import Carbon.HIToolbox
 
@@ -9,7 +10,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     
     // Property to track service-triggered popups
     private var isServiceTriggered: Bool = false
-
+    
     // Computed property to manage the menu bar status item
     var statusBarItem: NSStatusItem! {
         get {
@@ -36,7 +37,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         
         NSApp.servicesProvider = self
-
+        
         if CommandLine.arguments.contains("--reset") {
             DispatchQueue.main.async { [weak self] in
                 self?.performRecoveryReset()
@@ -46,7 +47,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         
         DispatchQueue.main.async { [weak self] in
             self?.setupMenuBar()
-            self?.setupHotKey()
             
             if self?.statusBarItem == nil {
                 self?.recreateStatusBarItem()
@@ -57,6 +57,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             }
             
             self?.requestAccessibilityPermissions()
+        }
+        
+        KeyboardShortcuts.onKeyUp(for: .showPopup) { [weak self] in
+            self?.showPopup()
         }
     }
     
@@ -102,7 +106,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         recreateStatusBarItem()
         setupMenuBar()
         
-        setupHotKey()
         
         let alert = NSAlert()
         alert.messageText = "App Reset Complete"
@@ -126,7 +129,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         // Recreate status bar and setup
         recreateStatusBarItem()
         setupMenuBar()
-        setupHotKey()
         
         // Show confirmation
         let alert = NSAlert()
@@ -150,70 +152,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             
             if alert.runModal() == .alertFirstButtonReturn {
                 NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!)
-            }
-        }
-    }
-    
-    // Initializes keyboard shortcut handling
-    private func setupHotKey() {
-        updateHotKey()
-        
-        NotificationCenter.default.removeObserver(self, name: UserDefaults.didChangeNotification, object: nil)
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(shortcutChanged),
-            name: UserDefaults.didChangeNotification,
-            object: nil
-        )
-    }
-    
-    // Handles changes to keyboard shortcut settings
-    @objc private func shortcutChanged() {
-        DispatchQueue.main.async { [weak self] in
-            if UserDefaults.standard.string(forKey: "shortcut") != nil {
-                self?.updateHotKey()
-            }
-        }
-    }
-    
-    // Updates the active keyboard shortcut based on settings
-    private func updateHotKey() {
-        // Clear any existing hotKey
-        hotKey = nil
-        
-        // Retrieve raw code & modifiers from UserDefaults
-        let rawKeyCode = UserDefaults.standard.integer(forKey: "hotKey_keyCode")
-        let rawModifiers = UserDefaults.standard.integer(forKey: "hotKey_modifiers")
-        
-        // If user never recorded anything, set a default.
-        if rawKeyCode == 0 && rawModifiers == 0 {
-            // Provide default if needed
-            let defaultKeyCode = kVK_ANSI_D
-            let defaultFlags   = NSEvent.ModifierFlags.control.carbonFlags
-            
-            UserDefaults.standard.set(Int(defaultKeyCode), forKey: "hotKey_keyCode")
-            UserDefaults.standard.set(Int(defaultFlags), forKey: "hotKey_modifiers")
-            
-            // Re-read from UserDefaults so code proceeds
-            return updateHotKey()
-        }
-        
-        // Construct the HotKey from those raw integers
-        let carbonKeyCode = UInt32(rawKeyCode)
-        let carbonModifiers = UInt32(rawModifiers)
-        
-        // Create the HotKey instance
-        hotKey = HotKey(keyCombo: KeyCombo(
-            carbonKeyCode: carbonKeyCode,
-            carbonModifiers: carbonModifiers
-        ))
-        
-        hotKey?.keyDownHandler = { [weak self] in
-            DispatchQueue.main.async {
-                if let frontmostApp = NSWorkspace.shared.frontmostApplication {
-                    self?.appState.previousApplication = frontmostApp
-                }
-                self?.showPopup()
             }
         }
     }
@@ -354,73 +292,73 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     
     // Handles window cleanup when any window is closed
     func windowWillClose(_ notification: Notification) {
-            guard !isServiceTriggered else { return }
-            
-            guard let window = notification.object as? NSWindow else { return }
-            DispatchQueue.main.async { [weak self] in
-                if window == self?.settingsWindow {
-                    self?.settingsHostingView = nil
-                    self?.settingsWindow = nil
-                } else if window == self?.aboutWindow {
-                    self?.aboutHostingView = nil
-                    self?.aboutWindow = nil
-                } else if window == self?.popupWindow {
-                    self?.popupWindow?.delegate = nil
-                    self?.popupWindow = nil
-                }
+        guard !isServiceTriggered else { return }
+        
+        guard let window = notification.object as? NSWindow else { return }
+        DispatchQueue.main.async { [weak self] in
+            if window == self?.settingsWindow {
+                self?.settingsHostingView = nil
+                self?.settingsWindow = nil
+            } else if window == self?.aboutWindow {
+                self?.aboutHostingView = nil
+                self?.aboutWindow = nil
+            } else if window == self?.popupWindow {
+                self?.popupWindow?.delegate = nil
+                self?.popupWindow = nil
             }
         }
+    }
     
     // Service handler for processing selected text
     @objc func handleSelectedText(_ pboard: NSPasteboard, userData: String, error: AutoreleasingUnsafeMutablePointer<NSString>) {
-            let types: [NSPasteboard.PasteboardType] = [
-                .string,
-                .rtf,
-                NSPasteboard.PasteboardType("public.plain-text")
-            ]
-            
-            guard let selectedText = types.lazy.compactMap({ pboard.string(forType: $0) }).first,
-                  !selectedText.isEmpty else {
-                error.pointee = "No text was selected" as NSString
-                return
+        let types: [NSPasteboard.PasteboardType] = [
+            .string,
+            .rtf,
+            NSPasteboard.PasteboardType("public.plain-text")
+        ]
+        
+        guard let selectedText = types.lazy.compactMap({ pboard.string(forType: $0) }).first,
+              !selectedText.isEmpty else {
+            error.pointee = "No text was selected" as NSString
+            return
+        }
+        
+        // Store the selected text
+        appState.selectedText = selectedText
+        
+        // Set service trigger flag
+        isServiceTriggered = true
+        
+        // Show the popup
+        DispatchQueue.main.async { [weak self] in
+            if let frontmostApp = NSWorkspace.shared.frontmostApplication {
+                self?.appState.previousApplication = frontmostApp
             }
             
-            // Store the selected text
-            appState.selectedText = selectedText
+            guard let self = self else { return }
             
-            // Set service trigger flag
-            isServiceTriggered = true
+            if !selectedText.isEmpty {
+                let window = PopupWindow(appState: self.appState)
+                window.delegate = self
+                
+                self.closePopupWindow()
+                self.popupWindow = window
+                
+                // Configure window for service mode
+                window.level = .floating
+                window.collectionBehavior = [.moveToActiveSpace]
+                
+                window.positionNearMouse()
+                window.makeKeyAndOrderFront(nil)
+                window.orderFrontRegardless()
+            }
             
-            // Show the popup
-            DispatchQueue.main.async { [weak self] in
-                if let frontmostApp = NSWorkspace.shared.frontmostApplication {
-                    self?.appState.previousApplication = frontmostApp
-                }
-                
-                guard let self = self else { return }
-                
-                if !selectedText.isEmpty {
-                    let window = PopupWindow(appState: self.appState)
-                    window.delegate = self
-                    
-                    self.closePopupWindow()
-                    self.popupWindow = window
-                    
-                    // Configure window for service mode
-                    window.level = .floating
-                    window.collectionBehavior = [.moveToActiveSpace]
-                    
-                    window.positionNearMouse()
-                    window.makeKeyAndOrderFront(nil)
-                    window.orderFrontRegardless()
-                }
-                
-                // Reset the flag after a delay
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    self.isServiceTriggered = false
-                }
+            // Reset the flag after a delay
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.isServiceTriggered = false
             }
         }
+    }
 }
 
 // Converts SwiftUI modifier flags to Carbon modifier flags for HotKey library

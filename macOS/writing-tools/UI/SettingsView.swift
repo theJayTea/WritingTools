@@ -1,137 +1,9 @@
 import SwiftUI
 import Carbon.HIToolbox
+import KeyboardShortcuts
 
-struct ShortcutRecorderView: View {
-    @State private var displayText = ""
-    
-    @FocusState private var isFocused: Bool
-    @State private var isRecording = false
-    
-    var body: some View {
-        HStack {
-            Text(displayText.isEmpty ? "Click to record" : displayText)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(8)
-                .background(Color(.textBackgroundColor))
-                .cornerRadius(6)
-                .onTapGesture {
-                    isFocused = true
-                    isRecording = true
-                    displayText = "Recording..."
-                }
-            
-            if isRecording {
-                Text("Press desired shortcut…")
-                    .foregroundColor(.secondary)
-            }
-        }
-        .focusable()
-        .focused($isFocused)
-        .onAppear {
-            NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .flagsChanged]) { event in
-                if isRecording {
-                    handleKeyEvent(event)
-                    // Return nil to indicate the event is handled
-                    return nil
-                }
-                // Otherwise, pass it on
-                return event
-            }
-        }
-    }
-    
-    private func handleKeyEvent(_ event: NSEvent) {
-        if event.type == .keyDown {
-            // Modifiers
-            let carbonModifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask).carbonFlags
-            
-            // The physical key code from the system
-            let rawKeyCode = UInt32(event.keyCode)
-            
-            // Save them in UserDefaults
-            UserDefaults.standard.set(Int(rawKeyCode), forKey: "hotKey_keyCode")
-            UserDefaults.standard.set(Int(carbonModifiers), forKey: "hotKey_modifiers")
-            
-            displayText = describeShortcut(keyCode: event.keyCode,
-                                           flags: event.modifierFlags)
-            
-            // Done recording
-            isRecording = false
-            isFocused = false
-        }
-    }
-    
-    //  helper to produce a “Ctrl + D” style string.
-    private func describeShortcut(keyCode: UInt16, flags: NSEvent.ModifierFlags) -> String {
-        var parts: [String] = []
-        
-        // 1) Collect modifier flags
-        if flags.contains(.command)  { parts.append("⌘") }
-        if flags.contains(.option)   { parts.append("⌥") }
-        if flags.contains(.control)  { parts.append("⌃") }
-        if flags.contains(.shift)    { parts.append("⇧") }
-        
-        // 2) Convert keyCode -> Int
-        let keyCodeInt = Int(keyCode)
-        
-        // 3) Check if it matches certain special/symbol keys
-        switch keyCodeInt {
-        case kVK_Space:
-            parts.append("Space")
-        case kVK_Return:
-            parts.append("Return")
-        case kVK_ANSI_Equal:
-            parts.append("=")
-        case kVK_ANSI_Minus:
-            parts.append("-")
-        case kVK_ANSI_LeftBracket:
-            parts.append("[")
-        case kVK_ANSI_RightBracket:
-            parts.append("]")
-        // Add more symbol keys if needed (e.g., kVK_ANSI_Semicolon, etc.)
-            
-        default:
-            // 4) If we find a letter in our dictionary, use it; else show the numeric code.
-            if let letter = keyCodeToLetter[keyCodeInt] {
-                parts.append(letter)
-            } else {
-                parts.append("(\(keyCode))") // Fallback for anything unrecognized
-            }
-        }
-        
-        // 5) Combine with spaces, e.g. "⌃ D", "⌘ ="
-        return parts.joined(separator: " ")
-    }
-    
-    // Maps the Carbon virtual key code (e.g. kVK_ANSI_D = 0x02) to the actual letter "D".
-    private let keyCodeToLetter: [Int: String] = [
-        kVK_ANSI_A: "A",
-        kVK_ANSI_B: "B",
-        kVK_ANSI_C: "C",
-        kVK_ANSI_D: "D",
-        kVK_ANSI_E: "E",
-        kVK_ANSI_F: "F",
-        kVK_ANSI_G: "G",
-        kVK_ANSI_H: "H",
-        kVK_ANSI_I: "I",
-        kVK_ANSI_J: "J",
-        kVK_ANSI_K: "K",
-        kVK_ANSI_L: "L",
-        kVK_ANSI_M: "M",
-        kVK_ANSI_N: "N",
-        kVK_ANSI_O: "O",
-        kVK_ANSI_P: "P",
-        kVK_ANSI_Q: "Q",
-        kVK_ANSI_R: "R",
-        kVK_ANSI_S: "S",
-        kVK_ANSI_T: "T",
-        kVK_ANSI_U: "U",
-        kVK_ANSI_V: "V",
-        kVK_ANSI_W: "W",
-        kVK_ANSI_X: "X",
-        kVK_ANSI_Y: "Y",
-        kVK_ANSI_Z: "Z"
-    ]
+extension KeyboardShortcuts.Name {
+    static let showPopup = Self("showPopup")
 }
 
 struct SettingsView: View {
@@ -184,22 +56,11 @@ struct SettingsView: View {
             if !showOnlyApiSetup {
                 Section("General Settings") {
                     Form {
-                            Text(displayShortcut.isEmpty ? "Not set" : displayShortcut)
-                            
-                            ShortcutRecorderView()
+                        
+                        KeyboardShortcuts.Recorder("Global Shortcut:", name: .showPopup)
                         
                     }
-                    .onAppear {
-                        // Load the raw keyCode & modifiers from UserDefaults
-                        let rawKeyCode   = UserDefaults.standard.integer(forKey: "hotKey_keyCode")
-                        let rawModifiers = UserDefaults.standard.integer(forKey: "hotKey_modifiers")
-                        
-                        // Convert to proper Swift types
-                        let keyCode = UInt16(rawKeyCode)
-                        let flags   = decodeCarbonModifiers(rawModifiers)
-                        
-                        displayShortcut = describeShortcut(keyCode: keyCode, flags: flags)
-                    }
+                    
                     Toggle("Use Gradient Theme", isOn: $useGradientTheme)
                 }
                 

@@ -1,9 +1,10 @@
 import SwiftUI
+import KeyboardShortcuts
 
 struct OnboardingView: View {
     @ObservedObject var appState: AppState
     @State private var currentStep = 0
-    @State private var shortcutText = "⌘ Space"
+    @State private var shortcutText = "⌃ Space"
     @State private var useGradientTheme = true
     @State private var isShowingSettings = false
     
@@ -141,7 +142,7 @@ struct OnboardingView: View {
     
     private var customizationStep: some View {
         VStack(spacing: 20) {
-            Text(steps[2].title)
+            Text("Customize Your Experience")
                 .font(.title)
                 .bold()
             
@@ -149,29 +150,15 @@ struct OnboardingView: View {
                 Text("Set your keyboard shortcut:")
                     .font(.headline)
                 
-                ShortcutRecorderView()
-                    .frame(maxWidth: .infinity)
-                
-                Text("Important: For reliable shortcuts, try:")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                
-                Text("• Control (⌃) + Letter (e.g., ⌃ D)")
-                Text("• Option (⌥) + Space")
-                Text("• Command (⌘) + Letter")
-                
-                Divider()
-                
-                Text("Choose your theme:")
-                    .font(.headline)
+                KeyboardShortcuts.Recorder("Shortcut:", name: .showPopup)
                 
                 Toggle("Use Gradient Theme", isOn: $useGradientTheme)
             }
         }
     }
     
+    
     private func saveSettingsAndContinue() {
-        UserDefaults.standard.set(shortcutText, forKey: "shortcut")
         UserDefaults.standard.set(useGradientTheme, forKey: "use_gradient_theme")
         WindowManager.shared.transitonFromOnboardingToSettings(appState: appState)
     }
