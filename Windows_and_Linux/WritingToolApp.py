@@ -289,7 +289,6 @@ class WritingToolApp(QtWidgets.QApplication):
 
         # Get the selected text
         selected_text = pyperclip.paste()
-        logging.debug(f'Selected text: "{selected_text}"')
 
         # Restore the clipboard
         pyperclip.copy(clipboard_backup)
