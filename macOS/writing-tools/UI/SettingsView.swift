@@ -10,6 +10,7 @@ struct SettingsView: View {
     @ObservedObject var appState: AppState
     @State private var shortcutText = UserDefaults.standard.string(forKey: "shortcut") ?? "⌥ Space"
     @State private var useGradientTheme = UserDefaults.standard.bool(forKey: "use_gradient_theme")
+    @State private var selectedTheme = UserDefaults.standard.string(forKey: "theme_style") ?? "gradient"
     @State private var selectedProvider = UserDefaults.standard.string(forKey: "current_provider") ?? "gemini"
     
     // Gemini settings
@@ -61,7 +62,18 @@ struct SettingsView: View {
                         
                     }
                     
-                    Toggle("Use Gradient Theme", isOn: $useGradientTheme)
+                    Section("Appearance") {
+                        Picker("Theme", selection: $selectedTheme) {
+                            Text("Standard").tag("standard")
+                            Text("Gradient").tag("gradient")
+                            Text("Glass").tag("glass")
+                        }
+                        .pickerStyle(.segmented)
+                        .onChange(of: selectedTheme) { _, newValue in
+                            UserDefaults.standard.set(newValue, forKey: "theme_style")
+                            useGradientTheme = (newValue != "standard")
+                        }
+                    }
                 }
                 
                 Section("AI Provider") {
@@ -136,7 +148,8 @@ struct SettingsView: View {
         let oldShortcut = UserDefaults.standard.string(forKey: "shortcut")
         
         UserDefaults.standard.set(shortcutText, forKey: "shortcut")
-        UserDefaults.standard.set(useGradientTheme, forKey: "use_gradient_theme")
+        UserDefaults.standard.set(selectedTheme, forKey: "theme_style")
+        UserDefaults.standard.set(selectedTheme != "standard", forKey: "use_gradient_theme")
         
         // Save provider-specific settings
         if selectedProvider == "gemini" {

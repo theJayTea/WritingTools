@@ -6,6 +6,7 @@ struct OnboardingView: View {
     @State private var currentStep = 0
     @State private var shortcutText = "⌃ Space"
     @State private var useGradientTheme = true
+    @State private var selectedTheme = UserDefaults.standard.string(forKey: "theme_style") ?? "gradient"
     @State private var isShowingSettings = false
     
     private let steps = [
@@ -152,14 +153,26 @@ struct OnboardingView: View {
                 
                 KeyboardShortcuts.Recorder("Shortcut:", name: .showPopup)
                 
-                Toggle("Use Gradient Theme", isOn: $useGradientTheme)
+                Section("Appearance") {
+                    Picker("Theme", selection: $selectedTheme) {
+                        Text("Standard").tag("standard")
+                        Text("Gradient").tag("gradient")
+                        Text("Glass").tag("glass")
+                    }
+                    .pickerStyle(.segmented)
+                    .onChange(of: selectedTheme) { _, newValue in
+                        UserDefaults.standard.set(newValue, forKey: "theme_style")
+                        useGradientTheme = (newValue != "standard")
+                    }
+                }
             }
         }
     }
     
     
     private func saveSettingsAndContinue() {
-        UserDefaults.standard.set(useGradientTheme, forKey: "use_gradient_theme")
+        UserDefaults.standard.set(selectedTheme, forKey: "theme_style")
+        UserDefaults.standard.set(selectedTheme != "standard", forKey: "use_gradient_theme")
         WindowManager.shared.transitonFromOnboardingToSettings(appState: appState)
     }
 }

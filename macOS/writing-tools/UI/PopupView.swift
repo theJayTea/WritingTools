@@ -178,8 +178,16 @@ struct PopupView: View {
                     
                     closeAction()
                     
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        simulatePaste()
+                    // Reactivate previous application and paste
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        if let previousApp = appState.previousApplication {
+                            previousApp.activate()
+                            
+                            // Wait for activation before pasting
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                simulatePaste()
+                            }
+                        }
                     }
                 }
             } catch {

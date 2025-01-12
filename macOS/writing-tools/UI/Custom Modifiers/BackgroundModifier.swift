@@ -1,14 +1,30 @@
 import SwiftUI
 
+enum AppTheme: String {
+    case standard = "standard"
+    case gradient = "gradient"
+    case glass = "glass"
+}
+
 struct WindowBackground: ViewModifier {
     @Environment(\.colorScheme) var colorScheme
     let useGradient: Bool
+    
+    var currentTheme: AppTheme {
+        if !useGradient {
+            return .standard
+        }
+        return UserDefaults.standard.string(forKey: "theme_style") == "glass" ? .glass : .gradient
+    }
     
     func body(content: Content) -> some View {
         content
             .background(
                 Group {
-                    if useGradient {
+                    switch currentTheme {
+                    case .standard:
+                        Color(.windowBackgroundColor)
+                    case .gradient:
                         if colorScheme == .light {
                             LinearGradient(
                                 colors: [
@@ -32,11 +48,40 @@ struct WindowBackground: ViewModifier {
                                 endPoint: .bottomTrailing
                             )
                         }
-                    } else {
-                        Color(.windowBackgroundColor)
+                    case .glass:
+                        GlassmorphicBackground()
                     }
                 }
             )
+    }
+}
+
+struct GlassmorphicBackground: View {
+    @Environment(\.colorScheme) var colorScheme
+    
+    var body: some View {
+        ZStack {
+            // Base color and Gradient overlay in light mode (Dark mode looks good)
+            if (colorScheme == .light){
+                Color(.windowBackgroundColor)
+                    .opacity(0.2)
+                
+                LinearGradient(
+                    colors: [
+                        Color.white.opacity(0.1),
+                        Color.white.opacity(0.2)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                
+            }
+            
+            // Blur effect
+            Rectangle()
+                .fill(.ultraThinMaterial)
+            
+        }
     }
 }
 
@@ -60,7 +105,7 @@ extension Color {
             .sRGB,
             red: Double(r) / 255,
             green: Double(g) / 255,
-            blue:  Double(b) / 255,
+            blue: Double(b) / 255,
             opacity: Double(a) / 255
         )
     }

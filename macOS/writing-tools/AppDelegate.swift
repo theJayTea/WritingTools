@@ -229,6 +229,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
+            // Store the current frontmost application before showing popup
+            if let frontmostApp = NSWorkspace.shared.frontmostApplication {
+                self.appState.previousApplication = frontmostApp
+            }
+            
             self.closePopupWindow()
             
             let pasteboard = NSPasteboard.general
