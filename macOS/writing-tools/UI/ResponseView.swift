@@ -117,37 +117,47 @@ struct ResponseView: View {
 }
 
 struct ChatMessageView: View {
+    
     let message: ChatMessage
     let fontSize: CGFloat
-    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
-        HStack(alignment: .top) {
-            if message.role == "user" {
-                Spacer(minLength: 60)
-            }
+        // If user message is on the right, assistant on the left:
+        HStack(alignment: .top, spacing: 12) {
             
-            VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: 4) {
-                ViewThatFits(in: .horizontal) {
-                    Markdown(message.content)
-                        .font(.system(size: fontSize))
-                        .textSelection(.enabled)
-                        .padding()
-                        .frame(minWidth: 100, idealWidth: 450, maxWidth: 600, alignment: .leading)
-                        .background(message.role == "user" ? Color.accentColor.opacity(0.1) : Color(.controlBackgroundColor))
-                        .cornerRadius(12)
-                }
-                
-                Text(message.timestamp.formatted(.dateTime.hour().minute()))
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-            }
-            
+            // If it's assistant, push bubble to the left
             if message.role == "assistant" {
-                Spacer(minLength: 60)
+                bubbleView(role: message.role)
+                Spacer(minLength: 15)
+            } else {
+                Spacer(minLength: 15)
+                bubbleView(role: message.role)
             }
         }
+        .padding(.top, 4)
     }
+    
+    @ViewBuilder
+    private func bubbleView(role: String) -> some View {
+        VStack(alignment: role == "assistant" ? .leading : .trailing, spacing: 2) {
+            Markdown(message.content)
+                .font(.system(size: fontSize))
+                .textSelection(.enabled)
+                .chatBubbleStyle(isFromUser: message.role == "user")
+            
+            // Time stamp
+            Text(message.timestamp.formatted(.dateTime.hour().minute()))
+                .font(.caption2)
+                .foregroundColor(.secondary)
+                .padding(.bottom, 2)
+        }
+        .frame(maxWidth: 500, alignment: role == "assistant" ? .leading : .trailing)
+    }
+}
+
+// A small convenience enum for clarity (optional)
+fileprivate enum MessageRole {
+    case user, assistant
 }
 
 

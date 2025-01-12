@@ -94,6 +94,7 @@ struct PopupView: View {
         }
     }
     
+    // Process custom commands
     private func processCustomCommand(_ command: CustomCommand) {
         loadingOptions.insert(command.id.uuidString)
         appState.isProcessing = true
@@ -169,6 +170,8 @@ struct PopupView: View {
                     await MainActor.run {
                         showResponseWindow(for: option, with: result)
                     }
+                    // Close the popup window after showing the response window
+                    closeAction()
                 } else {
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(result, forType: .string)
@@ -202,7 +205,7 @@ struct PopupView: View {
                 """
                 
                 let userPrompt = appState.selectedText.isEmpty ?
-                    instruction :
+                instruction :
                     """
                     User's instruction: \(instruction)
                     

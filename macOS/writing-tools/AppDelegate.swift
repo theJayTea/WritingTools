@@ -1,6 +1,5 @@
 import SwiftUI
 import KeyboardShortcuts
-import HotKey
 import Carbon.HIToolbox
 
 class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
@@ -24,7 +23,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             AppDelegate.sharedStatusItem = newValue
         }
     }
-    var hotKey: HotKey?
     let appState = AppState.shared
     private var settingsWindow: NSWindow?
     private var aboutWindow: NSWindow?
@@ -100,7 +98,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     
     // Resets app to default state when triggered from menu
     @objc private func resetApp() {
-        hotKey = nil
         WindowManager.shared.cleanupWindows()
         
         recreateStatusBarItem()
@@ -123,7 +120,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         UserDefaults.standard.synchronize()
         
         // Reset the app state
-        hotKey = nil
         WindowManager.shared.cleanupWindows()
         
         // Recreate status bar and setup
