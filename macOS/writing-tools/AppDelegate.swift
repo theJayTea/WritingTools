@@ -195,7 +195,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         settingsWindow?.contentView = settingsHostingView
         settingsWindow?.delegate = self
         
-        settingsWindow?.makeKeyAndOrderFront(nil)
+        // Ensure window appears in front
+        if let window = settingsWindow {
+            window.level = .floating
+            NSApp.activate()
+            window.makeKeyAndOrderFront(nil)
+            window.orderFrontRegardless()
+        }
     }
     
     // Opens the about window
@@ -219,7 +225,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         aboutWindow?.contentView = aboutHostingView
         aboutWindow?.delegate = self
         
-        aboutWindow?.makeKeyAndOrderFront(nil)
+        // Ensure window appears in front
+        if let window = aboutWindow {
+            window.level = .floating
+            NSApp.activate(ignoringOtherApps: true)
+            window.makeKeyAndOrderFront(nil)
+            window.orderFrontRegardless()
+        }
     }
     
     // Shows the main popup window when shortcut is triggered
