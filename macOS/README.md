@@ -104,3 +104,7 @@ If you encounter the "Could not open file" error:
 The macOS port is being developed by **Aryamirsepasi**.
 
 GitHub: [https://github.com/Aryamirsepasi](https://github.com/Aryamirsepasi)
+
+Special Thanks to @sindresorhus for developing an amazing and stable keyboard shortcuts package for Swift. 
+
+GitHub: [https://github.com/sindresorhus/KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts)

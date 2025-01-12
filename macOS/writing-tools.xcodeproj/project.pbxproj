@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2A57862B2CEFB15900DB01FC /* HotKey in Frameworks */ = {isa = PBXBuildFile; productRef = 2A57862A2CEFB15900DB01FC /* HotKey */; };
 		2AA154122CF2636900D27D18 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 2AA154112CF2636900D27D18 /* MarkdownUI */; };
+		2AF5CC562D2AFE1C0050F923 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 2AF5CC552D2AFE1C0050F923 /* KeyboardShortcuts */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,8 +60,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2A57862B2CEFB15900DB01FC /* HotKey in Frameworks */,
 				2AA154122CF2636900D27D18 /* MarkdownUI in Frameworks */,
+				2AF5CC562D2AFE1C0050F923 /* KeyboardShortcuts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -120,8 +120,8 @@
 			);
 			name = "writing-tools";
 			packageProductDependencies = (
-				2A57862A2CEFB15900DB01FC /* HotKey */,
 				2AA154112CF2636900D27D18 /* MarkdownUI */,
+				2AF5CC552D2AFE1C0050F923 /* KeyboardShortcuts */,
 			);
 			productName = "swift-writing-tools";
 			productReference = 2ABCBC1E2CDEB606001E4B5E /* writing-tools.app */;
@@ -200,8 +200,8 @@
 			mainGroup = 2ABCBC152CDEB606001E4B5E;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				2A5786292CEFB15900DB01FC /* XCRemoteSwiftPackageReference "HotKey" */,
 				2AA154102CF2636900D27D18 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
+				2AF5CC542D2AFE1C0050F923 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2ABCBC1F2CDEB606001E4B5E /* Products */;
@@ -581,14 +581,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		2A5786292CEFB15900DB01FC /* XCRemoteSwiftPackageReference "HotKey" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/soffes/HotKey";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
 		2AA154102CF2636900D27D18 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui";
@@ -597,18 +589,26 @@
 				minimumVersion = 2.4.1;
 			};
 		};
+		2AF5CC542D2AFE1C0050F923 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.2.4;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		2A57862A2CEFB15900DB01FC /* HotKey */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2A5786292CEFB15900DB01FC /* XCRemoteSwiftPackageReference "HotKey" */;
-			productName = HotKey;
-		};
 		2AA154112CF2636900D27D18 /* MarkdownUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 2AA154102CF2636900D27D18 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
 			productName = MarkdownUI;
+		};
+		2AF5CC552D2AFE1C0050F923 /* KeyboardShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2AF5CC542D2AFE1C0050F923 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
