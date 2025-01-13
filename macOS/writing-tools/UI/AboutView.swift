@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AboutView: View {
     @State private var useGradientTheme = UserDefaults.standard.bool(forKey: "use_gradient_theme")
+    @State private var updateChecker = UpdateChecker.shared
 
     var body: some View {
         VStack(spacing: 20) {
@@ -31,18 +32,40 @@ struct AboutView: View {
                 
                 Link("Email: developer@aryamirsepasi.com",
                      destination: URL(string: "mailto:developer@aryamirsepasi.com")!)
-                
             }
             
             Divider()
 
-            Text("Version: Beta 6 (Based on Windows Port version 6.0)")
+            Text("Version: 1.0 (Based on Windows Port version 6.0)")
                 .font(.caption)
             
-            Button("Check for Updates") {
-                NSWorkspace.shared.open(URL(string: "https://github.com/theJayTea/WritingTools/releases")!)
+            // Update checker section
+            VStack(spacing: 8) {
+                if updateChecker.isCheckingForUpdates {
+                    ProgressView("Checking for updates...")
+                } else if let error = updateChecker.checkError {
+                    Text(error)
+                        .foregroundColor(.red)
+                        .font(.caption)
+                } else if updateChecker.updateAvailable {
+                    Text("A new version is available!")
+                        .foregroundColor(.green)
+                        .font(.caption)
+                }
+                
+                Button(action: {
+                    if updateChecker.updateAvailable {
+                        updateChecker.openReleasesPage()
+                    } else {
+                        Task {
+                            await updateChecker.checkForUpdates()
+                        }
+                    }
+                }) {
+                    Text(updateChecker.updateAvailable ? "Download Update" : "Check for Updates")
+                }
+                .buttonStyle(.borderedProminent)
             }
-            .buttonStyle(.borderedProminent)
         }
         .padding()
         .frame(width: 400, height: 400)

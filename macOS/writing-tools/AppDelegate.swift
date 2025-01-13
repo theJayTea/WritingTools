@@ -336,6 +336,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             return
         }
         
+        // Store the current frontmost application
+        if let frontmostApp = NSWorkspace.shared.frontmostApplication {
+            appState.previousApplication = frontmostApp
+        }
+        
         // Store the selected text
         appState.selectedText = selectedText
         
@@ -344,29 +349,26 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         
         // Show the popup
         DispatchQueue.main.async { [weak self] in
-            if let frontmostApp = NSWorkspace.shared.frontmostApplication {
-                self?.appState.previousApplication = frontmostApp
-            }
-            
             guard let self = self else { return }
             
-            if !selectedText.isEmpty {
-                let window = PopupWindow(appState: self.appState)
-                window.delegate = self
-                
-                self.closePopupWindow()
-                self.popupWindow = window
-                
-                // Configure window for service mode
-                window.level = .floating
-                window.collectionBehavior = [.moveToActiveSpace]
-                
-                window.positionNearMouse()
-                window.makeKeyAndOrderFront(nil)
-                window.orderFrontRegardless()
-            }
+            let window = PopupWindow(appState: self.appState)
+            window.delegate = self
             
-            // Reset the flag after a delay
+            self.closePopupWindow()
+            self.popupWindow = window
+            
+            // Configure window for service mode
+            window.level = .floating
+            window.collectionBehavior = [.moveToActiveSpace]
+            
+            window.positionNearMouse()
+            window.makeKeyAndOrderFront(nil)
+            window.orderFrontRegardless()
+            
+            // Activate our app
+            NSApp.activate()
+            
+            // Reset the service trigger flag after a delay
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self.isServiceTriggered = false
             }
@@ -383,5 +385,18 @@ extension NSEvent.ModifierFlags {
         if contains(.control) { carbon |= UInt32(controlKey) }
         if contains(.shift) { carbon |= UInt32(shiftKey) }
         return carbon
+    }
+}
+
+// extension to support service registration
+extension AppDelegate {
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        
+        // Register services provider
+        NSApp.servicesProvider = self
+        
+        // Register the service
+        NSUpdateDynamicServices()
     }
 }
