@@ -200,55 +200,26 @@ python pyinstaller-build-script.py
    - Launch Xcode once installed and complete any additional component installations
 
 2. **Clone the Repository**
-   - Open Terminal and navigate to a directory you want the project to be in:
+   - Open Terminal and navigate to the directory where you want to store the project:
    ```bash
    git clone https://github.com/theJayTea/WritingTools.git
-   cd WritingTools
    ```
 
-3. **Create Xcode Project**
-   - Navigate to the project's macOS directory:
-     ```bash
-     cd macOS
-     ```
-   - Create a new Xcode project:
-     ```bash
-     xcodebuild -project writing-tools.xcodeproj
-     ```
+3. **Open in Xcode**
+   - Open Xcode
+   - Select "Open an existing project..." from the options.
+   - Navigate to the macOS folder within the WritingTools directory that you cloned previously, and select "writing-tools.xcodeproj"
 
-4. **Open in Xcode**
-   - Double-click the generated `writing-tools.xcodeproj` file
-   - Or open Xcode and select "Open a Project or File"
-   - Navigate to the `WritingTools/macOS/writing-tools.xcodeproj` file
-
-5. **Configure Project Settings**
-   - In Xcode, select the project in the navigator
+4. **Configure Project Settings**
+   - In Xcode, select the project in the Navigator pane.
    - Under "Targets", select "writing-tools"
    - Set the following:
      - Deployment Target: macOS 14.0
      - Signing & Capabilities: Add your development team
 
-6. **Install Dependencies**
-   - In Terminal, run:
-     ```bash
-     cd macOS
-     swift package resolve
-     ```
-
-7. **Build and Run**
+5. **Build and Run**
    - In Xcode, select "My Mac" as the run destination
    - Click the Play button or press ⌘R to build and run
-
-## Troubleshooting
-
-If you encounter the "Could not open file" error:
-1. Ensure you're opening the `.xcodeproj` file, not the folder
-2. If the error persists, try:
-   ```bash
-   cd WritingTools/macOS
-   rm -rf writing-tools.xcodeproj
-   xcodebuild -project writing-tools.xcodeproj
-   ```
 
 
 ## 🌟 Contributors
