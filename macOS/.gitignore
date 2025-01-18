@@ -47,7 +47,6 @@ fastlane/test_output
 # Secrets
 *.keychain
 *.mobileprovision
-*.entitlements
 
 # Temporary files
 *.swp
