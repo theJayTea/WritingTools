@@ -15,9 +15,10 @@
 [https://www.windowscentral.com/software-apps/can-apple-catch-up-apple-intelligence-just-shipped-yet-free-apple-writing-tools-on-github-for-windows-and-linux-make-a-better-alternative](https://www.windowscentral.com/software-apps/can-apple-catch-up-apple-intelligence-just-shipped-yet-free-apple-writing-tools-on-github-for-windows-and-linux-make-a-better-alternative)
 
 [https://www.phonandroid.com/cette-application-gratuite-apporte-les-outils-dapple-intelligence-sur-windows-11.html](https://www.phonandroid.com/cette-application-gratuite-apporte-les-outils-dapple-intelligence-sur-windows-11.html)
+
 [https://www.lesnumeriques.com/intelligence-artificielle/envie-d-apple-intelligence-sur-votre-pc-windows-c-est-possible-n227816.html](https://www.lesnumeriques.com/intelligence-artificielle/envie-d-apple-intelligence-sur-votre-pc-windows-c-est-possible-n227816.html)
 
-[https://www.theoutpost.ai/news-story/high-school-developer-brings-apple-like-ai-writing-assistant-to-windows-7045/](https://theoutpost.ai/news-story/high-school-developer-brings-apple-like-ai-writing-assistant-to-windows-7045/)
+[https://tinhte.vn/thread/mang-apple-intelligence-len-windows-chay-gemini-1-5-flash-thong-minh-hon-ho-tro-san-tieng-viet.3840902/](https://tinhte.vn/thread/mang-apple-intelligence-len-windows-chay-gemini-1-5-flash-thong-minh-hon-ho-tro-san-tieng-viet.3840902/)
 
 [https://shiftdelete.net/yok-artik-lise-ogrencisi-apple-intelligence-ozelliklerini-windows-11e-getirdi](https://shiftdelete.net/yok-artik-lise-ogrencisi-apple-intelligence-ozelliklerini-windows-11e-getirdi)
 
@@ -32,6 +33,8 @@
 [https://www.pcsofter.com/download/109892.html](https://www.pcsofter.com/download/109892.html)
 
 [https://www.geeknetic.es/Guia/2960/Como-usar-la-IA-para-ayudar-a-redactar-textos-en-Windows-11.html](https://www.geeknetic.es/Guia/2960/Como-usar-la-IA-para-ayudar-a-redactar-textos-en-Windows-11.html)
+
+[https://www.theoutpost.ai/news-story/high-school-developer-brings-apple-like-ai-writing-assistant-to-windows-7045/](https://theoutpost.ai/news-story/high-school-developer-brings-apple-like-ai-writing-assistant-to-windows-7045/)
 
 [https://windowsforum.com/threads/revolutionizing-writing-jesai-taruns-ai-tool-for-windows-11.344062/](https://windowsforum.com/threads/revolutionizing-writing-jesai-taruns-ai-tool-for-windows-11.344062/)
 
