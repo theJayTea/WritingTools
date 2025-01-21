@@ -26,7 +26,7 @@ Writing Tools is an **Apple Intelligence-inspired application for Windows, Linux
 
 With one hotkey press system-wide, it lets you fix grammar, optimize text according to your instructions, summarize content (webpages, YouTube videos, etc.), and more.
 
-It's currently the **world's most intelligent system-wide grammar assistant** and works in almost any language!
+It's currently the **world's most intelligent system-wide grammar assistant** and works in almost any language! It's been featured in [**21+ articles**](https://github.com/theJayTea/WritingTools/blob/main/Media%20Coverage.md) ([Beebom](https://beebom.com/high-schooler-app-brings-apple-inteligence-writing-tools-windows/), [XDA](https://www.xda-developers.com/windows-pc-can-now-deliver-instant-free-writing-help-across-all-apps/), [How-To Geek](https://www.howtogeek.com/if-you-like-apple-intelligences-writing-tool-try-this-open-source-app-as-its-windows-counterpart/), [Neowin](https://www.neowin.net/news/apple-intelligence-writing-tools-for-windows-get-new-summarization-features-and-more/), [Windows Central](https://www.windowscentral.com/software-apps/can-apple-catch-up-apple-intelligence-just-shipped-yet-free-apple-writing-tools-on-github-for-windows-and-linux-make-a-better-alternative)...).
 
 ## ⚡ What can I do with it, exactly?
 
@@ -57,8 +57,6 @@ Aside from being the only Windows/Linux program like Apple's Writing Tools, and 
 - **Code support:** Fix, improve, translate, or add comments to code with `Describe your change...`."
 - **Themes, Dark Mode, & Customization**: Choose between **2 themes**: a blurry gradient theme and a plain theme that resembles the Windows + V pop-up! Also has full **dark mode** support. **Set your own hotkey** for quick access.
 
-Writing Tools has been featured on [Beebom](https://beebom.com/high-schooler-app-brings-apple-inteligence-writing-tools-windows/), [XDA](https://www.xda-developers.com/windows-pc-can-now-deliver-instant-free-writing-help-across-all-apps/), [Neowin](https://www.neowin.net/news/this-small-app-brings-some-apple-intelligence-features-to-windows/), [and](https://www.windowscentral.com/software-apps/can-apple-catch-up-apple-intelligence-just-shipped-yet-free-apple-writing-tools-on-github-for-windows-and-linux-make-a-better-alternative) [numerous](https://tinhte.vn/thread/mang-apple-intelligence-len-windows-chay-gemini-1-5-flash-thong-minh-hon-ho-tro-san-tieng-viet.3840902/) [others](https://www.computer-wd.com/2024/10/new-computer-programs-to-try-now.html)!
-
 ## ✅ Installation
 
 ### Windows:
@@ -69,10 +67,14 @@ Writing Tools has been featured on [Beebom](https://beebom.com/high-schooler-app
 
 **PS:** Go to Writing Tools' Settings (from its tray icon at the bottom right of the taskbar) to enable starting Writing Tools on boot.
 
-### Linux:
-Run it from the source code (instructions below).
+### Linux (work-in-progress):
+[Run it from the source code](https://github.com/theJayTea/WritingTools?tab=readme-ov-file#-to-run-writing-tools-directly-from-the-source-code)
 
-### macOS (beta):
+Writing Tools works well on x11. On Wayland, there are a few caveats:
+- [it works on XWayland apps](https://github.com/theJayTea/WritingTools/issues/34#issuecomment-2461633556)
+- [and it works if you disable Wayland for individual Flatpaks with Flatseal.](https://github.com/theJayTea/WritingTools/issues/93#issuecomment-2576511041)
+
+### macOS:
 The macOS version is a **native Swift port**, developed by [Aryamirsepasi](https://github.com/Aryamirsepasi). View the [README inside the macOS folder](https://github.com/theJayTea/WritingTools/tree/main/macOS) to learn more.
 
 To install it:
@@ -117,7 +119,7 @@ Note: If you choose to use a cloud based LLM, refer to the AI provider's privacy
 2. Choose an LLM from [here](https://ollama.com/library). Recommended: Llama 3.1 8B (~8GB RAM or VRAM required).
 3. Run `ollama run llama3.1:8b` in your terminal to download and launch Llama 3.1.
 4. In Writing Tools, set the `OpenAI-Compatible` provider with:
-   - API Key: `ollama`
+   - API Key: `ollama` (PS: For most local LLM providers, any random string here will suffice.)
    - API Base URL: `http://localhost:11434/v1`
    - API Model: `llama3.1:8b`
 5. That's it! Enjoy Writing Tools with _absolute_ privacy and no internet connection! 🎉 From now on, you'll simply need to launch Ollama and Writing Tools into the background for it to work.
