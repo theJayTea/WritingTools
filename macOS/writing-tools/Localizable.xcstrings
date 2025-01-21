@@ -1,0 +1,573 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "." : {
+
+    },
+    "• Helps you write with clarity and confidence" : {
+
+    },
+    "• Improves your writing with AI" : {
+
+    },
+    "• Support Custom Commands for anything you want" : {
+
+    },
+    "• Works in any application" : {
+
+    },
+    "1. Click the button below to open System Settings" : {
+
+    },
+    "2. Click the '+' button in the accessibility section" : {
+
+    },
+    "3. Navigate to Applications and select writing-tools" : {
+
+    },
+    "4. Enable the checkbox next to writing-tools" : {
+
+    },
+    "A new version is available!" : {
+
+    },
+    "About Writing Tools" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Über Writing Tools"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acerca de Writing Tools"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À propos de Writing Tools"
+          }
+        }
+      }
+    },
+    "Add Custom Command" : {
+
+    },
+    "AI Provider" : {
+
+    },
+    "AI Provider Settings" : {
+
+    },
+    "API Key" : {
+
+    },
+    "Appearance" : {
+
+    },
+    "Ask a follow-up question..." : {
+
+    },
+    "Back" : {
+
+    },
+    "Base URL" : {
+
+    },
+    "Basic Settings" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Change Icon" : {
+
+    },
+    "Check for Updates" : {
+
+    },
+    "Check out Bliss AI on Google Play" : {
+
+    },
+    "Checking for updates..." : {
+
+    },
+    "Choose your theme:" : {
+
+    },
+    "Command Name" : {
+
+    },
+    "Complete Setup" : {
+
+    },
+    "Concise" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prägnant"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conciso"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Concis"
+          }
+        }
+      }
+    },
+    "Copied!" : {
+
+    },
+    "Copy" : {
+
+    },
+    "Created with care by Jesai, a high school student." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit Sorgfalt erstellt von Jesai, einem Schüler."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creado con cuidado por Jesai, un estudiante de secundaria."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créé avec soin par Jesai, un lycéen."
+          }
+        }
+      }
+    },
+    "Custom Commands" : {
+
+    },
+    "Customize Your Experience" : {
+
+    },
+    "Describe your change..." : {
+
+    },
+    "Download Update" : {
+
+    },
+    "Edit Command" : {
+
+    },
+    "Email: developer@aryamirsepasi.com" : {
+
+    },
+    "Email: jesaitarun@gmail.com" : {
+
+    },
+    "Finish" : {
+
+    },
+    "Friendly" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Freundlich"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amigable"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amical"
+          }
+        }
+      }
+    },
+    "Gemini AI" : {
+
+    },
+    "Gemini AI Settings" : {
+
+    },
+    "General Settings" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allgemeine Einstellungen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes Generales"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paramètres Généraux"
+          }
+        }
+      }
+    },
+    "Get API Key" : {
+
+    },
+    "Get Mistral API Key" : {
+
+    },
+    "Get OpenAI API Key" : {
+
+    },
+    "GitHub Page" : {
+
+    },
+    "Glass" : {
+
+    },
+    "Global Shortcut:" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Globaler Tastaturkurzbefehl:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atajo Global:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raccourci Global:"
+          }
+        }
+      }
+    },
+    "Gradient" : {
+
+    },
+    "How to enable accessibility access:" : {
+
+    },
+    "Icon" : {
+
+    },
+    "Key Points" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kernpunkte"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puntos Clave"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Points Clés"
+          }
+        }
+      }
+    },
+    "Let's get you set up with just a few quick steps." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lassen Sie uns mit wenigen Schritten beginnen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuremos todo en unos pocos pasos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurons tout en quelques étapes rapides."
+          }
+        }
+      }
+    },
+    "Local LLMs: use the instructions on" : {
+
+    },
+    "Mistral AI" : {
+
+    },
+    "Mistral AI Settings" : {
+
+    },
+    "Model" : {
+
+    },
+    "Model Name" : {
+
+    },
+    "Name" : {
+
+    },
+    "New Command" : {
+
+    },
+    "Next" : {
+
+    },
+    "Ollama Documentation" : {
+
+    },
+    "Open System Settings" : {
+
+    },
+    "OpenAI / Local LLM" : {
+
+    },
+    "OpenAI / Local LLM Settings" : {
+
+    },
+    "OpenAI models include: gpt-4o, gpt-3.5-turbo, etc." : {
+
+    },
+    "Organization ID (Optional)" : {
+
+    },
+    "Professional" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Professionell"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profesional"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Professionnel"
+          }
+        }
+      }
+    },
+    "Project ID (Optional)" : {
+
+    },
+    "Prompt" : {
+
+    },
+    "Proofread" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Korrekturlesen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relecture"
+          }
+        }
+      }
+    },
+    "Provider" : {
+
+    },
+    "Rewrite" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Umschreiben"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reescribir"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réécrire"
+          }
+        }
+      }
+    },
+    "Save" : {
+
+    },
+    "Select Icon" : {
+
+    },
+    "Set your keyboard shortcut:" : {
+
+    },
+    "Shortcut:" : {
+
+    },
+    "Show Response in Chat Window" : {
+
+    },
+    "Standard" : {
+
+    },
+    "Summary" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zusammenfassung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resumen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Résumé"
+          }
+        }
+      }
+    },
+    "Table" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabelle"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabla"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tableau"
+          }
+        }
+      }
+    },
+    "The macOS version is created by Arya Mirsepasi" : {
+
+    },
+    "Theme" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Design"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tema"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thème"
+          }
+        }
+      }
+    },
+    "Version: 1.0 (Based on Windows Port version 6.0)" : {
+
+    },
+    "Welcome to WritingTools!" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Willkommen bei WritingTools!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Bienvenido a WritingTools!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bienvenue sur WritingTools!"
+          }
+        }
+      }
+    },
+    "When enabled, responses will appear in a chat window instead of replacing the selected text." : {
+
+    },
+    "Writing Tools is a free & lightweight tool that helps you improve your writing with AI, similar to Apple's new Apple Intelligence feature." : {
+
+    }
+  },
+  "version" : "1.0"
+}

@@ -2,9 +2,9 @@ import Foundation
 import AppKit
 
 @Observable
-final class UpdateChecker: Sendable {
+final class UpdateChecker {
     static let shared = UpdateChecker()
-    private let currentVersion = 1  // Current app version
+    private let currentVersion = 1.1  // Current app version
     private let updateCheckURL = "https://raw.githubusercontent.com/theJayTea/WritingTools/main/macOS/Latest_Version_for_Update_Check.txt"
     private let updateDownloadURL = "https://github.com/theJayTea/WritingTools/releases"
     
@@ -36,7 +36,7 @@ final class UpdateChecker: Sendable {
                 print("Raw version data: '\(rawString)'")
             }
             
-            // Clean up the version string more aggressively
+            // Clean up the version string
             let cleanedString = String(data: data, encoding: .utf8)?
                 .components(separatedBy: .newlines)
                 .first?
@@ -46,7 +46,7 @@ final class UpdateChecker: Sendable {
             
             if let versionString = cleanedString,
                !versionString.isEmpty,
-               let latestVersion = Int(versionString) {
+               let latestVersion = Double(versionString) {
                 print("Parsed version: \(latestVersion)")
                 updateAvailable = latestVersion > currentVersion
             } else {

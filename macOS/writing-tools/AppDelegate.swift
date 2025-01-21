@@ -53,8 +53,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             if !UserDefaults.standard.bool(forKey: "has_completed_onboarding") {
                 self?.showOnboarding()
             }
-            
-            self?.requestAccessibilityPermissions()
         }
         
         KeyboardShortcuts.onKeyUp(for: .showPopup) { [weak self] in
