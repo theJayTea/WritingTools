@@ -119,7 +119,7 @@ Note: If you choose to use a cloud based LLM, refer to the AI provider's privacy
 2. Choose an LLM from [here](https://ollama.com/library). Recommended: Llama 3.1 8B (~8GB RAM or VRAM required).
 3. Run `ollama run llama3.1:8b` in your terminal to download and launch Llama 3.1.
 4. In Writing Tools, set the `OpenAI-Compatible` provider with:
-   - API Key: `ollama`
+   - API Key: `ollama` (PS: For most local LLM providers, any random string here will suffice.)
    - API Base URL: `http://localhost:11434/v1`
    - API Model: `llama3.1:8b`
 5. That's it! Enjoy Writing Tools with _absolute_ privacy and no internet connection! 🎉 From now on, you'll simply need to launch Ollama and Writing Tools into the background for it to work.
