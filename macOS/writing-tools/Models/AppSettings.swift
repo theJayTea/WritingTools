@@ -5,7 +5,7 @@ class AppSettings: ObservableObject {
     static let shared = AppSettings()
     
     private let defaults = UserDefaults.standard
-    
+
     // MARK: - Published Settings
     @Published var geminiApiKey: String {
         didSet { defaults.set(geminiApiKey, forKey: "gemini_api_key") }
@@ -50,7 +50,7 @@ class AppSettings: ObservableObject {
     @Published var useGradientTheme: Bool {
         didSet { defaults.set(useGradientTheme, forKey: "use_gradient_theme") }
     }
-    
+
     // MARK: - HotKey data
     @Published var hotKeyCode: Int {
         didSet { defaults.set(hotKeyCode, forKey: "hotKey_keyCode") }
@@ -58,19 +58,7 @@ class AppSettings: ObservableObject {
     @Published var hotKeyModifiers: Int {
         didSet { defaults.set(hotKeyModifiers, forKey: "hotKey_modifiers") }
     }
-    
-    @Published var mistralApiKey: String {
-        didSet { defaults.set(mistralApiKey, forKey: "mistral_api_key") }
-    }
-    
-    @Published var mistralBaseURL: String {
-        didSet { defaults.set(mistralBaseURL, forKey: "mistral_base_url") }
-    }
-    
-    @Published var mistralModel: String {
-        didSet { defaults.set(mistralModel, forKey: "mistral_model") }
-    }
-    
+
     // MARK: - Init
     private init() {
         let defaults = UserDefaults.standard
@@ -86,15 +74,11 @@ class AppSettings: ObservableObject {
         self.openAIOrganization = defaults.string(forKey: "openai_organization") ?? nil
         self.openAIProject = defaults.string(forKey: "openai_project") ?? nil
         
-        self.mistralApiKey = defaults.string(forKey: "mistral_api_key") ?? ""
-        self.mistralBaseURL = defaults.string(forKey: "mistral_base_url") ?? MistralConfig.defaultBaseURL
-        self.mistralModel = defaults.string(forKey: "mistral_model") ?? MistralConfig.defaultModel
-        
         self.currentProvider = defaults.string(forKey: "current_provider") ?? "gemini"
         self.shortcutText = defaults.string(forKey: "shortcut") ?? "⌥ Space"
         self.hasCompletedOnboarding = defaults.bool(forKey: "has_completed_onboarding")
         self.useGradientTheme = defaults.bool(forKey: "use_gradient_theme")
-        
+
         // HotKey
         self.hotKeyCode = defaults.integer(forKey: "hotKey_keyCode")
         self.hotKeyModifiers = defaults.integer(forKey: "hotKey_modifiers")

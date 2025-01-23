@@ -24,14 +24,8 @@ struct SettingsView: View {
     @State private var openAIProject = UserDefaults.standard.string(forKey: "openai_project") ?? ""
     @State private var openAIModelName = UserDefaults.standard.string(forKey: "openai_model") ?? OpenAIConfig.defaultModel
     
-    
-    // Mistral settings
-    @State private var mistralApiKey = UserDefaults.standard.string(forKey: "mistral_api_key") ?? ""
-    @State private var mistralBaseURL = UserDefaults.standard.string(forKey: "mistral_base_url") ?? MistralConfig.defaultBaseURL
-    @State private var mistralModel = UserDefaults.standard.string(forKey: "mistral_model") ?? MistralConfig.defaultModel
-
-    
     @State private var displayShortcut = ""
+    
     
     var showOnlyApiSetup: Bool = false
     
@@ -86,7 +80,6 @@ struct SettingsView: View {
                     Picker("Provider", selection: $selectedProvider) {
                         Text("Gemini AI").tag("gemini")
                         Text("OpenAI / Local LLM").tag("openai")
-                        Text("Mistral AI").tag("mistral")
                     }
                 }
             }
@@ -104,24 +97,6 @@ struct SettingsView: View {
                     
                     Button("Get API Key") {
                         NSWorkspace.shared.open(URL(string: "https://aistudio.google.com/app/apikey")!)
-                    }
-                }
-            } else if selectedProvider == "mistral" {
-                Section("Mistral AI Settings") {
-                    TextField("API Key", text: $mistralApiKey)
-                        .textFieldStyle(.roundedBorder)
-                    
-                    TextField("Base URL", text: $mistralBaseURL)
-                        .textFieldStyle(.roundedBorder)
-                    
-                    Picker("Model", selection: $mistralModel) {
-                        ForEach(MistralModel.allCases, id: \.self) { model in
-                            Text(model.displayName).tag(model.rawValue)
-                        }
-                    }
-                    
-                    Button("Get Mistral API Key") {
-                        NSWorkspace.shared.open(URL(string: "https://console.mistral.ai/api-keys/")!)
                     }
                 }
             } else {
@@ -179,12 +154,6 @@ struct SettingsView: View {
         // Save provider-specific settings
         if selectedProvider == "gemini" {
             appState.saveGeminiConfig(apiKey: geminiApiKey, model: selectedGeminiModel)
-        } else if selectedProvider == "mistral" {
-            appState.saveMistralConfig(
-                apiKey: mistralApiKey,
-                baseURL: mistralBaseURL,
-                model: mistralModel
-            )
         } else {
             appState.saveOpenAIConfig(
                 apiKey: openAIApiKey,
@@ -219,4 +188,82 @@ struct SettingsView: View {
             }
         }
     }
+    // Converts stored Carbon modifier bits into SwiftUI’s `NSEvent.ModifierFlags`.
+    private func decodeCarbonModifiers(_ rawModifiers: Int) -> NSEvent.ModifierFlags {
+        var flags = NSEvent.ModifierFlags()
+        let carbonFlags = UInt32(rawModifiers)
+        
+        if (carbonFlags & UInt32(cmdKey))     != 0 { flags.insert(.command) }
+        if (carbonFlags & UInt32(optionKey))  != 0 { flags.insert(.option) }
+        if (carbonFlags & UInt32(controlKey)) != 0 { flags.insert(.control) }
+        if (carbonFlags & UInt32(shiftKey))   != 0 { flags.insert(.shift) }
+        
+        return flags
+    }
+    
+    // Returns a human-friendly string like "⌘ =" or "⌃ D".
+    private func describeShortcut(keyCode: UInt16, flags: NSEvent.ModifierFlags) -> String {
+        var parts: [String] = []
+        
+        if flags.contains(.command)  { parts.append("⌘") }
+        if flags.contains(.option)   { parts.append("⌥") }
+        if flags.contains(.control)  { parts.append("⌃") }
+        if flags.contains(.shift)    { parts.append("⇧") }
+        
+        let keyCodeInt = Int(keyCode)
+        
+        switch keyCodeInt {
+        case kVK_Space:
+            parts.append("Space")
+        case kVK_Return:
+            parts.append("Return")
+        case kVK_ANSI_Equal:
+            parts.append("=")
+        case kVK_ANSI_Minus:
+            parts.append("-")
+        case kVK_ANSI_LeftBracket:
+            parts.append("[")
+        case kVK_ANSI_RightBracket:
+            parts.append("]")
+            
+        default:
+            if let letter = keyCodeToLetter[keyCodeInt] {
+                parts.append(letter)
+            } else {
+                parts.append("(\(keyCode))")
+            }
+        }
+        
+        return parts.joined(separator: " ")
+    }
+    
+    // Maps the Carbon virtual key code (e.g. kVK_ANSI_D = 0x02) to the actual letter "D".
+    private let keyCodeToLetter: [Int: String] = [
+        kVK_ANSI_A: "A",
+        kVK_ANSI_B: "B",
+        kVK_ANSI_C: "C",
+        kVK_ANSI_D: "D",
+        kVK_ANSI_E: "E",
+        kVK_ANSI_F: "F",
+        kVK_ANSI_G: "G",
+        kVK_ANSI_H: "H",
+        kVK_ANSI_I: "I",
+        kVK_ANSI_J: "J",
+        kVK_ANSI_K: "K",
+        kVK_ANSI_L: "L",
+        kVK_ANSI_M: "M",
+        kVK_ANSI_N: "N",
+        kVK_ANSI_O: "O",
+        kVK_ANSI_P: "P",
+        kVK_ANSI_Q: "Q",
+        kVK_ANSI_R: "R",
+        kVK_ANSI_S: "S",
+        kVK_ANSI_T: "T",
+        kVK_ANSI_U: "U",
+        kVK_ANSI_V: "V",
+        kVK_ANSI_W: "W",
+        kVK_ANSI_X: "X",
+        kVK_ANSI_Y: "Y",
+        kVK_ANSI_Z: "Z"
+    ]
 }
