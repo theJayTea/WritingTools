@@ -260,6 +260,10 @@ Helped add the start-on-boot setting!
 ### macOS version:
 #### A native Swift port created entirely by **[Aryamirsepasi](https://github.com/Aryamirsepasi)**! This was a big endeavour and they've done an amazing job. We're grateful to have them as a contributor. 🫡
 
+**1. [Joaov41](https://github.com/Joaov41):**
+
+Developed the amazing picture processing functionality for WritingTools, allowing the app to now work with images in addition to text!
+
 ## 🤝 Contributing
 
 I welcome contributions! :D

@@ -5,26 +5,32 @@ class AppState: ObservableObject {
     
     @Published var geminiProvider: GeminiProvider
     @Published var openAIProvider: OpenAIProvider
+    @Published var mistralProvider: MistralProvider
     
     @Published var customInstruction: String = ""
     @Published var selectedText: String = ""
     @Published var isPopupVisible: Bool = false
     @Published var isProcessing: Bool = false
     @Published var previousApplication: NSRunningApplication?
-
-    // Derived from AppSettings
-    var currentProvider: String {
-        get { AppSettings.shared.currentProvider }
-        set { AppSettings.shared.currentProvider = newValue }
-    }
+    @Published var selectedImages: [Data] = []  // Store selected image data
+    
+    // Current provider with UI binding support
+    @Published private(set) var currentProvider: String
     
     var activeProvider: any AIProvider {
-        currentProvider == "openai" ? openAIProvider : geminiProvider
+        if currentProvider == "openai" {
+            return openAIProvider
+        } else if currentProvider == "gemini" {
+            return geminiProvider
+        } else {
+            return mistralProvider
+        }
     }
     
     private init() {
         // Read from AppSettings
         let asettings = AppSettings.shared
+        self.currentProvider = asettings.currentProvider
         
         // Initialize Gemini
         let geminiConfig = GeminiConfig(apiKey: asettings.geminiApiKey,
@@ -41,7 +47,15 @@ class AppState: ObservableObject {
         )
         self.openAIProvider = OpenAIProvider(config: openAIConfig)
         
-        if asettings.openAIApiKey.isEmpty && asettings.geminiApiKey.isEmpty {
+        // Initialize Mistral
+                let mistralConfig = MistralConfig(
+                    apiKey: asettings.mistralApiKey,
+                    baseURL: asettings.mistralBaseURL,
+                    model: asettings.mistralModel
+                )
+                self.mistralProvider = MistralProvider(config: mistralConfig)
+        
+        if asettings.openAIApiKey.isEmpty && asettings.geminiApiKey.isEmpty && asettings.mistralApiKey.isEmpty {
             print("Warning: No API keys configured.")
         }
     }
@@ -70,8 +84,24 @@ class AppState: ObservableObject {
         openAIProvider = OpenAIProvider(config: config)
     }
     
-    // Switch AI provider
+    // Update provider and persist to settings
     func setCurrentProvider(_ provider: String) {
+        currentProvider = provider
         AppSettings.shared.currentProvider = provider
+        objectWillChange.send()  // Explicitly notify observers
     }
+    
+    func saveMistralConfig(apiKey: String, baseURL: String, model: String) {
+            let asettings = AppSettings.shared
+            asettings.mistralApiKey = apiKey
+            asettings.mistralBaseURL = baseURL
+            asettings.mistralModel = model
+            
+            let config = MistralConfig(
+                apiKey: apiKey,
+                baseURL: baseURL,
+                model: model
+            )
+            mistralProvider = MistralProvider(config: config)
+        }
 }

@@ -53,7 +53,7 @@ struct PopupView: View {
             }
             .padding(.horizontal)
             
-            if !appState.selectedText.isEmpty {
+            if !appState.selectedText.isEmpty || !appState.selectedImages.isEmpty {
                 ScrollView {
                     LazyVGrid(columns: [
                         GridItem(.flexible()),
@@ -108,7 +108,8 @@ struct PopupView: View {
             do {
                 let result = try await appState.activeProvider.processText(
                     systemPrompt: command.prompt,
-                    userPrompt: appState.selectedText
+                    userPrompt: appState.selectedText,
+                    images: appState.selectedImages
                 )
                 
                 if command.useResponseWindow {
@@ -126,11 +127,12 @@ struct PopupView: View {
                         window.orderFrontRegardless()
                     }
                 } else {
-                    // Use inline replacement
+                    // Set clipboard content and paste in one go
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(result, forType: .string)
                     
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    // Wait briefly then paste once
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                         simulatePaste()
                     }
                 }
@@ -163,7 +165,8 @@ struct PopupView: View {
             do {
                 let result = try await appState.activeProvider.processText(
                     systemPrompt: option.systemPrompt,
-                    userPrompt: appState.selectedText
+                    userPrompt: appState.selectedText,
+                    images: appState.selectedImages
                 )
                 
                 if [.summary, .keyPoints, .table].contains(option) {
@@ -173,20 +176,19 @@ struct PopupView: View {
                     // Close the popup window after showing the response window
                     closeAction()
                 } else {
+                    // Set clipboard content and paste in one go
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(result, forType: .string)
                     
                     closeAction()
                     
                     // Reactivate previous application and paste
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        if let previousApp = appState.previousApplication {
-                            previousApp.activate()
-                            
-                            // Wait for activation before pasting
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                simulatePaste()
-                            }
+                    if let previousApp = appState.previousApplication {
+                        previousApp.activate()
+                        
+                        // Wait briefly for activation then paste once
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            simulatePaste()
                         }
                     }
                 }
@@ -223,7 +225,8 @@ struct PopupView: View {
                 
                 let result = try await appState.activeProvider.processText(
                     systemPrompt: systemPrompt,
-                    userPrompt: userPrompt
+                    userPrompt: userPrompt,
+                    images: appState.selectedImages
                 )
                 
                 // Always show response in a new window

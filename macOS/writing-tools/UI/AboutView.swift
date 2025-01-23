@@ -36,7 +36,7 @@ struct AboutView: View {
             
             Divider()
 
-            Text("Version: 1.0 (Based on Windows Port version 6.0)")
+            Text("Version: 2.0 (Based on Windows Port version 6.0)")
                 .font(.caption)
             
             // Update checker section
@@ -49,6 +49,10 @@ struct AboutView: View {
                         .font(.caption)
                 } else if updateChecker.updateAvailable {
                     Text("A new version is available!")
+                        .foregroundColor(.green)
+                        .font(.caption)
+                } else if !updateChecker.updateAvailable {
+                    Text("The latest version is already installed!")
                         .foregroundColor(.green)
                         .font(.caption)
                 }
