@@ -14,9 +14,13 @@
 
 [https://www.windowscentral.com/software-apps/can-apple-catch-up-apple-intelligence-just-shipped-yet-free-apple-writing-tools-on-github-for-windows-and-linux-make-a-better-alternative](https://www.windowscentral.com/software-apps/can-apple-catch-up-apple-intelligence-just-shipped-yet-free-apple-writing-tools-on-github-for-windows-and-linux-make-a-better-alternative)
 
+[https://www.neowin.net/news/top-10-windows-11-apps-for-every-user-in-2025/](https://www.neowin.net/news/top-10-windows-11-apps-for-every-user-in-2025/)
+
 [https://www.phonandroid.com/cette-application-gratuite-apporte-les-outils-dapple-intelligence-sur-windows-11.html](https://www.phonandroid.com/cette-application-gratuite-apporte-les-outils-dapple-intelligence-sur-windows-11.html)
 
 [https://www.lesnumeriques.com/intelligence-artificielle/envie-d-apple-intelligence-sur-votre-pc-windows-c-est-possible-n227816.html](https://www.lesnumeriques.com/intelligence-artificielle/envie-d-apple-intelligence-sur-votre-pc-windows-c-est-possible-n227816.html)
+
+[https://www.maxiapple.com/2025/01/writingtools-writing-tools-ai-ia-macos-mac-windows-pc-alternative-apple-intelligence-gratuit.html](https://www.maxiapple.com/2025/01/writingtools-writing-tools-ai-ia-macos-mac-windows-pc-alternative-apple-intelligence-gratuit.html)
 
 [https://tinhte.vn/thread/mang-apple-intelligence-len-windows-chay-gemini-1-5-flash-thong-minh-hon-ho-tro-san-tieng-viet.3840902/](https://tinhte.vn/thread/mang-apple-intelligence-len-windows-chay-gemini-1-5-flash-thong-minh-hon-ho-tro-san-tieng-viet.3840902/)
 
