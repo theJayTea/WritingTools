@@ -33,6 +33,7 @@ class WritingToolApp(QtWidgets.QApplication):
 
     def __init__(self, argv):
         super().__init__(argv)
+        self.current_response_window = None
         logging.debug('Initializing WritingToolApp')
         self.output_ready_signal.connect(self.replace_text)
         self.show_message_signal.connect(self.show_message_box)
@@ -40,6 +41,9 @@ class WritingToolApp(QtWidgets.QApplication):
         self.config = None
         self.config_path = None
         self.load_config()
+        self.options = None
+        self.options_path = None
+        self.load_options()
         self.onboarding_window = None
         self.popup_window = None
         self.tray_icon = None
@@ -114,6 +118,20 @@ class WritingToolApp(QtWidgets.QApplication):
         else:
             logging.debug('Config file not found')
             self.config = None
+
+    def load_options(self):
+        """
+        Load the options file.
+        """
+        self.options_path = os.path.join(os.path.dirname(sys.argv[0]), 'options.json')
+        logging.debug(f'Loading options from {self.options_path}')
+        if os.path.exists(self.options_path):
+            with open(self.options_path, 'r') as f:
+                self.options = json.load(f)
+                logging.debug('Options loaded successfully')
+        else:
+            logging.debug('Options file not found')
+            self.options = None
 
     def save_config(self, config):
         """
@@ -197,6 +215,7 @@ class WritingToolApp(QtWidgets.QApplication):
             self.current_provider.cancel()
             self.output_queue = ""
 
+        # noinspection PyTypeChecker
         QtCore.QMetaObject.invokeMethod(self, "_show_popup", QtCore.Qt.ConnectionType.QueuedConnection)
 
     @Slot()
@@ -312,7 +331,7 @@ class WritingToolApp(QtWidgets.QApplication):
         logging.debug(f'Processing option: {option}')
         
         # For Summary, Key Points, Table, and empty text custom prompts, create response window
-        if option in ['Summary', 'Key Points', 'Table'] or (option == 'Custom' and not selected_text.strip()):
+        if (option == 'Custom' and not selected_text.strip()) or self.options[option]['open_in_window']:
             window_title = "Chat" if (option == 'Custom' and not selected_text.strip()) else option
             self.current_response_window = self.show_response_window(window_title, selected_text)
             
@@ -341,9 +360,6 @@ class WritingToolApp(QtWidgets.QApplication):
             """
             logging.debug(f'Starting processing thread for option: {option}')
             try:
-                with open('options.json', 'r') as file:
-                    option_prompts = json.load(file)
-
                 if selected_text.strip() == '':
                     # No selected text
                     if option == 'Custom':
@@ -353,7 +369,7 @@ class WritingToolApp(QtWidgets.QApplication):
                         self.show_message_signal.emit('Error', 'Please select text to use this option.')
                         return
                 else:
-                    selected_prompt = option_prompts.get(option, ('', ''))
+                    selected_prompt = self.options.get(option, ('', ''))
                     prompt_prefix = selected_prompt['prefix']
                     system_instruction = selected_prompt['instruction']
                     if option == 'Custom':
@@ -364,8 +380,8 @@ class WritingToolApp(QtWidgets.QApplication):
                 self.output_queue = ""
 
                 logging.debug(f'Getting response from provider for option: {option}')
-                
-                if option in ['Summary', 'Key Points', 'Table'] or (option == 'Custom' and not selected_text.strip()):
+
+                if (option == 'Custom' and not selected_text.strip()) or self.options[option]['open_in_window']:
                     logging.debug('Getting response for window display')
                     response = self.current_provider.get_response(system_instruction, prompt, return_response=True)
                     logging.debug(f'Got response of length: {len(response) if response else 0}')
@@ -379,6 +395,7 @@ class WritingToolApp(QtWidgets.QApplication):
                     
                     # Set initial response using QMetaObject.invokeMethod to ensure thread safety
                     if hasattr(self, 'current_response_window'):
+                        # noinspection PyTypeChecker
                         QtCore.QMetaObject.invokeMethod(
                             self.current_response_window,
                             'set_text',
@@ -620,12 +637,9 @@ class WritingToolApp(QtWidgets.QApplication):
                     response_text = response.text
                     
                 else:
-                    # For OpenAI/compatible providers, prepare messages array
-                    messages = []
-                    
-                    # Add system message
-                    messages.append({"role": "system", "content": system_instruction})
-                    
+                    # For OpenAI/compatible providers, prepare messages array, add system message
+                    messages = [{"role": "system", "content": system_instruction}]
+
                     # Add history messages (including latest question)
                     for msg in history:
                         # Convert 'assistant' role to 'assistant' for OpenAI
