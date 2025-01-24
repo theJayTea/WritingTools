@@ -8,17 +8,20 @@ build/
 DerivedData/
 
 # Xcode files
-xcuserdata/
 *.xcworkspace
-!default.xcworkspace/contents.xcworkspacedata
-
-# Logs
+*.xcuserdata
+*.xcuserstate
+*.xcarchive
 *.log
 
-# Temporary files
-*.swp
-*.lock
-*.xcuserstate
+### Xcode Patch ###
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+!*.xcodeproj/project.xcworkspace/
+!*.xcworkspace/contents.xcworkspacedata
+/*.gcno
+**/xcshareddata/WorkspaceSettings.xcsettings
 
 # CocoaPods
 Pods/
@@ -44,12 +47,7 @@ fastlane/test_output
 # Secrets
 *.keychain
 *.mobileprovision
-*.entitlements
 
-# Personal settings
-*.plist
-*.xcodeproj
-*.xcodeproj/project.xcworkspace
-*.xcodeproj/xcuserdata/
-*.xcodeproj/xcuserdata/**/*.xcuserdatad
-*.xcodeproj/xcuserdata/**/*.xccheckout
+# Temporary files
+*.swp
+*.lock

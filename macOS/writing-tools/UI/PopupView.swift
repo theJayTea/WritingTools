@@ -94,6 +94,7 @@ struct PopupView: View {
         }
     }
     
+    // Process custom commands
     private func processCustomCommand(_ command: CustomCommand) {
         loadingOptions.insert(command.id.uuidString)
         appState.isProcessing = true
@@ -169,14 +170,24 @@ struct PopupView: View {
                     await MainActor.run {
                         showResponseWindow(for: option, with: result)
                     }
+                    // Close the popup window after showing the response window
+                    closeAction()
                 } else {
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(result, forType: .string)
                     
                     closeAction()
                     
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        simulatePaste()
+                    // Reactivate previous application and paste
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        if let previousApp = appState.previousApplication {
+                            previousApp.activate()
+                            
+                            // Wait for activation before pasting
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                simulatePaste()
+                            }
+                        }
                     }
                 }
             } catch {
@@ -196,13 +207,13 @@ struct PopupView: View {
             do {
                 let systemPrompt = """
                 You are a writing and coding assistant. Your sole task is to respond to the user's instruction thoughtfully and comprehensively.
-                If the instruction is a question, provide a detailed answer.
-                If it's a request for help, provide clear guidance and examples where appropriate.
+                If the instruction is a question, provide a detailed answer. But always return the best and most accurate answer and not different options. 
+                If it's a request for help, provide clear guidance and examples where appropriate. Make sure tu use the language used or specified by the user instruction.
                 Use Markdown formatting to make your response more readable.
                 """
                 
                 let userPrompt = appState.selectedText.isEmpty ?
-                    instruction :
+                instruction :
                     """
                     User's instruction: \(instruction)
                     

@@ -70,6 +70,7 @@ struct ResponseView: View {
                         ForEach(viewModel.messages) { message in
                             ChatMessageView(message: message, fontSize: viewModel.fontSize)
                                 .id(message.id)
+                                .frame(maxWidth: .infinity, alignment: message.role == "user" ? .trailing : .leading)
                         }
                     }
                     .padding()
@@ -116,35 +117,49 @@ struct ResponseView: View {
 }
 
 struct ChatMessageView: View {
+    
     let message: ChatMessage
     let fontSize: CGFloat
     
     var body: some View {
-        HStack(alignment: .top) {
-            if message.role == "user" {
-                Spacer(minLength: 60)
-            }
+        // If user message is on the right, assistant on the left:
+        HStack(alignment: .top, spacing: 12) {
             
-            VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: 4) {
-                Markdown(message.content)
-                    .font(.system(size: fontSize))
-                    .textSelection(.enabled)
-                    .padding()
-                    .frame(maxWidth: 280, alignment: .leading) // Always left-align the text
-                    .background(message.role == "user" ? Color.accentColor.opacity(0.1) : Color(.controlBackgroundColor))
-                    .cornerRadius(12)
-                
-                Text(message.timestamp.formatted(.dateTime.hour().minute()))
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-            }
-            
+            // If it's assistant, push bubble to the left
             if message.role == "assistant" {
-                Spacer(minLength: 60)
+                bubbleView(role: message.role)
+                Spacer(minLength: 15)
+            } else {
+                Spacer(minLength: 15)
+                bubbleView(role: message.role)
             }
         }
+        .padding(.top, 4)
+    }
+    
+    @ViewBuilder
+    private func bubbleView(role: String) -> some View {
+        VStack(alignment: role == "assistant" ? .leading : .trailing, spacing: 2) {
+            Markdown(message.content)
+                .font(.system(size: fontSize))
+                .textSelection(.enabled)
+                .chatBubbleStyle(isFromUser: message.role == "user")
+            
+            // Time stamp
+            Text(message.timestamp.formatted(.dateTime.hour().minute()))
+                .font(.caption2)
+                .foregroundColor(.secondary)
+                .padding(.bottom, 2)
+        }
+        .frame(maxWidth: 500, alignment: role == "assistant" ? .leading : .trailing)
     }
 }
+
+// A small convenience enum for clarity (optional)
+fileprivate enum MessageRole {
+    case user, assistant
+}
+
 
 extension View {
     func maxWidth(_ width: CGFloat) -> some View {
@@ -200,10 +215,10 @@ final class ResponseViewModel: ObservableObject {
                 
                 let result = try await AppState.shared.activeProvider.processText(
                     systemPrompt: """
-                    You are a helpful AI assistant continuing a conversation. You have access to the entire conversation history and should maintain context when responding.
-                    Provide clear and direct responses, maintaining the same format and style as your previous responses.
-                    If appropriate, use Markdown formatting to make your response more readable.
-                    Consider all previous messages when formulating your response.
+                    You are a writing and coding assistant. Your sole task is to respond to the user's instruction thoughtfully and comprehensively.
+                    If the instruction is a question, provide a detailed answer. But always return the best and most accurate answer and not different options. 
+                    If it's a request for help, provide clear guidance and examples where appropriate. Make sure tu use the language used or specified by the user instruction.
+                    Use Markdown formatting to make your response more readable.
                     """,
                     userPrompt: contextualPrompt
                 )

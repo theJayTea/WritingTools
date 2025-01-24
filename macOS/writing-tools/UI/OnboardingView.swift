@@ -1,10 +1,12 @@
 import SwiftUI
+import KeyboardShortcuts
 
 struct OnboardingView: View {
     @ObservedObject var appState: AppState
     @State private var currentStep = 0
-    @State private var shortcutText = "⌘ Space"
+    @State private var shortcutText = "⌃ Space"
     @State private var useGradientTheme = true
+    @State private var selectedTheme = UserDefaults.standard.string(forKey: "theme_style") ?? "gradient"
     @State private var isShowingSettings = false
     
     private let steps = [
@@ -141,7 +143,7 @@ struct OnboardingView: View {
     
     private var customizationStep: some View {
         VStack(spacing: 20) {
-            Text(steps[2].title)
+            Text("Customize Your Experience")
                 .font(.title)
                 .bold()
             
@@ -149,30 +151,28 @@ struct OnboardingView: View {
                 Text("Set your keyboard shortcut:")
                     .font(.headline)
                 
-                ShortcutRecorderView()
-                    .frame(maxWidth: .infinity)
+                KeyboardShortcuts.Recorder("Shortcut:", name: .showPopup)
                 
-                Text("Important: For reliable shortcuts, try:")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                
-                Text("• Control (⌃) + Letter (e.g., ⌃ D)")
-                Text("• Option (⌥) + Space")
-                Text("• Command (⌘) + Letter")
-                
-                Divider()
-                
-                Text("Choose your theme:")
-                    .font(.headline)
-                
-                Toggle("Use Gradient Theme", isOn: $useGradientTheme)
+                Section("Appearance") {
+                    Picker("Theme", selection: $selectedTheme) {
+                        Text("Standard").tag("standard")
+                        Text("Gradient").tag("gradient")
+                        Text("Glass").tag("glass")
+                    }
+                    .pickerStyle(.segmented)
+                    .onChange(of: selectedTheme) { _, newValue in
+                        UserDefaults.standard.set(newValue, forKey: "theme_style")
+                        useGradientTheme = (newValue != "standard")
+                    }
+                }
             }
         }
     }
     
+    
     private func saveSettingsAndContinue() {
-        UserDefaults.standard.set(shortcutText, forKey: "shortcut")
-        UserDefaults.standard.set(useGradientTheme, forKey: "use_gradient_theme")
+        UserDefaults.standard.set(selectedTheme, forKey: "theme_style")
+        UserDefaults.standard.set(selectedTheme != "standard", forKey: "use_gradient_theme")
         WindowManager.shared.transitonFromOnboardingToSettings(appState: appState)
     }
 }
