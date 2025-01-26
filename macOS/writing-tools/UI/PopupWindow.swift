@@ -69,10 +69,11 @@ class PopupWindow: NSWindow {
         
         let numBuiltInOptions = WritingOption.allCases.count
         let numCustomOptions = commandsManager.commands.count
-        let totalOptions = appState.selectedText.isEmpty ? 0 : (numBuiltInOptions + numCustomOptions)
+        let hasContent = !appState.selectedText.isEmpty || !appState.selectedImages.isEmpty
+        let totalOptions = hasContent ? (numBuiltInOptions + numCustomOptions) : 0
         let numRows = ceil(Double(totalOptions) / 2.0) // 2 columns
         
-        let contentHeight = appState.selectedText.isEmpty ?
+        let contentHeight = !hasContent ?
         baseHeight :
         baseHeight + (buttonHeight * CGFloat(numRows)) + spacing + padding
         
