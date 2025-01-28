@@ -26,7 +26,7 @@ Writing Tools is an **Apple Intelligence-inspired application for Windows, Linux
 
 With one hotkey press system-wide, it lets you fix grammar, optimize text according to your instructions, summarize content (webpages, YouTube videos, etc.), and more.
 
-It's currently the **world's most intelligent system-wide grammar assistant** and works in almost any language! It's been featured in [**21+ articles**](https://github.com/theJayTea/WritingTools/blob/main/Media%20Coverage.md) ([Beebom](https://beebom.com/high-schooler-app-brings-apple-inteligence-writing-tools-windows/), [XDA](https://www.xda-developers.com/windows-pc-can-now-deliver-instant-free-writing-help-across-all-apps/), [How-To Geek](https://www.howtogeek.com/if-you-like-apple-intelligences-writing-tool-try-this-open-source-app-as-its-windows-counterpart/), [Neowin](https://www.neowin.net/news/apple-intelligence-writing-tools-for-windows-get-new-summarization-features-and-more/), [Windows Central](https://www.windowscentral.com/software-apps/can-apple-catch-up-apple-intelligence-just-shipped-yet-free-apple-writing-tools-on-github-for-windows-and-linux-make-a-better-alternative)...).
+It's currently the **world's most intelligent system-wide grammar assistant** and works in almost any language! It's been featured in [**23+ articles**](https://github.com/theJayTea/WritingTools/blob/main/Media%20Coverage.md) ([Beebom](https://beebom.com/high-schooler-app-brings-apple-inteligence-writing-tools-windows/), [XDA](https://www.xda-developers.com/windows-pc-can-now-deliver-instant-free-writing-help-across-all-apps/), [How-To Geek](https://www.howtogeek.com/if-you-like-apple-intelligences-writing-tool-try-this-open-source-app-as-its-windows-counterpart/), [Neowin](https://www.neowin.net/news/apple-intelligence-writing-tools-for-windows-get-new-summarization-features-and-more/), [Windows Central](https://www.windowscentral.com/software-apps/can-apple-catch-up-apple-intelligence-just-shipped-yet-free-apple-writing-tools-on-github-for-windows-and-linux-make-a-better-alternative)...).
 
 ## ⚡ What can I do with it, exactly?
 
@@ -259,6 +259,10 @@ Helped add the start-on-boot setting!
 
 ### macOS version:
 #### A native Swift port created entirely by **[Aryamirsepasi](https://github.com/Aryamirsepasi)**! This was a big endeavour and they've done an amazing job. We're grateful to have them as a contributor. 🫡
+
+**1. [Joaov41](https://github.com/Joaov41):**
+
+Developed the amazing picture processing functionality for WritingTools, allowing the app to now work with images in addition to text!
 
 ## 🤝 Contributing
 

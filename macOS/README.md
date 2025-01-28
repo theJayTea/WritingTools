@@ -76,6 +76,10 @@ The macOS port is being developed by **Aryamirsepasi**.
 
 GitHub: [https://github.com/Aryamirsepasi](https://github.com/Aryamirsepasi)
 
+The amazing picture processing functionality was created by **Joaov41**
+GitHub: [https://github.com/Joaov41](https://github.com/Joaov41)
+
 Special Thanks to @sindresorhus for developing an amazing and stable keyboard shortcuts package for Swift. 
 
 GitHub: [https://github.com/sindresorhus/KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts)
+
