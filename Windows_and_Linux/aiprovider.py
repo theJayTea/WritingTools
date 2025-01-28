@@ -42,6 +42,7 @@ from typing import List
 import google.generativeai as genai
 from google.generativeai.types import HarmBlockThreshold, HarmCategory
 from openai import OpenAI
+from ollama import Client as OllamaClient
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QVBoxLayout
 from ui.UIUtils import colorMode
@@ -387,3 +388,61 @@ class OpenAICompatibleProvider(AIProvider):
 
     def cancel(self):
         self.close_requested = True
+
+
+class OllamaProvider(AIProvider):
+    def __init__(self, app):
+        """
+        Initialize the Local OpenAI-compatible provider.
+        """
+        self.close_requested = None
+        self.client = None
+        self.app = app
+        settings = [
+            TextSetting("api_base", "API Base URL", "http://localhost:11434", "Eg. http://localhost:11434"),
+            TextSetting("api_model", "API Model", "llama3.1:latest", "Eg. llama3.1:latest"),
+            TextSetting("keep_alive", "Time to keep the model loaded in memory in minutes", "5", "Eg. 5")
+        ]
+        super().__init__(app, "Ollama (For Experts)", settings, "• Connect to an Ollama server.", "ollama", "Discover Ollama", lambda: webbrowser.open("https://ollama.com"))
+    def get_response(self, system_instruction: str, prompt: str|list, return_response: bool = False):
+        self.close_requested = False
+        streaming = self.app.config.get("streaming", False) and not return_response
+
+        if isinstance(prompt, list):
+            messages = prompt
+        else:
+            messages = [
+                {"role": "system", "content": system_instruction},
+                {"role": "user", "content": prompt}
+            ]
+
+        if streaming:
+            try:
+                stream = self.client.chat(model=self.api_model, messages=messages, stream=streaming, keep_alive=f'{self.keep_alive}m')
+                for chunk in stream:
+                    if self.close_requested:
+                        break
+                    self.app.output_ready_signal.emit(chunk['message']['content'].rstrip('\n'))
+            except Exception as e:
+                logging.error(f"Error while streaming: {e}")
+                self.app.output_ready_signal.emit("An error occurred while streaming.")
+            finally:
+                self.close_requested = True
+                self.app.replace_text(True)
+                return ""
+        else:
+            try:
+                response = self.client.chat(model=self.api_model, messages=messages)
+                response_text = response['message']['content'].strip()
+                if not return_response and not hasattr(self.app, 'current_response_window'):
+                    self.app.output_ready_signal.emit(response_text)
+                return  response_text
+            except Exception as e:
+                logging.error(f"Error during Ollama chat: {e}")
+    def after_load(self):
+        self.client = OllamaClient(host=self.api_base)
+    def before_load(self):
+        self.client = None
+    def cancel(self):
+        self.close_requested = True
+

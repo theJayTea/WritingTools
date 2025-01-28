@@ -8,7 +8,7 @@ import signal
 
 import darkdetect
 import pyperclip
-from aiprovider import GeminiProvider, OpenAICompatibleProvider
+from aiprovider import GeminiProvider, OpenAICompatibleProvider, OllamaProvider
 from pynput import keyboard as pykeyboard
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Signal, Slot
@@ -59,7 +59,7 @@ class WritingToolApp(QtWidgets.QApplication):
         self.setup_ctrl_c_listener()
 
         # Setup available AI providers
-        self.providers = [GeminiProvider(self), OpenAICompatibleProvider(self)]
+        self.providers = [GeminiProvider(self), OpenAICompatibleProvider(self), OllamaProvider(self)]
 
         if not self.config:
             logging.debug('No config found, showing onboarding')
@@ -635,7 +635,24 @@ class WritingToolApp(QtWidgets.QApplication):
                     # Get response using the chat
                     response = chat.send_message(question)
                     response_text = response.text
-                    
+
+                elif isinstance(self.current_provider, OllamaProvider):  #
+                    # For Ollama, prepare messages with system instruction and history
+                    messages = [{"role": "system", "content": system_instruction}]
+
+                    for msg in history:
+                        messages.append({
+                            "role": msg["role"],
+                            "content": msg["content"]
+                        })
+
+                    # Get response from Ollama
+                    response_text = self.current_provider.get_response(
+                        system_instruction,
+                        messages,
+                        return_response=True
+                    )
+
                 else:
                     # For OpenAI/compatible providers, prepare messages array, add system message
                     messages = [{"role": "system", "content": system_instruction}]
