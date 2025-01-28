@@ -8,6 +8,7 @@ from PySide6 import QtCore, QtGui, QtWidgets
 
 from ui.UIUtils import ThemeBackground, colorMode
 
+_ = lambda x: x
 
 class CustomPopupWindow(QtWidgets.QWidget):
     """
@@ -17,6 +18,7 @@ class CustomPopupWindow(QtWidgets.QWidget):
         super().__init__()
         self.app = app
         self.selected_text = selected_text
+        self.custom_input = None
         logging.debug('Initializing CustomPopupWindow')
         self.init_ui()
 
@@ -70,7 +72,7 @@ class CustomPopupWindow(QtWidgets.QWidget):
         has_text = not not self.selected_text.strip()
 
         self.custom_input = QtWidgets.QLineEdit()
-        self.custom_input.setPlaceholderText("Describe your change..." if has_text else "Ask your AI...")
+        self.custom_input.setPlaceholderText(_("Describe your change...") if has_text else _("Ask your AI..."))
         self.custom_input.setStyleSheet(f"""
             QLineEdit {{
                 padding: 8px;

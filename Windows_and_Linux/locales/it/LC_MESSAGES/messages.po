@@ -1,0 +1,241 @@
+# Italian translations for PACKAGE package.
+# Copyright (C) 2025 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#  <momos1796@gmail.com>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-28 13:01+0100\n"
+"PO-Revision-Date: 2025-01-28 13:05+0100\n"
+"Last-Translator: momos1796@gmail.com\n"
+"Language-Team: Italian <momos1796@gmail.com>\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.5\n"
+
+#: ui/AboutWindow.py:44
+msgid "About Writing Tools"
+msgstr "Informazioni su Writing Tools"
+
+#: ui/AboutWindow.py:49
+msgid ""
+"Writing Tools is a free & lightweight tool that helps you improve your "
+"writing with AI, similar to Apple's new Apple Intelligence feature. It works "
+"with an extensive range of AI LLMs, both online and locally run."
+msgstr ""
+"Writing Tools è un'app gratuita e leggera per aiutarti nella scrittura "
+"utilizzando l'IA, simile alla nuova feature di Apple. Funziona utilizzando "
+"un'ampia gamma di LLM, sia online che localmente."
+
+#: ui/AboutWindow.py:54
+msgid "Created with care by Jesai, a high school student."
+msgstr "Creata con cura da Jesai, uno studente delle superiori."
+
+#: ui/AboutWindow.py:55
+msgid "Feel free to check out my other AI app"
+msgstr "Da' un'occhiata all'altra mia app di IA"
+
+#: ui/AboutWindow.py:55
+msgid "It's a novel AI tutor that's free on the Google Play Store :)"
+msgstr "È un tutor IA, gratuito sul Google Play Store :)"
+
+#: ui/AboutWindow.py:56
+msgid "Contact me"
+msgstr "Contattami"
+
+#: ui/AboutWindow.py:60
+msgid ""
+"Writing Tools would not be where it is today without its <u>amazing</u> "
+"contributors"
+msgstr ""
+"Writing Tools non sarebbe qui oggi senza i suoi <u>fantastici</u> "
+"collaboratori"
+
+#: ui/AboutWindow.py:62
+msgid ""
+"Extensively refactored Writing Tools and added OpenAI Compatible API "
+"support, streamed responses, and the text generation mode when no text is "
+"selected."
+msgstr ""
+"Refactor estensivo di Writing Tools, e ha aggiunto il supporto alle API "
+"OpenAI-compatibili, risposte in streaming e generazione di testo senza testo "
+"selezionato."
+
+#: ui/AboutWindow.py:64
+msgid ""
+"Added Linux support, switched to the pynput API to improve Windows "
+"stability. Added Ollama API support, custom options and localization. Fixed "
+"misc. bugs and added graceful termination support by handling SIGINT signal."
+msgstr ""
+"Aggiunto supporto per Linux, passaggio alle API di pynput per migliorare "
+"stabilità su Windows. Aggiunto supporto alle api di Ollama, opzioni "
+"personalizzabili e traduzioni. Fix di bug vari e aggiunta chiusura dell'app "
+"con segnale di SIGINT."
+
+#: ui/AboutWindow.py:66
+msgid ""
+"Helped add dark mode, the plain theme, tray menu fixes, and UI improvements."
+msgstr ""
+"Aiutato con tema scuro, tema piatto, menu da icona e altre migliorie alla UI."
+
+#: ui/AboutWindow.py:68
+msgid "Helped improve the reliability of text selection."
+msgstr "Aiutato a migliorare la leggibilità della selezione del testo."
+
+#: ui/AboutWindow.py:70
+msgid "Made the rounded corners anti-aliased & prettier."
+msgstr "Ha reso i bordi stondati e più carini con l'anti-alias."
+
+#: ui/AboutWindow.py:72
+msgid ""
+"Significantly improved the About window, making it scrollable and cleaning "
+"things up. Also improved our .gitignore & requirements.txt."
+msgstr ""
+"Migliorato notevolmente la schermata di informazioni, rendendola scorrevole "
+"e ripulendola. Migliorato .gitignore e requirements.txt."
+
+#: ui/AboutWindow.py:74
+msgid "Helped add the start-on-boot setting."
+msgstr "Aiutato nell'aggiunta dell'impostazione di auto-avvio."
+
+#: ui/CustomPopupWindow.py:74
+msgid "Describe your change..."
+msgstr "Descrivi la tua modifica..."
+
+#: ui/CustomPopupWindow.py:74
+msgid "Ask your AI..."
+msgstr "Chiedi alla tua IA..."
+
+#: ui/OnboardingWindow.py:24 ui/OnboardingWindow.py:40
+msgid "Welcome to Writing Tools"
+msgstr "Benvenuto in Writing Tools"
+
+#: ui/OnboardingWindow.py:45
+msgid ""
+"Instantly optimize your writing with AI by selecting your text and invoking "
+"Writing Tools with \"ctrl+space\", anywhere."
+msgstr ""
+"Ottimizza istantaneamente la tua scrittura con l'IA, seleziona del testo e "
+"attivando Writing Tools, ovunque."
+
+#: ui/OnboardingWindow.py:47
+msgid ""
+"Get a summary you can chat with of articles, YouTube videos, or documents by "
+"select all text with \"ctrl+a\""
+msgstr ""
+"Ottieni un riassunto di documenti, articoli, video YouTube e altro "
+"selezionando tutto il testo con \"ctrl+a\""
+
+#: ui/OnboardingWindow.py:48
+msgid ""
+"(or select the YouTube transcript from its description), invoking Writing "
+"Tools, and choosing Summary."
+msgstr ""
+"(o seleziona la trascrizione di YouTube dalla descrizione del video), "
+"invocando Writing Tools e selezionando \"Riassunto\"."
+
+#: ui/OnboardingWindow.py:50
+msgid ""
+"Chat with AI anytime by invoking Writing Tools without selecting any text."
+msgstr "Chatta con l'IA in qualsiasi momento, non selezionando del testo."
+
+#: ui/OnboardingWindow.py:52
+msgid "Supports an extensive range of AI models:"
+msgstr "Supporto a vasta gamma di modelli di AI, come:"
+
+#: ui/OnboardingWindow.py:53
+msgid "Gemini 2.0"
+msgstr "Gemini 2.0"
+
+#: ui/OnboardingWindow.py:54
+msgid "ANY OpenAI Compatible API — including local LLMs!"
+msgstr ""
+"OGNI modello servito tramite API OpenAI-compatibili, anche modelli locali "
+"sul tuo PC!"
+
+#: ui/OnboardingWindow.py:75
+msgid "Choose your theme:"
+msgstr "Scegli il tuo tema:"
+
+#: ui/OnboardingWindow.py:80
+msgid "Gradient"
+msgstr "Gradiente"
+
+#: ui/OnboardingWindow.py:81 ui/SettingsWindow.py:239
+msgid "Plain"
+msgstr "Piatto"
+
+#: ui/OnboardingWindow.py:90
+msgid "Next"
+msgstr "Avanti"
+
+#: ui/ResponseWindow.py:301
+msgid "Response"
+msgstr "Risposta"
+
+#: ui/ResponseWindow.py:379
+msgid "Select to copy with formatting"
+msgstr "Seleziona per copiare con formattazione"
+
+#: ui/ResponseWindow.py:384
+msgid "Copy as Markdown"
+msgstr "Copia come Markdown"
+
+#: ui/ResponseWindow.py:395 ui/ResponseWindow.py:507 ui/ResponseWindow.py:509
+#: ui/ResponseWindow.py:516 ui/ResponseWindow.py:520
+msgid "Thinking"
+msgstr "Sto pensando"
+
+#: ui/ResponseWindow.py:429 ui/ResponseWindow.py:530
+msgid "Ask a follow-up question"
+msgstr "Chiedi una domanda a seguire"
+
+#: ui/SettingsWindow.py:32 ui/SettingsWindow.py:151 ui/SettingsWindow.py:205
+#: WritingToolApp.py:568
+msgid "Settings"
+msgstr "Impostazioni"
+
+#: ui/SettingsWindow.py:211
+msgid "Start on Boot"
+msgstr "Avvia all'accensione"
+
+#: ui/SettingsWindow.py:218
+msgid "Shortcut Key:"
+msgstr "Scorciatoia da tastiera:"
+
+#: ui/SettingsWindow.py:233
+msgid "Background Theme:"
+msgstr "Tema Sfondo:"
+
+#: ui/SettingsWindow.py:238
+msgid "Blurry Gradient"
+msgstr "Gradiente sfocato"
+
+#: ui/SettingsWindow.py:250
+msgid "Choose AI Provider:"
+msgstr "Scegli provider IA:"
+
+#: ui/SettingsWindow.py:307
+msgid "Finish AI Setup"
+msgstr "Termina setup"
+
+#: ui/SettingsWindow.py:307
+msgid "Save"
+msgstr "Salva"
+
+#: ui/SettingsWindow.py:326
+msgid "Please restart Writing Tools for changes to take effect."
+msgstr "Riavvia Writing Tools per rendere le modifiche attive."
+
+#: WritingToolApp.py:571
+msgid "About"
+msgstr "Informazioni"
+
+#: WritingToolApp.py:574
+msgid "Exit"
+msgstr "Esci"

@@ -1,0 +1,39 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-28 13:36+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ui/ResponseWindow.py:301
+msgid "Response"
+msgstr ""
+
+#: ui/ResponseWindow.py:379
+msgid "Select to copy with formatting"
+msgstr ""
+
+#: ui/ResponseWindow.py:384
+msgid "Copy as Markdown"
+msgstr ""
+
+#: ui/ResponseWindow.py:395 ui/ResponseWindow.py:507 ui/ResponseWindow.py:509
+#: ui/ResponseWindow.py:516 ui/ResponseWindow.py:520
+msgid "Thinking"
+msgstr ""
+
+#: ui/ResponseWindow.py:429 ui/ResponseWindow.py:530
+msgid "Ask a follow-up question"
+msgstr ""

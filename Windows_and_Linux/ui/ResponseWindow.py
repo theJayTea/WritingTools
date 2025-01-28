@@ -9,6 +9,7 @@ from PySide6.QtWidgets import QScrollArea
 
 from ui.UIUtils import UIUtils, colorMode
 
+_ = lambda x: x
 
 class MarkdownTextBrowser(QtWidgets.QTextBrowser):
     """Enhanced text browser for displaying Markdown content with improved sizing"""
@@ -157,6 +158,8 @@ class ChatContentScrollArea(QScrollArea):
     
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.content_widget = None
+        self.layout = None
         self.setup_ui()
         
     def setup_ui(self):
@@ -297,13 +300,17 @@ class ChatContentScrollArea(QScrollArea):
 class ResponseWindow(QtWidgets.QWidget):
     """Enhanced response window with improved sizing and zoom handling"""
     
-    def __init__(self, app, title="Response", parent=None):
+    def __init__(self, app, title=_("Response"), parent=None):
         super().__init__(parent)
         self.app = app
         self.original_title = title
         self.setWindowTitle(title)
         self.option = title.replace(" Result", "")
         self.selected_text = None
+        self.input_field = None
+        self.loading_label = None
+        self.loading_container = None
+        self.chat_area = None
         self.chat_history = []
 
         # Setup thinking animation with full range of dots
@@ -375,12 +382,12 @@ class ResponseWindow(QtWidgets.QWidget):
 
         # Copy controls with matching text size
         copy_bar = QtWidgets.QHBoxLayout()
-        copy_hint = QtWidgets.QLabel("Select to copy with formatting")
+        copy_hint = QtWidgets.QLabel(_("Select to copy with formatting"))
         copy_hint.setStyleSheet(f"color: {'#aaaaaa' if colorMode == 'dark' else '#666666'}; font-size: 14px;")
         copy_bar.addWidget(copy_hint)
         copy_bar.addStretch()
         
-        copy_md_btn = QtWidgets.QPushButton("Copy as Markdown")
+        copy_md_btn = QtWidgets.QPushButton(_("Copy as Markdown"))
         copy_md_btn.setStyleSheet(self.get_button_style())
         copy_md_btn.clicked.connect(self.copy_first_response)  # Updated to only copy first response
         copy_bar.addWidget(copy_md_btn)
@@ -391,7 +398,7 @@ class ResponseWindow(QtWidgets.QWidget):
         loading_layout = QtWidgets.QHBoxLayout(loading_container)
         loading_layout.setContentsMargins(0, 0, 0, 0)
         
-        self.loading_label = QtWidgets.QLabel("Thinking")
+        self.loading_label = QtWidgets.QLabel(_("Thinking"))
         self.loading_label.setStyleSheet(f"""
             QLabel {{
                 color: {'#ffffff' if colorMode == 'dark' else '#333333'};
@@ -402,7 +409,7 @@ class ResponseWindow(QtWidgets.QWidget):
         self.loading_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
         
         loading_inner_container = QtWidgets.QWidget()
-        loading_inner_container.setFixedWidth(120)
+        loading_inner_container.setFixedWidth(180)
         loading_inner_layout = QtWidgets.QHBoxLayout(loading_inner_container)
         loading_inner_layout.setContentsMargins(0, 0, 0, 0)
         loading_inner_layout.addWidget(self.loading_label)
@@ -425,7 +432,7 @@ class ResponseWindow(QtWidgets.QWidget):
         bottom_bar = QtWidgets.QHBoxLayout()
         
         self.input_field = QtWidgets.QLineEdit()
-        self.input_field.setPlaceholderText("Ask a follow-up question...")
+        self.input_field.setPlaceholderText(_("Ask a follow-up question")+'...')
         self.input_field.setStyleSheet(f"""
             QLineEdit {{
                 padding: 8px;
@@ -503,20 +510,20 @@ class ResponseWindow(QtWidgets.QWidget):
         dots = self.thinking_dots[self.thinking_dots_state]
         
         if self.loading_label.isVisible():
-            self.loading_label.setText(f"Thinking{dots}")
+            self.loading_label.setText(_("Thinking")+f"{dots}")
         else:
-            self.input_field.setPlaceholderText(f"Thinking{dots}")
+            self.input_field.setPlaceholderText(_("Thinking")+f"{dots}")
     
     def start_thinking_animation(self, initial=False):
         """Start the thinking animation for either initial load or follow-up questions"""
         self.thinking_dots_state = 0
         
         if initial:
-            self.loading_label.setText("Thinking")
+            self.loading_label.setText(_("Thinking"))
             self.loading_label.setVisible(True)
             self.loading_container.setVisible(True)
         else:
-            self.input_field.setPlaceholderText("Thinking")
+            self.input_field.setPlaceholderText(_("Thinking"))
             self.loading_container.setVisible(False)
             
         self.thinking_timer.start()
@@ -526,7 +533,7 @@ class ResponseWindow(QtWidgets.QWidget):
         self.thinking_timer.stop()
         self.loading_container.hide()
         self.loading_label.hide()
-        self.input_field.setPlaceholderText("Ask a follow-up question")
+        self.input_field.setPlaceholderText(_("Ask a follow-up question"))
         self.input_field.setEnabled(True)
         
         # Force layout update
