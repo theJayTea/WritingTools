@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-28 13:36+0100\n"
+"POT-Creation-Date: 2025-01-28 19:47+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,57 +17,57 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ui/OnboardingWindow.py:24 ui/OnboardingWindow.py:40
+#: ui/OnboardingWindow.py:26 ui/OnboardingWindow.py:42
 msgid "Welcome to Writing Tools"
 msgstr ""
 
-#: ui/OnboardingWindow.py:45
+#: ui/OnboardingWindow.py:47
 msgid ""
 "Instantly optimize your writing with AI by selecting your text and invoking "
 "Writing Tools with \"ctrl+space\", anywhere."
 msgstr ""
 
-#: ui/OnboardingWindow.py:47
+#: ui/OnboardingWindow.py:49
 msgid ""
 "Get a summary you can chat with of articles, YouTube videos, or documents by "
 "select all text with \"ctrl+a\""
 msgstr ""
 
-#: ui/OnboardingWindow.py:48
+#: ui/OnboardingWindow.py:50
 msgid ""
 "(or select the YouTube transcript from its description), invoking Writing "
 "Tools, and choosing Summary."
 msgstr ""
 
-#: ui/OnboardingWindow.py:50
+#: ui/OnboardingWindow.py:52
 msgid ""
 "Chat with AI anytime by invoking Writing Tools without selecting any text."
 msgstr ""
 
-#: ui/OnboardingWindow.py:52
+#: ui/OnboardingWindow.py:54
 msgid "Supports an extensive range of AI models:"
 msgstr ""
 
-#: ui/OnboardingWindow.py:53
+#: ui/OnboardingWindow.py:55
 msgid "Gemini 2.0"
 msgstr ""
 
-#: ui/OnboardingWindow.py:54
+#: ui/OnboardingWindow.py:56
 msgid "ANY OpenAI Compatible API — including local LLMs!"
 msgstr ""
 
-#: ui/OnboardingWindow.py:75
+#: ui/OnboardingWindow.py:77
 msgid "Choose your theme:"
 msgstr ""
 
-#: ui/OnboardingWindow.py:80
+#: ui/OnboardingWindow.py:82
 msgid "Gradient"
 msgstr ""
 
-#: ui/OnboardingWindow.py:81
+#: ui/OnboardingWindow.py:83
 msgid "Plain"
 msgstr ""
 
-#: ui/OnboardingWindow.py:90
+#: ui/OnboardingWindow.py:92
 msgid "Next"
 msgstr ""

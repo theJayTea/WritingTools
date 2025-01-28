@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-28 13:36+0100\n"
+"POT-Creation-Date: 2025-01-28 19:47+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,23 +17,23 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ui/ResponseWindow.py:301
+#: ui/ResponseWindow.py:303
 msgid "Response"
 msgstr ""
 
-#: ui/ResponseWindow.py:379
+#: ui/ResponseWindow.py:385
 msgid "Select to copy with formatting"
 msgstr ""
 
-#: ui/ResponseWindow.py:384
+#: ui/ResponseWindow.py:390
 msgid "Copy as Markdown"
 msgstr ""
 
-#: ui/ResponseWindow.py:395 ui/ResponseWindow.py:507 ui/ResponseWindow.py:509
-#: ui/ResponseWindow.py:516 ui/ResponseWindow.py:520
+#: ui/ResponseWindow.py:401 ui/ResponseWindow.py:513 ui/ResponseWindow.py:515
+#: ui/ResponseWindow.py:522 ui/ResponseWindow.py:526
 msgid "Thinking"
 msgstr ""
 
-#: ui/ResponseWindow.py:429 ui/ResponseWindow.py:530
+#: ui/ResponseWindow.py:435 ui/ResponseWindow.py:536
 msgid "Ask a follow-up question"
 msgstr ""

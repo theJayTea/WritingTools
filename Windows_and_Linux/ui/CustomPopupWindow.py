@@ -105,6 +105,20 @@ class CustomPopupWindow(QtWidgets.QWidget):
 
         content_layout.addLayout(input_layout)
 
+        default_options = {
+            "Proofread": _("Proofread"),
+            "Rewrite": _("Rewrite"),
+            "Friendly": _("Friendly"),
+            "Professional": _("Professional"),
+            "Concise": _("Concise"),
+            "Summary": _("Summary"),
+            "Key Points": _("Key Points"),
+            "Table": _("Table"),
+        }
+
+        def localize_option(option):
+            return default_options[option] if option in default_options else option
+
         if has_text:
 
             # Options grid
@@ -117,7 +131,7 @@ class CustomPopupWindow(QtWidgets.QWidget):
             for key in data:
                 if key != "Custom":
                     options.append(
-                        (key,
+                        (localize_option(key),
                          data[key]["icon"] + ('_dark' if colorMode == 'dark' else '_light') + '.png',
                          partial(self.on_generic_instruction, key))
                     )

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-28 13:36+0100\n"
+"POT-Creation-Date: 2025-01-28 19:47+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,14 +17,14 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: WritingToolApp.py:568
+#: WritingToolApp.py:569
 msgid "Settings"
 msgstr ""
 
-#: WritingToolApp.py:571
+#: WritingToolApp.py:572
 msgid "About"
 msgstr ""
 
-#: WritingToolApp.py:574
+#: WritingToolApp.py:575
 msgid "Exit"
 msgstr ""

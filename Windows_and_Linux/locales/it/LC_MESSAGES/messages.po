@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-28 13:01+0100\n"
+"POT-Creation-Date: 2025-01-28 19:44+0100\n"
 "PO-Revision-Date: 2025-01-28 13:05+0100\n"
 "Last-Translator: momos1796@gmail.com\n"
 "Language-Team: Italian <momos1796@gmail.com>\n"
@@ -103,19 +103,52 @@ msgstr ""
 msgid "Helped add the start-on-boot setting."
 msgstr "Aiutato nell'aggiunta dell'impostazione di auto-avvio."
 
-#: ui/CustomPopupWindow.py:74
+#: ui/CustomPopupWindow.py:75 ui/CustomPopupWindow.py:74
 msgid "Describe your change..."
 msgstr "Descrivi la tua modifica..."
 
-#: ui/CustomPopupWindow.py:74
+#: ui/CustomPopupWindow.py:75 ui/CustomPopupWindow.py:74
 msgid "Ask your AI..."
 msgstr "Chiedi alla tua IA..."
 
+#: ui/CustomPopupWindow.py:109
+msgid "Proofread"
+msgstr "Correggi"
+
+#: ui/CustomPopupWindow.py:110
+msgid "Rewrite"
+msgstr "Riscrivi"
+
+#: ui/CustomPopupWindow.py:111
+msgid "Friendly"
+msgstr "Amichevole"
+
+#: ui/CustomPopupWindow.py:112
+msgid "Professional"
+msgstr "Professionale"
+
+#: ui/CustomPopupWindow.py:113
+msgid "Concise"
+msgstr "Conciso"
+
+#: ui/CustomPopupWindow.py:114
+msgid "Summary"
+msgstr "Riassunto"
+
+#: ui/CustomPopupWindow.py:115
+msgid "Key Points"
+msgstr "Punti chiave"
+
+#: ui/CustomPopupWindow.py:116
+msgid "Table"
+msgstr "Tabella"
+
 #: ui/OnboardingWindow.py:24 ui/OnboardingWindow.py:40
+#: ui/OnboardingWindow.py:26 ui/OnboardingWindow.py:42
 msgid "Welcome to Writing Tools"
 msgstr "Benvenuto in Writing Tools"
 
-#: ui/OnboardingWindow.py:45
+#: ui/OnboardingWindow.py:45 ui/OnboardingWindow.py:47
 msgid ""
 "Instantly optimize your writing with AI by selecting your text and invoking "
 "Writing Tools with \"ctrl+space\", anywhere."
@@ -123,7 +156,7 @@ msgstr ""
 "Ottimizza istantaneamente la tua scrittura con l'IA, seleziona del testo e "
 "attivando Writing Tools, ovunque."
 
-#: ui/OnboardingWindow.py:47
+#: ui/OnboardingWindow.py:47 ui/OnboardingWindow.py:49
 msgid ""
 "Get a summary you can chat with of articles, YouTube videos, or documents by "
 "select all text with \"ctrl+a\""
@@ -131,7 +164,7 @@ msgstr ""
 "Ottieni un riassunto di documenti, articoli, video YouTube e altro "
 "selezionando tutto il testo con \"ctrl+a\""
 
-#: ui/OnboardingWindow.py:48
+#: ui/OnboardingWindow.py:48 ui/OnboardingWindow.py:50
 msgid ""
 "(or select the YouTube transcript from its description), invoking Writing "
 "Tools, and choosing Summary."
@@ -139,103 +172,108 @@ msgstr ""
 "(o seleziona la trascrizione di YouTube dalla descrizione del video), "
 "invocando Writing Tools e selezionando \"Riassunto\"."
 
-#: ui/OnboardingWindow.py:50
+#: ui/OnboardingWindow.py:50 ui/OnboardingWindow.py:52
 msgid ""
 "Chat with AI anytime by invoking Writing Tools without selecting any text."
 msgstr "Chatta con l'IA in qualsiasi momento, non selezionando del testo."
 
-#: ui/OnboardingWindow.py:52
+#: ui/OnboardingWindow.py:52 ui/OnboardingWindow.py:54
 msgid "Supports an extensive range of AI models:"
 msgstr "Supporto a vasta gamma di modelli di AI, come:"
 
-#: ui/OnboardingWindow.py:53
+#: ui/OnboardingWindow.py:53 ui/OnboardingWindow.py:55
 msgid "Gemini 2.0"
 msgstr "Gemini 2.0"
 
-#: ui/OnboardingWindow.py:54
+#: ui/OnboardingWindow.py:54 ui/OnboardingWindow.py:56
 msgid "ANY OpenAI Compatible API — including local LLMs!"
 msgstr ""
 "OGNI modello servito tramite API OpenAI-compatibili, anche modelli locali "
 "sul tuo PC!"
 
-#: ui/OnboardingWindow.py:75
+#: ui/OnboardingWindow.py:75 ui/OnboardingWindow.py:77
 msgid "Choose your theme:"
 msgstr "Scegli il tuo tema:"
 
-#: ui/OnboardingWindow.py:80
+#: ui/OnboardingWindow.py:80 ui/OnboardingWindow.py:82
 msgid "Gradient"
 msgstr "Gradiente"
 
-#: ui/OnboardingWindow.py:81 ui/SettingsWindow.py:239
+#: ui/OnboardingWindow.py:81 ui/SettingsWindow.py:239 ui/OnboardingWindow.py:83
+#: ui/SettingsWindow.py:244
 msgid "Plain"
 msgstr "Piatto"
 
-#: ui/OnboardingWindow.py:90
+#: ui/OnboardingWindow.py:90 ui/OnboardingWindow.py:92
 msgid "Next"
 msgstr "Avanti"
 
-#: ui/ResponseWindow.py:301
+#: ui/ResponseWindow.py:301 ui/ResponseWindow.py:303
 msgid "Response"
 msgstr "Risposta"
 
-#: ui/ResponseWindow.py:379
+#: ui/ResponseWindow.py:379 ui/ResponseWindow.py:385
 msgid "Select to copy with formatting"
 msgstr "Seleziona per copiare con formattazione"
 
-#: ui/ResponseWindow.py:384
+#: ui/ResponseWindow.py:384 ui/ResponseWindow.py:390
 msgid "Copy as Markdown"
 msgstr "Copia come Markdown"
 
 #: ui/ResponseWindow.py:395 ui/ResponseWindow.py:507 ui/ResponseWindow.py:509
-#: ui/ResponseWindow.py:516 ui/ResponseWindow.py:520
+#: ui/ResponseWindow.py:516 ui/ResponseWindow.py:520 ui/ResponseWindow.py:401
+#: ui/ResponseWindow.py:513 ui/ResponseWindow.py:515 ui/ResponseWindow.py:522
+#: ui/ResponseWindow.py:526
 msgid "Thinking"
 msgstr "Sto pensando"
 
-#: ui/ResponseWindow.py:429 ui/ResponseWindow.py:530
+#: ui/ResponseWindow.py:429 ui/ResponseWindow.py:530 ui/ResponseWindow.py:435
+#: ui/ResponseWindow.py:536
 msgid "Ask a follow-up question"
 msgstr "Chiedi una domanda a seguire"
 
 #: ui/SettingsWindow.py:32 ui/SettingsWindow.py:151 ui/SettingsWindow.py:205
-#: WritingToolApp.py:568
+#: WritingToolApp.py:568 ui/SettingsWindow.py:37 ui/SettingsWindow.py:156
+#: ui/SettingsWindow.py:210 WritingToolApp.py:569
 msgid "Settings"
 msgstr "Impostazioni"
 
-#: ui/SettingsWindow.py:211
+#: ui/SettingsWindow.py:211 ui/SettingsWindow.py:216
 msgid "Start on Boot"
 msgstr "Avvia all'accensione"
 
-#: ui/SettingsWindow.py:218
+#: ui/SettingsWindow.py:218 ui/SettingsWindow.py:223
 msgid "Shortcut Key:"
 msgstr "Scorciatoia da tastiera:"
 
-#: ui/SettingsWindow.py:233
+#: ui/SettingsWindow.py:233 ui/SettingsWindow.py:238
 msgid "Background Theme:"
 msgstr "Tema Sfondo:"
 
-#: ui/SettingsWindow.py:238
+#: ui/SettingsWindow.py:238 ui/SettingsWindow.py:243
 msgid "Blurry Gradient"
 msgstr "Gradiente sfocato"
 
-#: ui/SettingsWindow.py:250
+#: ui/SettingsWindow.py:250 ui/SettingsWindow.py:255
 msgid "Choose AI Provider:"
 msgstr "Scegli provider IA:"
 
-#: ui/SettingsWindow.py:307
+#: ui/SettingsWindow.py:307 ui/SettingsWindow.py:312
 msgid "Finish AI Setup"
 msgstr "Termina setup"
 
-#: ui/SettingsWindow.py:307
+#: ui/SettingsWindow.py:307 ui/SettingsWindow.py:312
 msgid "Save"
 msgstr "Salva"
 
-#: ui/SettingsWindow.py:326
+#: ui/SettingsWindow.py:326 ui/SettingsWindow.py:331
 msgid "Please restart Writing Tools for changes to take effect."
 msgstr "Riavvia Writing Tools per rendere le modifiche attive."
 
-#: WritingToolApp.py:571
+#: WritingToolApp.py:571 WritingToolApp.py:572
 msgid "About"
 msgstr "Informazioni"
 
-#: WritingToolApp.py:574
+#: WritingToolApp.py:574 WritingToolApp.py:575
 msgid "Exit"
 msgstr "Esci"
