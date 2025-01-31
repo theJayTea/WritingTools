@@ -53,6 +53,8 @@ class WritingToolApp(QtWidgets.QApplication):
         self.output_queue = ""
         self.last_replace = 0
         self.hotkey_listener = None
+        self.paused = False
+        self.toggle_action = None
 
         # Initialize the ctrl+c hotkey listener
         self.ctrl_c_timer = None
@@ -164,6 +166,8 @@ class WritingToolApp(QtWidgets.QApplication):
                 self.hotkey_listener.stop()
 
             def on_activate():
+                if self.paused:
+                    return
                 logging.debug('triggered hotkey')
                 self.hotkey_triggered_signal.emit()  # Emit the signal when hotkey is pressed
 
@@ -329,7 +333,7 @@ class WritingToolApp(QtWidgets.QApplication):
         Process the selected writing option in a separate thread.
         """
         logging.debug(f'Processing option: {option}')
-        
+
         # For Summary, Key Points, Table, and empty text custom prompts, create response window
         if (option == 'Custom' and not selected_text.strip()) or self.options[option]['open_in_window']:
             window_title = "Chat" if (option == 'Custom' and not selected_text.strip()) else option
@@ -515,6 +519,9 @@ class WritingToolApp(QtWidgets.QApplication):
         settings_action = tray_menu.addAction('Settings')
         settings_action.triggered.connect(self.show_settings)
 
+        self.toggle_action = tray_menu.addAction('Resume' if self.paused else 'Pause')
+        self.toggle_action.triggered.connect(self.toggle_paused)
+
         about_action = tray_menu.addAction('About')
         about_action.triggered.connect(self.show_about)
 
@@ -524,6 +531,12 @@ class WritingToolApp(QtWidgets.QApplication):
         self.tray_icon.setContextMenu(tray_menu)
         self.tray_icon.show()
         logging.debug('Tray icon displayed')
+
+    def toggle_paused(self):
+        logging.debug('Toggle paused state')
+        self.paused = not self.paused
+        self.toggle_action.setText('Resume' if self.paused else 'Pause')
+        logging.debug('App is paused' if self.paused else 'App is resumed')
 
     @staticmethod
     def apply_dark_mode_styles(menu):
