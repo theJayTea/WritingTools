@@ -9,7 +9,7 @@ import gettext
 
 import darkdetect
 import pyperclip
-from aiprovider import GeminiProvider, OpenAICompatibleProvider
+from aiprovider import GeminiProvider, OpenAICompatibleProvider, OllamaProvider
 from pynput import keyboard as pykeyboard
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Signal, Slot, QLocale
@@ -58,6 +58,8 @@ class WritingToolApp(QtWidgets.QApplication):
         self.output_queue = ""
         self.last_replace = 0
         self.hotkey_listener = None
+        self.paused = False
+        self.toggle_action = None
 
         self._ = gettext.gettext
 
@@ -66,7 +68,7 @@ class WritingToolApp(QtWidgets.QApplication):
         self.setup_ctrl_c_listener()
 
         # Setup available AI providers
-        self.providers = [GeminiProvider(self), OpenAICompatibleProvider(self)]
+        self.providers = [GeminiProvider(self), OpenAICompatibleProvider(self), OllamaProvider(self)]
 
         if not self.config:
             logging.debug('No config found, showing onboarding')
@@ -211,6 +213,8 @@ class WritingToolApp(QtWidgets.QApplication):
                 self.hotkey_listener.stop()
 
             def on_activate():
+                if self.paused:
+                    return
                 logging.debug('triggered hotkey')
                 self.hotkey_triggered_signal.emit()  # Emit the signal when hotkey is pressed
 
@@ -376,7 +380,7 @@ class WritingToolApp(QtWidgets.QApplication):
         Process the selected writing option in a separate thread.
         """
         logging.debug(f'Processing option: {option}')
-        
+
         # For Summary, Key Points, Table, and empty text custom prompts, create response window
         if (option == 'Custom' and not selected_text.strip()) or self.options[option]['open_in_window']:
             window_title = "Chat" if (option == 'Custom' and not selected_text.strip()) else option
@@ -561,19 +565,37 @@ class WritingToolApp(QtWidgets.QApplication):
         logging.debug('Tray icon displayed')
 
     def update_tray_menu(self):
+        """
+        Update the tray menu with all menu items, including pause functionality
+        and proper translations.
+        """
         self.tray_menu.clear()
 
         # Apply dark mode styles using darkdetect
         self.apply_dark_mode_styles(self.tray_menu)
 
+        # Settings menu item
         settings_action = self.tray_menu.addAction(self._('Settings'))
         settings_action.triggered.connect(self.show_settings)
 
+        # Pause/Resume toggle action 
+        self.toggle_action = self.tray_menu.addAction(self._('Resume') if self.paused else self._('Pause'))
+        self.toggle_action.triggered.connect(self.toggle_paused)
+
+        # About menu item
         about_action = self.tray_menu.addAction(self._('About'))
         about_action.triggered.connect(self.show_about)
 
+        # Exit menu item
         exit_action = self.tray_menu.addAction(self._('Exit'))
         exit_action.triggered.connect(self.exit_app)
+        
+    def toggle_paused(self):
+        """Toggle the paused state of the application."""
+        logging.debug('Toggle paused state')
+        self.paused = not self.paused
+        self.toggle_action.setText(self._('Resume') if self.paused else self._('Pause'))
+        logging.debug('App is paused' if self.paused else 'App is resumed')
 
     @staticmethod
     def apply_dark_mode_styles(menu):
@@ -685,7 +707,24 @@ class WritingToolApp(QtWidgets.QApplication):
                     # Get response using the chat
                     response = chat.send_message(question)
                     response_text = response.text
-                    
+
+                elif isinstance(self.current_provider, OllamaProvider):  #
+                    # For Ollama, prepare messages with system instruction and history
+                    messages = [{"role": "system", "content": system_instruction}]
+
+                    for msg in history:
+                        messages.append({
+                            "role": msg["role"],
+                            "content": msg["content"]
+                        })
+
+                    # Get response from Ollama
+                    response_text = self.current_provider.get_response(
+                        system_instruction,
+                        messages,
+                        return_response=True
+                    )
+
                 else:
                     # For OpenAI/compatible providers, prepare messages array, add system message
                     messages = [{"role": "system", "content": system_instruction}]

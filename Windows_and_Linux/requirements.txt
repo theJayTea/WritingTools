@@ -6,3 +6,5 @@ pynput
 PySide6
 markdown2
 pyinstaller
+ollama
+
