@@ -5,20 +5,24 @@ import sys
 import threading
 import time
 import signal
+import gettext
 
 import darkdetect
 import pyperclip
 from aiprovider import GeminiProvider, OpenAICompatibleProvider, OllamaProvider
 from pynput import keyboard as pykeyboard
 from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtCore import Signal, Slot
+from PySide6.QtCore import Signal, Slot, QLocale
 from PySide6.QtGui import QCursor, QGuiApplication
-from PySide6.QtWidgets import QMessageBox
-from ui.AboutWindow import AboutWindow
-from ui.CustomPopupWindow import CustomPopupWindow
-from ui.OnboardingWindow import OnboardingWindow
-from ui.SettingsWindow import SettingsWindow
+from PySide6.QtWidgets import QMessageBox, QApplication
+import ui.AboutWindow
+import ui.SettingsWindow
+import ui.ResponseWindow
+import ui.OnboardingWindow
+import ui.CustomPopupWindow
 from update_checker import UpdateChecker
+
+_ = gettext.gettext
 
 
 class WritingToolApp(QtWidgets.QApplication):
@@ -47,6 +51,7 @@ class WritingToolApp(QtWidgets.QApplication):
         self.onboarding_window = None
         self.popup_window = None
         self.tray_icon = None
+        self.tray_menu = None
         self.settings_window = None
         self.about_window = None
         self.registered_hotkey = None
@@ -55,6 +60,8 @@ class WritingToolApp(QtWidgets.QApplication):
         self.hotkey_listener = None
         self.paused = False
         self.toggle_action = None
+
+        self._ = gettext.gettext
 
         # Initialize the ctrl+c hotkey listener
         self.ctrl_c_timer = None
@@ -81,7 +88,13 @@ class WritingToolApp(QtWidgets.QApplication):
 
             self.create_tray_icon()
             self.register_hotkey()
-            
+
+            try:
+                lang = self.config['locale']
+            except KeyError:
+                lang = None
+            self.change_language(lang)
+
             # Initialize update checker
             self.update_checker = UpdateChecker(self)
             self.update_checker.check_updates_async()
@@ -89,6 +102,40 @@ class WritingToolApp(QtWidgets.QApplication):
         self.recent_triggers = []  # Track recent hotkey triggers
         self.TRIGGER_WINDOW = 1.5  # Time window in seconds
         self.MAX_TRIGGERS = 3  # Max allowed triggers in window
+
+    def setup_translations(self, lang=None):
+        if not lang:
+            lang = QLocale.system().name().split('_')[0]
+
+        try:
+            translation = gettext.translation(
+                'messages',
+                localedir=os.path.join(os.path.dirname(__file__), 'locales'),
+                languages=[lang]
+            )
+        except FileNotFoundError:
+            translation = gettext.NullTranslations()
+
+        translation.install()
+        # Update the translation function for all UI components.
+        self._ = translation.gettext
+        ui.AboutWindow._ = self._
+        ui.SettingsWindow._ = self._
+        ui.ResponseWindow._ = self._
+        ui.OnboardingWindow._ = self._
+        ui.CustomPopupWindow._ = self._
+
+    def retranslate_ui(self):
+        self.update_tray_menu()
+
+    def change_language(self, lang):
+        self.setup_translations(lang)
+        self.retranslate_ui()
+
+        # Update all other windows
+        for widget in QApplication.topLevelWidgets():
+            if widget != self and hasattr(widget, 'retranslate_ui'):
+                widget.retranslate_ui()
 
     def check_trigger_spam(self):
         """
@@ -149,7 +196,7 @@ class WritingToolApp(QtWidgets.QApplication):
         Show the onboarding window for first-time users.
         """
         logging.debug('Showing onboarding window')
-        self.onboarding_window = OnboardingWindow(self)
+        self.onboarding_window = ui.OnboardingWindow.OnboardingWindow(self)
         self.onboarding_window.close_signal.connect(self.exit_app)
         self.onboarding_window.show()
 
@@ -245,7 +292,7 @@ class WritingToolApp(QtWidgets.QApplication):
                     self.popup_window.close()
                 self.popup_window = None
             logging.debug('Creating new popup window')
-            self.popup_window = CustomPopupWindow(self, selected_text)
+            self.popup_window = ui.CustomPopupWindow.CustomPopupWindow(self, selected_text)
 
             # Set the window icon
             icon_path = os.path.join(os.path.dirname(sys.argv[0]), 'icons', 'app_icon.png')
@@ -427,8 +474,7 @@ class WritingToolApp(QtWidgets.QApplication):
         """
         Show the response in a new window instead of pasting it.
         """
-        from ui.ResponseWindow import ResponseWindow
-        response_window = ResponseWindow(self, f"{option} Result")
+        response_window = ui.ResponseWindow.ResponseWindow(self, f"{option} Result")
         response_window.selected_text = text  # Store the text for regeneration
         response_window.show()
         return response_window
@@ -511,31 +557,44 @@ class WritingToolApp(QtWidgets.QApplication):
             self.tray_icon = QtWidgets.QSystemTrayIcon(QtGui.QIcon(icon_path), self)
         # Set the tooltip (hover name) for the tray icon
         self.tray_icon.setToolTip("WritingTools")
-        tray_menu = QtWidgets.QMenu()
+        self.tray_menu = QtWidgets.QMenu()
+        self.tray_icon.setContextMenu(self.tray_menu)
 
-        # Apply dark mode styles using darkdetect
-        self.apply_dark_mode_styles(tray_menu)
-
-        settings_action = tray_menu.addAction('Settings')
-        settings_action.triggered.connect(self.show_settings)
-
-        self.toggle_action = tray_menu.addAction('Resume' if self.paused else 'Pause')
-        self.toggle_action.triggered.connect(self.toggle_paused)
-
-        about_action = tray_menu.addAction('About')
-        about_action.triggered.connect(self.show_about)
-
-        exit_action = tray_menu.addAction('Exit')
-        exit_action.triggered.connect(self.exit_app)
-
-        self.tray_icon.setContextMenu(tray_menu)
+        self.update_tray_menu()
         self.tray_icon.show()
         logging.debug('Tray icon displayed')
 
+    def update_tray_menu(self):
+        """
+        Update the tray menu with all menu items, including pause functionality
+        and proper translations.
+        """
+        self.tray_menu.clear()
+
+        # Apply dark mode styles using darkdetect
+        self.apply_dark_mode_styles(self.tray_menu)
+
+        # Settings menu item
+        settings_action = self.tray_menu.addAction(self._('Settings'))
+        settings_action.triggered.connect(self.show_settings)
+
+        # Pause/Resume toggle action 
+        self.toggle_action = self.tray_menu.addAction(self._('Resume') if self.paused else self._('Pause'))
+        self.toggle_action.triggered.connect(self.toggle_paused)
+
+        # About menu item
+        about_action = self.tray_menu.addAction(self._('About'))
+        about_action.triggered.connect(self.show_about)
+
+        # Exit menu item
+        exit_action = self.tray_menu.addAction(self._('Exit'))
+        exit_action.triggered.connect(self.exit_app)
+        
     def toggle_paused(self):
+        """Toggle the paused state of the application."""
         logging.debug('Toggle paused state')
         self.paused = not self.paused
-        self.toggle_action.setText('Resume' if self.paused else 'Pause')
+        self.toggle_action.setText(self._('Resume') if self.paused else self._('Pause'))
         logging.debug('App is paused' if self.paused else 'App is resumed')
 
     @staticmethod
@@ -709,8 +768,9 @@ class WritingToolApp(QtWidgets.QApplication):
         """
         logging.debug('Showing settings window')
         # Always create a new settings window to handle providers_only correctly
-        self.settings_window = SettingsWindow(self, providers_only=providers_only)
+        self.settings_window = ui.SettingsWindow.SettingsWindow(self, providers_only=providers_only)
         self.settings_window.close_signal.connect(self.exit_app)
+        self.settings_window.retranslate_ui()
         self.settings_window.show()
 
 
@@ -720,7 +780,7 @@ class WritingToolApp(QtWidgets.QApplication):
         """
         logging.debug('Showing about window')
         if not self.about_window:
-            self.about_window = AboutWindow()
+            self.about_window = ui.AboutWindow.AboutWindow()
         self.about_window.show()
 
     def setup_ctrl_c_listener(self):

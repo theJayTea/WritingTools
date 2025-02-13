@@ -16,6 +16,9 @@
 
 [https://www.neowin.net/news/top-10-windows-11-apps-for-every-user-in-2025/](https://www.neowin.net/news/top-10-windows-11-apps-for-every-user-in-2025/)
 
+[https://www.ifun.de/freie-writing-tools-systemweite-ki-schreibassistenz-fuer-den-mac-247247/](https://www.ifun.de/freie-writing-tools-systemweite-ki-schreibassistenz-fuer-den-mac-247247/
+)
+
 [https://www.phonandroid.com/cette-application-gratuite-apporte-les-outils-dapple-intelligence-sur-windows-11.html](https://www.phonandroid.com/cette-application-gratuite-apporte-les-outils-dapple-intelligence-sur-windows-11.html)
 
 [https://www.lesnumeriques.com/intelligence-artificielle/envie-d-apple-intelligence-sur-votre-pc-windows-c-est-possible-n227816.html](https://www.lesnumeriques.com/intelligence-artificielle/envie-d-apple-intelligence-sur-votre-pc-windows-c-est-possible-n227816.html)
@@ -28,6 +31,8 @@
 
 [https://allthings.how/you-can-get-apples-writing-tools-on-windows-11-with-this-app/](https://allthings.how/you-can-get-apples-writing-tools-on-windows-11-with-this-app/)
 
+[https://www.techbang.com/posts/120711-windows-11-apple-intelligence](https://www.techbang.com/posts/120711-windows-11-apple-intelligence)
+
 [https://www.pcforalla.se/article/2570283/nytt-gratisprogram-gor-det-enkelt-att-sammanfatta-texter-med-ai.html](https://www.pcforalla.se/article/2570283/nytt-gratisprogram-gor-det-enkelt-att-sammanfatta-texter-med-ai.html)
 
 [https://www.computer-wd.com/2024/10/new-computer-programs-to-try-now.html](https://www.computer-wd.com/2024/10/new-computer-programs-to-try-now.html)
@@ -37,6 +42,8 @@
 [https://www.pcsofter.com/download/109892.html](https://www.pcsofter.com/download/109892.html)
 
 [https://www.geeknetic.es/Guia/2960/Como-usar-la-IA-para-ayudar-a-redactar-textos-en-Windows-11.html](https://www.geeknetic.es/Guia/2960/Como-usar-la-IA-para-ayudar-a-redactar-textos-en-Windows-11.html)
+
+[https://m.cnbeta.com.tw/view/1468912.htm](https://m.cnbeta.com.tw/view/1468912.htm)
 
 [https://www.theoutpost.ai/news-story/high-school-developer-brings-apple-like-ai-writing-assistant-to-windows-7045/](https://theoutpost.ai/news-story/high-school-developer-brings-apple-like-ai-writing-assistant-to-windows-7045/)
 

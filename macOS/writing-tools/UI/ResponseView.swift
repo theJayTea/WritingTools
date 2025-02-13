@@ -220,7 +220,8 @@ final class ResponseViewModel: ObservableObject {
                     If it's a request for help, provide clear guidance and examples where appropriate. Make sure tu use the language used or specified by the user instruction.
                     Use Markdown formatting to make your response more readable.
                     """,
-                    userPrompt: contextualPrompt
+                    userPrompt: contextualPrompt,
+                    images: AppState.shared.selectedImages
                 )
                 
                 DispatchQueue.main.async {
@@ -242,15 +243,17 @@ final class ResponseViewModel: ObservableObject {
     }
     
     func copyContent() {
-        // Only copy the latest AI response
-        if let latestAiMessage = messages.last(where: { $0.role == "assistant" }) {
-            NSPasteboard.general.clearContents()
-            NSPasteboard.general.setString(latestAiMessage.content, forType: .string)
-            
-            showCopyConfirmation = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                self.showCopyConfirmation = false
-            }
+        // Concatenate all messages in the conversation
+        let conversationText = messages.map { message in
+            return "\(message.role.capitalized): \(message.content)" // Format each message with role
+        }.joined(separator: "\n\n") // Join messages with double newlines for readability
+
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(conversationText, forType: .string)
+
+        showCopyConfirmation = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            self.showCopyConfirmation = false
         }
     }
-}
+    }

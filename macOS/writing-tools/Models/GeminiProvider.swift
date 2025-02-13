@@ -29,7 +29,7 @@ class GeminiProvider: ObservableObject, AIProvider {
         self.config = config
     }
     
-    func processText(systemPrompt: String? = "You are a helpful writing assistant.", userPrompt: String) async throws -> String {
+    func processText(systemPrompt: String? = "You are a helpful writing assistant.", userPrompt: String, images: [Data] = []) async throws -> String {
         isProcessing = true
         defer { isProcessing = false }
         
@@ -39,16 +39,31 @@ class GeminiProvider: ObservableObject, AIProvider {
             throw NSError(domain: "GeminiAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "API key is missing."])
         }
         
-        guard let url = URL(string: "https://generativelanguage.googleapis.com/v1beta/models/\(config.modelName):generateContent?key=\(config.apiKey)") else {
+        // Create parts array with text
+        var parts: [[String: Any]] = []
+        parts.append(["text": finalPrompt])
+        
+        // Add image parts if present
+        for imageData in images {
+            parts.append([
+                "inline_data": [
+                    "mime_type": "image/jpeg",
+                    "data": imageData.base64EncodedString()
+                ]
+            ])
+        }
+        
+        // Always use gemini-2.0-flash-exp
+        let modelName = "gemini-2.0-flash-exp"
+        
+        guard let url = URL(string: "https://generativelanguage.googleapis.com/v1beta/models/\(modelName):generateContent?key=\(config.apiKey)") else {
             throw NSError(domain: "GeminiAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid URL."])
         }
         
         let requestBody: [String: Any] = [
             "contents": [
                 [
-                    "parts": [
-                        ["text": finalPrompt]
-                    ]
+                    "parts": parts
                 ]
             ]
         ]
@@ -60,11 +75,24 @@ class GeminiProvider: ObservableObject, AIProvider {
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
-        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-            throw NSError(domain: "GeminiAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Server returned an error."])
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw NSError(domain: "GeminiAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response type."])
+        }
+        
+        if httpResponse.statusCode != 200 {
+            // Try to parse error details from response
+            if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let error = json["error"] as? [String: Any],
+               let message = error["message"] as? String {
+                print("API Error: \(message)")
+                throw NSError(domain: "GeminiAPI", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: message])
+            }
+            print("Response data: \(String(data: data, encoding: .utf8) ?? "no data")")
+            throw NSError(domain: "GeminiAPI", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: "Server returned error \(httpResponse.statusCode)"])
         }
         
         guard let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
+            print("Failed to parse response: \(String(data: data, encoding: .utf8) ?? "no data")")
             throw NSError(domain: "GeminiAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to parse JSON response."])
         }
         
@@ -85,3 +113,4 @@ class GeminiProvider: ObservableObject, AIProvider {
         isProcessing = false
     }
 }
+
