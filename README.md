@@ -235,7 +235,9 @@ Extensively refactored Writing Tools and added OpenAI Compatible API support, st
 
 **2. [momokrono](https://github.com/momokrono):**
 
-Added Linux support and switched to the pynput API to improve Windows stability. Fixed misc. bugs, such as handling quitting onboarding without completing it. @momokrono has been super kind and helpful, and I'm very grateful to have them as a contributor - Jesai.
+Added Linux support, switched to the pynput API to improve Windows stability. Added Ollama API support, custom options and localization. Fixed misc. bugs and added graceful termination support by handling SIGINT signal.
+
+@momokrono has been super kind and helpful, and I'm very grateful to have him as a contributor - Jesai.
 
 **3. [Disneyhockey40 (Soszust40)](https://github.com/Disneyhockey40):**
 

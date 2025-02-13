@@ -9,6 +9,7 @@ from PySide6.QtWidgets import QHBoxLayout, QRadioButton, QScrollArea
 from ui.AutostartManager import AutostartManager
 from ui.UIUtils import UIUtils, colorMode
 
+_ = lambda x: x
 
 class SettingsWindow(QtWidgets.QWidget):
     """
@@ -22,7 +23,18 @@ class SettingsWindow(QtWidgets.QWidget):
         self.app = app
         self.current_provider_layout = None
         self.providers_only = providers_only
+        self.gradient_radio = None
+        self.plain_radio = None
+        self.provider_dropdown = None
+        self.provider_container = None
+        self.autostart_checkbox = None
+        self.shortcut_input = None
         self.init_ui()
+        self.retranslate_ui()
+
+
+    def retranslate_ui(self):
+        self.setWindowTitle(_("Settings"))
 
     def init_provider_ui(self, provider: AIProvider, layout):
         """
@@ -141,7 +153,7 @@ class SettingsWindow(QtWidgets.QWidget):
         Initialize the user interface for the settings window.
         Now includes a scroll area for better handling of content on smaller screens.
         """
-        self.setWindowTitle('Settings')
+        self.setWindowTitle(_('Settings'))
         # Set the exact width we want (592px) as both minimum and default
         self.setMinimumWidth(592)
         self.setFixedWidth(592)  # This makes the width non-resizable
@@ -195,20 +207,20 @@ class SettingsWindow(QtWidgets.QWidget):
         content_layout.setSpacing(20)
 
         if not self.providers_only:
-            title_label = QtWidgets.QLabel("Settings")
+            title_label = QtWidgets.QLabel(_("Settings"))
             title_label.setStyleSheet(f"font-size: 24px; font-weight: bold; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
             content_layout.addWidget(title_label, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
 
             # Add autostart checkbox for Windows compiled version
             if AutostartManager.get_startup_path():
-                self.autostart_checkbox = QtWidgets.QCheckBox("Start on Boot")
+                self.autostart_checkbox = QtWidgets.QCheckBox(_("Start on Boot"))
                 self.autostart_checkbox.setStyleSheet(f"font-size: 16px; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
                 self.autostart_checkbox.setChecked(AutostartManager.check_autostart())
                 self.autostart_checkbox.stateChanged.connect(self.toggle_autostart)
                 content_layout.addWidget(self.autostart_checkbox)
 
             # Add shortcut key input
-            shortcut_label = QtWidgets.QLabel("Shortcut Key:")
+            shortcut_label = QtWidgets.QLabel(_("Shortcut Key:"))
             shortcut_label.setStyleSheet(f"font-size: 16px; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
             content_layout.addWidget(shortcut_label)
 
@@ -223,13 +235,13 @@ class SettingsWindow(QtWidgets.QWidget):
             content_layout.addWidget(self.shortcut_input)
 
             # Add theme selection
-            theme_label = QtWidgets.QLabel("Background Theme:")
+            theme_label = QtWidgets.QLabel(_("Background Theme:"))
             theme_label.setStyleSheet(f"font-size: 16px; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
             content_layout.addWidget(theme_label)
 
             theme_layout = QHBoxLayout()
-            self.gradient_radio = QRadioButton("Blurry Gradient")
-            self.plain_radio = QRadioButton("Plain")
+            self.gradient_radio = QRadioButton(_("Blurry Gradient"))
+            self.plain_radio = QRadioButton(_("Plain"))
             self.gradient_radio.setStyleSheet(f"color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
             self.plain_radio.setStyleSheet(f"color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
             current_theme = self.app.config.get('theme', 'gradient')
@@ -240,7 +252,7 @@ class SettingsWindow(QtWidgets.QWidget):
             content_layout.addLayout(theme_layout)
 
         # Add provider selection
-        provider_label = QtWidgets.QLabel("Choose AI Provider:")
+        provider_label = QtWidgets.QLabel(_("Choose AI Provider:"))
         provider_label.setStyleSheet(f"font-size: 16px; color: {'#ffffff' if colorMode == 'dark' else '#333333'};")
         content_layout.addWidget(provider_label)
 
@@ -297,7 +309,7 @@ class SettingsWindow(QtWidgets.QWidget):
         bottom_layout.setSpacing(10)
 
         # Add save button to bottom container
-        save_button = QtWidgets.QPushButton("Finish AI Setup" if self.providers_only else "Save")
+        save_button = QtWidgets.QPushButton(_("Finish AI Setup") if self.providers_only else _("Save"))
         save_button.setStyleSheet("""
             QPushButton {
                 background-color: #4CAF50;
@@ -315,11 +327,10 @@ class SettingsWindow(QtWidgets.QWidget):
         bottom_layout.addWidget(save_button)
 
         if not self.providers_only:
-            restart_text = """
-            <p style='text-align: center;'>
-            Please restart Writing Tools for changes to take effect.
-            </p>
-            """
+            restart_text = "<p style='text-align: center;'>" + \
+            _("Please restart Writing Tools for changes to take effect.") + \
+            "</p>"
+
             restart_notice = QtWidgets.QLabel(restart_text)
             restart_notice.setStyleSheet(f"font-size: 15px; color: {'#cccccc' if colorMode == 'dark' else '#555555'}; font-style: italic;")
             restart_notice.setWordWrap(True)
@@ -333,12 +344,15 @@ class SettingsWindow(QtWidgets.QWidget):
         desired_height = min(720, max_height)  # Cap at 720px or 85% of screen height
         self.resize(592, desired_height)  # Use an exact width of 592px so stuff looks good!
 
-    def toggle_autostart(self, state):
+    @staticmethod
+    def toggle_autostart(state):
         """Toggle the autostart setting."""
         AutostartManager.set_autostart(state == 2)
 
     def save_settings(self):
         """Save the current settings."""
+        self.app.config['locale'] = 'en'
+
         if not self.providers_only:
             self.app.config['shortcut'] = self.shortcut_input.text()
             self.app.config['theme'] = 'gradient' if self.gradient_radio.isChecked() else 'plain'

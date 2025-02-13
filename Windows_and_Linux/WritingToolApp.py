@@ -4,20 +4,25 @@ import os
 import sys
 import threading
 import time
+import signal
+import gettext
 
 import darkdetect
 import pyperclip
 from aiprovider import GeminiProvider, OpenAICompatibleProvider
 from pynput import keyboard as pykeyboard
 from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtCore import Signal, Slot
+from PySide6.QtCore import Signal, Slot, QLocale
 from PySide6.QtGui import QCursor, QGuiApplication
-from PySide6.QtWidgets import QMessageBox
-from ui.AboutWindow import AboutWindow
-from ui.CustomPopupWindow import CustomPopupWindow
-from ui.OnboardingWindow import OnboardingWindow
-from ui.SettingsWindow import SettingsWindow
+from PySide6.QtWidgets import QMessageBox, QApplication
+import ui.AboutWindow
+import ui.SettingsWindow
+import ui.ResponseWindow
+import ui.OnboardingWindow
+import ui.CustomPopupWindow
 from update_checker import UpdateChecker
+
+_ = gettext.gettext
 
 
 class WritingToolApp(QtWidgets.QApplication):
@@ -32,6 +37,7 @@ class WritingToolApp(QtWidgets.QApplication):
 
     def __init__(self, argv):
         super().__init__(argv)
+        self.current_response_window = None
         logging.debug('Initializing WritingToolApp')
         self.output_ready_signal.connect(self.replace_text)
         self.show_message_signal.connect(self.show_message_box)
@@ -39,15 +45,25 @@ class WritingToolApp(QtWidgets.QApplication):
         self.config = None
         self.config_path = None
         self.load_config()
+        self.options = None
+        self.options_path = None
+        self.load_options()
         self.onboarding_window = None
         self.popup_window = None
         self.tray_icon = None
+        self.tray_menu = None
         self.settings_window = None
         self.about_window = None
         self.registered_hotkey = None
         self.output_queue = ""
         self.last_replace = 0
         self.hotkey_listener = None
+
+        self._ = gettext.gettext
+
+        # Initialize the ctrl+c hotkey listener
+        self.ctrl_c_timer = None
+        self.setup_ctrl_c_listener()
 
         # Setup available AI providers
         self.providers = [GeminiProvider(self), OpenAICompatibleProvider(self)]
@@ -70,7 +86,13 @@ class WritingToolApp(QtWidgets.QApplication):
 
             self.create_tray_icon()
             self.register_hotkey()
-            
+
+            try:
+                lang = self.config['locale']
+            except KeyError:
+                lang = None
+            self.change_language(lang)
+
             # Initialize update checker
             self.update_checker = UpdateChecker(self)
             self.update_checker.check_updates_async()
@@ -78,6 +100,40 @@ class WritingToolApp(QtWidgets.QApplication):
         self.recent_triggers = []  # Track recent hotkey triggers
         self.TRIGGER_WINDOW = 1.5  # Time window in seconds
         self.MAX_TRIGGERS = 3  # Max allowed triggers in window
+
+    def setup_translations(self, lang=None):
+        if not lang:
+            lang = QLocale.system().name().split('_')[0]
+
+        try:
+            translation = gettext.translation(
+                'messages',
+                localedir=os.path.join(os.path.dirname(__file__), 'locales'),
+                languages=[lang]
+            )
+        except FileNotFoundError:
+            translation = gettext.NullTranslations()
+
+        translation.install()
+        # Update the translation function for all UI components.
+        self._ = translation.gettext
+        ui.AboutWindow._ = self._
+        ui.SettingsWindow._ = self._
+        ui.ResponseWindow._ = self._
+        ui.OnboardingWindow._ = self._
+        ui.CustomPopupWindow._ = self._
+
+    def retranslate_ui(self):
+        self.update_tray_menu()
+
+    def change_language(self, lang):
+        self.setup_translations(lang)
+        self.retranslate_ui()
+
+        # Update all other windows
+        for widget in QApplication.topLevelWidgets():
+            if widget != self and hasattr(widget, 'retranslate_ui'):
+                widget.retranslate_ui()
 
     def check_trigger_spam(self):
         """
@@ -110,6 +166,20 @@ class WritingToolApp(QtWidgets.QApplication):
             logging.debug('Config file not found')
             self.config = None
 
+    def load_options(self):
+        """
+        Load the options file.
+        """
+        self.options_path = os.path.join(os.path.dirname(sys.argv[0]), 'options.json')
+        logging.debug(f'Loading options from {self.options_path}')
+        if os.path.exists(self.options_path):
+            with open(self.options_path, 'r') as f:
+                self.options = json.load(f)
+                logging.debug('Options loaded successfully')
+        else:
+            logging.debug('Options file not found')
+            self.options = None
+
     def save_config(self, config):
         """
         Save the configuration file.
@@ -124,7 +194,7 @@ class WritingToolApp(QtWidgets.QApplication):
         Show the onboarding window for first-time users.
         """
         logging.debug('Showing onboarding window')
-        self.onboarding_window = OnboardingWindow(self)
+        self.onboarding_window = ui.OnboardingWindow.OnboardingWindow(self)
         self.onboarding_window.close_signal.connect(self.exit_app)
         self.onboarding_window.show()
 
@@ -192,6 +262,7 @@ class WritingToolApp(QtWidgets.QApplication):
             self.current_provider.cancel()
             self.output_queue = ""
 
+        # noinspection PyTypeChecker
         QtCore.QMetaObject.invokeMethod(self, "_show_popup", QtCore.Qt.ConnectionType.QueuedConnection)
 
     @Slot()
@@ -217,7 +288,7 @@ class WritingToolApp(QtWidgets.QApplication):
                     self.popup_window.close()
                 self.popup_window = None
             logging.debug('Creating new popup window')
-            self.popup_window = CustomPopupWindow(self, selected_text)
+            self.popup_window = ui.CustomPopupWindow.CustomPopupWindow(self, selected_text)
 
             # Set the window icon
             icon_path = os.path.join(os.path.dirname(sys.argv[0]), 'icons', 'app_icon.png')
@@ -284,7 +355,6 @@ class WritingToolApp(QtWidgets.QApplication):
 
         # Get the selected text
         selected_text = pyperclip.paste()
-        logging.debug(f'Selected text: "{selected_text}"')
 
         # Restore the clipboard
         pyperclip.copy(clipboard_backup)
@@ -308,7 +378,7 @@ class WritingToolApp(QtWidgets.QApplication):
         logging.debug(f'Processing option: {option}')
         
         # For Summary, Key Points, Table, and empty text custom prompts, create response window
-        if option in ['Summary', 'Key Points', 'Table'] or (option == 'Custom' and not selected_text.strip()):
+        if (option == 'Custom' and not selected_text.strip()) or self.options[option]['open_in_window']:
             window_title = "Chat" if (option == 'Custom' and not selected_text.strip()) else option
             self.current_response_window = self.show_response_window(window_title, selected_text)
             
@@ -337,45 +407,6 @@ class WritingToolApp(QtWidgets.QApplication):
             """
             logging.debug(f'Starting processing thread for option: {option}')
             try:
-                option_prompts = {
-                    'Proofread': (
-                        'Proofread this:\n\n',
-                        'You are a grammar proofreading assistant. Output ONLY the corrected text without any additional comments. Maintain the original text structure and writing style. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with this (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                    ),
-                    'Rewrite': (
-                        'Rewrite this:\n\n',
-                        'You are a writing assistant. Rewrite the text provided by the user to improve phrasing. Output ONLY the rewritten text without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with proofreading (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                    ),
-                    'Friendly': (
-                        'Make this more friendly:\n\n',
-                        'You are a writing assistant. Rewrite the text provided by the user to be more friendly. Output ONLY the friendly text without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with rewriting (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                    ),
-                    'Professional': (
-                        'Make this more professional:\n\n',
-                        'You are a writing assistant. Rewrite the text provided by the user to sound more professional. Output ONLY the professional text without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with this (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                    ),
-                    'Concise': (
-                        'Make this more concise:\n\n',
-                        'You are a writing assistant. Rewrite the text provided by the user to be slightly more concise in tone, thus making it just a bit shorter. Do not change the text too much or be too reductive. Output ONLY the concise version without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with this (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                    ),
-                    'Summary': (
-                        'Summarize this:\n\n',
-                        'You are a summarisation assistant. Provide a succinct summary of the text provided by the user. The summary should be succinct yet encompass all the key insightful points. To make it quite legible and readable, you MUST use Markdown formatting (bold, italics, underline...). You should add line spacing between your paragraphs/lines. Only if appropriate, you could also use headings (only the very small ones), lists, tables, etc. Don\'t be repetitive or too verbose. Output ONLY the summary without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with summarisation (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                    ),
-                    'Key Points': (
-                        'Extract key points from this:\n\n',
-                        'You are an assistant that extracts key points from text provided by the user. Output ONLY the key points without additional comments. You MUST use Markdown formatting (lists, bold, italics, underline, etc. as appropriate) to make it quite legible and readable. Don\'t be repetitive or too verbose. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is absolutely incompatible with extracting key points (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                    ),
-                    'Table': (
-                        'Convert this into a table:\n\n',
-                        'You are an assistant that converts text provided by the user into a Markdown table. Output ONLY the table without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text is completely incompatible with this with conversion, output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                    ),
-                    'Custom': (
-                        'Make the following change to this text:\n\n',
-                        'You are a writing and coding assistant. You MUST make the user\'s described change to the text or code provided by the user. Output ONLY the appropriately modified text or code without additional comments. Respond in the same language as the input (e.g., English US, French). Do not answer or respond to the user\'s text content. If the text or code is absolutely incompatible with the requested change, output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".'
-                    )
-                }
-
                 if selected_text.strip() == '':
                     # No selected text
                     if option == 'Custom':
@@ -385,7 +416,9 @@ class WritingToolApp(QtWidgets.QApplication):
                         self.show_message_signal.emit('Error', 'Please select text to use this option.')
                         return
                 else:
-                    prompt_prefix, system_instruction = option_prompts.get(option, ('', ''))
+                    selected_prompt = self.options.get(option, ('', ''))
+                    prompt_prefix = selected_prompt['prefix']
+                    system_instruction = selected_prompt['instruction']
                     if option == 'Custom':
                         prompt = f"{prompt_prefix}Described change: {custom_change}\n\nText: {selected_text}"
                     else:
@@ -394,8 +427,8 @@ class WritingToolApp(QtWidgets.QApplication):
                 self.output_queue = ""
 
                 logging.debug(f'Getting response from provider for option: {option}')
-                
-                if option in ['Summary', 'Key Points', 'Table'] or (option == 'Custom' and not selected_text.strip()):
+
+                if (option == 'Custom' and not selected_text.strip()) or self.options[option]['open_in_window']:
                     logging.debug('Getting response for window display')
                     response = self.current_provider.get_response(system_instruction, prompt, return_response=True)
                     logging.debug(f'Got response of length: {len(response) if response else 0}')
@@ -409,6 +442,7 @@ class WritingToolApp(QtWidgets.QApplication):
                     
                     # Set initial response using QMetaObject.invokeMethod to ensure thread safety
                     if hasattr(self, 'current_response_window'):
+                        # noinspection PyTypeChecker
                         QtCore.QMetaObject.invokeMethod(
                             self.current_response_window,
                             'set_text',
@@ -436,8 +470,7 @@ class WritingToolApp(QtWidgets.QApplication):
         """
         Show the response in a new window instead of pasting it.
         """
-        from ui.ResponseWindow import ResponseWindow
-        response_window = ResponseWindow(self, f"{option} Result")
+        response_window = ui.ResponseWindow.ResponseWindow(self, f"{option} Result")
         response_window.selected_text = text  # Store the text for regeneration
         response_window.show()
         return response_window
@@ -520,23 +553,27 @@ class WritingToolApp(QtWidgets.QApplication):
             self.tray_icon = QtWidgets.QSystemTrayIcon(QtGui.QIcon(icon_path), self)
         # Set the tooltip (hover name) for the tray icon
         self.tray_icon.setToolTip("WritingTools")
-        tray_menu = QtWidgets.QMenu()
+        self.tray_menu = QtWidgets.QMenu()
+        self.tray_icon.setContextMenu(self.tray_menu)
 
-        # Apply dark mode styles using darkdetect
-        self.apply_dark_mode_styles(tray_menu)
-
-        settings_action = tray_menu.addAction('Settings')
-        settings_action.triggered.connect(self.show_settings)
-
-        about_action = tray_menu.addAction('About')
-        about_action.triggered.connect(self.show_about)
-
-        exit_action = tray_menu.addAction('Exit')
-        exit_action.triggered.connect(self.exit_app)
-
-        self.tray_icon.setContextMenu(tray_menu)
+        self.update_tray_menu()
         self.tray_icon.show()
         logging.debug('Tray icon displayed')
+
+    def update_tray_menu(self):
+        self.tray_menu.clear()
+
+        # Apply dark mode styles using darkdetect
+        self.apply_dark_mode_styles(self.tray_menu)
+
+        settings_action = self.tray_menu.addAction(self._('Settings'))
+        settings_action.triggered.connect(self.show_settings)
+
+        about_action = self.tray_menu.addAction(self._('About'))
+        about_action.triggered.connect(self.show_about)
+
+        exit_action = self.tray_menu.addAction(self._('Exit'))
+        exit_action.triggered.connect(self.exit_app)
 
     @staticmethod
     def apply_dark_mode_styles(menu):
@@ -650,12 +687,9 @@ class WritingToolApp(QtWidgets.QApplication):
                     response_text = response.text
                     
                 else:
-                    # For OpenAI/compatible providers, prepare messages array
-                    messages = []
-                    
-                    # Add system message
-                    messages.append({"role": "system", "content": system_instruction})
-                    
+                    # For OpenAI/compatible providers, prepare messages array, add system message
+                    messages = [{"role": "system", "content": system_instruction}]
+
                     # Add history messages (including latest question)
                     for msg in history:
                         # Convert 'assistant' role to 'assistant' for OpenAI
@@ -695,7 +729,9 @@ class WritingToolApp(QtWidgets.QApplication):
         """
         logging.debug('Showing settings window')
         # Always create a new settings window to handle providers_only correctly
-        self.settings_window = SettingsWindow(self, providers_only=providers_only)
+        self.settings_window = ui.SettingsWindow.SettingsWindow(self, providers_only=providers_only)
+        self.settings_window.close_signal.connect(self.exit_app)
+        self.settings_window.retranslate_ui()
         self.settings_window.show()
 
 
@@ -705,8 +741,28 @@ class WritingToolApp(QtWidgets.QApplication):
         """
         logging.debug('Showing about window')
         if not self.about_window:
-            self.about_window = AboutWindow()
+            self.about_window = ui.AboutWindow.AboutWindow()
         self.about_window.show()
+
+    def setup_ctrl_c_listener(self):
+        """
+        Listener for Ctrl+C to exit the app.
+        """
+        signal.signal(signal.SIGINT, lambda signum, frame: self.handle_sigint(signum, frame))
+        # This empty timer is needed to make sure that the sigint handler gets checked inside the main loop:
+        # without it, the sigint handle would trigger only when an event is triggered, either by a hotkey combination
+        # or by another GUI event like spawning a new window. With this we trigger it every 100ms with an empy lambda
+        # so that the signal handler gets checked regularly.
+        self.ctrl_c_timer = QtCore.QTimer()
+        self.ctrl_c_timer.start(100)
+        self.ctrl_c_timer.timeout.connect(lambda: None)
+    def handle_sigint(self, signum, frame):
+        """
+        Handle the SIGINT signal (Ctrl+C) to exit the app gracefully.
+        """
+        logging.info("Received SIGINT. Exiting...")
+        self.exit_app()
+
 
     def exit_app(self):
         """

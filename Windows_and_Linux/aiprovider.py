@@ -323,7 +323,7 @@ class OpenAICompatibleProvider(AIProvider):
         self.ollama_button_text = "Ollama Set-up Tutorial"
         self.ollama_button_action = lambda: webbrowser.open("https://github.com/theJayTea/WritingTools?tab=readme-ov-file#-optional-ollama-local-llm-instructions")
 
-    def get_response(self, system_instruction: str, prompt: str, return_response: bool = False) -> str:
+    def get_response(self, system_instruction: str, prompt: str|list, return_response: bool = False) -> str:
         """
         Pass a system instruction and a prompt to the AI provider and return the response.
         If return_response is True, returns the complete response instead of streaming it.

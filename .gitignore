@@ -2,3 +2,8 @@
 
 .DS_Store
 Windows_and_Linux/config.json
+
+.idea
+**/__pycache__
+**/*.mo
+**/pot_files

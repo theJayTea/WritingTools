@@ -1,11 +1,14 @@
 import logging
 import os
 import sys
+import json
+from functools import partial
 
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from ui.UIUtils import ThemeBackground, colorMode
 
+_ = lambda x: x
 
 class CustomPopupWindow(QtWidgets.QWidget):
     """
@@ -15,6 +18,7 @@ class CustomPopupWindow(QtWidgets.QWidget):
         super().__init__()
         self.app = app
         self.selected_text = selected_text
+        self.custom_input = None
         logging.debug('Initializing CustomPopupWindow')
         self.init_ui()
 
@@ -68,7 +72,7 @@ class CustomPopupWindow(QtWidgets.QWidget):
         has_text = not not self.selected_text.strip()
 
         self.custom_input = QtWidgets.QLineEdit()
-        self.custom_input.setPlaceholderText("Describe your change..." if has_text else "Ask your AI...")
+        self.custom_input.setPlaceholderText(_("Describe your change...") if has_text else _("Ask your AI..."))
         self.custom_input.setStyleSheet(f"""
             QLineEdit {{
                 padding: 8px;
@@ -101,22 +105,36 @@ class CustomPopupWindow(QtWidgets.QWidget):
 
         content_layout.addLayout(input_layout)
 
+        default_options = {
+            "Proofread": _("Proofread"),
+            "Rewrite": _("Rewrite"),
+            "Friendly": _("Friendly"),
+            "Professional": _("Professional"),
+            "Concise": _("Concise"),
+            "Summary": _("Summary"),
+            "Key Points": _("Key Points"),
+            "Table": _("Table"),
+        }
+
+        def localize_option(option):
+            return default_options[option] if option in default_options else option
+
         if has_text:
 
             # Options grid
             options_grid = QtWidgets.QGridLayout()
             options_grid.setSpacing(10)
 
-            options = [
-                ('Proofread', 'icons/magnifying-glass' + ('_dark' if colorMode == 'dark' else '_light') + '.png', self.on_proofread),
-                ('Rewrite', 'icons/rewrite' + ('_dark' if colorMode == 'dark' else '_light') + '.png', self.on_rewrite),
-                ('Friendly', 'icons/smiley-face' + ('_dark' if colorMode == 'dark' else '_light') + '.png', self.on_friendly),
-                ('Professional', 'icons/briefcase' + ('_dark' if colorMode == 'dark' else '_light') + '.png', self.on_professional),
-                ('Concise', 'icons/concise' + ('_dark' if colorMode == 'dark' else '_light') + '.png', self.on_concise),
-                ('Table', 'icons/table' + ('_dark' if colorMode == 'dark' else '_light') + '.png', self.on_table),
-                ('Key Points', 'icons/keypoints' + ('_dark' if colorMode == 'dark' else '_light') + '.png', self.on_keypoints),
-                ('Summary', 'icons/summary' + ('_dark' if colorMode == 'dark' else '_light') + '.png', self.on_summary)
-            ]
+            with open('options.json', 'r') as file:
+                data = json.load(file)
+            options = []
+            for key in data:
+                if key != "Custom":
+                    options.append(
+                        (localize_option(key),
+                         data[key]["icon"] + ('_dark' if colorMode == 'dark' else '_light') + '.png',
+                         partial(self.on_generic_instruction, key))
+                    )
 
             for i, (label, icon_path, callback) in enumerate(options):
                 button = QtWidgets.QPushButton(label)
@@ -186,60 +204,11 @@ class CustomPopupWindow(QtWidgets.QWidget):
             self.app.process_option('Custom', self.selected_text, custom_change)
             self.close()
 
-    def on_proofread(self):
+    def on_generic_instruction(self, instruction):
         """
-        Handle the proofread request.
+        Handle a generic request.
         """
-        self.app.process_option('Proofread', self.selected_text)
-        self.close()
-
-    def on_rewrite(self):
-        """
-        Handle the rewrite request.
-        """
-        self.app.process_option('Rewrite', self.selected_text)
-        self.close()
-
-    def on_friendly(self):
-        """
-        Handle the make friendly request.
-        """
-        self.app.process_option('Friendly', self.selected_text)
-        self.close()
-
-    def on_professional(self):
-        """
-        Handle the make professional request.
-        """
-        self.app.process_option('Professional', self.selected_text)
-        self.close()
-
-    def on_concise(self):
-        """
-        Handle the make concise request.
-        """
-        self.app.process_option('Concise', self.selected_text)
-        self.close()
-
-    def on_summary(self):
-        """
-        Handle the summarize request.
-        """
-        self.app.process_option('Summary', self.selected_text)
-        self.close()
-
-    def on_keypoints(self):
-        """
-        Handle the extract key points request.
-        """
-        self.app.process_option('Key Points', self.selected_text)
-        self.close()
-
-    def on_table(self):
-        """
-        Handle the convert to table request.
-        """
-        self.app.process_option('Table', self.selected_text)
+        self.app.process_option(instruction, self.selected_text)
         self.close()
 
     def keyPressEvent(self, event):
