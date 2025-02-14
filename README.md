@@ -1,16 +1,23 @@
 # Writing Tools
 
-**Instantly proofread and optimize your writing system-wide with AI:**
+### **Instantly proofread and optimize your writing system-wide with AI:**
 
 https://github.com/user-attachments/assets/d3ce4694-b593-45ff-ae9a-892ce94b1dc8
 
-**Summarize content (webpages, YouTube videos, documents...) in a click:**
+### **Summarize content (webpages, YouTube videos, documents...) in a click:**
 
 https://github.com/user-attachments/assets/76d13eb9-168e-4459-ada4-62e0586ae58c
 
+### **Add your own buttons for unlimited potential!**
+
+![image](https://github.com/user-attachments/assets/f5391035-56a4-4a4f-9078-aedec4244af6)
+
+
 ---
 
-Hi! I'm Jesai, and I develop and maintain Writing Tools (Windows & Linux) with help from our amazing contributors.
+Hi! I'm Jesai, and I develop and maintain Writing Tools (Windows & Linux) with help from our [amazing contributors](https://github.com/theJayTea/WritingTools/edit/main/README.md#-contributors) —
+
+I want to especially shout out [momokrono](https://github.com/momokrono), who's extensively contributed to the Windows/Linux version, and [Arya Mirsepasi](https://github.com/Aryamirsepasi), who built the entire macOS port!
 
 Writing Tools will always remain completely free and open-source.
 
@@ -41,41 +48,44 @@ It's currently the **world's most intelligent system-wide grammar assistant** an
 - Get a pop-up summary with clear and beautiful formatting (with Markdown rendering), saving you hours.
 - Chat with the summary if you'd like to learn more or have questions.
 
+### 3️⃣ Go wild with your own buttons!
+- They're your own magic buttons. Dream, and it'll magically be done with AI.
+
 ### 3️⃣ Chat with an LLM anytime in a click:
 - Press `ctrl+space` without selecting text to start a conversation with your LLM _(for privacy, chat history is deleted when you close the window)_.
 
 ## 🌟 Why Choose Writing Tools?
 
-Aside from being the only Windows/Linux program like Apple's Writing Tools, and the only way to use them on an Intel Mac:
+Aside from being the only Windows/Linux program like Apple's Writing Tools, and the only way to use them on an Intel Mac or in the EU:
 
 - **More intelligent than Apple's Writing Tools and Grammarly Premium:** Apple uses a tiny 3B parameter model, while Writing Tools lets you use much more advanced models for free (e.g., Gemini 2.0 Flash [~30B]). Grammarly's rule-based NLP can't compete with LLMs.
-- **Completely free and open-source:** No subscriptions or hidden costs. Bloat-free and uses **0% of your CPU** when idle.
-- **Versatile AI LLM support:** Jump in quickly with the **free Gemini API & Gemini 2.0**, or an extensive range of **local LLMs** (via Ollama [[instructions]](https://github.com/theJayTea/WritingTools?tab=readme-ov-file#-optional-ollama-local-llm-instructions), llama.cpp, KoboldCPP, TabbyAPI, vLLM, etc.) or **cloud-based LLMs** (ChatGPT, Mistral AI, etc.) through Writing Tools' OpenAI-API-compatibility.
+- **Completely free and open-source:** No subscriptions or hidden costs. Bloat-free and uses **~0% of your CPU** even when actively using it.
+- **Versatile AI LLM support:** Jump in quickly with the **free Gemini API & Gemini 2.0**, or an extensive range of **local LLMs** (via Ollama [[instructions]](https://github.com/theJayTea/WritingTools?tab=readme-ov-file#-optional-ollama-local-llm-instructions-for-windows-v7-onwards), llama.cpp, KoboldCPP, TabbyAPI, vLLM, etc.) or **cloud-based LLMs** (ChatGPT, Mistral AI, etc.) through Writing Tools' OpenAI-API-compatibility.
 - **Does not mess with your clipboard, and works system-wide.**
 - **Privacy-focused**: Your API key and config files stay on *your* device. NO logging, diagnostic collection, tracking, or ads. Invoked *only* on your command. Local LLMs keep your data on your device & work without the internet.
 - **Supports multiple languages:** Works with any language and translates text better than Google Translate (type "translate to [language]" in `Describe your change...`).
 - **Code support:** Fix, improve, translate, or add comments to code with `Describe your change...`."
 - **Themes, Dark Mode, & Customization**: Choose between **2 themes**: a blurry gradient theme and a plain theme that resembles the Windows + V pop-up! Also has full **dark mode** support. **Set your own hotkey** for quick access.
 
-## ✅ Installation
+## ✅ **1 Minute Installation**
 
-### Windows:
+### **🪟 Windows**:
 1. Go to the [Releases](https://github.com/theJayTea/WritingTools/releases) page and download the latest `Writing.Tools.zip` file.
-2. Extract it to your desired location, run `Writing Tools.exe`, and enjoy! :D
+2. Extract it to your desired location (recommended: `Documents` or `App Data/Local`), run `Writing Tools.exe`, and enjoy! :D
 
-*Note: Writing Tools is a portable app. If you extract it into a protected folder (e.g., Program Files), run it as administrator at least on first launch so it can create/edit its config file (in the same folder as its exe).*
+*Note: Writing Tools is a portable app. If you extract it into a protected folder (e.g., Program Files), you must run it as administrator at least on first launch so it can create/edit its config files (in the same folder as its exe).*
 
-**PS:** Go to Writing Tools' Settings (from its tray icon at the bottom right of the taskbar) to enable starting Writing Tools on boot.
+**PS: Go to Writing Tools' Settings (from its tray icon at the bottom right of the taskbar) to enable starting Writing Tools on boot.**
 
-### Linux (work-in-progress):
-[Run it from the source code](https://github.com/theJayTea/WritingTools?tab=readme-ov-file#-to-run-writing-tools-directly-from-the-source-code)
+### **🐧 Linux (work-in-progress)**:
+[Run it from the source code](https://github.com/theJayTea/WritingTools/blob/8713e5a5de63a7892b05a43b9753172e692768fb/README's%20Linked%20Content/To%20Run%20Writing%20Tools%20Directly%20from%20the%20Source%20Code.md)
 
 Writing Tools works well on x11. On Wayland, there are a few caveats:
 - [it works on XWayland apps](https://github.com/theJayTea/WritingTools/issues/34#issuecomment-2461633556)
 - [and it works if you disable Wayland for individual Flatpaks with Flatseal.](https://github.com/theJayTea/WritingTools/issues/93#issuecomment-2576511041)
 
-### macOS:
-The macOS version is a **native Swift port**, developed by [Aryamirsepasi](https://github.com/Aryamirsepasi). View the [README inside the macOS folder](https://github.com/theJayTea/WritingTools/tree/main/macOS) to learn more.
+### **🍎 macOS**:
+The macOS version is a **native Swift port**, developed by [Arya Mirsepasi](https://github.com/Aryamirsepasi). View the [README inside the macOS folder](https://github.com/theJayTea/WritingTools/tree/main/macOS) to learn more.
 
 To install it:
 1. Go to the [Releases](https://github.com/theJayTea/WritingTools/releases) page and download the latest `.dmg` file.
@@ -92,6 +102,16 @@ P.S.: Word's rich-text formatting (bold, italics, underline, colours...) will be
 
 https://github.com/user-attachments/assets/42a3d8c7-18ac-4282-9478-16aab935f35e
 
+## 🔒 Privacy
+
+I believe strongly in protecting your privacy. Writing Tools:
+- Does not collect or store any of your writing data by itself. It doesn't even collect general logs, so it's super light and privacy-friendly.
+- Lets you use local LLMs to process your text entirely on-device.
+- Only sends text to the chosen AI provider (encrypted) when you *explicitly* use one of the options.
+- Only stores your API key locally on your device.
+
+Note: If you choose to use a cloud based LLM, refer to the AI provider's privacy policy and terms of service.
+
 ## ✨ Options Explained
 
 - **Proofread:** The smartest grammar & spelling corrector. Sorry not sorry, Grammarly Premium.
@@ -104,18 +124,8 @@ The following options respond in a pop-up window (with markdown rendering, selec
 - **Extract Key Points:** Highlight the most important points.
 - **Create Tables:** Convert text into a formatted table. PS: You can copy & paste the table into MS Word.
 
-## 🔒 Privacy
-
-I believe strongly in protecting your privacy. Writing Tools:
-- Does not collect or store any of your writing data by itself. It doesn't even collect general logs, so it's super light and privacy-friendly.
-- Lets you use local LLMs to process your text entirely on-device.
-- Only sends text to the chosen AI provider (encrypted) when you *explicitly* use one of the options.
-- Only stores your API key locally on your device.
-
-Note: If you choose to use a cloud based LLM, refer to the AI provider's privacy policy and terms of service.
-
-## 🦙 (Optional) Ollama Local LLM Instructions [for Windows v7 onwards]:
-These instructions are for Writing Tools Windows v7+, using its native Ollama provider:
+## 🦙 (Optional) Ollama Local LLM Instructions [for Windows/Linux v7 onwards]:
+These instructions are for Writing Tools Windows/Linux v7+, using its native Ollama provider:
 1. [Download](https://ollama.com/download) and install Ollama.
 2. Choose an LLM from [here](https://ollama.com/library). Recommended: `Llama 3.1 8B` (~8GB RAM of VRAM required).
 3. Run `ollama pull llama3.1:8b` in your terminal to download it.
@@ -142,111 +152,27 @@ These instructions are for any Writing Tools version, using the OpenAI-Compatibl
 
 ## 👨‍💻 To Run Writing Tools Directly from the Source Code
 
-If you prefer to run the program directly from the `main.py` file, follow these OS-specific instructions.
+[Instructions here!](https://github.com/theJayTea/WritingTools/blob/8713e5a5de63a7892b05a43b9753172e692768fb/README's%20Linked%20Content/To%20Run%20Writing%20Tools%20Directly%20from%20the%20Source%20Code.md)
 
-**1. Download the Code**
-- Click the green `<> Code ▼` button toward the very top of this page, and click `Download ZIP`.
 
-**2. Install Dependencies**  
-After extracting the folder, open your **Terminal** (or **Command Prompt**) in the relevant directory.
+## 👨‍💻 To Compile the Application Yourself:
 
-- Windows:
-   ```bash
-   cd path\to\Windows_and_Linux
-   pip install -r requirements.txt
-   ```
-
-- Linux:
-   ```bash
-   cd /path/to/Windows_and_Linux
-   pip3 install -r requirements.txt
-   ```
-Of course, you'll need to have [Python installed](https://www.python.org/downloads/)!
-
-**3. Run the Program**
-- **Windows:**
-   ```bash
-   python main.py
-   ```
-- **Linux:**
-   ```bash
-   python3 main.py
-   ```
-
-## 👨‍💻 To compile the application yourself:
-
-### Windows and Linux Version build instructions:
-Here's how to compile it with PyInstaller and a virtual environment:
-
-1. First, create and activate a virtual environment:
-```bash
-# Install virtualenv if you haven't already
-pip install virtualenv
-
-# Create a new virtual environment
-virtualenv myvenv
-
-# Activate it
-# On Windows:
-myvenv\Scripts\activate
-# On Linux:
-source myvenv/bin/activate
-```
-
-2. Once activated, install the required packages:
-
-```bash
-pip install -r requirements.txt
-```
-
-3. Build Writing Tools:
-```bash
-python pyinstaller-build-script.py
-```
-
-### macOS Version (by [Aryamirsepasi](https://github.com/Aryamirsepasi)) build instructions:
-
-1. **Install Xcode**
-   - Download and install Xcode from the App Store
-   - Launch Xcode once installed and complete any additional component installations
-
-2. **Clone the Repository**
-   - Open Terminal and navigate to the directory where you want to store the project:
-   ```bash
-   git clone https://github.com/theJayTea/WritingTools.git
-   ```
-
-3. **Open in Xcode**
-   - Open Xcode
-   - Select "Open an existing project..." from the options.
-   - Navigate to the macOS folder within the WritingTools directory that you cloned previously, and select "writing-tools.xcodeproj"
-
-4. **Configure Project Settings**
-   - In Xcode, select the project in the Navigator pane.
-   - Under "Targets", select "writing-tools"
-   - Set the following:
-     - Deployment Target: macOS 14.0
-     - Signing & Capabilities: Add your development team
-
-5. **Build and Run**
-   - In Xcode, select "My Mac" as the run destination
-   - Click the Play button or press ⌘R to build and run
-
+[Instructions here!](https://github.com/theJayTea/WritingTools/blob/8713e5a5de63a7892b05a43b9753172e692768fb/README's%20Linked%20Content/To%20Compile%20the%20Application%20Yourself.md)
 
 ## 🌟 Contributors
 
 Writing Tools would not be where it is today without its amazing contributors:
 
-### Windows & Linux version:
-**1. [Cameron Redmore (CameronRedmore)](https://github.com/CameronRedmore):**
+### 🪟🐧 Windows & Linux version:
+**1. [momokrono](https://github.com/momokrono):**
 
-Extensively refactored Writing Tools and added OpenAI Compatible API support, streamed responses, and the chat mode when no text is selected.
-
-**2. [momokrono](https://github.com/momokrono):**
-
-Added Linux support, switched to the pynput API to improve Windows stability. Added Ollama API support, custom options and localization. Fixed misc. bugs and added graceful termination support by handling SIGINT signal.
+Added Linux support, switched to the pynput API to improve Windows stability. Added Ollama API support, the core logic for customisable buttons, and localization. Fixed misc. bugs and added graceful termination support by handling SIGINT signal.
 
 @momokrono has been super kind and helpful, and I'm very grateful to have him as a contributor - Jesai.
+
+**2. [Cameron Redmore (CameronRedmore)](https://github.com/CameronRedmore):**
+
+Extensively refactored Writing Tools and added OpenAI Compatible API support, streamed responses, and the chat mode when no text is selected.
 
 **3. [Disneyhockey40 (Soszust40)](https://github.com/Disneyhockey40):**
 
@@ -268,8 +194,8 @@ Significantly improved the About window, making it scrollable and cleaning thing
 
 Helped add the start-on-boot setting!
 
-### macOS version:
-#### A native Swift port created entirely by **[Aryamirsepasi](https://github.com/Aryamirsepasi)**! This was a big endeavour and they've done an amazing job. We're grateful to have them as a contributor. 🫡
+### 🍎 macOS version:
+#### A native Swift port created entirely by **[Arya Mirsepasi](https://github.com/Aryamirsepasi)**! This was a big endeavour and they've done an amazing job. We're grateful to have them as a contributor. 🫡
 
 **1. [Joaov41](https://github.com/Joaov41):**
 
@@ -279,7 +205,7 @@ Developed the amazing picture processing functionality for WritingTools, allowin
 
 I welcome contributions! :D
 
-If you'd like to improve Writing Tools, please feel free to open a Pull Request or get in touch with me.
+If you'd like to improve Writing Tools, please feel free to open a Pull Request or get in touch with me (email below).
 
 If there are major changes on your mind, it may be a good idea to get in touch before working on it.
 
