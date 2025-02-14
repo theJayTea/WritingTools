@@ -1,3 +1,5 @@
+# 👨‍💻 To compile the application yourself:
+
 ### Windows and Linux Version build instructions:
 Here's how to compile it with PyInstaller and a virtual environment:
 
