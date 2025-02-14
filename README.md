@@ -114,15 +114,24 @@ I believe strongly in protecting your privacy. Writing Tools:
 
 Note: If you choose to use a cloud based LLM, refer to the AI provider's privacy policy and terms of service.
 
-## 🦙 (Optional) Ollama Local LLM Instructions:
+## 🦙 (Optional) Ollama Local LLM Instructions [for Windows v7 onwards]:
+These instructions are for Writing Tools Windows v7+, using its native Ollama provider:
 1. [Download](https://ollama.com/download) and install Ollama.
-2. Choose an LLM from [here](https://ollama.com/library). Recommended: Llama 3.1 8B (~8GB RAM or VRAM required).
-3. Run `ollama run llama3.1:8b` in your terminal to download and launch Llama 3.1.
+2. Choose an LLM from [here](https://ollama.com/library). Recommended: `Llama 3.1 8B` (~8GB RAM of VRAM required).
+3. Run `ollama pull llama3.1:8b` in your terminal to download it.
+4. Open Writing Tools Settings and simply select the Ollama AI Provider. The default model name is already `Llama 3.1 8B`.
+5. That's it! **Enjoy Writing Tools with _absolute_ privacy and no internet connection!** 🎉 From now on, you'll simply need to launch Ollama and Writing Tools into the background for it to work.
+
+## 🦙 (Optional) Ollama Local LLM Instructions:
+These instructions are for any Writing Tools version, using the OpenAI-Compatible provider:
+1. [Download](https://ollama.com/download) and install Ollama.
+2. Choose an LLM from [here](https://ollama.com/library). Recommended: `Llama 3.1 8B` (~8GB RAM of VRAM/RAM required).
+3. Run `ollama pull llama3.1:8b` in your terminal to download Llama 3.1.
 4. In Writing Tools, set the `OpenAI-Compatible` provider with:
    - API Key: `ollama` (PS: For most local LLM providers, any random string here will suffice.)
    - API Base URL: `http://localhost:11434/v1`
    - API Model: `llama3.1:8b`
-5. That's it! Enjoy Writing Tools with _absolute_ privacy and no internet connection! 🎉 From now on, you'll simply need to launch Ollama and Writing Tools into the background for it to work.
+5. That's it! **Enjoy Writing Tools with _absolute_ privacy and no internet connection!** 🎉 From now on, you'll simply need to launch Ollama and Writing Tools into the background for it to work.
 
 ## 🐞 Known Issues
 1. (Being investigated) On some devices, Writing Tools does not work correctly with the default hotkey.
@@ -157,7 +166,7 @@ Of course, you'll need to have [Python installed](https://www.python.org/downloa
 **3. Run the Program**
 - **Windows:**
    ```bash
-   pythonw main.py
+   python main.py
    ```
 - **Linux:**
    ```bash
