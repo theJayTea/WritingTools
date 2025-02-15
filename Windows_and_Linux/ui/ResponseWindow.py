@@ -574,7 +574,7 @@ class ResponseWindow(QtWidgets.QWidget):
                 self.layout().contentsMargins().bottom() +
                 self.input_field.height() +
                 self.layout().spacing() * 5 +
-                185  # Increased from 170 but not as much as before
+                200  # Increased from 185 for taller default height
             )
                 
             # Get screen constraints
@@ -592,8 +592,8 @@ class ResponseWindow(QtWidgets.QWidget):
                 max_height
             )
                 
-            # Set reasonable minimum height
-            final_height = max(540, desired_total_height)  # Slightly increased from 520
+            # Set reasonable minimum height - increased by 10%
+            final_height = max(600, desired_total_height)  # Increased from 540
                 
             # Set width to 600px
             final_width = 600
@@ -612,7 +612,7 @@ class ResponseWindow(QtWidgets.QWidget):
                 
         except Exception as e:
             logging.error(f"Error adjusting window height: {e}")
-            self.resize(600, 540)  # Updated fallback size
+            self.resize(600, 600)  # Updated fallback size
             self._size_initialized = True
 
     @Slot(str)
