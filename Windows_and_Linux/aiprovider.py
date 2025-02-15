@@ -41,8 +41,8 @@ from typing import List
 
 import google.generativeai as genai
 from google.generativeai.types import HarmBlockThreshold, HarmCategory
-from openai import OpenAI
 from ollama import Client as OllamaClient
+from openai import OpenAI
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QVBoxLayout
 from ui.UIUtils import colorMode
@@ -180,13 +180,13 @@ class GeminiProvider(AIProvider):
             DropdownSetting(
                 name="model_name",
                 display_name="Model",
-                default_value="gemini-2.0-flash-exp",
+                default_value="gemini-2.0-flash",
                 description="Select Gemini model to use",
                 options=[
-                    ("Gemini 1.5 Flash 8B (fast)", "gemini-1.5-flash-8b-latest"),
-                    ("Gemini 1.5 Flash (more intelligent & fast)", "gemini-1.5-flash-latest"),
-                    ("Gemini 1.5 Pro (very intelligent, but slower & lower rate limit)", "gemini-1.5-pro-latest"),
-                    ("Gemini 2.0 Flash (extremely intelligent & fast, recommended)", "gemini-2.0-flash-exp")
+                    ("Gemini 2.0 Flash Lite (intelligent | very fast | 30 uses/min)", "gemini-2.0-flash-lite-preview-02-05"),
+                    ("Gemini 2.0 Flash (very intelligent | fast | 15 uses/min)", "gemini-2.0-flash"),
+                    ("Gemini 2.0 Flash Thinking (most intelligent | slow | 10 uses/min)", "gemini-2.0-flash-thinking-exp-01-21"),
+                    ("Gemini 2.0 Pro (most intelligent | slow | 2 uses/min)", "gemini-2.0-pro-exp-02-05")
                 ]
             )
         ]
@@ -320,65 +320,51 @@ class OpenAICompatibleProvider(AIProvider):
             "• Connect to ANY Open-AI Compatible API (v1/chat/completions), such as OpenAI, Mistral AI, Anthropic, or locally hosted models via llama.cpp, KoboldCPP, TabbyAPI, vLLM, etc.\n• Note: You must adhere to the connected service's Terms of Service, and your text will be processed as per their Privacy Policies etc.",
             "openai", "Get OpenAI API Key", lambda: webbrowser.open("https://platform.openai.com/account/api-keys"))
 
-        # Add button for Ollama setup
-        self.ollama_button_text = "Ollama Set-up Tutorial"
-        self.ollama_button_action = lambda: webbrowser.open("https://github.com/theJayTea/WritingTools?tab=readme-ov-file#-optional-ollama-local-llm-instructions")
-
     def get_response(self, system_instruction: str, prompt: str|list, return_response: bool = False) -> str:
         """
         Pass a system instruction and a prompt to the AI provider and return the response.
-        If return_response is True, returns the complete response instead of streaming it.
         """
         self.close_requested = False
-        streaming = self.app.config.get("streaming", False) and not return_response
 
-        # Handle different prompt types
-        if isinstance(prompt, list):
-            # It's a messages array for chat
-            messages = prompt
-        else:
-            # It's a regular prompt string
-            messages = [
-                {"role": "system", "content": system_instruction},
-                {"role": "user", "content": prompt}
-            ]
+        try:
+            response = self.model.generate_content(
+                contents=[system_instruction, prompt],
+                stream=False  # Streaming deprecated
+            )
 
-        response = self.client.chat.completions.create(
-            model=self.api_model,
-            messages=messages,
-            temperature=0.5,
-            stream=streaming
-        )
-
-        if streaming:
-            try:
-                for chunk in response:
-                    if self.close_requested:
-                        break
-                    else:
-                        # Strip any trailing newlines from chunks
-                        if chunk.choices[0].delta.content:
-                            self.app.output_ready_signal.emit(chunk.choices[0].delta.content.rstrip('\n'))
-
-            except Exception as e:
-                logging.error(f"Error while streaming: {e}")
-                self.app.output_ready_signal.emit("An error occurred while streaming.")
-
-            finally:
-                response.close()
-                self.close_requested = False
-                self.app.replace_text(True)  # Signal end of streaming
+            # Check if the response was blocked
+            if response.prompt_feedback.block_reason:
+                logging.warning('Response was blocked due to safety settings')
+                self.app.show_message_signal.emit('Content Blocked',
+                                        'The generated content was blocked due to safety settings.')
                 return ""
-        else:
-            # For non-streaming mode 
-            response_text = response.choices[0].message.content.strip()
-            
-            # Only emit signal if not a summary/follow-up (return_response=False)
-            # AND not a window-based option (Summary, Key Points, Table)
+
+            # Get complete response text
+            response_text = response.text.rstrip('\n')
+
+            # For direct text operations, emit the output
             if not return_response and not hasattr(self.app, 'current_response_window'):
                 self.app.output_ready_signal.emit(response_text)
-                
+                self.app.replace_text(True)
+
             return response_text
+
+        except Exception as e:
+            error_str = str(e)
+            logging.error(f"Error while generating content: {error_str}")
+            
+            if "Resource has been exhausted" in error_str:
+                # Rate limit error handling
+                self.app.show_message_signal.emit(
+                    'Rate Limit Hit',
+                    'Whoops! You\'ve hit the per-minute rate limit of the Gemini API. Please try again in a few moments.\n\n'
+                    'If this happens often, simply switch to a Gemini model with a higher usage limit in Settings.'
+                )
+            else:
+                # Generic error handling
+                self.app.show_message_signal.emit('Error', f"An error occurred: {error_str}")
+            
+            return ""
 
     def after_load(self):
         self.client = OpenAI(api_key=self.api_key, base_url=self.api_base, organization=self.api_organisation, project=self.api_project)
@@ -400,10 +386,10 @@ class OllamaProvider(AIProvider):
         self.app = app
         settings = [
             TextSetting("api_base", "API Base URL", "http://localhost:11434", "Eg. http://localhost:11434"),
-            TextSetting("api_model", "API Model", "llama3.1:latest", "Eg. llama3.1:latest"),
+            TextSetting("api_model", "API Model", "llama3.1:8b", "Eg. llama3.1:8b"),
             TextSetting("keep_alive", "Time to keep the model loaded in memory in minutes", "5", "Eg. 5")
         ]
-        super().__init__(app, "Ollama (For Experts)", settings, "• Connect to an Ollama server.", "ollama", "Discover Ollama", lambda: webbrowser.open("https://ollama.com"))
+        super().__init__(app, "Ollama (For Experts)", settings, "• Connect to an Ollama server.", "ollama", "Ollama Set-up Instructions", lambda: webbrowser.open("https://github.com/theJayTea/WritingTools?tab=readme-ov-file#-optional-ollama-local-llm-instructions-for-windows-v7-onwards"))
     def get_response(self, system_instruction: str, prompt: str|list, return_response: bool = False):
         self.close_requested = False
         streaming = self.app.config.get("streaming", False) and not return_response

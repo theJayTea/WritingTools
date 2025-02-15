@@ -1,25 +1,26 @@
+import gettext
 import json
 import logging
 import os
+import signal
 import sys
 import threading
 import time
-import signal
-import gettext
 
 import darkdetect
 import pyperclip
-from aiprovider import GeminiProvider, OpenAICompatibleProvider, OllamaProvider
 from pynput import keyboard as pykeyboard
 from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtCore import Signal, Slot, QLocale
+from PySide6.QtCore import QLocale, Signal, Slot
 from PySide6.QtGui import QCursor, QGuiApplication
-from PySide6.QtWidgets import QMessageBox, QApplication
+from PySide6.QtWidgets import QApplication, QMessageBox
+
 import ui.AboutWindow
-import ui.SettingsWindow
-import ui.ResponseWindow
-import ui.OnboardingWindow
 import ui.CustomPopupWindow
+import ui.OnboardingWindow
+import ui.ResponseWindow
+import ui.SettingsWindow
+from aiprovider import GeminiProvider, OllamaProvider, OpenAICompatibleProvider
 from update_checker import UpdateChecker
 
 _ = gettext.gettext
@@ -415,7 +416,7 @@ class WritingToolApp(QtWidgets.QApplication):
                     # No selected text
                     if option == 'Custom':
                         prompt = custom_change
-                        system_instruction = "You are a helpful assistant to the user. The user cannot follow-up with you after your single response to them, so do not ask them questions."
+                        system_instruction = "You are a friendly, helpful, compassionate, and endearing AI conversational assistant. Avoid making assumptions or generating harmful, biased, or inappropriate content. When in doubt, do not make up information. Ask the user for clarification if needed. Try not be unnecessarily repetitive in your response. You can, and should as appropriate, use Markdown formatting to make your response nicely readable."
                     else:
                         self.show_message_signal.emit('Error', 'Please select text to use this option.')
                         return
@@ -461,7 +462,11 @@ class WritingToolApp(QtWidgets.QApplication):
 
             except Exception as e:
                 logging.error(f'An error occurred: {e}', exc_info=True)
-                self.show_message_signal.emit('Error', f'An error occurred: {e}')
+
+                if "Resource has been exhausted" in str(e):
+                    self.show_message_signal.emit('Error - Rate Limit Hit', 'Whoops! You\'ve hit the per-minute rate limit of the Gemini API. Please try again in a few moments.\n\nIf this happens often, simply switch to a Gemini model with a higher usage limit in Settings.')
+                else:
+                    self.show_message_signal.emit('Error', f'An error occurred: {e}')
 
     @Slot(str, str)
     def show_message_box(self, title, message):
@@ -755,9 +760,14 @@ class WritingToolApp(QtWidgets.QApplication):
 
             except Exception as e:
                 logging.error(f'Error processing follow-up question: {e}', exc_info=True)
-                self.show_message_signal.emit('Error', f'An error occurred: {e}')
-                self.followup_response_signal.emit("An error occurred while processing your question.")
-                
+
+                if "Resource has been exhausted" in str(e):
+                    self.show_message_signal.emit('Error - Rate Limit Hit', 'Whoops! You\'ve hit the per-minute rate limit of the Gemini API. Please try again in a few moments.\n\nIf this happens often, simply switch to a Gemini model with a higher usage limit in Settings.')
+                    self.followup_response_signal.emit("Sorry, an error occurred while processing your question.")
+                else:
+                    self.show_message_signal.emit('Error', f'An error occurred: {e}')
+                    self.followup_response_signal.emit("Sorry, an error occurred while processing your question.")
+
         # Start the thread
         threading.Thread(target=process_thread, daemon=True).start()
 
@@ -801,7 +811,6 @@ class WritingToolApp(QtWidgets.QApplication):
         """
         logging.info("Received SIGINT. Exiting...")
         self.exit_app()
-
 
     def exit_app(self):
         """
