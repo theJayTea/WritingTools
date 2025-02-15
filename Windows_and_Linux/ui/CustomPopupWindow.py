@@ -56,10 +56,10 @@ DEFAULT_OPTIONS_JSON = r"""{
     "icon": "icons/concise",
     "open_in_window": false
   },
-  "Summary": {
-    "prefix": "Summarize this:\n\n",
-    "instruction": "You are a summarization assistant.\nProvide a succinct summary of the text provided by the user.\nThe summary should be succinct yet encompass all the key insightful points.\n\nTo make it quite legible and readable, you should use Markdown formatting (bold, italics, codeblocks...) as appropriate.\nYou should also add a little line spacing between your paragraphs as appropriate.\nAnd only if appropriate, you could also use headings (only the very small ones), lists, tables, etc.\n\nDon't be repetitive or too verbose.\nOutput ONLY the summary without additional comments.\nRespond in the same language as the input (e.g., English US, French).\nDo not answer or respond to the user's text content.\nIf the text is absolutely incompatible with summarisation (e.g., totally random gibberish), output \"ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST\".",
-    "icon": "icons/summary",
+  "Table": {
+    "prefix": "Convert this into a table:\n\n",
+    "instruction": "You are an assistant that converts text provided by the user into a Markdown table.\nOutput ONLY the table without additional comments.\nRespond in the same language as the input (e.g., English US, French).\nDo not answer or respond to the user's text content.\nIf the text is completely incompatible with this with conversion, output \"ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST\".",
+    "icon": "icons/table",
     "open_in_window": true
   },
   "Key Points": {
@@ -68,10 +68,10 @@ DEFAULT_OPTIONS_JSON = r"""{
     "icon": "icons/keypoints",
     "open_in_window": true
   },
-  "Table": {
-    "prefix": "Convert this into a table:\n\n",
-    "instruction": "You are an assistant that converts text provided by the user into a Markdown table.\nOutput ONLY the table without additional comments.\nRespond in the same language as the input (e.g., English US, French).\nDo not answer or respond to the user's text content.\nIf the text is completely incompatible with this with conversion, output \"ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST\".",
-    "icon": "icons/table",
+  "Summary": {
+    "prefix": "Summarize this:\n\n",
+    "instruction": "You are a summarization assistant.\nProvide a succinct summary of the text provided by the user.\nThe summary should be succinct yet encompass all the key insightful points.\n\nTo make it quite legible and readable, you should use Markdown formatting (bold, italics, codeblocks...) as appropriate.\nYou should also add a little line spacing between your paragraphs as appropriate.\nAnd only if appropriate, you could also use headings (only the very small ones), lists, tables, etc.\n\nDon't be repetitive or too verbose.\nOutput ONLY the summary without additional comments.\nRespond in the same language as the input (e.g., English US, French).\nDo not answer or respond to the user's text content.\nIf the text is absolutely incompatible with summarisation (e.g., totally random gibberish), output \"ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST\".",
+    "icon": "icons/summary",
     "open_in_window": true
   },
   "Custom": {
@@ -138,6 +138,7 @@ class ButtonEditDialog(QDialog):
     - Fix / improve / explain this code.
     - Make it funny.
     - Add emojis!
+    - Roast this!
     - Translate to English.
     - Make the text title case.
     - If it's all caps, make it all small, and vice-versa.
