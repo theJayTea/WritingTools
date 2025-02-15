@@ -176,7 +176,7 @@ Added Linux support, switched to the pynput API to improve Windows stability. Ad
 
 Extensively refactored Writing Tools and added OpenAI Compatible API support, streamed responses, and the chat mode when no text is selected.
 
-**3. [Disneyhockey40 (Soszust40)](https://github.com/Disneyhockey40):**
+**3. [Soszust40 (Soszust40)](https://github.com/Soszust40):**
 
 Helped add dark mode, the plain theme, tray menu fixes, and UI improvements.
 
