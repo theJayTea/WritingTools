@@ -170,7 +170,7 @@ Writing Tools would not be where it is today without its amazing contributors:
 
 Added Linux support, switched to the pynput API to improve Windows stability. Added Ollama API support, the core logic for customisable buttons, and localization. Fixed misc. bugs and added graceful termination support by handling SIGINT signal.
 
-@momokrono has been super kind and helpful, and I'm very grateful to have him as a contributor - Jesai.
+@momokrono has been incredibly kind and helpful, and I'm truly grateful to have him as a contributor. Not only has he provided extensive help with code, but he's also played a big role in managing GitHub issues. - Jesai
 
 **2. [Cameron Redmore (CameronRedmore)](https://github.com/CameronRedmore):**
 
