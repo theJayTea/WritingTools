@@ -62,7 +62,7 @@ class AboutWindow(QtWidgets.QWidget):
                 _("Added Linux support, switched to the pynput API to improve Windows stability. Added Ollama API support, core logic for customizable buttons, and localization. Fixed misc. bugs and added graceful termination support by handling SIGINT signal.") + "<br>" + \
                 "<b>2. <a href=\"https://github.com/CameronRedmore\">Cameron Redmore (CameronRedmore)</a>:</b><br>" + \
                 _("Extensively refactored Writing Tools and added OpenAI Compatible API support, streamed responses, and the text generation mode when no text is selected.") + "<br>" + \
-                '<b>3. <a href="https://github.com/Disneyhockey40">Disneyhockey40 (Soszust40)</a>:</b><br>' + \
+                '<b>3. <a href="https://github.com/Soszust40">Soszust40 (Soszust40)</a>:</b><br>' + \
                 _('Helped add dark mode, the plain theme, tray menu fixes, and UI improvements.') + '</b><br>' + \
                 '<b>4. <a href="https://github.com/arsaboo">Alok Saboo (arsaboo)</a>:</b><br>' + \
                 _('Helped improve the reliability of text selection.') + '</b><br>' + \
