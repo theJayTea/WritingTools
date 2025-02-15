@@ -170,7 +170,7 @@ Writing Tools would not be where it is today without its amazing contributors:
 
 Added Linux support, switched to the pynput API to improve Windows stability. Added Ollama API support, the core logic for customisable buttons, and localization. Fixed misc. bugs and added graceful termination support by handling SIGINT signal.
 
-@momokrono has been incredibly kind and helpful, and I'm truly grateful to have him as a contributor. Not only has he provided extensive help with code, but he's also played a big role in managing GitHub issues. - Jesai
+@momokrono has been incredibly kind and helpful, and I'm forever grateful to have him as a contributor. Not only has he provided extensive help with code, but he's also played a big role in managing GitHub issues. - Jesai
 
 **2. [Cameron Redmore (CameronRedmore)](https://github.com/CameronRedmore):**
 
@@ -197,7 +197,9 @@ Significantly improved the About window, making it scrollable and cleaning thing
 Helped add the start-on-boot setting!
 
 ### 🍎 macOS version:
-#### A native Swift port created entirely by **[Arya Mirsepasi](https://github.com/Aryamirsepasi)**! This was a big endeavour and he's done an amazing job. We're grateful to have him as a contributor. 🫡
+#### A native Swift port created entirely by **[Arya Mirsepasi](https://github.com/Aryamirsepasi)**! This was a big endeavour and he's done an increadble job.
+
+Over so many emails, @Aryamirsepasi has been someone I truly look up to, and it's rare to find people as kind as him. We're incredibly grateful for all his contributions here! — Jesai
 
 **1. [Joaov41](https://github.com/Joaov41):**
 
