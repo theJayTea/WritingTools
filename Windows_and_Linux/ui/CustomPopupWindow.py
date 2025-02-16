@@ -343,7 +343,7 @@ class CustomPopupWindow(QtWidgets.QWidget):
         self.close_button = None
         self.custom_input = None
         self.input_area = None
-        
+        self.model_dropdown = None
         self.button_widgets = []
 
         logging.debug('Initializing CustomPopupWindow')
@@ -500,6 +500,22 @@ class CustomPopupWindow(QtWidgets.QWidget):
         content_layout.addWidget(self.input_area)
         
         if self.has_text:
+            if self.app.config['provider'] == 'Ollama (For Experts)':
+                model_list = [model['model'] for model in self.app.current_provider.list()['models']]
+                self.model_dropdown = QtWidgets.QComboBox()
+                self.model_dropdown.setStyleSheet(f"""
+                    font-size: 16px;
+                    padding: 5px;
+                    background-color: {'#444' if colorMode == 'dark' else 'white'};
+                    color: {'#ffffff' if colorMode == 'dark' else '#000000'};
+                    border: 1px solid {'#666' if colorMode == 'dark' else '#ccc'};
+                """)
+                self.model_dropdown.setInsertPolicy(QtWidgets.QComboBox.InsertPolicy.NoInsert)
+                current_model = self.app.current_provider.api_model
+                for model in model_list:
+                    self.model_dropdown.addItem(model)
+                self.model_dropdown.setCurrentIndex(self.model_dropdown.findText(current_model))
+                content_layout.addWidget(self.model_dropdown)
             self.build_buttons_list()
             self.rebuild_grid_layout(content_layout)
         else:
@@ -887,12 +903,14 @@ class CustomPopupWindow(QtWidgets.QWidget):
     def on_custom_change(self):
         txt = self.custom_input.text().strip()
         if txt:
-            self.app.process_option('Custom', self.selected_text, txt)
+            api_model = str(self.model_dropdown.currentText()) if self.model_dropdown is not None else None
+            self.app.process_option('Custom', self.selected_text, txt, api_model=api_model)
             self.close()
 
     def on_generic_instruction(self, instruction):
         if not self.edit_mode:
-            self.app.process_option(instruction, self.selected_text)
+            api_model = str(self.model_dropdown.currentText()) if self.model_dropdown is not None else None
+            self.app.process_option(instruction, self.selected_text, api_model=api_model)
             self.close()
 
     def eventFilter(self, obj, event):

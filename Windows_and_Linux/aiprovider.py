@@ -252,7 +252,7 @@ class GeminiProvider(AIProvider):
             "Get API Key",
             lambda: webbrowser.open("https://aistudio.google.com/app/apikey"))
 
-    def get_response(self, system_instruction: str, prompt: str, return_response: bool = False) -> str:
+    def get_response(self, system_instruction: str, prompt: str, return_response: bool = False, api_model: str | None = None) -> str:
         """
         Generate content using Gemini.
         
@@ -333,7 +333,7 @@ class OpenAICompatibleProvider(AIProvider):
             "• You must abide by the service's Terms of Service.",
             "openai", "Get OpenAI API Key", lambda: webbrowser.open("https://platform.openai.com/account/api-keys"))
 
-    def get_response(self, system_instruction: str, prompt: str | list, return_response: bool = False) -> str:
+    def get_response(self, system_instruction: str, prompt: str | list, return_response: bool = False, api_model: str | None = None) -> str:
         """
         Send a chat request to the OpenAI-compatible API.
         
@@ -413,7 +413,7 @@ class OllamaProvider(AIProvider):
             "ollama", "Ollama Set-up Instructions",
             lambda: webbrowser.open("https://github.com/theJayTea/WritingTools?tab=readme-ov-file#-optional-ollama-local-llm-instructions-for-windows-v7-onwards"))
 
-    def get_response(self, system_instruction: str, prompt: str | list, return_response: bool = False) -> str:
+    def get_response(self, system_instruction: str, prompt: str | list, return_response: bool = False, api_model: str | None = None) -> str:
         """
         Send a chat request to the Ollama server.
         
@@ -432,7 +432,8 @@ class OllamaProvider(AIProvider):
             ]
 
         try:
-            response = self.client.chat(model=self.api_model, messages=messages)
+            model = api_model if api_model else self.api_model
+            response = self.client.chat(model=model, messages=messages, keep_alive=f'{self.keep_alive}m')
             response_text = response['message']['content'].strip()
             if not return_response and not hasattr(self.app, 'current_response_window'):
                 self.app.output_ready_signal.emit(response_text)
@@ -450,3 +451,6 @@ class OllamaProvider(AIProvider):
 
     def cancel(self):
         self.close_requested = True
+
+    def list(self):
+        return self.client.list()

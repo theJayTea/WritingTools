@@ -376,7 +376,7 @@ class WritingToolApp(QtWidgets.QApplication):
         except Exception as e:
             logging.error(f'Error clearing clipboard: {e}')
 
-    def process_option(self, option, selected_text, custom_change=None):
+    def process_option(self, option, selected_text, custom_change=None, api_model=None):
         """
         Process the selected writing option in a separate thread.
         """
@@ -404,9 +404,9 @@ class WritingToolApp(QtWidgets.QApplication):
             if hasattr(self, 'current_response_window'):
                 delattr(self, 'current_response_window')
                 
-        threading.Thread(target=self.process_option_thread, args=(option, selected_text, custom_change), daemon=True).start()
+        threading.Thread(target=self.process_option_thread, args=(option, selected_text, custom_change, api_model), daemon=True).start()
 
-    def process_option_thread(self, option, selected_text, custom_change=None):
+    def process_option_thread(self, option, selected_text, custom_change=None, api_model=None):
             """
             Thread function to process the selected writing option using the AI model.
             """
@@ -435,7 +435,7 @@ class WritingToolApp(QtWidgets.QApplication):
 
                 if (option == 'Custom' and not selected_text.strip()) or self.options[option]['open_in_window']:
                     logging.debug('Getting response for window display')
-                    response = self.current_provider.get_response(system_instruction, prompt, return_response=True)
+                    response = self.current_provider.get_response(system_instruction, prompt, return_response=True, api_model=api_model)
                     logging.debug(f'Got response of length: {len(response) if response else 0}')
                     
                     # For custom prompts with no text, add question to chat history
@@ -457,7 +457,7 @@ class WritingToolApp(QtWidgets.QApplication):
                         logging.debug('Invoked set_text on response window')
                 else:
                     logging.debug('Getting response for direct replacement')
-                    self.current_provider.get_response(system_instruction, prompt)
+                    self.current_provider.get_response(system_instruction, prompt, api_model=api_model)
                     logging.debug('Response processed')
 
             except Exception as e:
