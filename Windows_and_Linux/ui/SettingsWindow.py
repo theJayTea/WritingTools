@@ -291,6 +291,13 @@ class SettingsWindow(QtWidgets.QWidget):
             lambda: self.init_provider_ui(self.app.providers[self.provider_dropdown.currentIndex()], self.provider_container)
         )
 
+        if self.app.config['provider'] != 'Gemini (Recommended)':
+            # add a checkbox to enable/disable model selection
+            model_selection_checkbox = QtWidgets.QCheckBox(_('Enable model selection'))
+            model_selection_checkbox.setChecked(self.app.config['model_selection'])
+            model_selection_checkbox.stateChanged.connect(self.toggle_model_selection)
+            content_layout.addWidget(model_selection_checkbox)
+
         # Add horizontal separator
         line = QtWidgets.QFrame()
         line.setFrameShape(QtWidgets.QFrame.Shape.HLine)
@@ -343,6 +350,10 @@ class SettingsWindow(QtWidgets.QWidget):
         max_height = int(screen.height() * 0.85)  # 85% of screen height
         desired_height = min(720, max_height)  # Cap at 720px or 85% of screen height
         self.resize(592, desired_height)  # Use an exact width of 592px so stuff looks good!
+
+    def toggle_model_selection(self, state):
+        """Toggle model selection."""
+        self.app.config['model_selection'] = bool(state)
 
     @staticmethod
     def toggle_autostart(state):

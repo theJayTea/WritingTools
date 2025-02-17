@@ -500,8 +500,8 @@ class CustomPopupWindow(QtWidgets.QWidget):
         content_layout.addWidget(self.input_area)
         
         if self.has_text:
-            if self.app.config['provider'] == 'Ollama (For Experts)':
-                model_list = [model['model'] for model in self.app.current_provider.list()['models']]
+            if self.app.config['provider'] != 'Gemini (Recommended)' and self.app.config['model_selection']:
+                model_list = self.app.current_provider.list()
                 self.model_dropdown = QtWidgets.QComboBox()
                 self.model_dropdown.setStyleSheet(f"""
                     font-size: 16px;

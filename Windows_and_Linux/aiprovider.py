@@ -353,8 +353,9 @@ class OpenAICompatibleProvider(AIProvider):
             ]
 
         try:
+            model = api_model if api_model else self.api_model
             response = self.client.chat.completions.create(
-                model=self.api_model,
+                model=model,
                 messages=messages,
                 temperature=0.5,
                 stream=False
@@ -390,6 +391,9 @@ class OpenAICompatibleProvider(AIProvider):
 
     def cancel(self):
         self.close_requested = True
+
+    def list(self):
+        return [model.id for model in self.client.models.list()]
 
 
 class OllamaProvider(AIProvider):
@@ -453,4 +457,4 @@ class OllamaProvider(AIProvider):
         self.close_requested = True
 
     def list(self):
-        return self.client.list()
+        return [model['model'] for model in self.client.list()['models']]
