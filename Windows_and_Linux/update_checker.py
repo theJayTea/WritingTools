@@ -4,7 +4,7 @@ import time
 from urllib.error import HTTPError
 from urllib.request import URLError, urlopen
 
-CURRENT_VERSION = 7
+CURRENT_VERSION = 8
 UPDATE_CHECK_URL = "https://raw.githubusercontent.com/theJayTea/WritingTools/main/Windows_and_Linux/Latest_Version_for_Update_Check.txt"
 UPDATE_DOWNLOAD_URL = "https://github.com/theJayTea/WritingTools/releases"
 
@@ -50,7 +50,6 @@ class UpdateChecker:
         Returns True if an update is available.
         """
         latest_version = self._retry_fetch_version()
-        
         if latest_version is None:
             return False
             
