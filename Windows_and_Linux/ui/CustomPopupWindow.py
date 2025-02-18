@@ -525,9 +525,14 @@ class CustomPopupWindow(QtWidgets.QWidget):
         storing them in self.button_widgets in the same order as the JSON file.
         """
         self.button_widgets.clear()
-        with open('options.json','r') as f:
-            data = json.load(f)
-        
+        options_path = os.path.join(os.path.dirname(sys.argv[0]), 'options.json')
+        if os.path.exists(options_path):
+            with open(options_path, 'r') as f:
+                data = json.load(f)
+                logging.debug('Options loaded successfully')
+        else:
+            logging.debug('Options file not found')
+
         for k,v in data.items():
             if k=="Custom":
                 continue
