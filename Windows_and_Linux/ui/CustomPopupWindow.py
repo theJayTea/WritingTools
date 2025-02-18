@@ -519,15 +519,32 @@ class CustomPopupWindow(QtWidgets.QWidget):
         self.installEventFilter(self)
         QtCore.QTimer.singleShot(250, lambda: self.custom_input.setFocus())
 
+    @staticmethod
+    def load_options():
+        options_path = os.path.join(os.path.dirname(sys.argv[0]), 'options.json')
+        if os.path.exists(options_path):
+            with open(options_path, 'r') as f:
+                data = json.load(f)
+                logging.debug('Options loaded successfully')
+        else:
+            logging.debug('Options file not found')
+
+        return data
+
+    @staticmethod
+    def save_options(options):
+        options_path = os.path.join(os.path.dirname(sys.argv[0]), 'options.json')
+        with open(options_path, 'w') as f:
+            json.dump(options, f, indent=2)
+
     def build_buttons_list(self):
         """
         Reads options.json, creates DraggableButton for each (except "Custom"),
         storing them in self.button_widgets in the same order as the JSON file.
         """
         self.button_widgets.clear()
-        with open('options.json','r') as f:
-            data = json.load(f)
-        
+        data = self.load_options()
+
         for k,v in data.items():
             if k=="Custom":
                 continue
@@ -748,9 +765,8 @@ class CustomPopupWindow(QtWidgets.QWidget):
             try:
                 logging.debug('Resetting to default options.json')
                 default_data = json.loads(DEFAULT_OPTIONS_JSON)
-                with open('options.json','w') as f:
-                    json.dump(default_data,f,indent=2)
-                
+                self.save_options(default_data)
+
                 # Save and quit
                 self.app.load_options()
                 self.close()
@@ -767,17 +783,15 @@ class CustomPopupWindow(QtWidgets.QWidget):
         dialog = ButtonEditDialog(self, title="Add New Button")
         if dialog.exec_():
             bd = dialog.get_button_data()
-            with open('options.json','r') as f:
-                data = json.load(f)
+            data = self.load_options()
             data[bd["name"]] = {
                 "prefix": bd["prefix"],
                 "instruction": bd["instruction"],
                 "icon": bd["icon"],  # uses 'icons/custom'
                 "open_in_window": bd["open_in_window"]
             }
-            with open('options.json','w') as f:
-                json.dump(data,f,indent=2)
-            
+            self.save_options(data)
+
             self.build_buttons_list()
             self.rebuild_grid_layout()
 
@@ -797,16 +811,14 @@ class CustomPopupWindow(QtWidgets.QWidget):
     def edit_button_clicked(self, btn):
         """User clicked the small pencil icon over a button."""
         key = btn.key
-        with open('options.json','r') as f:
-            data = json.load(f)
+        data = self.load_options()
         bd = data[key]
         bd["name"] = key
         
         dialog = ButtonEditDialog(self, bd)
         if dialog.exec_():
             new_data = dialog.get_button_data()
-            with open('options.json','r') as f:
-                data = json.load(f)
+            data = self.load_options()
             if new_data["name"] != key:
                 del data[key]
             data[new_data["name"]] = {
@@ -815,9 +827,8 @@ class CustomPopupWindow(QtWidgets.QWidget):
                 "icon": new_data["icon"],
                 "open_in_window": new_data["open_in_window"]
             }
-            with open('options.json','w') as f:
-                json.dump(data,f,indent=2)
-            
+            self.save_options(data)
+
             self.build_buttons_list()
             self.rebuild_grid_layout()
 
@@ -846,12 +857,10 @@ class CustomPopupWindow(QtWidgets.QWidget):
         
         if confirm.exec_() == QtWidgets.QMessageBox.Yes:
             try:
-                with open('options.json', 'r') as f:
-                    data = json.load(f)
+                data = self.load_options()
                 del data[key]
-                with open('options.json', 'w') as f:
-                    json.dump(data, f, indent=2)
-                    
+                self.save_options(data)
+
                 # Clean up UI elements
                 for btn_ in self.button_widgets[:]:
                     if btn_.key == key:
@@ -876,13 +885,11 @@ class CustomPopupWindow(QtWidgets.QWidget):
         Called after a drop reorder. Reflect the new order in options.json,
         so that user's custom arrangement persists.
         """
-        with open('options.json','r') as f:
-            data = json.load(f)
+        data = self.load_options()
         new_data = {"Custom": data["Custom"]} if "Custom" in data else {}
         for b in self.button_widgets:
             new_data[b.key] = data[b.key]
-        with open('options.json','w') as f:
-            json.dump(new_data,f,indent=2)
+        self.save_options(new_data)
 
     def on_custom_change(self):
         txt = self.custom_input.text().strip()
