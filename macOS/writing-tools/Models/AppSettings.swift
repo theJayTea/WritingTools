@@ -77,8 +77,8 @@ class AppSettings: ObservableObject {
         
         // Load or set defaults
         self.geminiApiKey = defaults.string(forKey: "gemini_api_key") ?? ""
-        let geminiModelStr = defaults.string(forKey: "gemini_model") ?? GeminiModel.oneflash.rawValue
-        self.geminiModel = GeminiModel(rawValue: geminiModelStr) ?? .oneflash
+        let geminiModelStr = defaults.string(forKey: "gemini_model") ?? GeminiModel.twoflash.rawValue
+        self.geminiModel = GeminiModel(rawValue: geminiModelStr) ?? .twoflash
         
         self.openAIApiKey = defaults.string(forKey: "openai_api_key") ?? ""
         self.openAIBaseURL = defaults.string(forKey: "openai_base_url") ?? OpenAIConfig.defaultBaseURL

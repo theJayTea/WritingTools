@@ -55,10 +55,7 @@ struct PopupView: View {
             
             if !appState.selectedText.isEmpty || !appState.selectedImages.isEmpty {
                 ScrollView {
-                    LazyVGrid(columns: [
-                        GridItem(.flexible()),
-                        GridItem(.flexible())
-                    ], spacing: 16) {
+                    LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8){
                         // Built-in options
                         ForEach(WritingOption.allCases) { option in
                             OptionButton(
@@ -77,11 +74,12 @@ struct PopupView: View {
                             )
                         }
                     }
+                    .padding(.horizontal, 8)
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, 8)
             }
         }
-        .padding(.bottom, 16)
+        .padding(.bottom, 8)
         .windowBackground(useGradient: useGradientTheme)
         .overlay(
             RoundedRectangle(cornerRadius: 12)
@@ -293,14 +291,16 @@ struct OptionButton: View {
     let option: WritingOption
     let action: () -> Void
     let isLoading: Bool
-    
+
     var body: some View {
         Button(action: action) {
             HStack {
                 Image(systemName: option.icon)
                 Text(option.rawValue)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
             }
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: 140)
             .padding()
             .background(Color(.controlBackgroundColor))
             .cornerRadius(8)
@@ -310,18 +310,21 @@ struct OptionButton: View {
     }
 }
 
+
 struct CustomOptionButton: View {
     let command: CustomCommand
     let action: () -> Void
     let isLoading: Bool
-    
+
     var body: some View {
         Button(action: action) {
             HStack {
                 Image(systemName: command.icon)
                 Text(command.name)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
             }
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: 140)
             .padding()
             .background(Color(.controlBackgroundColor))
             .cornerRadius(8)
