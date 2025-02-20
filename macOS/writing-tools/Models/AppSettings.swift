@@ -58,6 +58,10 @@ class AppSettings: ObservableObject {
     @Published var hotKeyModifiers: Int {
         didSet { defaults.set(hotKeyModifiers, forKey: "hotKey_modifiers") }
     }
+    @Published var hotkeysPaused: Bool {
+        didSet { defaults.set(hotkeysPaused, forKey: "hotkeys_paused") }
+    }
+    
     
     @Published var mistralApiKey: String {
         didSet { defaults.set(mistralApiKey, forKey: "mistral_api_key") }
@@ -70,6 +74,20 @@ class AppSettings: ObservableObject {
     @Published var mistralModel: String {
         didSet { defaults.set(mistralModel, forKey: "mistral_model") }
     }
+    
+    // New Ollama settings:
+    @Published var ollamaBaseURL: String {
+        didSet { defaults.set(ollamaBaseURL, forKey: "ollama_base_url") }
+    }
+    
+    @Published var ollamaModel: String {
+        didSet { defaults.set(ollamaModel, forKey: "ollama_model") }
+    }
+    
+    @Published var ollamaKeepAlive: String {
+        didSet { defaults.set(ollamaKeepAlive, forKey: "ollama_keep_alive") }
+    }
+    
     
     // MARK: - Init
     private init() {
@@ -90,6 +108,10 @@ class AppSettings: ObservableObject {
         self.mistralBaseURL = defaults.string(forKey: "mistral_base_url") ?? MistralConfig.defaultBaseURL
         self.mistralModel = defaults.string(forKey: "mistral_model") ?? MistralConfig.defaultModel
         
+        self.ollamaBaseURL = defaults.string(forKey: "ollama_base_url") ?? OllamaConfig.defaultBaseURL
+        self.ollamaModel = defaults.string(forKey: "ollama_model") ?? OllamaConfig.defaultModel
+        self.ollamaKeepAlive = defaults.string(forKey: "ollama_keep_alive") ?? OllamaConfig.defaultKeepAlive
+        
         self.currentProvider = defaults.string(forKey: "current_provider") ?? "gemini"
         self.shortcutText = defaults.string(forKey: "shortcut") ?? "⌥ Space"
         self.hasCompletedOnboarding = defaults.bool(forKey: "has_completed_onboarding")
@@ -98,6 +120,7 @@ class AppSettings: ObservableObject {
         // HotKey
         self.hotKeyCode = defaults.integer(forKey: "hotKey_keyCode")
         self.hotKeyModifiers = defaults.integer(forKey: "hotKey_modifiers")
+        self.hotkeysPaused = defaults.bool(forKey: "hotkeys_paused")
     }
     
     // MARK: - Convenience

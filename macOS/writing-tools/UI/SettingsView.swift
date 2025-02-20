@@ -8,29 +8,8 @@ extension KeyboardShortcuts.Name {
 
 struct SettingsView: View {
     @ObservedObject var appState: AppState
-    @State private var shortcutText = UserDefaults.standard.string(forKey: "shortcut") ?? "⌥ Space"
-    @State private var useGradientTheme = UserDefaults.standard.bool(forKey: "use_gradient_theme")
-    @State private var selectedTheme = UserDefaults.standard.string(forKey: "theme_style") ?? "gradient"
-    @State private var selectedProvider = UserDefaults.standard.string(forKey: "current_provider") ?? "gemini"
-    
-    // Gemini settings
-    @State private var geminiApiKey = UserDefaults.standard.string(forKey: "gemini_api_key") ?? ""
-    @State private var selectedGeminiModel = GeminiModel(rawValue: UserDefaults.standard.string(forKey: "gemini_model") ?? "gemini-1.5-flash-latest") ?? .twoflash
-    
-    // OpenAI settings
-    @State private var openAIApiKey = UserDefaults.standard.string(forKey: "openai_api_key") ?? ""
-    @State private var openAIBaseURL = UserDefaults.standard.string(forKey: "openai_base_url") ?? OpenAIConfig.defaultBaseURL
-    @State private var openAIOrganization = UserDefaults.standard.string(forKey: "openai_organization") ?? ""
-    @State private var openAIProject = UserDefaults.standard.string(forKey: "openai_project") ?? ""
-    @State private var openAIModelName = UserDefaults.standard.string(forKey: "openai_model") ?? OpenAIConfig.defaultModel
-    
-    
-    // Mistral settings
-    @State private var mistralApiKey = UserDefaults.standard.string(forKey: "mistral_api_key") ?? ""
-    @State private var mistralBaseURL = UserDefaults.standard.string(forKey: "mistral_base_url") ?? MistralConfig.defaultBaseURL
-    @State private var mistralModel = UserDefaults.standard.string(forKey: "mistral_model") ?? MistralConfig.defaultModel
-
-    
+    @ObservedObject var settings = AppSettings.shared
+    @State private var selectedTheme: String = UserDefaults.standard.string(forKey: "theme_style") ?? "gradient"
     @State private var displayShortcut = ""
     
     var showOnlyApiSetup: Bool = false
@@ -41,15 +20,15 @@ struct SettingsView: View {
                 Text("Local LLMs: use the instructions on")
                     .font(.caption)
                     .foregroundColor(.secondary)
-                
                 Text("GitHub Page")
                     .font(.caption)
                     .foregroundColor(.blue)
                     .underline()
                     .onTapGesture {
-                        NSWorkspace.shared.open(URL(string: "https://github.com/theJayTea/WritingTools?tab=readme-ov-file#-optional-ollama-local-llm-instructions")!)
+                        if let url = URL(string: "https://github.com/theJayTea/WritingTools?tab=readme-ov-file#-optional-ollama-local-llm-instructions") {
+                            NSWorkspace.shared.open(url)
+                        }
                     }
-                
                 Text(".")
                     .font(.caption)
                     .foregroundColor(.secondary)
@@ -57,103 +36,111 @@ struct SettingsView: View {
         }
     }
     
-    
     var body: some View {
         Form {
             if !showOnlyApiSetup {
                 Section("General Settings") {
-                    Form {
-                        
-                        KeyboardShortcuts.Recorder("Global Shortcut:", name: .showPopup)
-                        
+                    KeyboardShortcuts.Recorder("Global Shortcut:", name: .showPopup)
+                }
+                
+                Section("Appearance") {
+                    Picker("Theme", selection: $selectedTheme) {
+                        Text("Standard").tag("standard")
+                        Text("Gradient").tag("gradient")
+                        Text("Glass").tag("glass")
                     }
-                    
-                    Section("Appearance") {
-                        Picker("Theme", selection: $selectedTheme) {
-                            Text("Standard").tag("standard")
-                            Text("Gradient").tag("gradient")
-                            Text("Glass").tag("glass")
-                        }
-                        .pickerStyle(.segmented)
-                        .onChange(of: selectedTheme) { _, newValue in
-                            UserDefaults.standard.set(newValue, forKey: "theme_style")
-                            useGradientTheme = (newValue != "standard")
-                        }
+                    .pickerStyle(.segmented)
+                    .onChange(of: selectedTheme) { newValue in
+                        UserDefaults.standard.set(newValue, forKey: "theme_style")
+                        settings.useGradientTheme = (newValue != "standard")
                     }
                 }
                 
                 Section("AI Provider") {
-                    Picker("Provider", selection: $selectedProvider) {
+                    Picker("Provider", selection: $settings.currentProvider) {
                         Text("Gemini AI").tag("gemini")
-                        Text("OpenAI / Local LLM").tag("openai")
+                        Text("OpenAI").tag("openai")
                         Text("Mistral AI").tag("mistral")
+                        Text("Ollama").tag("ollama")
                     }
                 }
             }
             
-            if selectedProvider == "gemini" {
+            if settings.currentProvider == "gemini" {
                 Section("Gemini AI Settings") {
-                    TextField("API Key", text: $geminiApiKey)
+                    TextField("API Key", text: $settings.geminiApiKey)
                         .textFieldStyle(.roundedBorder)
                     
-                    Picker("Model", selection: $selectedGeminiModel) {
+                    Picker("Model", selection: $settings.geminiModel) {
                         ForEach(GeminiModel.allCases, id: \.self) { model in
                             Text(model.displayName).tag(model)
                         }
                     }
                     
                     Button("Get API Key") {
-                        NSWorkspace.shared.open(URL(string: "https://aistudio.google.com/app/apikey")!)
+                        if let url = URL(string: "https://aistudio.google.com/app/apikey") {
+                            NSWorkspace.shared.open(url)
+                        }
                     }
                 }
-            } else if selectedProvider == "mistral" {
+            } else if settings.currentProvider == "mistral" {
                 Section("Mistral AI Settings") {
-                    TextField("API Key", text: $mistralApiKey)
+                    TextField("API Key", text: $settings.mistralApiKey)
                         .textFieldStyle(.roundedBorder)
-                    
-                    TextField("Base URL", text: $mistralBaseURL)
+                    TextField("Base URL", text: $settings.mistralBaseURL)
                         .textFieldStyle(.roundedBorder)
-                    
-                    Picker("Model", selection: $mistralModel) {
+                    Picker("Model", selection: $settings.mistralModel) {
                         ForEach(MistralModel.allCases, id: \.self) { model in
                             Text(model.displayName).tag(model.rawValue)
                         }
                     }
-                    
                     Button("Get Mistral API Key") {
-                        NSWorkspace.shared.open(URL(string: "https://console.mistral.ai/api-keys/")!)
+                        if let url = URL(string: "https://console.mistral.ai/api-keys/") {
+                            NSWorkspace.shared.open(url)
+                        }
                     }
                 }
-            } else {
-                Section("OpenAI / Local LLM Settings") {
-                    TextField("API Key", text: $openAIApiKey)
+            } else if settings.currentProvider == "openai" {
+                Section("OpenAI Settings") {
+                    TextField("API Key", text: $settings.openAIApiKey)
                         .textFieldStyle(.roundedBorder)
-                    
-                    TextField("Base URL", text: $openAIBaseURL)
+                    TextField("Base URL", text: $settings.openAIBaseURL)
                         .textFieldStyle(.roundedBorder)
-                    
-                    TextField("Model Name", text: $openAIModelName)
+                    TextField("Model Name", text: $settings.openAIModel)
                         .textFieldStyle(.roundedBorder)
-                    
-                    Text("OpenAI models include: gpt-4o, gpt-3.5-turbo, etc.")
+                    Text("OpenAI models include: gpt-4o, gpt-4o-mini, etc.")
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    
                     LinkText()
-                    
-                    TextField("Organization ID (Optional)", text: $openAIOrganization)
-                        .textFieldStyle(.roundedBorder)
-                    
-                    TextField("Project ID (Optional)", text: $openAIProject)
-                        .textFieldStyle(.roundedBorder)
-                    
+                    TextField("Organization ID (Optional)", text: Binding(
+                        get: { settings.openAIOrganization ?? "" },
+                        set: { settings.openAIOrganization = $0 }
+                    ))
+                    .textFieldStyle(.roundedBorder)
+                    TextField("Project ID (Optional)", text: Binding(
+                        get: { settings.openAIProject ?? "" },
+                        set: { settings.openAIProject = $0 }
+                    ))
+                    .textFieldStyle(.roundedBorder)
                     HStack {
                         Button("Get OpenAI API Key") {
-                            NSWorkspace.shared.open(URL(string: "https://platform.openai.com/account/api-keys")!)
+                            if let url = URL(string: "https://platform.openai.com/account/api-keys") {
+                                NSWorkspace.shared.open(url)
+                            }
                         }
-                        
+                    }
+                }
+            } else if settings.currentProvider == "ollama" {
+                Section(header: Text("Ollama Provider Settings")) {
+                    TextField("Ollama Base URL", text: $settings.ollamaBaseURL)
+                    TextField("Ollama Model", text: $settings.ollamaModel)
+                    TextField("Keep Alive Time", text: $settings.ollamaKeepAlive)
+                    LinkText()
+                    HStack {
                         Button("Ollama Documentation") {
-                            NSWorkspace.shared.open(URL(string: "https://ollama.ai/download")!)
+                            if let url = URL(string: "https://ollama.ai/download") {
+                                NSWorkspace.shared.open(url)
+                            }
                         }
                     }
                 }
@@ -166,40 +153,46 @@ struct SettingsView: View {
         }
         .padding()
         .frame(width: 500)
-        .windowBackground(useGradient: useGradientTheme)
+        .windowBackground(useGradient: settings.useGradientTheme)
     }
     
     private func saveSettings() {
         let oldShortcut = UserDefaults.standard.string(forKey: "shortcut")
         
-        UserDefaults.standard.set(shortcutText, forKey: "shortcut")
+        UserDefaults.standard.set(settings.shortcutText, forKey: "shortcut")
         UserDefaults.standard.set(selectedTheme, forKey: "theme_style")
         UserDefaults.standard.set(selectedTheme != "standard", forKey: "use_gradient_theme")
         
         // Save provider-specific settings
-        if selectedProvider == "gemini" {
-            appState.saveGeminiConfig(apiKey: geminiApiKey, model: selectedGeminiModel)
-        } else if selectedProvider == "mistral" {
+        if settings.currentProvider == "gemini" {
+            appState.saveGeminiConfig(apiKey: settings.geminiApiKey, model: settings.geminiModel)
+        } else if settings.currentProvider == "mistral" {
             appState.saveMistralConfig(
-                apiKey: mistralApiKey,
-                baseURL: mistralBaseURL,
-                model: mistralModel
+                apiKey: settings.mistralApiKey,
+                baseURL: settings.mistralBaseURL,
+                model: settings.mistralModel
             )
-        } else {
+        } else if settings.currentProvider == "openai" {
             appState.saveOpenAIConfig(
-                apiKey: openAIApiKey,
-                baseURL: openAIBaseURL,
-                organization: openAIOrganization,
-                project: openAIProject,
-                model: openAIModelName
+                apiKey: settings.openAIApiKey,
+                baseURL: settings.openAIBaseURL,
+                organization: settings.openAIOrganization,
+                project: settings.openAIProject,
+                model: settings.openAIModel
+            )
+        } else if settings.currentProvider == "ollama" {
+            appState.saveOllamaConfig(
+                baseURL: settings.ollamaBaseURL,
+                model: settings.ollamaModel,
+                keepAlive: settings.ollamaKeepAlive
             )
         }
         
         // Set current provider
-        appState.setCurrentProvider(selectedProvider)
+        appState.setCurrentProvider(settings.currentProvider)
         
         // If shortcut changed, post notification
-        if oldShortcut != shortcutText {
+        if oldShortcut != settings.shortcutText {
             NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
         }
         
@@ -208,14 +201,14 @@ struct SettingsView: View {
             UserDefaults.standard.set(true, forKey: "has_completed_onboarding")
         }
         
-        // Close windows safely
+        // Close window
         DispatchQueue.main.async {
             if self.showOnlyApiSetup {
                 WindowManager.shared.cleanupWindows()
-            } else {
-                if let window = NSApplication.shared.windows.first(where: { $0.contentView?.subviews.contains(where: { $0 is NSHostingView<SettingsView> }) ?? false }) {
-                    window.close()
-                }
+            } else if let window = NSApplication.shared.windows.first(where: {
+                $0.contentView?.subviews.contains(where: { $0 is NSHostingView<SettingsView> }) ?? false
+            }) {
+                window.close()
             }
         }
     }

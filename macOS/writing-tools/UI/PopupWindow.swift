@@ -63,6 +63,7 @@ class PopupWindow: NSWindow {
         // Set up first responder
         self.initialFirstResponder = hostingView
         self.makeFirstResponder(hostingView)
+        self.makeKey()
         
         updateWindowSize()
     }

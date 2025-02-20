@@ -36,7 +36,7 @@ struct AboutView: View {
             
             Divider()
 
-            Text("Version: 2.0 (Based on Windows Port version 6.0)")
+            Text("Version: 3.0 (Based on Windows Port version 7.1)")
                 .font(.caption)
             
             // Update checker section

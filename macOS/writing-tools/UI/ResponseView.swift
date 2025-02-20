@@ -44,21 +44,6 @@ struct ResponseView: View {
                 
                 Spacer()
                 
-                HStack(spacing: 8) {
-                    Button(action: { viewModel.fontSize = max(10, viewModel.fontSize - 2) }) {
-                        Image(systemName: "minus.magnifyingglass")
-                    }
-                    .disabled(viewModel.fontSize <= 10)
-                    
-                    Button(action: { viewModel.fontSize = 14 }) {
-                        Image(systemName: "arrow.clockwise")
-                    }
-                    
-                    Button(action: { viewModel.fontSize = min(24, viewModel.fontSize + 2) }) {
-                        Image(systemName: "plus.magnifyingglass")
-                    }
-                    .disabled(viewModel.fontSize >= 24)
-                }
             }
             .padding()
             .background(Color(.windowBackgroundColor))

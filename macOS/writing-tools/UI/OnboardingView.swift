@@ -251,7 +251,7 @@ struct OnboardingView: View {
             TextField("Model Name", text: $openAIModelName)
                 .textFieldStyle(.roundedBorder)
             
-            Text("OpenAI models include: gpt-4o, gpt-3.5-turbo, etc.")
+            Text("OpenAI models include: gpt-4o, gpt-4o-mini, etc.")
                 .font(.caption)
                 .foregroundColor(.secondary)
             

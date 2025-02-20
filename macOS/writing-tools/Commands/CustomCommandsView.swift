@@ -159,7 +159,7 @@ struct CustomCommandEditor: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Name")
                                 .font(.headline)
-                            TextField("Command Name", text: $name)
+                            TextField("Button Name", text: $name)
                                 .textFieldStyle(.roundedBorder)
                         }
                         
@@ -185,7 +185,7 @@ struct CustomCommandEditor: View {
                     
                     // Prompt field
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Prompt")
+                        Text("What should your AI do with your selected text? (Prompt)")
                             .font(.headline)
                         TextEditor(text: $prompt)
                             .frame(height: 150)
@@ -271,7 +271,7 @@ struct IconPickerView: View {
         "character.book.closed", "book", "rectangle.and.text.magnifyingglass",
         "keyboard", "text.redaction", "a.magnify", "character.textbox",
         "character.cursor.ibeam", "cursorarrow.and.square.on.square.dashed", "rectangle.and.pencil.and.ellipsis",
-        "bubble.middle.bottom", "bubble.left", "text.badge.star", "text.insert", "arrow.uturn.backward.circle.fill"
+        "bubble.middle.bottom", "bubble.left", "text.badge.star", "text.insert", "arrow.uturn.backward.circle.fill", "arrow.uturn.forward.circle.fill", "arrow.uturn.left.circle.fill", "arrow.uturn.right.circle.fill", "arrow.uturn.up.circle.fill", "arrow.uturn.down.circle.fill", 
     ]
     
     let columns = Array(repeating: GridItem(.flexible()), count: 8)

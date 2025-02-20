@@ -1,3 +1,5 @@
+import SwiftUI
+
 enum WritingOption: String, CaseIterable, Identifiable {
     case proofread = "Proofread"
     case rewrite = "Rewrite"
@@ -8,8 +10,27 @@ enum WritingOption: String, CaseIterable, Identifiable {
     case keyPoints = "Key Points"
     case table = "Table"
     
-    var id: String { rawValue }
-    
+    var id: String {
+        switch self {
+        case .proofread:
+            return String(localized:"Proofread", comment: "ID for proofreading")
+        case .rewrite:
+            return String(localized:"Rewrite", comment: "ID for rewriting")
+        case .friendly:
+            return String(localized:"Friendly", comment: "ID for friendly tone")
+        case .professional:
+            return String(localized:"Professional", comment: "ID for professional tone")
+        case .concise:
+            return String(localized:"Concise", comment: "ID for concise tone")
+        case .summary:
+            return String(localized:"Summary", comment: "ID for summarization")
+        case .keyPoints:
+            return String(localized:"Key Points", comment: "ID for key points extraction")
+        case .table:
+            return String(localized:"Table", comment: "ID for table conversion")
+        }
+    }
+        
     var systemPrompt: String {
         switch self {
         case .proofread:

@@ -196,6 +196,9 @@
 			knownRegions = (
 				en,
 				Base,
+				de,
+				fr,
+				es,
 			);
 			mainGroup = 2ABCBC152CDEB606001E4B5E;
 			minimizedProjectReferenceProxies = 1;
@@ -337,6 +340,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -394,6 +398,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 			};
 			name = Release;
 		};

@@ -6,6 +6,7 @@ class AppState: ObservableObject {
     @Published var geminiProvider: GeminiProvider
     @Published var openAIProvider: OpenAIProvider
     @Published var mistralProvider: MistralProvider
+    @Published var ollamaProvider: OllamaProvider
     
     @Published var customInstruction: String = ""
     @Published var selectedText: String = ""
@@ -18,11 +19,14 @@ class AppState: ObservableObject {
     @Published private(set) var currentProvider: String
     
     var activeProvider: any AIProvider {
-        if currentProvider == "openai" {
+        switch currentProvider {
+        case "openai":
             return openAIProvider
-        } else if currentProvider == "gemini" {
+        case "gemini":
             return geminiProvider
-        } else {
+        case "ollama":
+            return ollamaProvider
+        default:
             return mistralProvider
         }
     }
@@ -48,12 +52,22 @@ class AppState: ObservableObject {
         self.openAIProvider = OpenAIProvider(config: openAIConfig)
         
         // Initialize Mistral
-                let mistralConfig = MistralConfig(
-                    apiKey: asettings.mistralApiKey,
-                    baseURL: asettings.mistralBaseURL,
-                    model: asettings.mistralModel
-                )
-                self.mistralProvider = MistralProvider(config: mistralConfig)
+        let mistralConfig = MistralConfig(
+            apiKey: asettings.mistralApiKey,
+            baseURL: asettings.mistralBaseURL,
+            model: asettings.mistralModel
+        )
+        self.mistralProvider = MistralProvider(config: mistralConfig)
+        
+        
+        
+        // Initialize OllamaProvider with its settings.
+        let ollamaConfig = OllamaConfig(
+            baseURL: asettings.ollamaBaseURL,
+            model: asettings.ollamaModel,
+            keepAlive: asettings.ollamaKeepAlive
+        )
+        self.ollamaProvider = OllamaProvider(config: ollamaConfig)
         
         if asettings.openAIApiKey.isEmpty && asettings.geminiApiKey.isEmpty && asettings.mistralApiKey.isEmpty {
             print("Warning: No API keys configured.")
@@ -92,16 +106,27 @@ class AppState: ObservableObject {
     }
     
     func saveMistralConfig(apiKey: String, baseURL: String, model: String) {
-            let asettings = AppSettings.shared
-            asettings.mistralApiKey = apiKey
-            asettings.mistralBaseURL = baseURL
-            asettings.mistralModel = model
-            
-            let config = MistralConfig(
-                apiKey: apiKey,
-                baseURL: baseURL,
-                model: model
-            )
-            mistralProvider = MistralProvider(config: config)
-        }
+        let asettings = AppSettings.shared
+        asettings.mistralApiKey = apiKey
+        asettings.mistralBaseURL = baseURL
+        asettings.mistralModel = model
+        
+        let config = MistralConfig(
+            apiKey: apiKey,
+            baseURL: baseURL,
+            model: model
+        )
+        mistralProvider = MistralProvider(config: config)
+    }
+    
+    // For updating Ollama settings
+    func saveOllamaConfig(baseURL: String, model: String, keepAlive: String) {
+        let asettings = AppSettings.shared
+        asettings.ollamaBaseURL = baseURL
+        asettings.ollamaModel = model
+        asettings.ollamaKeepAlive = keepAlive
+        
+        let config = OllamaConfig(baseURL: baseURL, model: model, keepAlive: keepAlive)
+        ollamaProvider = OllamaProvider(config: config)
+    }
 }

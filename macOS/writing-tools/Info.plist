@@ -1,52 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-    <dict>
-        <key>CFBundleIdentifier</key>
-        <string>com.aryamirsepasi.writing-tools</string>
-        <key>CFBundleName</key>
-        <string>WritingTools</string>
-        <key>CFBundleDisplayName</key>
-        <string>WritingTools</string>
-        <key>CFBundleExecutable</key>
-        <string>$(EXECUTABLE_NAME)</string>
-        <key>CFBundlePackageType</key>
-        <string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
-        <key>CFBundleShortVersionString</key>
-        <string>1.0</string>
-        <key>CFBundleVersion</key>
-        <string>1</string>
-        <key>LSMinimumSystemVersion</key>
-        <string>$(MACOSX_DEPLOYMENT_TARGET)</string>
-        <key>LSUIElement</key>
-        <true />
-        <key>NSServices</key>
-    <array>
-        <dict>
-            <key>NSMenuItem</key>
-            <dict>
-                <key>default</key>
-                <string>Process with WritingTools</string>
-            </dict>
-            <key>NSMessage</key>
-            <string>handleSelectedText</string>
-            <key>NSPortName</key>
-            <string>com.aryamirsepasi.writing-tools</string>
-            <key>NSRequiredContext</key>
-            <dict>
-                <key>NSTextContent</key>
-                <string>NSStringPboardType</string>
-            </dict>
-            <key>NSReturnTypes</key>
-            <array/>
-            <key>NSSendTypes</key>
-            <array>
-                <string>NSStringPboardType</string>
-                <string>NSRTFPboardType</string>
-                <string>public.plain-text</string>
-                <string>public.text</string>
-            </array>
-        </dict>
-    </array>
+<dict>
+	<key>CFBundleIdentifier</key>
+	<string>com.aryamirsepasi.writing-tools</string>
+	<key>CFBundleName</key>
+	<string>WritingTools</string>
+	<key>CFBundleDisplayName</key>
+	<string>WritingTools</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
+	<key>LSUIElement</key>
+	<true/>
+	<key>NSServices</key>
+	<array/>
 </dict>
 </plist>
