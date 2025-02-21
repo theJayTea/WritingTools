@@ -11,6 +11,7 @@ struct OllamaConfig: Codable {
     static let defaultKeepAlive = "5m"
 }
 
+@MainActor
 class OllamaProvider: ObservableObject, AIProvider {
     @Published var isProcessing = false
     private var config: OllamaConfig

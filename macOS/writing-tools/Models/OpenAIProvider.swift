@@ -25,6 +25,7 @@ enum OpenAIModel: String, CaseIterable {
     }
 }
 
+@MainActor
 class OpenAIProvider: ObservableObject, AIProvider {
     @Published var isProcessing = false
     private var config: OpenAIConfig

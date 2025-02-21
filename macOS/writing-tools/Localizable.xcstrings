@@ -4,6 +4,9 @@
     "." : {
 
     },
+    "%lld%%" : {
+
+    },
     "• Helps you write with clarity and confidence" : {
       "localizations" : {
         "de" : {
@@ -156,6 +159,9 @@
           }
         }
       }
+    },
+    "Are you sure you want to delete the downloaded model? You'll need to download it again to use local processing." : {
+
     },
     "Ask a follow-up question..." : {
       "localizations" : {
@@ -338,6 +344,12 @@
         }
       }
     },
+    "Delete" : {
+
+    },
+    "Delete Model" : {
+
+    },
     "Describe your change..." : {
       "localizations" : {
         "de" : {
@@ -348,6 +360,9 @@
         }
       }
     },
+    "Download Model" : {
+
+    },
     "Download Update" : {
       "localizations" : {
         "de" : {
@@ -357,6 +372,9 @@
           }
         }
       }
+    },
+    "Downloading model..." : {
+
     },
     "Edit Command" : {
       "localizations" : {
@@ -387,6 +405,9 @@
           }
         }
       }
+    },
+    "Error" : {
+
     },
     "Finish" : {
       "localizations" : {
@@ -550,6 +571,15 @@
         }
       }
     },
+    "Loading model..." : {
+
+    },
+    "Local LLM (LLama 3.2 3b)" : {
+
+    },
+    "Local LLM (LLama 3.2)" : {
+
+    },
     "Local LLMs: use the instructions on" : {
       "localizations" : {
         "de" : {
@@ -590,6 +620,9 @@
         }
       }
     },
+    "Model Information" : {
+
+    },
     "Model Name" : {
       "localizations" : {
         "de" : {
@@ -599,6 +632,12 @@
           }
         }
       }
+    },
+    "Model needs to be downloaded before first use" : {
+
+    },
+    "Model ready" : {
+
     },
     "Name" : {
       "localizations" : {
@@ -629,6 +668,9 @@
           }
         }
       }
+    },
+    "OK" : {
+
     },
     "Ollama" : {
       "localizations" : {
@@ -701,6 +743,7 @@
       }
     },
     "OpenAI / Local LLM" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -784,6 +827,9 @@
           }
         }
       }
+    },
+    "Retry" : {
+
     },
     "Rewrite" : {
       "comment" : "ID for rewriting",

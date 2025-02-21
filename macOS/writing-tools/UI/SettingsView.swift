@@ -50,7 +50,7 @@ struct SettingsView: View {
                         Text("Glass").tag("glass")
                     }
                     .pickerStyle(.segmented)
-                    .onChange(of: selectedTheme) { newValue in
+                    .onChange(of: selectedTheme) { _, newValue in
                         UserDefaults.standard.set(newValue, forKey: "theme_style")
                         settings.useGradientTheme = (newValue != "standard")
                     }
@@ -58,6 +58,7 @@ struct SettingsView: View {
                 
                 Section("AI Provider") {
                     Picker("Provider", selection: $settings.currentProvider) {
+                        Text("Local LLM (LLama 3.2)").tag("local")
                         Text("Gemini AI").tag("gemini")
                         Text("OpenAI").tag("openai")
                         Text("Mistral AI").tag("mistral")
@@ -111,7 +112,6 @@ struct SettingsView: View {
                     Text("OpenAI models include: gpt-4o, gpt-4o-mini, etc.")
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    LinkText()
                     TextField("Organization ID (Optional)", text: Binding(
                         get: { settings.openAIOrganization ?? "" },
                         set: { settings.openAIOrganization = $0 }
@@ -144,6 +144,8 @@ struct SettingsView: View {
                         }
                     }
                 }
+            } else if settings.currentProvider == "local" {
+                LocalLLMSettingsView(evaluator: appState.localLLMProvider)
             }
             
             Button(showOnlyApiSetup ? "Complete Setup" : "Save") {
@@ -210,6 +212,136 @@ struct SettingsView: View {
             }) {
                 window.close()
             }
+        }
+    }
+}
+
+
+struct LocalLLMSettingsView: View {
+    @ObservedObject private var llmEvaluator: LocalLLMProvider
+    @State private var showingDeleteAlert = false
+    @State private var showingErrorAlert = false
+    
+    init(evaluator: LocalLLMProvider) {
+        self.llmEvaluator = evaluator
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            if !llmEvaluator.modelInfo.isEmpty {
+                Text(llmEvaluator.modelInfo)
+                    .textFieldStyle(.roundedBorder)
+            }
+            GroupBox("Model Information") {
+                VStack(alignment: .leading, spacing: 8) {
+                    InfoRow(label: "Model", value: "LLama3.2 3b (4-bit Quantized)")
+                    InfoRow(label: "Size", value: "~1.8GB")
+                    InfoRow(label: "Optimized", value: "Apple Silicon")
+                }
+                .padding(.vertical, 4)
+            }
+            GroupBox {
+                VStack(alignment: .leading, spacing: 12) {
+                    if llmEvaluator.isDownloading {
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                ProgressView()
+                                    .controlSize(.small)
+                                Text("Downloading model...")
+                                    .foregroundColor(.secondary)
+                                Spacer()
+                                Button(action: { llmEvaluator.cancelDownload() }) {
+                                    Text("Cancel")
+                                        .foregroundColor(.red)
+                                }
+                            }
+                            ProgressView(value: llmEvaluator.downloadProgress) {
+                                Text("\(Int(llmEvaluator.downloadProgress * 100))%")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                    } else if llmEvaluator.running {
+                        HStack {
+                            ProgressView()
+                                .controlSize(.small)
+                            Text("Loading model...")
+                                .foregroundColor(.secondary)
+                        }
+                    } else if case .idle = llmEvaluator.loadState {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Model needs to be downloaded before first use")
+                                .foregroundColor(.secondary)
+                            HStack {
+                                Button("Download Model") {
+                                    llmEvaluator.startDownload()
+                                }
+                                .buttonStyle(.borderedProminent)
+                                if llmEvaluator.lastError != nil {
+                                    Button("Retry") {
+                                        llmEvaluator.retryDownload()
+                                    }
+                                    .disabled(llmEvaluator.retryCount >= 3)
+                                }
+                            }
+                            if let error = llmEvaluator.lastError {
+                                Text(error)
+                                    .foregroundColor(.red)
+                                    .font(.caption)
+                            }
+                        }
+                    } else {
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundColor(.green)
+                                Text("Model ready")
+                                    .foregroundColor(.secondary)
+                                Spacer()
+                                Button("Delete Model") {
+                                    showingDeleteAlert = true
+                                }
+                                .foregroundColor(.red)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .alert("Delete Model", isPresented: $showingDeleteAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) {
+                do {
+                    try llmEvaluator.deleteModel()
+                } catch {
+                    llmEvaluator.lastError = "Failed to delete model: \(error.localizedDescription)"
+                    showingErrorAlert = true
+                }
+            }
+        } message: {
+            Text("Are you sure you want to delete the downloaded model? You'll need to download it again to use local processing.")
+        }
+        .alert("Error", isPresented: $showingErrorAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            if let error = llmEvaluator.lastError {
+                Text(error)
+            }
+        }
+    }
+}
+
+struct InfoRow: View {
+    let label: String
+    let value: String
+    
+    var body: some View {
+        HStack {
+            Text(label)
+                .foregroundColor(.secondary)
+            Spacer()
+            Text(value)
         }
     }
 }

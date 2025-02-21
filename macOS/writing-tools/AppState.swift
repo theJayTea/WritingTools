@@ -1,5 +1,6 @@
 import SwiftUI
 
+@MainActor
 class AppState: ObservableObject {
     static let shared = AppState()
     
@@ -7,6 +8,7 @@ class AppState: ObservableObject {
     @Published var openAIProvider: OpenAIProvider
     @Published var mistralProvider: MistralProvider
     @Published var ollamaProvider: OllamaProvider
+    @Published var localLLMProvider: LocalLLMProvider
     
     @Published var customInstruction: String = ""
     @Published var selectedText: String = ""
@@ -26,8 +28,10 @@ class AppState: ObservableObject {
             return geminiProvider
         case "ollama":
             return ollamaProvider
-        default:
+        case "mistral":
             return mistralProvider
+        default:
+            return localLLMProvider
         }
     }
     
@@ -59,6 +63,7 @@ class AppState: ObservableObject {
         )
         self.mistralProvider = MistralProvider(config: mistralConfig)
         
+        self.localLLMProvider = LocalLLMProvider()
         
         
         // Initialize OllamaProvider with its settings.

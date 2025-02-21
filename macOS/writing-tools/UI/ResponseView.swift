@@ -154,6 +154,7 @@ extension View {
 
 // Update ResponseViewModel to handle chat messages
 final class ResponseViewModel: ObservableObject {
+    
     @Published var messages: [ChatMessage] = []
     @Published var fontSize: CGFloat = 14
     @Published var showCopyConfirmation: Bool = false

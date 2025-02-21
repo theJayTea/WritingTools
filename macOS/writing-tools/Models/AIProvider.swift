@@ -1,5 +1,6 @@
 import Foundation
 
+@MainActor
 protocol AIProvider: ObservableObject {
     
     // Indicates if provider is processing a request

@@ -2,6 +2,7 @@ import SwiftUI
 import KeyboardShortcuts
 import Carbon.HIToolbox
 
+@MainActor
 class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     
     // Static status item to prevent deallocation
@@ -227,7 +228,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
     
     // Shows the main popup window when shortcut is triggered
-    private func showPopup() {
+    @MainActor private func showPopup() {
         appState.activeProvider.cancel()
         
         DispatchQueue.main.async { [weak self] in
