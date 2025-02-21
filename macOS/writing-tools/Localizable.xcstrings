@@ -114,6 +114,9 @@
         }
       }
     },
+    "Add New Button" : {
+
+    },
     "AI Provider" : {
       "localizations" : {
         "de" : {
@@ -757,6 +760,9 @@
           }
         }
       }
+    },
+    "Prompt" : {
+
     },
     "Proofread" : {
       "comment" : "ID for proofreading",

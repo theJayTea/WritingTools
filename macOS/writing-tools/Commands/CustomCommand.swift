@@ -53,4 +53,10 @@ class CustomCommandsManager: ObservableObject {
         commands.removeAll { $0.id == command.id }
         saveCommands()
     }
+    
+    // New helper method to replace commands altogether.
+    func replaceCommands(with newCommands: [CustomCommand]) {
+        commands = newCommands
+        saveCommands()
+    }
 }
