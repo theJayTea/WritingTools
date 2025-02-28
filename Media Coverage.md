@@ -17,7 +17,10 @@
 [https://www.neowin.net/news/top-10-windows-11-apps-for-every-user-in-2025/](https://www.neowin.net/news/top-10-windows-11-apps-for-every-user-in-2025/)
 
 [https://www.ifun.de/freie-writing-tools-systemweite-ki-schreibassistenz-fuer-den-mac-247247/](https://www.ifun.de/freie-writing-tools-systemweite-ki-schreibassistenz-fuer-den-mac-247247/
-)
+) (macOS version specifically)
+
+Cover page feature on the Vous et Vote Mac (VVMac) French Magazine, Issue 185 (macOS version specifically)
+https://www.vvmac.com/pages/LL_COUV/COUV_185.jpg
 
 [https://www.phonandroid.com/cette-application-gratuite-apporte-les-outils-dapple-intelligence-sur-windows-11.html](https://www.phonandroid.com/cette-application-gratuite-apporte-les-outils-dapple-intelligence-sur-windows-11.html)
 
