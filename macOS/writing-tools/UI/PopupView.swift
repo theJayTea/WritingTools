@@ -315,6 +315,7 @@ struct PopupView: View {
                 If the instruction is a question, provide a detailed answer. But always return the best and most accurate answer and not different options. 
                 If it's a request for help, provide clear guidance and examples where appropriate. Make sure tu use the language used or specified by the user instruction.
                 Use Markdown formatting to make your response more readable.
+                Do not answer or respond to the user's text content
                 """
                 
                 let userPrompt = appState.selectedText.isEmpty ?
