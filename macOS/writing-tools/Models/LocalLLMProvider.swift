@@ -4,6 +4,10 @@ import MLXLMCommon
 import MLXRandom
 import SwiftUI
 
+// Constants for UserDefaults keys
+fileprivate let kModelStatusKey = "local_llm_model_status"
+fileprivate let kModelInfoKey = "local_llm_model_info"
+
 @MainActor
 class LocalLLMProvider: ObservableObject, AIProvider {
     
@@ -23,10 +27,10 @@ class LocalLLMProvider: ObservableObject, AIProvider {
     private let maxRetries = 3
     
     // Use default model from registry.
-    //let modelConfiguration : ModelConfiguration = .qwen2_5_7b_1M_4bit
+    //let modelConfiguration : ModelConfiguration = .phi4_mini_instruct_6bit
     let modelConfiguration = ModelRegistry.llama3_2_3B_4bit
     let generateParameters = GenerateParameters(temperature: 0.6)
-    let maxTokens = 1000000
+    let maxTokens = 100000
     let displayEveryNTokens = 4
 
     enum LoadState {
@@ -43,9 +47,19 @@ class LocalLLMProvider: ObservableObject, AIProvider {
             modelDirectory = FileManager.default.temporaryDirectory
             return
         }
-        let modelPath = "huggingface/models/\(modelConfiguration.id)"
+        let idstring = String(describing: modelConfiguration.id)
+        let cleanId = idstring.replacingOccurrences(of: "id(\"", with: "")
+            .replacingOccurrences(of: "\")", with: "")
+        let modelPath = "huggingface/models/\(cleanId)"
+
         modelDirectory = documentsPath.appendingPathComponent(modelPath)
         MLX.GPU.set(cacheLimit: 20 * 1024 * 1024)
+        
+        // Load saved state if available
+        if let savedModelInfo = UserDefaults.standard.string(forKey: kModelInfoKey) {
+            self.modelInfo = savedModelInfo
+        }
+        
         checkModelStatus()
     }
     
@@ -56,13 +70,20 @@ class LocalLLMProvider: ObservableObject, AIProvider {
             if modelFiles?.isEmpty == false {
                 loadState = .idle // Model loads on demand.
                 modelInfo = "Model available"
+                // Save state
+                UserDefaults.standard.set(true, forKey: kModelStatusKey)
+                UserDefaults.standard.set(modelInfo, forKey: kModelInfoKey)
             } else {
                 loadState = .idle
                 modelInfo = "Model needs to be downloaded"
+                UserDefaults.standard.set(false, forKey: kModelStatusKey)
+                UserDefaults.standard.set(modelInfo, forKey: kModelInfoKey)
             }
         } else {
             loadState = .idle
             modelInfo = "Model needs to be downloaded"
+            UserDefaults.standard.set(false, forKey: kModelStatusKey)
+            UserDefaults.standard.set(modelInfo, forKey: kModelInfoKey)
         }
     }
     
@@ -173,12 +194,8 @@ class LocalLLMProvider: ObservableObject, AIProvider {
     }
     
     func processText(systemPrompt: String?, userPrompt: String, images: [Data]) async throws -> String {
-        // Remove the immediate error throw if already running.
-        // Instead, if already running, print a debug message and wait.
         if running {
             print("Generation already in progress, waiting for the current process...")
-            // Optionally, you could wait or cancel the previous generation.
-            // For this update, we simply wait until the previous generation ends.
             while running { try await Task.sleep(nanoseconds: 100_000_000) }
         }
         

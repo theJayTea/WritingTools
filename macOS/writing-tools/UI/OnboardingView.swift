@@ -171,7 +171,7 @@ struct OnboardingView: View {
                 
                 VStack(alignment: .leading, spacing: 15) {
                     Picker("Provider", selection: $settings.currentProvider) {
-                        Text("Local LLM (LLama 3.2 3b)").tag("local")
+                        Text("Local LLM (Llama 3.2 3b)").tag("local")
                         Text("Gemini AI").tag("gemini")
                         Text("OpenAI").tag("openai")
                         Text("Mistral AI").tag("mistral")

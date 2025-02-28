@@ -1,7 +1,7 @@
 import SwiftUI
 import MarkdownUI
 
-struct ChatMessage: Identifiable, Equatable {
+struct ChatMessage: Identifiable, Equatable, Sendable {
     let id = UUID()
     let role: String // "user" or "assistant"
     let content: String
@@ -153,8 +153,9 @@ extension View {
 }
 
 // Update ResponseViewModel to handle chat messages
-final class ResponseViewModel: ObservableObject {
-    
+@MainActor
+final class ResponseViewModel: ObservableObject, Sendable {
+
     @Published var messages: [ChatMessage] = []
     @Published var fontSize: CGFloat = 14
     @Published var showCopyConfirmation: Bool = false

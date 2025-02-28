@@ -10,7 +10,9 @@ enum WritingOption: String, CaseIterable, Identifiable {
     case keyPoints = "Key Points"
     case table = "Table"
     
-    var id: String {
+    var id: String { rawValue }
+    
+    var localizedName: String {
         switch self {
         case .proofread:
             return String(localized:"Proofread", comment: "ID for proofreading")

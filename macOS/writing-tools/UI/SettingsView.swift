@@ -58,7 +58,7 @@ struct SettingsView: View {
                 
                 Section("AI Provider") {
                     Picker("Provider", selection: $settings.currentProvider) {
-                        Text("Local LLM (LLama 3.2)").tag("local")
+                        Text("Local LLM (Llama 3.2)").tag("local")
                         Text("Gemini AI").tag("gemini")
                         Text("OpenAI").tag("openai")
                         Text("Mistral AI").tag("mistral")
@@ -234,7 +234,7 @@ struct LocalLLMSettingsView: View {
             }
             GroupBox("Model Information") {
                 VStack(alignment: .leading, spacing: 8) {
-                    InfoRow(label: "Model", value: "LLama3.2 3b (4-bit Quantized)")
+                    InfoRow(label: "Model", value: "Llama 3.2 3b (4-bit Quantized)")
                     InfoRow(label: "Size", value: "~1.8GB")
                     InfoRow(label: "Optimized", value: "Apple Silicon")
                 }

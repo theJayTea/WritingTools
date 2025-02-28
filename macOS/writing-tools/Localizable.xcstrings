@@ -631,7 +631,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Beschreiben Sie Ihre Änderung..."
+            "value" : "Änderung beschreiben…"
           }
         },
         "fr" : {
@@ -1028,34 +1028,34 @@
         }
       }
     },
-    "Local LLM (LLama 3.2 3b)" : {
+    "Local LLM (Llama 3.2 3b)" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Local LLM (LLama 3.2 3b)"
+            "value" : "Local LLM (Llama 3.2 3b)"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Local LLM (LLama 3.2 3b)"
+            "value" : "Local LLM (Llama 3.2 3b)"
           }
         }
       }
     },
-    "Local LLM (LLama 3.2)" : {
+    "Local LLM (Llama 3.2)" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Local LLM (LLama 3.2)"
+            "value" : "Local LLM (Llama 3.2)"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Local LLM (LLama 3.2)"
+            "value" : "Local LLM (Llama 3.2)"
           }
         }
       }

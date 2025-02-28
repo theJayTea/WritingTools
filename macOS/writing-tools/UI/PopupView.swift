@@ -20,7 +20,7 @@ struct PopupView: View {
         var commands: [UnifiedCommand] = WritingOption.allCases.map { option in
             UnifiedCommand(
                 id: option.id,
-                name: option.rawValue,
+                name: option.localizedName,
                 prompt: option.systemPrompt,
                 icon: option.icon,
                 useResponseWindow: [.summary, .keyPoints, .table].contains(option),
@@ -360,7 +360,7 @@ struct PopupView: View {
     private func showResponseWindow(for option: WritingOption, with result: String) {
         DispatchQueue.main.async {
             let window = ResponseWindow(
-                title: "\(option.rawValue) Result",
+                title: "\(option.localizedName) Result",
                 content: result,
                 selectedText: appState.selectedText,
                 option: option
@@ -401,7 +401,7 @@ struct OptionButton: View {
         Button(action: action) {
             HStack {
                 Image(systemName: option.icon)
-                Text(option.rawValue)
+                Text(option.localizedName)
                     .lineLimit(1)
                     .truncationMode(.tail)
             }

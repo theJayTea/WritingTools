@@ -22,5 +22,7 @@
 	<true/>
 	<key>NSServices</key>
 	<array/>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>WritingTools needs accessibility access to help improve your writing across applications.</string>
 </dict>
 </plist>

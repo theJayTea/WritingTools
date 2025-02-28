@@ -22,4 +22,8 @@ extension ModelConfiguration: @retroactive Equatable {
         id: "mlx-community/DeepSeek-R1-Distill-Qwen-14B-4bit"
     )
     
+    public static let phi4_mini_instruct_6bit = ModelConfiguration(
+        id: "mlx-community/Phi-4-mini-instruct-8bit"
+    )
+    
 }
