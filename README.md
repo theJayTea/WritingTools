@@ -28,7 +28,7 @@ Hi! I'm Jesai, a high school student from Bangalore, and I created and maintain 
 
 Writing Tools will always remain completely free and open-source.
 
-If you find value in it, it would mean the world to me if you could support our continued development of this project ❤️
+If you find value in it, it would mean the world to me if you could support us as we continue to improve it. ❤️
 
 <table>
   <tr>
@@ -68,7 +68,7 @@ Aside from being the only Windows/Linux program like Apple's Writing Tools, and 
 
 - **More intelligent than Apple's Writing Tools and Grammarly Premium:** Apple uses a tiny 3B parameter model, while Writing Tools lets you use much more advanced models for free (e.g., Gemini 2.0 Flash [~30B]). Grammarly's rule-based NLP can't compete with LLMs.
 - **Completely free and open-source:** No subscriptions or hidden costs. Bloat-free and uses **~0% of your CPU** even when actively using it.
-- **Versatile AI LLM support:** Jump in quickly with the **free Gemini API & Gemini 2.0**, or an extensive range of **local LLMs** (via Ollama [[instructions]](https://github.com/theJayTea/WritingTools?tab=readme-ov-file#-optional-ollama-local-llm-instructions-for-windows-v7-onwards), llama.cpp, KoboldCPP, TabbyAPI, vLLM, etc.) or **cloud-based LLMs** (ChatGPT, Mistral AI, etc.) through Writing Tools' OpenAI-API-compatibility.
+- **Versatile AI LLM support:** Jump in quickly with the **free Gemini API & Gemini 2.0**, or an extensive range of **local LLMs** (via Ollama [[instructions]](https://github.com/theJayTea/WritingTools?tab=readme-ov-file#-optional-ollama-local-llm-instructions-for-windowslinux-v7-onwards), llama.cpp, KoboldCPP, TabbyAPI, vLLM, etc.) or **cloud-based LLMs** (ChatGPT, Mistral AI, etc.) through Writing Tools' OpenAI-API-compatibility.
 - **Does not mess with your clipboard, and works system-wide.**
 - **Privacy-focused**: Your API key and config files stay on *your* device. NO logging, diagnostic collection, tracking, or ads. Invoked *only* on your command. Local LLMs keep your data on your device & work without the internet.
 - **Supports multiple languages:** Works with any language and translates text better than Google Translate (type "translate to [language]" in `Describe your change...`).
