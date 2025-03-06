@@ -6,17 +6,19 @@ class PopupWindow: NSWindow {
     private var trackingArea: NSTrackingArea?
     private let appState: AppState
     private let commandsManager: CustomCommandsManager
+    private let windowWidth: CGFloat = 305  // Define fixed width
+
     
     init(appState: AppState) {
         self.appState = appState
         self.commandsManager = CustomCommandsManager()
         
         super.init(
-            contentRect: NSRect(x: 0, y: 0, width: 400, height: 100),
-            styleMask: [.borderless],
-            backing: .buffered,
-            defer: true
-        )
+                    contentRect: NSRect(x: 0, y: 0, width: windowWidth, height: 100),
+                    styleMask: [.borderless, .fullSizeContentView],
+                    backing: .buffered,
+                    defer: true
+                )
         
         self.isReleasedWhenClosed = false
         
@@ -54,9 +56,14 @@ class PopupWindow: NSWindow {
         }
         
         let popupView = PopupView(appState: appState, closeAction: closeAction)
-        let hostingView = NSHostingView(rootView: popupView)
+        let hostingView = FirstResponderHostingView(rootView: popupView) // Use custom view
         contentView = hostingView
         retainedHostingView = hostingView
+        
+        // Set up first responder
+        self.initialFirstResponder = hostingView
+        self.makeFirstResponder(hostingView)
+        self.makeKey()
         
         updateWindowSize()
     }
@@ -64,8 +71,7 @@ class PopupWindow: NSWindow {
     @objc private func updateWindowSize() {
         let baseHeight: CGFloat = 100 // Height for header and input field
         let buttonHeight: CGFloat = 55 // Height for each button row
-        let spacing: CGFloat = 16 // Vertical spacing between elements
-        let padding: CGFloat = 20 // Bottom padding
+        let spacing: CGFloat = 10 // Vertical spacing between elements
         
         let numBuiltInOptions = WritingOption.allCases.count
         let numCustomOptions = commandsManager.commands.count
@@ -75,12 +81,12 @@ class PopupWindow: NSWindow {
         
         let contentHeight = !hasContent ?
         baseHeight :
-        baseHeight + (buttonHeight * CGFloat(numRows)) + spacing + padding
+        baseHeight + (buttonHeight * CGFloat(numRows)) + spacing
         
         // Set size on main thread
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            self.setContentSize(NSSize(width: 400, height: contentHeight))
+            self.setContentSize(NSSize(width: windowWidth, height: contentHeight))
             
             // Maintain window position relative to the mouse
             if let screen = self.screen {
@@ -193,30 +199,37 @@ class PopupWindow: NSWindow {
         return nil
     }
     
-    func positionNearMouse() {
-        let mouseLocation = NSEvent.mouseLocation
-        
-        guard let screen = screenAt(point: mouseLocation) else { return }
-        
-        let screenFrame = screen.visibleFrame
-        let padding: CGFloat = 10
-        var windowFrame = frame
-        
-        windowFrame.origin.x = mouseLocation.x + padding
-        windowFrame.origin.y = mouseLocation.y - windowFrame.height - padding
-        
-        if windowFrame.maxX > screenFrame.maxX {
-            windowFrame.origin.x = mouseLocation.x - windowFrame.width - padding
+     func positionNearMouse() {
+            let mouseLocation = NSEvent.mouseLocation
+            guard let screen = NSScreen.screens.first(where: { $0.frame.contains(mouseLocation) }) ?? NSScreen.main else { return }
+            
+            let padding: CGFloat = 10
+            var windowFrame = frame
+            windowFrame.size.width = windowWidth  // Ensure width stays fixed
+            
+            // Position below mouse by default
+            windowFrame.origin.x = mouseLocation.x - (windowWidth / 2)  // Center horizontally on mouse
+            windowFrame.origin.y = mouseLocation.y - windowFrame.height - padding
+            
+            // Keep window within screen bounds
+            windowFrame.origin.x = max(screen.visibleFrame.minX + padding,
+                                     min(windowFrame.origin.x,
+                                         screen.visibleFrame.maxX - windowWidth - padding))
+            
+            if windowFrame.minY < screen.visibleFrame.minY {
+                windowFrame.origin.y = mouseLocation.y + padding
+            }
+            
+            setFrame(windowFrame, display: true)
         }
-        
-        if windowFrame.minY < screenFrame.minY {
-            windowFrame.origin.y = mouseLocation.y + padding
+    
+    // Close via ESC Key
+    override func keyDown(with event: NSEvent) {
+        if event.keyCode == 53 { // ESC key
+            self.close()
+        } else {
+            super.keyDown(with: event)
         }
-        
-        windowFrame.origin.x = max(screenFrame.minX + padding, min(windowFrame.origin.x, screenFrame.maxX - windowFrame.width - padding))
-        windowFrame.origin.y = max(screenFrame.minY + padding, min(windowFrame.origin.y, screenFrame.maxY - windowFrame.height - padding))
-        
-        setFrame(windowFrame, display: true)
     }
     
 }
@@ -229,4 +242,10 @@ extension PopupWindow: NSWindowDelegate {
     func windowDidBecomeKey(_ notification: Notification) {
         level = .popUpMenu
     }
+}
+
+
+
+class FirstResponderHostingView<Content: View>: NSHostingView<Content> {
+    override var acceptsFirstResponder: Bool { true }
 }

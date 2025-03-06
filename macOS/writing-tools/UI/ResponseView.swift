@@ -1,7 +1,7 @@
 import SwiftUI
 import MarkdownUI
 
-struct ChatMessage: Identifiable, Equatable {
+struct ChatMessage: Identifiable, Equatable, Sendable {
     let id = UUID()
     let role: String // "user" or "assistant"
     let content: String
@@ -44,21 +44,6 @@ struct ResponseView: View {
                 
                 Spacer()
                 
-                HStack(spacing: 8) {
-                    Button(action: { viewModel.fontSize = max(10, viewModel.fontSize - 2) }) {
-                        Image(systemName: "minus.magnifyingglass")
-                    }
-                    .disabled(viewModel.fontSize <= 10)
-                    
-                    Button(action: { viewModel.fontSize = 14 }) {
-                        Image(systemName: "arrow.clockwise")
-                    }
-                    
-                    Button(action: { viewModel.fontSize = min(24, viewModel.fontSize + 2) }) {
-                        Image(systemName: "plus.magnifyingglass")
-                    }
-                    .disabled(viewModel.fontSize >= 24)
-                }
             }
             .padding()
             .background(Color(.windowBackgroundColor))
@@ -168,7 +153,9 @@ extension View {
 }
 
 // Update ResponseViewModel to handle chat messages
-final class ResponseViewModel: ObservableObject {
+@MainActor
+final class ResponseViewModel: ObservableObject, Sendable {
+
     @Published var messages: [ChatMessage] = []
     @Published var fontSize: CGFloat = 14
     @Published var showCopyConfirmation: Bool = false

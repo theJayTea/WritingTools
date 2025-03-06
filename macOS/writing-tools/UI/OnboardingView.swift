@@ -3,23 +3,11 @@ import KeyboardShortcuts
 
 struct OnboardingView: View {
     @ObservedObject var appState: AppState
+    @ObservedObject var settings = AppSettings.shared
     @State private var currentStep = 0
     @State private var shortcutText = "⌃ Space"
-    @State private var useGradientTheme = true
     @State private var selectedTheme = UserDefaults.standard.string(forKey: "theme_style") ?? "gradient"
     
-    // Provider settings
-    @State private var selectedProvider = UserDefaults.standard.string(forKey: "current_provider") ?? "gemini"
-    @State private var geminiApiKey = UserDefaults.standard.string(forKey: "gemini_api_key") ?? ""
-    @State private var selectedGeminiModel = GeminiModel(rawValue: UserDefaults.standard.string(forKey: "gemini_model") ?? "gemini-1.5-flash-latest") ?? .oneflash
-    @State private var openAIApiKey = UserDefaults.standard.string(forKey: "openai_api_key") ?? ""
-    @State private var openAIBaseURL = UserDefaults.standard.string(forKey: "openai_base_url") ?? OpenAIConfig.defaultBaseURL
-    @State private var openAIOrganization = UserDefaults.standard.string(forKey: "openai_organization") ?? ""
-    @State private var openAIProject = UserDefaults.standard.string(forKey: "openai_project") ?? ""
-    @State private var openAIModelName = UserDefaults.standard.string(forKey: "openai_model") ?? OpenAIConfig.defaultModel
-    @State private var mistralApiKey = UserDefaults.standard.string(forKey: "mistral_api_key") ?? ""
-    @State private var mistralBaseURL = UserDefaults.standard.string(forKey: "mistral_base_url") ?? MistralConfig.defaultBaseURL
-    @State private var mistralModel = UserDefaults.standard.string(forKey: "mistral_model") ?? MistralConfig.defaultModel
     
     private let steps = [
         OnboardingStep(
@@ -182,20 +170,27 @@ struct OnboardingView: View {
                     .font(.headline)
                 
                 VStack(alignment: .leading, spacing: 15) {
-                    Picker("Provider", selection: $selectedProvider) {
+                    Picker("Provider", selection: $settings.currentProvider) {
+                        Text("Local LLM (Llama 3.2 3b)").tag("local")
                         Text("Gemini AI").tag("gemini")
-                        Text("OpenAI / Local LLM").tag("openai")
+                        Text("OpenAI").tag("openai")
                         Text("Mistral AI").tag("mistral")
+                        Text("Ollama").tag("ollama")
                     }
                     .pickerStyle(.segmented)
                     
                     // Provider-specific settings
-                    if selectedProvider == "gemini" {
+                    if appState.currentProvider == "gemini" {
                         providerSettingsGemini
-                    } else if selectedProvider == "mistral" {
+                    } else if appState.currentProvider == "mistral" {
                         providerSettingsMistral
-                    } else {
+                    } else if appState.currentProvider == "openai" {
                         providerSettingsOpenAI
+                    }else if appState.currentProvider == "ollama" {
+                        providerSettingsOllama
+                    }
+                    else if appState.currentProvider == "local" {
+                        LocalLLMSettingsView(evaluator: appState.localLLMProvider)
                     }
                 }
                 .padding(.horizontal)
@@ -205,10 +200,10 @@ struct OnboardingView: View {
     
     private var providerSettingsGemini: some View {
         VStack(alignment: .leading, spacing: 10) {
-            TextField("API Key", text: $geminiApiKey)
+            TextField("API Key", text: $settings.geminiApiKey)
                 .textFieldStyle(.roundedBorder)
             
-            Picker("Model", selection: $selectedGeminiModel) {
+            Picker("Model", selection: $settings.geminiModel) {
                 ForEach(GeminiModel.allCases, id: \.self) { model in
                     Text(model.displayName).tag(model)
                 }
@@ -222,13 +217,13 @@ struct OnboardingView: View {
     
     private var providerSettingsMistral: some View {
         VStack(alignment: .leading, spacing: 10) {
-            TextField("API Key", text: $mistralApiKey)
+            TextField("API Key", text: $settings.mistralApiKey)
                 .textFieldStyle(.roundedBorder)
             
-            TextField("Base URL", text: $mistralBaseURL)
+            TextField("Base URL", text: $settings.mistralBaseURL)
                 .textFieldStyle(.roundedBorder)
             
-            Picker("Model", selection: $mistralModel) {
+            Picker("Model", selection: $settings.mistralModel) {
                 ForEach(MistralModel.allCases, id: \.self) { model in
                     Text(model.displayName).tag(model.rawValue)
                 }
@@ -240,29 +235,49 @@ struct OnboardingView: View {
         }
     }
     
+
+    private var providerSettingsOllama: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            TextField("Ollama Base URL", text: $settings.ollamaBaseURL)
+            TextField("Ollama Model", text: $settings.ollamaModel)
+            TextField("Keep Alive Time", text: $settings.ollamaKeepAlive)
+            LinkText()
+            HStack {
+                Button("Ollama Documentation") {
+                    if let url = URL(string: "https://ollama.ai/download") {
+                        NSWorkspace.shared.open(url)
+                    }
+                }
+            }
+        }
+    }
+    
     private var providerSettingsOpenAI: some View {
         VStack(alignment: .leading, spacing: 10) {
-            TextField("API Key", text: $openAIApiKey)
+            TextField("API Key", text: $settings.openAIApiKey)
                 .textFieldStyle(.roundedBorder)
             
-            TextField("Base URL", text: $openAIBaseURL)
+            TextField("Base URL", text: $settings.openAIBaseURL)
                 .textFieldStyle(.roundedBorder)
             
-            TextField("Model Name", text: $openAIModelName)
+            TextField("Model Name", text: $settings.openAIModel)
                 .textFieldStyle(.roundedBorder)
             
-            Text("OpenAI models include: gpt-4o, gpt-3.5-turbo, etc.")
+            Text("OpenAI models include: gpt-4o, gpt-4o-mini, etc.")
                 .font(.caption)
                 .foregroundColor(.secondary)
-            
-            LinkText()
-            
-            TextField("Organization ID (Optional)", text: $openAIOrganization)
-                .textFieldStyle(.roundedBorder)
-            
-            TextField("Project ID (Optional)", text: $openAIProject)
-                .textFieldStyle(.roundedBorder)
-            
+                        
+            TextField("Organization ID (Optional)", text: Binding(
+                get: { settings.openAIOrganization ?? "" },
+                set: { settings.openAIOrganization = $0.isEmpty ? nil : $0 }
+            ))
+            .textFieldStyle(.roundedBorder)
+
+            TextField("Project ID (Optional)", text: Binding(
+                get: { settings.openAIProject ?? "" },
+                set: { settings.openAIProject = $0.isEmpty ? nil : $0 }
+            ))
+            .textFieldStyle(.roundedBorder)
             HStack {
                 Button("Get OpenAI API Key") {
                     NSWorkspace.shared.open(URL(string: "https://platform.openai.com/account/api-keys")!)
@@ -281,26 +296,32 @@ struct OnboardingView: View {
         UserDefaults.standard.set(selectedTheme != "standard", forKey: "use_gradient_theme")
         
         // Save provider-specific settings
-        if selectedProvider == "gemini" {
-            appState.saveGeminiConfig(apiKey: geminiApiKey, model: selectedGeminiModel)
-        } else if selectedProvider == "mistral" {
+        if appState.currentProvider == "gemini" {
+            appState.saveGeminiConfig(apiKey: settings.geminiApiKey, model: settings.geminiModel)
+        } else if appState.currentProvider == "mistral" {
             appState.saveMistralConfig(
-                apiKey: mistralApiKey,
-                baseURL: mistralBaseURL,
-                model: mistralModel
+                apiKey: settings.mistralApiKey,
+                baseURL: settings.mistralBaseURL,
+                model: settings.mistralModel
             )
-        } else {
+        } else if appState.currentProvider == "openai" {
             appState.saveOpenAIConfig(
-                apiKey: openAIApiKey,
-                baseURL: openAIBaseURL,
-                organization: openAIOrganization,
-                project: openAIProject,
-                model: openAIModelName
+                apiKey: settings.openAIApiKey,
+                baseURL: settings.openAIBaseURL,
+                organization: settings.openAIOrganization,
+                project: settings.openAIProject,
+                model: settings.openAIModel
+            )
+        } else if appState.currentProvider == "ollama" {
+            appState.saveOllamaConfig(
+                baseURL: settings.ollamaBaseURL,
+                model: settings.ollamaModel,
+                keepAlive: settings.ollamaKeepAlive
             )
         }
         
         // Set current provider
-        appState.setCurrentProvider(selectedProvider)
+        appState.setCurrentProvider(appState.currentProvider)
         
         // Mark onboarding as complete
         UserDefaults.standard.set(true, forKey: "has_completed_onboarding")
@@ -322,15 +343,15 @@ struct LinkText: View {
             Text("Local LLMs: use the instructions on")
                 .font(.caption)
                 .foregroundColor(.secondary)
-            
             Text("GitHub Page")
                 .font(.caption)
                 .foregroundColor(.blue)
                 .underline()
                 .onTapGesture {
-                    NSWorkspace.shared.open(URL(string: "https://github.com/theJayTea/WritingTools?tab=readme-ov-file#-optional-ollama-local-llm-instructions")!)
+                    if let url = URL(string: "https://github.com/theJayTea/WritingTools?tab=readme-ov-file#-optional-ollama-local-llm-instructions") {
+                        NSWorkspace.shared.open(url)
+                    }
                 }
-            
             Text(".")
                 .font(.caption)
                 .foregroundColor(.secondary)

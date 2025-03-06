@@ -2,6 +2,7 @@ import SwiftUI
 import KeyboardShortcuts
 import Carbon.HIToolbox
 
+@MainActor
 class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     
     // Static status item to prevent deallocation
@@ -29,8 +30,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private(set) var popupWindow: NSWindow?
     private var settingsHostingView: NSHostingView<SettingsView>?
     private var aboutHostingView: NSHostingView<AboutView>?
-    private let windowAccessQueue = DispatchQueue(label: "com.example.writingtools.windowQueue")
-    
+    @objc private func toggleHotkeys() {
+        AppSettings.shared.hotkeysPaused.toggle()
+        // Refresh the menu so the title changes.
+        setupMenuBar()
+    }
     // Called when app launches - initializes core functionality
     func applicationDidFinishLaunching(_ notification: Notification) {
         
@@ -57,7 +61,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         }
         
         KeyboardShortcuts.onKeyUp(for: .showPopup) { [weak self] in
-            self?.showPopup()
+            if !AppSettings.shared.hotkeysPaused {
+                self?.showPopup()
+            } else {
+                NSLog("Hotkeys are paused")
+            }
         }
     }
     
@@ -88,6 +96,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         let menu = NSMenu()
         menu.addItem(NSMenuItem(title: "Settings", action: #selector(showSettings), keyEquivalent: ","))
         menu.addItem(NSMenuItem(title: "About", action: #selector(showAbout), keyEquivalent: "i"))
+        // New Pause/Resume item:
+            let hotkeyTitle = AppSettings.shared.hotkeysPaused ? "Resume" : "Pause"
+            menu.addItem(NSMenuItem(title: hotkeyTitle, action: #selector(toggleHotkeys), keyEquivalent: "p"))
         menu.addItem(NSMenuItem(title: "Reset App", action: #selector(resetApp), keyEquivalent: "r"))
         menu.addItem(NSMenuItem.separator())
         menu.addItem(NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
@@ -217,7 +228,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
     
     // Shows the main popup window when shortcut is triggered
-    private func showPopup() {
+    @MainActor private func showPopup() {
         appState.activeProvider.cancel()
         
         DispatchQueue.main.async { [weak self] in
@@ -289,6 +300,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 }
                 
                 window.positionNearMouse()
+                NSApp.activate(ignoringOtherApps: true)
                 window.makeKeyAndOrderFront(nil)
                 window.orderFrontRegardless()
             }
@@ -328,87 +340,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 self?.popupWindow = nil
             }
         }
-    }
-    
-    // Service handler for processing selected text
-    @objc func handleSelectedText(_ pboard: NSPasteboard, userData: String, error: AutoreleasingUnsafeMutablePointer<NSString>) {
-        if let frontmostApp = NSWorkspace.shared.frontmostApplication {
-            appState.previousApplication = frontmostApp
-            
-            // Prioritized image types (in order of preference)
-            let supportedImageTypes = [
-                NSPasteboard.PasteboardType("public.png"),
-                NSPasteboard.PasteboardType("public.jpeg"),
-                NSPasteboard.PasteboardType("public.tiff"),
-                NSPasteboard.PasteboardType("com.compuserve.gif"),
-                NSPasteboard.PasteboardType("public.image")
-            ]
-            
-            var foundImage: Data? = nil
-            
-            // Try to find the first available image in order of preference
-            for type in supportedImageTypes {
-                if let data = pboard.data(forType: type) {
-                    foundImage = data
-                    NSLog("Selected image type (Service): \(type)")
-                    break // Take only the first matching format
-                }
-            }
-            
-            let textTypes: [NSPasteboard.PasteboardType] = [
-                .string,
-                .rtf,
-                NSPasteboard.PasteboardType("public.plain-text")
-            ]
-            
-            guard let selectedText = textTypes.lazy.compactMap({ pboard.string(forType: $0) }).first,
-                  !selectedText.isEmpty else {
-                error.pointee = "No text was selected" as NSString
-                return
-            }
-            
-            appState.selectedText = selectedText
-            appState.selectedImages = foundImage.map { [$0] } ?? []
-            isServiceTriggered = true
-            
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                
-                let window = PopupWindow(appState: self.appState)
-                window.delegate = self
-                
-                self.closePopupWindow()
-                self.popupWindow = window
-                
-                window.level = .floating
-                window.collectionBehavior = [.moveToActiveSpace]
-                
-                window.positionNearMouse()
-                window.makeKeyAndOrderFront(nil)
-                window.orderFrontRegardless()
-                
-                NSApp.activate()
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    self.isServiceTriggered = false
-                }
-            }
-        } else {
-            error.pointee = "Could not determine frontmost application" as NSString
-            return
-        }
-    }
-}
-
-// Converts SwiftUI modifier flags to Carbon modifier flags for HotKey library
-extension NSEvent.ModifierFlags {
-    var carbonFlags: UInt32 {
-        var carbon: UInt32 = 0
-        if contains(.command) { carbon |= UInt32(cmdKey) }
-        if contains(.option) { carbon |= UInt32(optionKey) }
-        if contains(.control) { carbon |= UInt32(controlKey) }
-        if contains(.shift) { carbon |= UInt32(shiftKey) }
-        return carbon
     }
 }
 
