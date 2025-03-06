@@ -96,8 +96,10 @@ Writing Tools works well on x11. On Wayland, there are a few caveats:
 The macOS version is a **native Swift port**, developed by [Arya Mirsepasi](https://github.com/Aryamirsepasi). View the [README inside the macOS folder](https://github.com/theJayTea/WritingTools/tree/main/macOS) to learn more.
 
 To install it:
-1. Go to the [Releases](https://github.com/theJayTea/WritingTools/releases) page and download the latest `.dmg` file.
+1. Go to the [Releases](https://github.com/theJayTea/WritingTools/releases) page and download the latest macOS `.dmg` file.
 2. Open the `.dmg` file, also open a Finder Window, and drag the `writing-tools.app` into the Applications folder. That's it!
+
+**Note:** macOS 14 or later is required due to accessibility API requirements.
 
 ## 👀 Tips
 
