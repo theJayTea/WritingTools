@@ -12,21 +12,6 @@ https://github.com/user-attachments/assets/76d13eb9-168e-4459-ada4-62e0586ae58c
 
 ![image](https://github.com/user-attachments/assets/f5391035-56a4-4a4f-9078-aedec4244af6)
 
-
----
-
-Hi! I'm Jesai, and I develop and maintain Writing Tools (Windows & Linux) with help from our [amazing contributors](https://github.com/theJayTea/WritingTools/edit/main/README.md#-contributors) —
-
-I want to especially shout out [momokrono](https://github.com/momokrono), who's extensively contributed to the Windows/Linux version, and [Arya Mirsepasi](https://github.com/Aryamirsepasi), who built the entire macOS port!
-
-Writing Tools will always remain completely free and open-source.
-
-If you find value in it, it would mean the world to me if you could support my continued development of it ❤️
-
-<a href="https://www.buymeacoffee.com/jesaitarun" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
-
----
-
 ## ✨ What is Writing Tools?
 
 Writing Tools is an **Apple Intelligence-inspired application for Windows, Linux, and macOS that supercharges your writing with an AI LLM** (cloud-based or local).
@@ -37,7 +22,28 @@ It's currently the **world's most intelligent system-wide grammar assistant** an
 
 Writing Tools was also the 🔥 [**8th most trending AI program in the world**](https://devface.ai/ranking/top_ai_developers/2024-10) on GitHub in October 2024.
 
-## ⚡ What can I do with it, exactly?
+---
+
+Hi! I'm Jesai, a high school student from Bangalore, and I created and maintain Writing Tools with help from our [amazing contributors](https://github.com/theJayTea/WritingTools/edit/main/README.md#-contributors). I want to especially shout out [momokrono](https://github.com/momokrono), who's contributed extensively, and [Arya Mirsepasi](https://github.com/Aryamirsepasi), who built the entire macOS port!
+
+Writing Tools will always remain completely free and open-source.
+
+If you find value in it, it would mean the world to me if you could support our continued development of this project ❤️
+
+<table>
+  <tr>
+    <td><b>Support Jesai</b> (Windows/Linux):</td>
+    <td><b>Support Arya</b> (macOS):</td>
+  </tr>
+  <tr>
+    <td><a href="https://www.buymeacoffee.com/jesaitarun" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;"></a></td>
+    <td><a href="http://buymeacoffee.com/aryamirsepasi" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;"></a></td>
+  </tr>
+</table>
+
+---
+
+## ⚡ What can I do with Writing Tools, exactly?
 
 ### 1️⃣ Hyper-intelligent Writing Tools:
 - Select _any_ text on your PC and invoke Writing Tools with `ctrl+space`.
