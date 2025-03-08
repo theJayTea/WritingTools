@@ -24,7 +24,7 @@ struct ResponseView: View {
     @State private var scrollProxy: ScrollViewProxy?
     @State private var latestMessageId: UUID?
     
-    init(content: String, selectedText: String, option: WritingOption) {
+    init(content: String, selectedText: String, option: WritingOption? = nil) {
         self._viewModel = StateObject(wrappedValue: ResponseViewModel(
             content: content,
             selectedText: selectedText,
@@ -161,9 +161,9 @@ final class ResponseViewModel: ObservableObject, Sendable {
     @Published var showCopyConfirmation: Bool = false
     
     let selectedText: String
-    let option: WritingOption
+    let option: WritingOption?
     
-    init(content: String, selectedText: String, option: WritingOption) {
+    init(content: String, selectedText: String, option: WritingOption? = nil) {
         self.selectedText = selectedText
         self.option = option
         
@@ -243,4 +243,4 @@ final class ResponseViewModel: ObservableObject, Sendable {
             self.showCopyConfirmation = false
         }
     }
-    }
+}

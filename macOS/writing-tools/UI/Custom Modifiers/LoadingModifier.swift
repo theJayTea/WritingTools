@@ -37,27 +37,7 @@ extension Color {
     static let aiPink = Color(red: 255/255, green: 197/255, blue: 211/255)
 }
 
-
-// Loading button style for option buttons
-struct LoadingButtonStyle: ButtonStyle {
-    let isLoading: Bool
-    @State private var rotation: Double = 0
-    
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .opacity(isLoading ? 0.6 : 1.0)
-            .overlay(
-                Group {
-                    if isLoading {
-                        Color.aiPink.mask {
-                            ProgressView()
-                        }
-                    }
-                }
-            )
-            .animation(.easeInOut(duration: 0.2), value: isLoading)
-    }
-}
+// LoadingButtonStyle is now moved to CommandButton.swift
 
 // Extension to handle loading state buttons
 extension View {

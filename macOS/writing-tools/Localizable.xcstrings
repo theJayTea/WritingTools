@@ -161,6 +161,9 @@
         }
       }
     },
+    "A command with this name already exists. Please choose a different name." : {
+
+    },
     "A new version is available!" : {
       "localizations" : {
         "de" : {
@@ -210,6 +213,7 @@
       }
     },
     "Add New Button" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -369,6 +373,9 @@
         }
       }
     },
+    "Built-in" : {
+
+    },
     "Button Name" : {
       "localizations" : {
         "de" : {
@@ -481,6 +488,9 @@
         }
       }
     },
+    "Command Type" : {
+
+    },
     "Complete Setup" : {
       "localizations" : {
         "de" : {
@@ -562,6 +572,9 @@
         }
       }
     },
+    "Custom" : {
+
+    },
     "Custom Commands" : {
       "localizations" : {
         "de" : {
@@ -642,6 +655,9 @@
         }
       }
     },
+    "Display response in window" : {
+
+    },
     "Download Model" : {
       "localizations" : {
         "de" : {
@@ -689,6 +705,12 @@
           }
         }
       }
+    },
+    "Duplicate Command Name" : {
+
+    },
+    "Edit Built-In Command" : {
+
     },
     "Edit Command" : {
       "localizations" : {
@@ -1075,6 +1097,9 @@
           }
         }
       }
+    },
+    "Manage Commands" : {
+
     },
     "Mistral AI" : {
       "localizations" : {
@@ -1494,6 +1519,18 @@
         }
       }
     },
+    "Reset" : {
+
+    },
+    "Reset all built-in commands to their original state, including restoring any that were deleted" : {
+
+    },
+    "Reset Built-in Commands" : {
+
+    },
+    "Reset to Defaults" : {
+
+    },
     "Retry" : {
       "localizations" : {
         "de" : {
@@ -1704,6 +1741,12 @@
           }
         }
       }
+    },
+    "This is a built-in command. Your changes will be saved but you can reset to the original configuration later if needed." : {
+
+    },
+    "This will reset all built-in commands to their original settings, restore any deleted built-in commands, and keep your custom commands. This action cannot be undone." : {
+
     },
     "Version: 3.0 (Based on Windows Port version 7.1)" : {
       "localizations" : {

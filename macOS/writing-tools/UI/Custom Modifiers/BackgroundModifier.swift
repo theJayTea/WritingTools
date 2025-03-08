@@ -9,6 +9,12 @@ enum AppTheme: String {
 struct WindowBackground: ViewModifier {
     @Environment(\.colorScheme) var colorScheme
     let useGradient: Bool
+    let cornerRadius: CGFloat?
+    
+    init(useGradient: Bool, cornerRadius: CGFloat? = nil) {
+        self.useGradient = useGradient
+        self.cornerRadius = cornerRadius
+    }
     
     var currentTheme: AppTheme {
         if !useGradient {
@@ -52,6 +58,12 @@ struct WindowBackground: ViewModifier {
                         GlassmorphicBackground()
                     }
                 }
+                .clipShape(
+                    RoundedRectangle(
+                        cornerRadius: cornerRadius ?? 0, 
+                        style: .continuous
+                    )
+                )
             )
     }
 }
@@ -112,7 +124,7 @@ extension Color {
 }
 
 extension View {
-    func windowBackground(useGradient: Bool) -> some View {
-        modifier(WindowBackground(useGradient: useGradient))
+    func windowBackground(useGradient: Bool, cornerRadius: CGFloat? = nil) -> some View {
+        modifier(WindowBackground(useGradient: useGradient, cornerRadius: cornerRadius))
     }
 }
