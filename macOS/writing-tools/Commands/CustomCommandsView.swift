@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CustomCommandsView: View {
     @ObservedObject var commandsManager: CustomCommandsManager
+    @ObservedObject private var settings = AppSettings.shared
     @Environment(\.dismiss) var dismiss
     @State private var isAddingNew = false
     @State private var selectedCommand: CustomCommand?
@@ -49,7 +50,7 @@ struct CustomCommandsView: View {
             }
         }
         .frame(width: 500, height: 400)
-        .background(Color(.windowBackgroundColor))
+        .windowBackground(useGradient: settings.useGradientTheme)
         .sheet(isPresented: $isAddingNew) {
             CustomCommandEditor(
                 commandsManager: commandsManager,
@@ -112,6 +113,7 @@ struct CustomCommandRow: View {
 
 struct CustomCommandEditor: View {
     @ObservedObject var commandsManager: CustomCommandsManager
+    @ObservedObject private var settings = AppSettings.shared
     @Binding var isPresented: Bool
     @Environment(\.dismiss) var dismiss
     
@@ -245,84 +247,9 @@ struct CustomCommandEditor: View {
             .padding()
         }
         .frame(width: 500, height: 600)
-        .background(Color(.windowBackgroundColor))
+        .windowBackground(useGradient: settings.useGradientTheme)
         .sheet(isPresented: $showingIconPicker) {
-            IconPickerView(selectedIcon: $selectedIcon)
+            IconPickerView(selectedIcon: $selectedIcon, availableIcons: nil)
         }
-    }
-}
-
-struct IconPickerView: View {
-    @Environment(\.dismiss) var dismiss
-    @Binding var selectedIcon: String
-    
-    let icons = [
-        "star.fill", "heart.fill", "bolt.fill", "leaf.fill", "globe",
-        "text.bubble.fill", "pencil", "doc.fill", "book.fill", "bookmark.fill",
-        "tag.fill", "checkmark.circle.fill", "bell.fill", "flag.fill", "paperclip",
-        "link", "quote.bubble.fill", "list.bullet", "chart.bar.fill", "arrow.right.circle.fill",
-        "arrow.triangle.2.circlepath", "magnifyingglass", "lightbulb.fill", "wand.and.stars",
-        "brain.head.profile", "character.bubble", "globe.europe.africa.fill",
-        "globe.americas.fill", "globe.asia.australia.fill", "character", "textformat",
-        "folder.fill", "pencil.tip.crop.circle", "paintbrush", "text.justify", "scissors",
-        "doc.on.clipboard", "arrow.up.doc", "arrow.down.doc", "doc.badge.plus",
-        "bookmark.circle.fill", "bubble.left.and.bubble.right", "doc.text.magnifyingglass",
-        "checkmark.rectangle", "trash", "quote.bubble", "abc", "globe.badge.chevron.backward",
-        "character.book.closed", "book", "rectangle.and.text.magnifyingglass",
-        "keyboard", "text.redaction", "a.magnify", "character.textbox",
-        "character.cursor.ibeam", "cursorarrow.and.square.on.square.dashed", "rectangle.and.pencil.and.ellipsis",
-        "bubble.middle.bottom", "bubble.left", "text.badge.star", "text.insert",
-        "arrow.uturn.backward.circle.fill", "arrow.uturn.forward.circle.fill",
-        "arrow.uturn.left.circle.fill", "arrow.uturn.right.circle.fill",
-        "arrow.uturn.up.circle.fill", "arrow.uturn.down.circle.fill",
-        "eyedropper", "sparkles", "circle.hexagongrid.fill", "square.and.pencil",
-        "calendar", "clock.fill", "person.crop.circle", "person.3.fill",
-        "face.smiling", "gear", "shield.fill", "lock.fill", "cloud.fill",
-        "map.fill", "camera.fill", "video.fill", "waveform.path.ecg",
-        "headphones", "speaker.wave.3.fill", "play.rectangle.fill", "music.note",
-        "gamecontroller.fill", "trophy.fill", "dumbbell", "leaf.arrow.triangle.circlepath"
-    ]
-    
-    let columns = Array(repeating: GridItem(.flexible()), count: 8)
-    
-    var body: some View {
-        VStack(spacing: 0) {
-            // Header
-            HStack {
-                Text("Select Icon")
-                    .font(.headline)
-                Spacer()
-                Button(action: { dismiss() }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.title2)
-                        .foregroundColor(.secondary)
-                }
-                .buttonStyle(.plain)
-            }
-            .padding()
-            
-            // Icons grid
-            ScrollView {
-                LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(icons, id: \.self) { icon in
-                        Button(action: {
-                            selectedIcon = icon
-                            dismiss()
-                        }) {
-                            Image(systemName: icon)
-                                .font(.title2)
-                                .frame(width: 32, height: 32)
-                                .foregroundColor(selectedIcon == icon ? .white : .primary)
-                                .background(selectedIcon == icon ? Color.accentColor : Color.clear)
-                                .cornerRadius(6)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-                .padding()
-            }
-        }
-        .frame(width: 400, height: 300)
-        .background(Color(.windowBackgroundColor))
     }
 }

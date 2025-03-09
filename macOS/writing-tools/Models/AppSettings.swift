@@ -7,6 +7,14 @@ class AppSettings: ObservableObject {
     private let defaults = UserDefaults.standard
     
     // MARK: - Published Settings
+    @Published var themeStyle: String {
+        didSet { 
+            defaults.set(themeStyle, forKey: "theme_style") 
+            // Also update the useGradientTheme flag for backward compatibility
+            useGradientTheme = (themeStyle != "standard")
+        }
+    }
+    
     @Published var geminiApiKey: String {
         didSet { defaults.set(geminiApiKey, forKey: "gemini_api_key") }
     }
@@ -92,6 +100,9 @@ class AppSettings: ObservableObject {
     // MARK: - Init
     private init() {
         let defaults = UserDefaults.standard
+        
+        // Initialize the theme style first
+        self.themeStyle = defaults.string(forKey: "theme_style") ?? "gradient"
         
         // Load or set defaults
         self.geminiApiKey = defaults.string(forKey: "gemini_api_key") ?? ""

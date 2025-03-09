@@ -17,6 +17,10 @@ class AppState: ObservableObject {
     @Published var previousApplication: NSRunningApplication?
     @Published var selectedImages: [Data] = []  // Store selected image data
     
+    // Command management
+    @Published var commandManager = CommandManager()
+    @Published var customCommandsManager = CustomCommandsManager()
+    
     // Current provider with UI binding support
     @Published private(set) var currentProvider: String
     
@@ -77,6 +81,12 @@ class AppState: ObservableObject {
         if asettings.openAIApiKey.isEmpty && asettings.geminiApiKey.isEmpty && asettings.mistralApiKey.isEmpty {
             print("Warning: No API keys configured.")
         }
+        
+        // Perform migration from old system to new CommandManager if needed
+        MigrationHelper.shared.migrateIfNeeded(
+            commandManager: commandManager, 
+            customCommandsManager: customCommandsManager
+        )
     }
     
     // For Gemini changes
@@ -133,5 +143,90 @@ class AppState: ObservableObject {
         
         let config = OllamaConfig(baseURL: baseURL, model: model, keepAlive: keepAlive)
         ollamaProvider = OllamaProvider(config: config)
+    }
+    
+    // Process a command (unified method for all command types)
+    func processCommand(_ command: CommandModel) {
+        guard !selectedText.isEmpty else { return }
+        
+        isProcessing = true
+        
+        Task {
+            do {
+                let prompt = command.prompt
+                let result = try await activeProvider.processText(
+                    systemPrompt: prompt,
+                    userPrompt: selectedText,
+                    images: []
+                )
+                
+                // Determine what to do with the result based on command settings
+                if command.useResponseWindow {
+                    // Display in response window
+                    let window = ResponseWindow(
+                        title: "\(command.name) Result",
+                        content: result,
+                        selectedText: selectedText,
+                        option: nil // Using nil since this is using the generic CommandModel
+                    )
+                    
+                    WindowManager.shared.addResponseWindow(window)
+                    window.makeKeyAndOrderFront(nil)
+                    window.orderFrontRegardless()
+                } else {
+                    // Replace selected text by setting clipboard and pasting
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(result, forType: .string)
+                    
+                    // Reactivate previous application and paste
+                    if let previousApp = previousApplication {
+                        previousApp.activate()
+                        
+                        // Wait briefly for activation then paste once
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            self.simulatePaste()
+                        }
+                    }
+                }
+            } catch {
+                // Handle error
+                print("Error processing command: \(error)")
+            }
+            
+            isProcessing = false
+        }
+    }
+    
+    // Helper method to replace selected text
+    func replaceSelectedText(with newText: String) {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(newText, forType: .string)
+        
+        // Reactivate previous application and paste
+        if let previousApp = previousApplication {
+            previousApp.activate()
+            
+            // Wait briefly for activation then paste once
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                self.simulatePaste()
+            }
+        }
+    }
+    
+    // Simulate paste command
+    private func simulatePaste() {
+        guard let source = CGEventSource(stateID: .hidSystemState) else { return }
+        
+        // Create a Command + V key down event
+        let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: true)
+        keyDown?.flags = .maskCommand
+        
+        // Create a Command + V key up event
+        let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: false)
+        keyUp?.flags = .maskCommand
+        
+        // Post the events to the HID event system
+        keyDown?.post(tap: .cghidEventTap)
+        keyUp?.post(tap: .cghidEventTap)
     }
 }

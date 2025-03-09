@@ -1,17 +1,16 @@
 import SwiftUI
+import Combine
 
 class PopupWindow: NSWindow {
     private var initialLocation: NSPoint?
     private var retainedHostingView: NSHostingView<PopupView>?
     private var trackingArea: NSTrackingArea?
     private let appState: AppState
-    private let commandsManager: CustomCommandsManager
     private let windowWidth: CGFloat = 305  // Define fixed width
-
+    private var commandCountCancellable: AnyCancellable?
     
     init(appState: AppState) {
         self.appState = appState
-        self.commandsManager = CustomCommandsManager()
         
         super.init(
                     contentRect: NSRect(x: 0, y: 0, width: windowWidth, height: 100),
@@ -31,11 +30,25 @@ class PopupWindow: NSWindow {
             self?.updateWindowSize()
         }
         
-        // Listen for changes in custom commands
+        // Set up observation of command changes using Combine
+        commandCountCancellable = appState.commandManager.objectWillChange
+            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.updateWindowSize()
+            }
+        
+        // Also observe notifications for immediate resize events
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(updateWindowSize),
-            name: UserDefaults.didChangeNotification,
+            name: NSNotification.Name("EditModeChanged"),
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(updateWindowSize),
+            name: NSNotification.Name("CommandsChanged"),
             object: nil
         )
     }
@@ -69,41 +82,68 @@ class PopupWindow: NSWindow {
     }
     
     @objc private func updateWindowSize() {
-        let baseHeight: CGFloat = 100 // Height for header and input field
-        let buttonHeight: CGFloat = 55 // Height for each button row
-        let spacing: CGFloat = 10 // Vertical spacing between elements
-        
-        let numBuiltInOptions = WritingOption.allCases.count
-        let numCustomOptions = commandsManager.commands.count
-        let hasContent = !appState.selectedText.isEmpty || !appState.selectedImages.isEmpty
-        let totalOptions = hasContent ? (numBuiltInOptions + numCustomOptions) : 0
-        let numRows = ceil(Double(totalOptions) / 2.0) // 2 columns
-        
-        let contentHeight = !hasContent ?
-        baseHeight :
-        baseHeight + (buttonHeight * CGFloat(numRows)) + spacing
-        
-        // Set size on main thread
-        DispatchQueue.main.async { [weak self] in
+        // Add a small delay to ensure view changes have settled
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             guard let self = self else { return }
-            self.setContentSize(NSSize(width: windowWidth, height: contentHeight))
             
-            // Maintain window position relative to the mouse
-            if let screen = self.screen {
-                var frame = self.frame
-                frame.size.height = contentHeight
+            let baseHeight: CGFloat = 100 // Height for header and input field
+            let buttonHeight: CGFloat = 55 // Height for each button row
+            let spacing: CGFloat = 10 // Vertical spacing between elements
+            let editButtonHeight: CGFloat = 60 // Height for the "Manage Commands" button
+            
+            // Get the total number of commands from the new CommandManager
+            let totalCommands = self.appState.commandManager.commands.count
+            let hasContent = !self.appState.selectedText.isEmpty || !self.appState.selectedImages.isEmpty
+            let isEditMode = (self.retainedHostingView?.rootView as? PopupView)?.isEditMode ?? false
+            
+            // Calculate the number of rows (2 commands per row)
+            let numRows = hasContent ? ceil(Double(totalCommands) / 2.0) : 0
+            
+            // Calculate content height
+            var contentHeight: CGFloat = baseHeight
+            
+            if hasContent {
+                contentHeight += (buttonHeight * CGFloat(numRows)) + spacing
                 
-                // Ensure window stays within screen bounds
-                if frame.maxY > screen.visibleFrame.maxY {
-                    frame.origin.y = screen.visibleFrame.maxY - frame.height
+                // Add height for the "Manage Commands" button if in edit mode
+                if isEditMode {
+                    contentHeight += editButtonHeight
                 }
                 
-                self.setFrame(frame, display: true)
+                // Add padding in edit mode
+                if isEditMode {
+                    contentHeight += 10
+                }
+            }
+            
+            print("Updating window size: Total commands: \(totalCommands), Rows: \(numRows), Edit mode: \(isEditMode), Height: \(contentHeight)")
+            
+            // Set size with animation
+            NSAnimationContext.runAnimationGroup { context in
+                context.duration = 0.25
+                context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+                
+                // Animate size change
+                self.animator().setContentSize(NSSize(width: self.windowWidth, height: contentHeight))
+                
+                // Maintain window position relative to the mouse
+                if let screen = self.screen {
+                    var frame = self.frame
+                    frame.size.height = contentHeight
+                    
+                    // Ensure window stays within screen bounds
+                    if frame.maxY > screen.visibleFrame.maxY {
+                        frame.origin.y = screen.visibleFrame.maxY - frame.height
+                    }
+                    
+                    self.animator().setFrame(frame, display: true)
+                }
             }
         }
     }
     
     deinit {
+        commandCountCancellable?.cancel()
         NotificationCenter.default.removeObserver(self)
     }
     
@@ -141,6 +181,8 @@ class PopupWindow: NSWindow {
         self.delegate = nil
         
         self.contentView = nil
+        commandCountCancellable?.cancel()
+        NotificationCenter.default.removeObserver(self)
     }
     
     override func close() {

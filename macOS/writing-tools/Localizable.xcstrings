@@ -161,6 +161,22 @@
         }
       }
     },
+    "A command with this name already exists. Please choose a different name." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Befehl mit diesem Namen existiert bereits. Bitte wählen Sie einen anderen Namen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une commande avec ce nom existe déjà. Veuillez choisir un autre nom."
+          }
+        }
+      }
+    },
     "A new version is available!" : {
       "localizations" : {
         "de" : {
@@ -210,6 +226,7 @@
       }
     },
     "Add New Button" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -224,6 +241,9 @@
           }
         }
       }
+    },
+    "Add one to get started" : {
+
     },
     "AI Provider" : {
       "localizations" : {
@@ -369,6 +389,25 @@
         }
       }
     },
+    "Built-in" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eingebaut"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intégré"
+          }
+        }
+      }
+    },
+    "Built-in Commands" : {
+
+    },
     "Button Name" : {
       "localizations" : {
         "de" : {
@@ -481,6 +520,28 @@
         }
       }
     },
+    "Close" : {
+
+    },
+    "Command Name" : {
+
+    },
+    "Command Type" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Befehlstyp"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type de commande"
+          }
+        }
+      }
+    },
     "Complete Setup" : {
       "localizations" : {
         "de" : {
@@ -531,6 +592,7 @@
       }
     },
     "Copy" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -546,6 +608,9 @@
         }
       }
     },
+    "Copy All" : {
+
+    },
     "Created with care by Jesai, a high school student." : {
       "localizations" : {
         "de" : {
@@ -558,6 +623,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Créé avec soin par Jesai, un lycéen."
+          }
+        }
+      }
+    },
+    "Custom" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benutzerdefiniert"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personnalisé"
           }
         }
       }
@@ -610,6 +691,9 @@
         }
       }
     },
+    "Delete command" : {
+
+    },
     "Delete Model" : {
       "localizations" : {
         "de" : {
@@ -638,6 +722,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Décrivez votre modification..."
+          }
+        }
+      }
+    },
+    "Display response in window" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antwort im Fenster anzeigen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher la réponse dans la fenêtre"
           }
         }
       }
@@ -689,6 +789,41 @@
           }
         }
       }
+    },
+    "Duplicate Command Name" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Doppelter Befehlsname"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nom de commande en double"
+          }
+        }
+      }
+    },
+    "Edit Built-In Command" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Integrierten Befehl Bearbeiten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier la commande intégrée"
+          }
+        }
+      }
+    },
+    "Edit command" : {
+
     },
     "Edit Command" : {
       "localizations" : {
@@ -1076,6 +1211,22 @@
         }
       }
     },
+    "Manage Commands" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Befehle Verwalten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gérer les commandes"
+          }
+        }
+      }
+    },
     "Mistral AI" : {
       "localizations" : {
         "de" : {
@@ -1235,6 +1386,12 @@
           }
         }
       }
+    },
+    "No built-in commands" : {
+
+    },
+    "No custom commands yet" : {
+
     },
     "OK" : {
       "localizations" : {
@@ -1494,6 +1651,70 @@
         }
       }
     },
+    "Reset" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neu setzen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réinitialiser"
+          }
+        }
+      }
+    },
+    "Reset all built-in commands to their original state, including restoring any that were deleted" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Setzen Sie alle integrierten Befehle in ihren ursprünglichen Zustand zurück, einschließlich der Wiederherstellung gelöschter Befehle"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réinitialiser toutes les commandes intégrées à leur état d'origine, y compris la restauration de celles qui ont été supprimées"
+          }
+        }
+      }
+    },
+    "Reset Built-in Commands" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Integrierte Befehle zurücksetzen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réinitialiser les commandes intégrées"
+          }
+        }
+      }
+    },
+    "Reset to Defaults" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Integrierte Befehle zurücksetzen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réinitialiser les valeurs par défaut"
+          }
+        }
+      }
+    },
     "Retry" : {
       "localizations" : {
         "de" : {
@@ -1701,6 +1922,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Thème"
+          }
+        }
+      }
+    },
+    "This is a built-in command. Your changes will be saved but you can reset to the original configuration later if needed." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dies ist ein integrierter Befehl. Ihre Änderungen werden gespeichert, aber Sie können bei Bedarf später auf die ursprüngliche Konfiguration zurücksetzen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il s'agit d'une commande intégrée. Vos modifications seront enregistrées, mais vous pourrez réinitialiser à la configuration d'origine plus tard si nécessaire."
+          }
+        }
+      }
+    },
+    "This will reset all built-in commands to their original settings, restore any deleted built-in commands, and keep your custom commands. This action cannot be undone." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dadurch werden alle integrierten Befehle auf ihre ursprünglichen Einstellungen zurückgesetzt, alle gelöschten integrierten Befehle wiederhergestellt und Ihre benutzerdefinierten Befehle beibehalten. Diese Aktion kann nicht rückgängig gemacht werden."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cela réinitialisera toutes les commandes intégrées à leurs paramètres d'origine, restaurera toutes les commandes intégrées supprimées et conservera vos commandes personnalisées. Cette action ne peut pas être annulée."
           }
         }
       }

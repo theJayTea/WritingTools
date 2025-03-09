@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AboutView: View {
-    @State private var useGradientTheme = UserDefaults.standard.bool(forKey: "use_gradient_theme")
+    @ObservedObject private var settings = AppSettings.shared
     @State private var updateChecker = UpdateChecker.shared
 
     var body: some View {
@@ -73,6 +73,6 @@ struct AboutView: View {
         }
         .padding()
         .frame(width: 400, height: 400)
-        .windowBackground(useGradient: useGradientTheme)
+        .windowBackground(useGradient: settings.useGradientTheme)
     }
 }
