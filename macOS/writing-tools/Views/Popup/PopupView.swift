@@ -88,11 +88,9 @@ struct PopupView: View {
                                 isLoading: processingCommandId == command.id,
                                 onTap: {
                                     processingCommandId = command.id
-                                    appState.processCommand(command)
-                                    
-                                    // Reset loading state after a short delay
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                        processingCommandId = nil
+                                    Task {
+                                        // Process the command and only close when complete
+                                        await processCommandAndCloseWhenDone(command)
                                     }
                                 },
                                 onEdit: {
@@ -144,6 +142,62 @@ struct PopupView: View {
                     // as commands may have been added/removed
                     NotificationCenter.default.post(name: NSNotification.Name("CommandsChanged"), object: nil)
                 }
+        }
+    }
+    
+    // Process a command asynchronously and only close the popup when done
+    private func processCommandAndCloseWhenDone(_ command: CommandModel) async {
+        guard !appState.selectedText.isEmpty else {
+            processingCommandId = nil
+            return
+        }
+        
+        appState.isProcessing = true
+        
+        do {
+            // Get the systemprompt and user text
+            let systemPrompt = command.prompt
+            let userText = appState.selectedText
+            
+            // Process the text with the AI provider
+            let result = try await appState.activeProvider.processText(
+                systemPrompt: systemPrompt,
+                userPrompt: userText,
+                images: appState.selectedImages
+            )
+            
+            // Handle the result on the main thread
+            await MainActor.run {
+                if command.useResponseWindow {
+                    // Create response window
+                    let window = ResponseWindow(
+                        title: command.name,
+                        content: result,
+                        selectedText: userText,
+                        option: .proofread // Using proofread as default
+                    )
+                    
+                    WindowManager.shared.addResponseWindow(window)
+                    window.makeKeyAndOrderFront(nil)
+                    window.orderFrontRegardless()
+                } else {
+                    // Directly apply the text if no response window
+                    appState.replaceSelectedText(with: result)
+                }
+                
+                // Now close the popup after response is received
+                closeAction()
+                processingCommandId = nil
+            }
+        } catch {
+            print("Error processing command: \(error.localizedDescription)")
+            await MainActor.run {
+                processingCommandId = nil
+            }
+        }
+        
+        await MainActor.run {
+            appState.isProcessing = false
         }
     }
     

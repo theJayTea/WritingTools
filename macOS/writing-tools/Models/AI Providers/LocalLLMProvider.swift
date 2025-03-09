@@ -26,6 +26,20 @@ class LocalLLMProvider: ObservableObject, AIProvider {
     private let modelDirectory: URL
     private let maxRetries = 3
     
+    // Platform compatibility check
+    static var isAppleSilicon: Bool {
+        #if arch(arm64)
+            return true
+        #else
+            return false
+        #endif
+    }
+    
+    // Is the current platform supported
+    var isPlatformSupported: Bool {
+        LocalLLMProvider.isAppleSilicon
+    }
+    
     // Use default model from registry.
     //let modelConfiguration : ModelConfiguration = .phi4_mini_instruct_6bit
     let modelConfiguration = ModelRegistry.llama3_2_3B_4bit
@@ -53,17 +67,32 @@ class LocalLLMProvider: ObservableObject, AIProvider {
         let modelPath = "huggingface/models/\(cleanId)"
 
         modelDirectory = documentsPath.appendingPathComponent(modelPath)
-        MLX.GPU.set(cacheLimit: 20 * 1024 * 1024)
         
-        // Load saved state if available
-        if let savedModelInfo = UserDefaults.standard.string(forKey: kModelInfoKey) {
-            self.modelInfo = savedModelInfo
+        // Only initialize MLX on Apple Silicon
+        if isPlatformSupported {
+            MLX.GPU.set(cacheLimit: 20 * 1024 * 1024)
+            
+            // Load saved state if available
+            if let savedModelInfo = UserDefaults.standard.string(forKey: kModelInfoKey) {
+                self.modelInfo = savedModelInfo
+            }
+            
+            checkModelStatus()
+        } else {
+            // Set message for Intel Macs
+            modelInfo = "Local LLM is only available on Apple Silicon devices"
+            loadState = .idle
+            UserDefaults.standard.set(false, forKey: kModelStatusKey)
+            UserDefaults.standard.set(modelInfo, forKey: kModelInfoKey)
         }
-        
-        checkModelStatus()
     }
     
     private func checkModelStatus() {
+        guard isPlatformSupported else {
+            modelInfo = "Local LLM is only available on Apple Silicon devices"
+            return
+        }
+        
         if FileManager.default.fileExists(atPath: modelDirectory.path) {
             let modelFiles = try? FileManager.default.contentsOfDirectory(
                 atPath: modelDirectory.path)
@@ -88,6 +117,11 @@ class LocalLLMProvider: ObservableObject, AIProvider {
     }
     
     func startDownload() {
+        guard isPlatformSupported else {
+            lastError = "Local LLM is only available on Apple Silicon devices"
+            return
+        }
+        
         guard downloadTask == nil else { return }
         isCancelled = false
         retryCount = 0
@@ -98,6 +132,8 @@ class LocalLLMProvider: ObservableObject, AIProvider {
     }
     
     func cancelDownload() {
+        guard isPlatformSupported else { return }
+        
         isCancelled = true
         downloadTask?.cancel()
         downloadTask = nil
@@ -108,6 +144,11 @@ class LocalLLMProvider: ObservableObject, AIProvider {
     }
     
     func retryDownload() {
+        guard isPlatformSupported else {
+            lastError = "Local LLM is only available on Apple Silicon devices"
+            return
+        }
+        
         guard retryCount < maxRetries else {
             lastError = "Maximum retry attempts reached"
             return
@@ -117,6 +158,14 @@ class LocalLLMProvider: ObservableObject, AIProvider {
     }
     
     func deleteModel() throws {
+        guard isPlatformSupported else {
+            throw NSError(
+                domain: "LocalLLM",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "Local LLM is only available on Apple Silicon devices"]
+            )
+        }
+        
         guard !isDownloading && !running else {
             throw NSError(
                 domain: "LocalLLM",
@@ -148,6 +197,14 @@ class LocalLLMProvider: ObservableObject, AIProvider {
     }
     
     func load() async throws -> ModelContainer {
+        guard isPlatformSupported else {
+            throw NSError(
+                domain: "LocalLLM",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "Local LLM is only available on Apple Silicon devices"]
+            )
+        }
+        
         guard !isCancelled else { throw CancellationError() }
         switch loadState {
         case .idle:
@@ -194,6 +251,14 @@ class LocalLLMProvider: ObservableObject, AIProvider {
     }
     
     func processText(systemPrompt: String?, userPrompt: String, images: [Data]) async throws -> String {
+        guard isPlatformSupported else {
+            throw NSError(
+                domain: "LocalLLM",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "Local LLM is only available on Apple Silicon devices"]
+            )
+        }
+        
         if running {
             print("Generation already in progress, waiting for the current process...")
             while running { try await Task.sleep(nanoseconds: 100_000_000) }
