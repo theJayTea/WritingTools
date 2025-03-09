@@ -153,38 +153,64 @@ struct PopupView: View {
         appState.processCommand(command)
     }
     
-    // Process custom text input
+    // Process custom text changes
     private func processCustomChange() {
-        guard !customText.isEmpty && !appState.selectedText.isEmpty else { return }
-        
+        guard !customText.isEmpty else { return }
         isCustomLoading = true
-        
-        let systemPrompt = """
-        You are a helpful AI assistant. Your task is to modify the text according to the following instructions:
-        
-        \(customText)
-        
-        Only return the modified text. Do not provide explanations or extra text unless specifically asked for in the instructions.
-        """
+        processCustomInstruction(customText)
+    }
+
+    private func processCustomInstruction(_ instruction: String) {
+        guard !instruction.isEmpty else { return }
+        appState.isProcessing = true
         
         Task {
             do {
+                let systemPrompt = """
+                You are a writing and coding assistant. Your sole task is to respond to the user's instruction thoughtfully and comprehensively.
+                If the instruction is a question, provide a detailed answer. But always return the best and most accurate answer and not different options. 
+                If it's a request for help, provide clear guidance and examples where appropriate. Make sure tu use the language used or specified by the user instruction.
+                Use Markdown formatting to make your response more readable.
+                """
+                
+                let userPrompt = appState.selectedText.isEmpty ?
+                instruction :
+                    """
+                    User's instruction: \(instruction)
+                    
+                    Text:
+                    \(appState.selectedText)
+                    """
+                
                 let result = try await appState.activeProvider.processText(
                     systemPrompt: systemPrompt,
-                    userPrompt: appState.selectedText,
-                    images: []
+                    userPrompt: userPrompt,
+                    images: appState.selectedImages
                 )
                 
-                DispatchQueue.main.async {
-                    appState.replaceSelectedText(with: result)
+                // Always show response in a new window
+                await MainActor.run {
+                    let window = ResponseWindow(
+                        title: "AI Response",
+                        content: result,
+                        selectedText: appState.selectedText.isEmpty ? instruction : appState.selectedText,
+                        option: .proofread // Using proofread as default, the response window will adapt based on content
+                    )
+                    
+                    WindowManager.shared.addResponseWindow(window)
+                    window.makeKeyAndOrderFront(nil)
+                    window.orderFrontRegardless()
+                    
                     customText = ""
                     isCustomLoading = false
                     closeAction()
                 }
             } catch {
-                print("Error processing custom prompt: \(error)")
+                print("Error processing text: \(error.localizedDescription)")
                 isCustomLoading = false
             }
+            
+            appState.isProcessing = false
         }
     }
 }

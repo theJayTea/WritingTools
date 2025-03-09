@@ -88,14 +88,22 @@ struct CommandEditor: View {
                         Text("Prompt")
                             .font(.headline)
                         
-                        TextEditor(text: $prompt)
-                            .font(.system(.body, design: .monospaced))
-                            .padding(8)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.gray.opacity(0.2), lineWidth: 1)
-                            )
-                            .frame(minHeight: 200)
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color(.textBackgroundColor))
+                                .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+                                
+                            TextEditor(text: $prompt)
+                                .font(.system(.body, design: .monospaced))
+                                .scrollContentBackground(.hidden)
+                                .background(Color.clear)
+                                .padding(8)
+                        }
+                        .frame(height: 200)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                        )
                     }
                     .padding(.horizontal)
                     
@@ -154,4 +162,4 @@ struct CommandEditor: View {
             Text("A command with this name already exists. Please choose a different name.")
         }
     }
-} 
+}

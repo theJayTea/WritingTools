@@ -91,10 +91,6 @@ struct IconPickerView: View {
                 .padding()
             }
             
-            Button("Cancel") {
-                dismiss()
-            }
-            .padding()
         }
         .frame(width: 480, height: 480)
     }
