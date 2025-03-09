@@ -6,8 +6,6 @@ struct OnboardingView: View {
     @ObservedObject var settings = AppSettings.shared
     @State private var currentStep = 0
     @State private var shortcutText = "⌃ Space"
-    @State private var selectedTheme = UserDefaults.standard.string(forKey: "theme_style") ?? "gradient"
-    
     
     private let steps = [
         OnboardingStep(
@@ -154,7 +152,7 @@ struct OnboardingView: View {
                     Divider()
                     
                     Text("Choose your theme:")
-                    Picker("Theme", selection: $selectedTheme) {
+                    Picker("Theme", selection: $settings.themeStyle) {
                         Text("Standard").tag("standard")
                         Text("Gradient").tag("gradient")
                         Text("Glass").tag("glass")
@@ -292,8 +290,8 @@ struct OnboardingView: View {
     
     private func saveSettingsAndFinish() {
         // Save theme settings
-        UserDefaults.standard.set(selectedTheme, forKey: "theme_style")
-        UserDefaults.standard.set(selectedTheme != "standard", forKey: "use_gradient_theme")
+        UserDefaults.standard.set(settings.themeStyle, forKey: "theme_style")
+        UserDefaults.standard.set(settings.themeStyle != "standard", forKey: "use_gradient_theme")
         
         // Save provider-specific settings
         if appState.currentProvider == "gemini" {

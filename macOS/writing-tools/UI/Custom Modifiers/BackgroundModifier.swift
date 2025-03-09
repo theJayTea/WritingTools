@@ -8,6 +8,7 @@ enum AppTheme: String {
 
 struct WindowBackground: ViewModifier {
     @Environment(\.colorScheme) var colorScheme
+    @ObservedObject private var settings = AppSettings.shared
     let useGradient: Bool
     let cornerRadius: CGFloat?
     
@@ -20,7 +21,7 @@ struct WindowBackground: ViewModifier {
         if !useGradient {
             return .standard
         }
-        return UserDefaults.standard.string(forKey: "theme_style") == "glass" ? .glass : .gradient
+        return AppTheme(rawValue: settings.themeStyle) ?? .gradient
     }
     
     func body(content: Content) -> some View {

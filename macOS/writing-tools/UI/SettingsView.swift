@@ -9,8 +9,6 @@ extension KeyboardShortcuts.Name {
 struct SettingsView: View {
     @ObservedObject var appState: AppState
     @ObservedObject var settings = AppSettings.shared
-    @State private var selectedTheme: String = UserDefaults.standard.string(forKey: "theme_style") ?? "gradient"
-    @State private var displayShortcut = ""
     
     var showOnlyApiSetup: Bool = false
     
@@ -44,16 +42,13 @@ struct SettingsView: View {
                 }
                 
                 Section("Appearance") {
-                    Picker("Theme", selection: $selectedTheme) {
+                    Picker("Theme", selection: $settings.themeStyle) {
                         Text("Standard").tag("standard")
                         Text("Gradient").tag("gradient")
                         Text("Glass").tag("glass")
                     }
                     .pickerStyle(.segmented)
-                    .onChange(of: selectedTheme) { _, newValue in
-                        UserDefaults.standard.set(newValue, forKey: "theme_style")
-                        settings.useGradientTheme = (newValue != "standard")
-                    }
+                    // The onChange is handled by the property wrapper in AppSettings
                 }
                 
                 Section("AI Provider") {
@@ -162,8 +157,8 @@ struct SettingsView: View {
         let oldShortcut = UserDefaults.standard.string(forKey: "shortcut")
         
         UserDefaults.standard.set(settings.shortcutText, forKey: "shortcut")
-        UserDefaults.standard.set(selectedTheme, forKey: "theme_style")
-        UserDefaults.standard.set(selectedTheme != "standard", forKey: "use_gradient_theme")
+        
+        // No need to manually set theme_style as it's handled by the property wrapper
         
         // Save provider-specific settings
         if settings.currentProvider == "gemini" {
@@ -215,7 +210,6 @@ struct SettingsView: View {
         }
     }
 }
-
 
 struct LocalLLMSettingsView: View {
     @ObservedObject private var llmEvaluator: LocalLLMProvider

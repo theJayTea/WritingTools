@@ -17,12 +17,13 @@ struct ChatMessage: Identifiable, Equatable, Sendable {
 
 struct ResponseView: View {
     @StateObject private var viewModel: ResponseViewModel
+    @ObservedObject private var settings = AppSettings.shared
     @Environment(\.colorScheme) var colorScheme
-    @AppStorage("use_gradient_theme") private var useGradientTheme = false
     @State private var inputText: String = ""
     @State private var isRegenerating: Bool = false
     @State private var scrollProxy: ScrollViewProxy?
     @State private var latestMessageId: UUID?
+    @State private var showSettings = false
     
     init(content: String, selectedText: String, option: WritingOption? = nil) {
         self._viewModel = StateObject(wrappedValue: ResponseViewModel(
@@ -34,16 +35,49 @@ struct ResponseView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Top toolbar with controls
-            HStack {
+            // Enhanced toolbar with more controls
+            HStack(spacing: 16) {
                 Button(action: { viewModel.copyContent() }) {
-                    Label(viewModel.showCopyConfirmation ? "Copied!" : "Copy",
+                    Label(viewModel.showCopyConfirmation ? "Copied!" : "Copy All",
                           systemImage: viewModel.showCopyConfirmation ? "checkmark" : "doc.on.doc")
+                        .frame(minWidth: 80)
                 }
+                .buttonStyle(.bordered)
                 .animation(.easeInOut, value: viewModel.showCopyConfirmation)
                 
                 Spacer()
                 
+                /*HStack(spacing: 12) {
+                    Button(action: { viewModel.fontSize -= 1 }) {
+                        Image(systemName: "textformat.size.smaller")
+                            .foregroundColor(.primary)
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(viewModel.fontSize <= 10)
+                    .help("Decrease text size")
+                    
+                    Button(action: { viewModel.fontSize += 1 }) {
+                        Image(systemName: "textformat.size.larger")
+                            .foregroundColor(.primary)
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(viewModel.fontSize >= 20)
+                    .help("Increase text size")
+                    
+                    Button(action: {
+                        viewModel.clearConversation()
+                        // Add first message again
+                        viewModel.messages.append(ChatMessage(
+                            role: "assistant",
+                            content: viewModel.initialContent
+                        ))
+                    }) {
+                        Image(systemName: "arrow.counterclockwise")
+                            .foregroundColor(.primary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Clear conversation")
+                }*/
             }
             .padding()
             .background(Color(.windowBackgroundColor))
@@ -87,7 +121,7 @@ struct ResponseView: View {
             }
             .background(Color(.windowBackgroundColor))
         }
-        .windowBackground(useGradient: useGradientTheme)
+        .windowBackground(useGradient: settings.useGradientTheme)
     }
     
     private func sendMessage() {
@@ -159,11 +193,13 @@ final class ResponseViewModel: ObservableObject, Sendable {
     @Published var messages: [ChatMessage] = []
     @Published var fontSize: CGFloat = 14
     @Published var showCopyConfirmation: Bool = false
+    let initialContent: String
     
     let selectedText: String
     let option: WritingOption?
     
     init(content: String, selectedText: String, option: WritingOption? = nil) {
+        self.initialContent = content
         self.selectedText = selectedText
         self.option = option
         

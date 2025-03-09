@@ -2,6 +2,9 @@ import SwiftUI
 
 struct CommandEditor: View {
     @Binding var command: CommandModel
+    @ObservedObject private var settings = AppSettings.shared
+    @Environment(\.colorScheme) var colorScheme
+    
     var onSave: () -> Void
     var onCancel: () -> Void
     var isBuiltIn: Bool
@@ -28,131 +31,138 @@ struct CommandEditor: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Header
+            // Enhanced Header
             HStack {
                 Text(isBuiltIn ? "Edit Built-In Command" : "Edit Command")
                     .font(.headline)
+                    .foregroundColor(.primary)
                 Spacer()
                 Button(action: { onCancel() }) {
                     Image(systemName: "xmark.circle.fill")
                         .font(.title2)
                         .foregroundColor(.secondary)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .help("Cancel")
             }
             .padding()
             
             ScrollView {
-                VStack(spacing: 20) {
-                    // Name & Icon
-                    HStack(alignment: .top, spacing: 16) {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Name")
-                                .font(.headline)
-                            TextField("Button Name", text: $name)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                        }
-                        .frame(maxWidth: .infinity)
-                        
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Icon")
-                                .font(.headline)
-                            
-                            Button(action: { showingIconPicker = true }) {
-                                HStack {
-                                    Image(systemName: selectedIcon)
-                                        .font(.title2)
-                                        .frame(width: 30)
-                                    
-                                    Text("Change Icon")
-                                        .font(.subheadline)
-                                }
-                                .padding(8)
-                                .background(Color(.controlBackgroundColor))
-                                .cornerRadius(8)
+                VStack(alignment: .leading, spacing: 24) {
+                    // Command Information Card
+                    VStack(alignment: .leading, spacing: 20) {
+                        // Name & Icon with better spacing and styling
+                        HStack(alignment: .top, spacing: 20) {
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text("Name")
+                                    .font(.headline)
+                                    .foregroundColor(.primary)
+                                TextField("Command Name", text: $name)
+                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                                    .frame(maxWidth: .infinity)
                             }
-                            .buttonStyle(.plain)
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text("Icon")
+                                    .font(.headline)
+                                    .foregroundColor(.primary)
+                                Button(action: { showingIconPicker = true }) {
+                                    HStack {
+                                        Image(systemName: selectedIcon)
+                                            .font(.title2)
+                                            .frame(width: 30)
+                                        
+                                        Text("Change Icon")
+                                            .font(.subheadline)
+                                    }
+                                    .padding(8)
+                                    .background(Color(.controlBackgroundColor))
+                                    .cornerRadius(8)
+                                }
+                                .buttonStyle(.plain)
+                            }
                         }
-                        .frame(maxWidth: .infinity)
-                    }
-                    .padding(.horizontal)
-                    
-                    // Display response in window toggle
-                    VStack(alignment: .leading, spacing: 8) {
-                        Toggle("Display response in window", isOn: $useResponseWindow)
-                            .padding(.horizontal)
-                    }
-                    
-                    // Prompt
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Prompt")
-                            .font(.headline)
+                        .padding(.horizontal)
                         
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(Color(.textBackgroundColor))
-                                .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+                        // Display response in window toggle
+                        VStack(alignment: .leading, spacing: 8) {
+                            Toggle("Display response in window", isOn: $useResponseWindow)
+                                .padding(.horizontal)
+                        }
+                        
+                        // Prompt
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Prompt")
+                                .font(.headline)
+                                .foregroundColor(.primary)
+                            
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color(.textBackgroundColor))
+                                    .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+                                    
+                                TextEditor(text: $prompt)
+                                    .font(.system(.body, design: .monospaced))
+                                    .scrollContentBackground(.hidden)
+                                    .background(Color.clear)
+                                    .padding(8)
+                            }
+                            .frame(height: 200)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                            )
+                        }
+                        .padding(.horizontal)
+                        
+                        if isBuiltIn {
+                            VStack {
+                                Text("This is a built-in command. Your changes will be saved but you can reset to the original configuration later if needed.")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                    .multilineTextAlignment(.center)
+                                    .padding()
+                            }
+                        }
+                        
+                        // Buttons
+                        HStack {
+                            Button(action: {
+                                onCancel()
+                            }) {
+                                Text("Cancel")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.bordered)
+                            
+                            Button(action: {
+                                // Save changes back to the command
+                                var updatedCommand = command
+                                updatedCommand.name = name
+                                updatedCommand.prompt = prompt
+                                updatedCommand.icon = selectedIcon
+                                updatedCommand.useResponseWindow = useResponseWindow
                                 
-                            TextEditor(text: $prompt)
-                                .font(.system(.body, design: .monospaced))
-                                .scrollContentBackground(.hidden)
-                                .background(Color.clear)
-                                .padding(8)
+                                // Update the binding
+                                command = updatedCommand
+                                
+                                // Call the save action
+                                onSave()
+                            }) {
+                                Text("Save")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                         }
-                        .frame(height: 200)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                        )
+                        .padding()
                     }
-                    .padding(.horizontal)
-                    
-                    if isBuiltIn {
-                        VStack {
-                            Text("This is a built-in command. Your changes will be saved but you can reset to the original configuration later if needed.")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .multilineTextAlignment(.center)
-                                .padding()
-                        }
-                    }
-                    
-                    // Buttons
-                    HStack {
-                        Button(action: {
-                            onCancel()
-                        }) {
-                            Text("Cancel")
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.bordered)
-                        
-                        Button(action: {
-                            // Save changes back to the command
-                            var updatedCommand = command
-                            updatedCommand.name = name
-                            updatedCommand.prompt = prompt
-                            updatedCommand.icon = selectedIcon
-                            updatedCommand.useResponseWindow = useResponseWindow
-                            
-                            // Update the binding
-                            command = updatedCommand
-                            
-                            // Call the save action
-                            onSave()
-                        }) {
-                            Text("Save")
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    }
-                    .padding()
                 }
                 .padding(.vertical)
             }
         }
         .frame(width: 500, height: 600)
+        .windowBackground(useGradient: settings.useGradientTheme)
         .sheet(isPresented: $showingIconPicker) {
             IconPickerView(selectedIcon: $selectedIcon)
         }

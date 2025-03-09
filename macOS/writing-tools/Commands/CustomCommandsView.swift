@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CustomCommandsView: View {
     @ObservedObject var commandsManager: CustomCommandsManager
+    @ObservedObject private var settings = AppSettings.shared
     @Environment(\.dismiss) var dismiss
     @State private var isAddingNew = false
     @State private var selectedCommand: CustomCommand?
@@ -49,7 +50,7 @@ struct CustomCommandsView: View {
             }
         }
         .frame(width: 500, height: 400)
-        .background(Color(.windowBackgroundColor))
+        .windowBackground(useGradient: settings.useGradientTheme)
         .sheet(isPresented: $isAddingNew) {
             CustomCommandEditor(
                 commandsManager: commandsManager,
@@ -112,6 +113,7 @@ struct CustomCommandRow: View {
 
 struct CustomCommandEditor: View {
     @ObservedObject var commandsManager: CustomCommandsManager
+    @ObservedObject private var settings = AppSettings.shared
     @Binding var isPresented: Bool
     @Environment(\.dismiss) var dismiss
     
@@ -245,11 +247,9 @@ struct CustomCommandEditor: View {
             .padding()
         }
         .frame(width: 500, height: 600)
-        .background(Color(.windowBackgroundColor))
+        .windowBackground(useGradient: settings.useGradientTheme)
         .sheet(isPresented: $showingIconPicker) {
             IconPickerView(selectedIcon: $selectedIcon, availableIcons: nil)
         }
     }
 }
-
-// IconPickerView has been moved to its own file

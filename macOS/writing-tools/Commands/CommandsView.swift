@@ -2,7 +2,9 @@ import SwiftUI
 
 struct CommandsView: View {
     @ObservedObject var commandManager: CommandManager
+    @ObservedObject private var settings = AppSettings.shared
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
     
     @State private var isAddingNew = false
     @State private var editingCommand: CommandModel?
@@ -12,44 +14,57 @@ struct CommandsView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Header
+            // Header with enhanced styling
             HStack {
                 Text("Manage Commands")
                     .font(.headline)
+                    .foregroundColor(.primary)
                 Spacer()
                 Button(action: { dismiss() }) {
                     Image(systemName: "xmark.circle.fill")
                         .font(.title2)
                         .foregroundColor(.secondary)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .help("Close")
             }
             .padding()
             
-            // Tab switcher
+            // Tab switcher with improved styling
             Picker("Command Type", selection: $selectedTab) {
                 Text("Built-in").tag(0)
                 Text("Custom").tag(1)
             }
             .pickerStyle(.segmented)
             .padding(.horizontal)
+            .padding(.bottom, 8)
             
-            // Command list
-            if selectedTab == 0 {
-                builtInCommandsView
-            } else {
-                customCommandsView
+            // Command list with section header
+            VStack(alignment: .leading, spacing: 8) {
+                Text(selectedTab == 0 ? "Built-in Commands" : "Custom Commands")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+                
+                if selectedTab == 0 {
+                    builtInCommandsView
+                } else {
+                    customCommandsView
+                }
             }
             
             Divider()
             
-            // Action buttons
+            // Action buttons with enhanced styling
             HStack {
                 if selectedTab == 0 {
                     Button(action: { showingResetAlert = true }) {
                         Label("Reset to Defaults", systemImage: "arrow.counterclockwise")
                             .font(.body)
                     }
+                    .buttonStyle(.bordered)
                     .controlSize(.large)
                     .padding()
                     .help("Reset all built-in commands to their original state, including restoring any that were deleted")
@@ -58,6 +73,7 @@ struct CommandsView: View {
                         Label("Add Custom Command", systemImage: "plus.circle.fill")
                             .font(.body)
                     }
+                    .buttonStyle(.borderedProminent)
                     .controlSize(.large)
                     .padding()
                 }
@@ -66,6 +82,7 @@ struct CommandsView: View {
             }
         }
         .frame(width: 600, height: 500)
+        .windowBackground(useGradient: settings.useGradientTheme)
         .sheet(isPresented: $isAddingNew) {
             CommandEditor(
                 command: $newCommand,
@@ -123,6 +140,20 @@ struct CommandsView: View {
                 )
             }
         }
+        .listStyle(.inset)
+        .overlay(
+            Group {
+                if commandManager.builtInCommands.isEmpty {
+                    VStack {
+                        Image(systemName: "questionmark.circle")
+                            .font(.largeTitle)
+                            .foregroundColor(.secondary)
+                        Text("No built-in commands")
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+        )
     }
     
     var customCommandsView: some View {
@@ -149,10 +180,23 @@ struct CommandsView: View {
                 commandManager.replaceAllCommands(with: newCommands)
             }
         }
-        // Use a different approach instead of editMode for macOS
-        .onAppear {
-            // In macOS, the list will have drag handles by default when .onMove is used
-        }
+        .listStyle(.inset)
+        .overlay(
+            Group {
+                if commandManager.customCommands.isEmpty {
+                    VStack {
+                        Image(systemName: "plus.circle")
+                            .font(.largeTitle)
+                            .foregroundColor(.secondary)
+                        Text("No custom commands yet")
+                            .foregroundColor(.secondary)
+                        Text("Add one to get started")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+        )
     }
 }
 
@@ -161,39 +205,68 @@ struct CommandRow: View {
     let onEdit: (CommandModel) -> Void
     let onDelete: (CommandModel) -> Void
     
+    @Environment(\.colorScheme) var colorScheme
+    
     var body: some View {
-        HStack {
+        HStack(spacing: 16) {
+            // Icon with consistent size and styling
             Image(systemName: command.icon)
-                .frame(width: 30)
+                .font(.title3)
+                .foregroundColor(.accentColor)
+                .frame(width: 30, height: 30)
+                .background(
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(Color.accentColor.opacity(0.1))
+                )
             
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(command.name)
-                    .fontWeight(.medium)
+                    .font(.headline)
                 
                 Text(command.isBuiltIn ? "Built-in" : "Custom")
                     .font(.caption)
                     .foregroundColor(.secondary)
+                    .padding(.vertical, 2)
+                    .padding(.horizontal, 6)
+                    .background(
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(command.isBuiltIn ?
+                                  Color.blue.opacity(0.2) :
+                                  Color.green.opacity(0.2))
+                    )
             }
             
             Spacer()
             
-            Button(action: { onEdit(command) }) {
-                Image(systemName: "pencil")
-                    .foregroundColor(.blue)
+            HStack(spacing: 12) {
+                Button(action: { onEdit(command) }) {
+                    Image(systemName: "pencil")
+                        .font(.body)
+                        .foregroundColor(.blue)
+                        .frame(width: 28, height: 28)
+                        .background(Color.blue.opacity(0.1))
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.plain)
+                .help("Edit command")
+                
+                Button(action: { onDelete(command) }) {
+                    Image(systemName: "trash")
+                        .font(.body)
+                        .foregroundColor(.red)
+                        .frame(width: 28, height: 28)
+                        .background(Color.red.opacity(0.1))
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.plain)
+                .help("Delete command")
             }
-            .buttonStyle(.borderless)
-            
-            // Allow deletion of any command
-            Button(action: { onDelete(command) }) {
-                Image(systemName: "trash")
-                    .foregroundColor(.red)
-            }
-            .buttonStyle(.borderless)
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 8)
+        .contentShape(Rectangle())
     }
 }
 
 #Preview {
     CommandsView(commandManager: CommandManager())
-} 
+}

@@ -242,6 +242,9 @@
         }
       }
     },
+    "Add one to get started" : {
+
+    },
     "AI Provider" : {
       "localizations" : {
         "de" : {
@@ -402,6 +405,9 @@
         }
       }
     },
+    "Built-in Commands" : {
+
+    },
     "Button Name" : {
       "localizations" : {
         "de" : {
@@ -514,6 +520,12 @@
         }
       }
     },
+    "Close" : {
+
+    },
+    "Command Name" : {
+
+    },
     "Command Type" : {
       "localizations" : {
         "de" : {
@@ -580,6 +592,7 @@
       }
     },
     "Copy" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -594,6 +607,9 @@
           }
         }
       }
+    },
+    "Copy All" : {
+
     },
     "Created with care by Jesai, a high school student." : {
       "localizations" : {
@@ -674,6 +690,9 @@
           }
         }
       }
+    },
+    "Delete command" : {
+
     },
     "Delete Model" : {
       "localizations" : {
@@ -802,6 +821,9 @@
           }
         }
       }
+    },
+    "Edit command" : {
+
     },
     "Edit Command" : {
       "localizations" : {
@@ -1364,6 +1386,12 @@
           }
         }
       }
+    },
+    "No built-in commands" : {
+
+    },
+    "No custom commands yet" : {
+
     },
     "OK" : {
       "localizations" : {
