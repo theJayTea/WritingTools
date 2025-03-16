@@ -18,6 +18,7 @@
       }
     },
     "(Llama 3.2)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -29,6 +30,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "(Llama 3.2)"
+          }
+        }
+      }
+    },
+    "(Qwen2.5 3B 4-bit)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Qwen2.5 3B 4-bit)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Qwen2.5 3B 4-bit)"
           }
         }
       }
@@ -225,6 +242,9 @@
         }
       }
     },
+    "Activate Writing Tools:" : {
+
+    },
     "Add Custom Command" : {
       "localizations" : {
         "de" : {
@@ -274,8 +294,10 @@
         }
       }
     },
+    "Advanced Options" : {
+
+    },
     "AI Provider" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -292,7 +314,6 @@
       }
     },
     "AI Provider Settings" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -307,6 +328,9 @@
           }
         }
       }
+    },
+    "API Configuration" : {
+
     },
     "API Key" : {
       "localizations" : {
@@ -325,7 +349,6 @@
       }
     },
     "Appearance" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -340,6 +363,9 @@
           }
         }
       }
+    },
+    "Appearance Settings" : {
+
     },
     "Apple Silicon Required" : {
       "localizations" : {
@@ -566,6 +592,9 @@
         }
       }
     },
+    "Choose how the app windows will appear" : {
+
+    },
     "Choose your theme:" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -663,6 +692,9 @@
           }
         }
       }
+    },
+    "Connection Settings" : {
+
     },
     "Copied!" : {
       "localizations" : {
@@ -857,6 +889,9 @@
         }
       }
     },
+    "Documentation" : {
+
+    },
     "Download Model" : {
       "localizations" : {
         "de" : {
@@ -969,6 +1004,9 @@
         }
       }
     },
+    "Edit Commands" : {
+
+    },
     "Email: developer@aryamirsepasi.com" : {
       "localizations" : {
         "de" : {
@@ -1016,6 +1054,9 @@
           }
         }
       }
+    },
+    "Exit Edit Mode" : {
+
     },
     "Finish" : {
       "localizations" : {
@@ -1098,8 +1139,10 @@
         }
       }
     },
+    "General" : {
+
+    },
     "General Settings" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1194,6 +1237,9 @@
           }
         }
       }
+    },
+    "Global Keyboard Shortcut" : {
+
     },
     "Global Shortcut:" : {
       "localizations" : {
@@ -1374,6 +1420,9 @@
         }
       }
     },
+    "Local LLM is only available on Apple Silicon devices." : {
+
+    },
     "Local LLMs: use the instructions on" : {
       "localizations" : {
         "de" : {
@@ -1470,6 +1519,9 @@
         }
       }
     },
+    "Model Configuration" : {
+
+    },
     "Model Information" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1534,6 +1586,9 @@
           }
         }
       }
+    },
+    "Model Selection" : {
+
     },
     "Name" : {
       "localizations" : {
@@ -2050,6 +2105,12 @@
         }
       }
     },
+    "Save Changes" : {
+
+    },
+    "Select AI Service" : {
+
+    },
     "Select Icon" : {
       "localizations" : {
         "de" : {
@@ -2310,6 +2371,9 @@
           }
         }
       }
+    },
+    "Window Style" : {
+
     },
     "Writing Tools is a free & lightweight tool that helps you improve your writing with AI, similar to Apple's new Apple Intelligence feature." : {
       "localizations" : {

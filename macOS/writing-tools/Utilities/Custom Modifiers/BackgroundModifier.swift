@@ -124,6 +124,7 @@ extension Color {
     }
 }
 
+
 extension View {
     func windowBackground(useGradient: Bool, cornerRadius: CGFloat? = nil) -> some View {
         modifier(WindowBackground(useGradient: useGradient, cornerRadius: cornerRadius))

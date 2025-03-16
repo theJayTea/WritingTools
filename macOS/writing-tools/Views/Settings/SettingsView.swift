@@ -9,8 +9,26 @@ extension KeyboardShortcuts.Name {
 struct SettingsView: View {
     @ObservedObject var appState: AppState
     @ObservedObject var settings = AppSettings.shared
+    @State private var selectedTab: SettingsTab = .general
+    @State private var needsSaving: Bool = false
     
     var showOnlyApiSetup: Bool = false
+    
+    enum SettingsTab: String, CaseIterable, Identifiable {
+        case general = "General"
+        case appearance = "Appearance"
+        case aiProvider = "AI Provider"
+        
+        var id: String { self.rawValue }
+        
+        var icon: String {
+            switch self {
+            case .general: return "gear"
+            case .appearance: return "paintpalette"
+            case .aiProvider: return "brain.head.profile"
+            }
+        }
+    }
     
     struct LinkText: View {
         var body: some View {
@@ -35,54 +53,133 @@ struct SettingsView: View {
     }
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 10) {
-                if !showOnlyApiSetup {
-                    generalSettingsSection
-                    appearanceSection
-                    aiProviderSection
+        TabView(selection: $selectedTab) {
+            generalPane
+                .tabItem {
+                    Label("General", systemImage: "gear")
                 }
-                
-                providerSpecificSettings
-                
-                Button(showOnlyApiSetup ? "Complete Setup" : "Save") {
-                    saveSettings()
+                .tag(SettingsTab.general)
+            
+            appearancePane
+                .tabItem {
+                    Label("Appearance", systemImage: "paintpalette")
                 }
-                .buttonStyle(.borderedProminent)
-            }
-            .padding()
+                .tag(SettingsTab.appearance)
+            
+            aiProviderPane
+                .tabItem {
+                    Label("AI Provider", systemImage: "brain.head.profile")
+                }
+                .tag(SettingsTab.aiProvider)
         }
-        .frame(width: 500)
+        .padding(20)
+        .frame(width: 540, height: showOnlyApiSetup ? 400 : 460)
         .background(
             Rectangle()
                 .fill(Color.clear)
                 .windowBackground(useGradient: settings.useGradientTheme)
         )
-    }
-    
-    private var generalSettingsSection: some View {
-        GroupBox {
-            KeyboardShortcuts.Recorder("Global Shortcut:", name: .showPopup)
-                .padding(.vertical, 4)
+        .onChange(of: selectedTab) { oldValue, newValue in 
+            // Save selected tab for next time
+            UserDefaults.standard.set(selectedTab.rawValue, forKey: "lastSettingsTab")
         }
-    }
-    
-    private var appearanceSection: some View {
-        GroupBox {
-            Picker("Theme", selection: $settings.themeStyle) {
-                Text("Standard").tag("standard")
-                Text("Gradient").tag("gradient")
-                Text("Glass").tag("glass")
+        .onAppear {
+            // Restore last selected tab
+            if let savedTab = UserDefaults.standard.string(forKey: "lastSettingsTab"),
+               let tab = SettingsTab(rawValue: savedTab) {
+                selectedTab = tab
             }
-            .pickerStyle(.segmented)
-            .padding(.vertical, 4)
-            // The onChange is handled by the property wrapper in AppSettings
+            
+            // Configure window properties
+            DispatchQueue.main.async {
+                if let window = NSApplication.shared.windows.first(where: {
+                    $0.contentView?.subviews.contains(where: { $0 is NSHostingView<SettingsView> }) ?? false
+                }) {
+                    window.title = "\(selectedTab.rawValue) Settings"
+                    
+                    // Disable minimize and zoom buttons
+                    window.standardWindowButton(.miniaturizeButton)?.isEnabled = false
+                    window.standardWindowButton(.zoomButton)?.isEnabled = false
+                }
+            }
+        }
+        .onChange(of: selectedTab) { oldValue, newValue in
+            DispatchQueue.main.async {
+                if let window = NSApplication.shared.windows.first(where: {
+                    $0.contentView?.subviews.contains(where: { $0 is NSHostingView<SettingsView> }) ?? false
+                }) {
+                    window.title = "\(newValue.rawValue) Settings"
+                }
+            }
         }
     }
     
-    private var aiProviderSection: some View {
-        GroupBox{
-            VStack(alignment: .leading) {
+    private var generalPane: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            Text("General Settings")
+                .font(.headline)
+            
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Global Keyboard Shortcut")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                
+                KeyboardShortcuts.Recorder("Activate Writing Tools:", name: .showPopup)
+                    .padding(.vertical, 2)
+            }
+            
+            Spacer()
+            
+            if !showOnlyApiSetup {
+                saveButton
+            }
+        }
+    }
+    
+    private var appearancePane: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            Text("Appearance Settings")
+                .font(.headline)
+            
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Window Style")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                
+                Text("Choose how the app windows will appear")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                
+                Picker("Theme", selection: $settings.themeStyle) {
+                    Text("Standard").tag("standard")
+                    Text("Gradient").tag("gradient")
+                    Text("Glass").tag("glass")
+                }
+                .pickerStyle(.segmented)
+                .padding(.vertical, 4)
+                .onChange(of: settings.themeStyle) { oldValue, newValue in 
+                    needsSaving = true 
+                }
+            }
+            
+            Spacer()
+            
+            if !showOnlyApiSetup {
+                saveButton
+            }
+        }
+    }
+    
+    private var aiProviderPane: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            Text("AI Provider Settings")
+                .font(.headline)
+            
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Select AI Service")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                
                 Picker("Provider", selection: $settings.currentProvider) {
                     if LocalLLMProvider.isAppleSilicon {
                         Text("Local LLM").tag("local")
@@ -94,19 +191,33 @@ struct SettingsView: View {
                 }
                 .pickerStyle(.menu)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .onChange(of: settings.currentProvider, initial: false) { oldValue, newValue in
+                .onChange(of: settings.currentProvider) { oldValue, newValue in
                     if newValue == "local" && !LocalLLMProvider.isAppleSilicon {
                         settings.currentProvider = "gemini"
                     }
+                    needsSaving = true
                 }
                 
                 if settings.currentProvider == "local" {
-                    Text("(Llama 3.2)")
+                    Text("(Qwen2.5 3B 4-bit)")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
             }
-            .padding(.vertical, 4)
+            
+            Divider()
+                .padding(.vertical, 4)
+            
+            ScrollView {
+                providerSpecificSettings
+                    .frame(maxWidth: .infinity)
+            }
+            
+            if !showOnlyApiSetup {
+                saveButton
+            } else {
+                completeSetupButton
+            }
         }
     }
     
@@ -127,115 +238,239 @@ struct SettingsView: View {
     }
     
     private var geminiSettings: some View {
-        GroupBox("Gemini AI Settings") {
-            VStack(alignment: .leading, spacing: 12) {
-                TextField("API Key", text: $settings.geminiApiKey)
-                    .textFieldStyle(.roundedBorder)
-                
-                Picker("Model", selection: $settings.geminiModel) {
-                    ForEach(GeminiModel.allCases, id: \.self) { model in
-                        Text(model.displayName).tag(model)
-                    }
+        VStack(alignment: .leading, spacing: 16) {
+            Group {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("API Configuration")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    
+                    TextField("API Key", text: $settings.geminiApiKey)
+                        .textFieldStyle(.roundedBorder)
+                        .onChange(of: settings.geminiApiKey) { oldValue, newValue in 
+                            needsSaving = true 
+                        }
                 }
-                .pickerStyle(.menu)
-                .frame(maxWidth: .infinity, alignment: .leading)
                 
-                Button("Get API Key") {
-                    if let url = URL(string: "https://aistudio.google.com/app/apikey") {
-                        NSWorkspace.shared.open(url)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Model Selection")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    
+                    Picker("Model", selection: $settings.geminiModel) {
+                        ForEach(GeminiModel.allCases, id: \.self) { model in
+                            Text(model.displayName).tag(model)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .onChange(of: settings.geminiModel) { oldValue, newValue in 
+                        needsSaving = true 
                     }
                 }
             }
-            .padding(.vertical, 4)
+            .padding(.bottom, 4)
+                            
+            Button("Get API Key") {
+                if let url = URL(string: "https://aistudio.google.com/app/apikey") {
+                    NSWorkspace.shared.open(url)
+                }
+            }
+            .buttonStyle(.link)
         }
     }
     
     private var mistralSettings: some View {
-        GroupBox("Mistral AI Settings") {
-            VStack(alignment: .leading, spacing: 12) {
-                TextField("API Key", text: $settings.mistralApiKey)
-                    .textFieldStyle(.roundedBorder)
-                
-                TextField("Base URL", text: $settings.mistralBaseURL)
-                    .textFieldStyle(.roundedBorder)
-                
-                Picker("Model", selection: $settings.mistralModel) {
-                    ForEach(MistralModel.allCases, id: \.self) { model in
-                        Text(model.displayName).tag(model.rawValue)
-                    }
+        VStack(alignment: .leading, spacing: 16) {
+            Group {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("API Configuration")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    
+                    TextField("API Key", text: $settings.mistralApiKey)
+                        .textFieldStyle(.roundedBorder)
+                        .onChange(of: settings.mistralApiKey) { oldValue, newValue in 
+                            needsSaving = true 
+                        }
+                    
+                    TextField("Base URL", text: $settings.mistralBaseURL)
+                        .textFieldStyle(.roundedBorder)
+                        .onChange(of: settings.mistralBaseURL) { oldValue, newValue in 
+                            needsSaving = true 
+                        }
                 }
-                .pickerStyle(.menu)
-                .frame(maxWidth: .infinity, alignment: .leading)
                 
-                Button("Get Mistral API Key") {
-                    if let url = URL(string: "https://console.mistral.ai/api-keys/") {
-                        NSWorkspace.shared.open(url)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Model Selection")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    
+                    Picker("Model", selection: $settings.mistralModel) {
+                        ForEach(MistralModel.allCases, id: \.self) { model in
+                            Text(model.displayName).tag(model.rawValue)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .onChange(of: settings.mistralModel) { oldValue, newValue in 
+                        needsSaving = true 
                     }
                 }
             }
-            .padding(.vertical, 4)
+            .padding(.bottom, 4)
+                            
+            Button("Get Mistral API Key") {
+                if let url = URL(string: "https://console.mistral.ai/api-keys/") {
+                    NSWorkspace.shared.open(url)
+                }
+            }
+            .buttonStyle(.link)
         }
     }
     
     private var openAISettings: some View {
-        GroupBox("OpenAI Settings") {
-            VStack(alignment: .leading, spacing: 12) {
-                TextField("API Key", text: $settings.openAIApiKey)
+        VStack(alignment: .leading, spacing: 16) {
+            Group {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("API Configuration")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    
+                    TextField("API Key", text: $settings.openAIApiKey)
+                        .textFieldStyle(.roundedBorder)
+                        .onChange(of: settings.openAIApiKey) { oldValue, newValue in 
+                            needsSaving = true 
+                        }
+                    
+                    TextField("Base URL", text: $settings.openAIBaseURL)
+                        .textFieldStyle(.roundedBorder)
+                        .onChange(of: settings.openAIBaseURL) { oldValue, newValue in 
+                            needsSaving = true 
+                        }
+                }
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Model Configuration")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    
+                    TextField("Model Name", text: $settings.openAIModel)
+                        .textFieldStyle(.roundedBorder)
+                        .onChange(of: settings.openAIModel) { oldValue, newValue in 
+                            needsSaving = true 
+                        }
+                    
+                    Text("OpenAI models include: gpt-4o, gpt-4o-mini, etc.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Advanced Options")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    
+                    TextField("Organization ID (Optional)", text: Binding(
+                        get: { settings.openAIOrganization ?? "" },
+                        set: { 
+                            settings.openAIOrganization = $0.isEmpty ? nil : $0 
+                            needsSaving = true
+                        }
+                    ))
                     .textFieldStyle(.roundedBorder)
-                
-                TextField("Base URL", text: $settings.openAIBaseURL)
+                    
+                    TextField("Project ID (Optional)", text: Binding(
+                        get: { settings.openAIProject ?? "" },
+                        set: { 
+                            settings.openAIProject = $0.isEmpty ? nil : $0 
+                            needsSaving = true
+                        }
+                    ))
                     .textFieldStyle(.roundedBorder)
-                
-                TextField("Model Name", text: $settings.openAIModel)
-                    .textFieldStyle(.roundedBorder)
-                
-                Text("OpenAI models include: gpt-4o, gpt-4o-mini, etc.")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                
-                TextField("Organization ID (Optional)", text: Binding(
-                    get: { settings.openAIOrganization ?? "" },
-                    set: { settings.openAIOrganization = $0.isEmpty ? nil : $0 }
-                ))
-                .textFieldStyle(.roundedBorder)
-                
-                TextField("Project ID (Optional)", text: Binding(
-                    get: { settings.openAIProject ?? "" },
-                    set: { settings.openAIProject = $0.isEmpty ? nil : $0 }
-                ))
-                .textFieldStyle(.roundedBorder)
-                
-                Button("Get OpenAI API Key") {
-                    if let url = URL(string: "https://platform.openai.com/account/api-keys") {
-                        NSWorkspace.shared.open(url)
-                    }
                 }
             }
-            .padding(.vertical, 4)
+            .padding(.bottom, 4)
+                            
+            Button("Get OpenAI API Key") {
+                if let url = URL(string: "https://platform.openai.com/account/api-keys") {
+                    NSWorkspace.shared.open(url)
+                }
+            }
+            .buttonStyle(.link)
         }
     }
     
     private var ollamaSettings: some View {
-        GroupBox("Ollama Provider Settings") {
-            VStack(alignment: .leading, spacing: 12) {
-                TextField("Ollama Base URL", text: $settings.ollamaBaseURL)
-                    .textFieldStyle(.roundedBorder)
+        VStack(alignment: .leading, spacing: 16) {
+            Group {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Connection Settings")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    
+                    TextField("Ollama Base URL", text: $settings.ollamaBaseURL)
+                        .textFieldStyle(.roundedBorder)
+                        .onChange(of: settings.ollamaBaseURL) { oldValue, newValue in 
+                            needsSaving = true 
+                        }
+                }
                 
-                TextField("Ollama Model", text: $settings.ollamaModel)
-                    .textFieldStyle(.roundedBorder)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Model Configuration")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    
+                    TextField("Ollama Model", text: $settings.ollamaModel)
+                        .textFieldStyle(.roundedBorder)
+                        .onChange(of: settings.ollamaModel) { oldValue, newValue in 
+                            needsSaving = true 
+                        }
+                    
+                    TextField("Keep Alive Time", text: $settings.ollamaKeepAlive)
+                        .textFieldStyle(.roundedBorder)
+                        .onChange(of: settings.ollamaKeepAlive) { oldValue, newValue in 
+                            needsSaving = true 
+                        }
+                }
                 
-                TextField("Keep Alive Time", text: $settings.ollamaKeepAlive)
-                    .textFieldStyle(.roundedBorder)
-                
-                LinkText()
-                
-                Button("Ollama Documentation") {
-                    if let url = URL(string: "https://ollama.ai/download") {
-                        NSWorkspace.shared.open(url)
-                    }
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Documentation")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    
+                    LinkText()
                 }
             }
-            .padding(.vertical, 4)
+            .padding(.bottom, 4)
+                            
+            Button("Ollama Documentation") {
+                if let url = URL(string: "https://ollama.ai/download") {
+                    NSWorkspace.shared.open(url)
+                }
+            }
+            .buttonStyle(.link)
+        }
+    }
+    
+    private var saveButton: some View {
+        HStack {
+            Spacer()
+            Button("Save Changes") {
+                saveSettings()
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(!needsSaving)
+        }
+    }
+    
+    private var completeSetupButton: some View {
+        HStack {
+            Spacer()
+            Button("Complete Setup") {
+                saveSettings()
+            }
+            .buttonStyle(.borderedProminent)
         }
     }
     
@@ -347,7 +582,7 @@ struct LocalLLMSettingsView: View {
                 .font(.title)
                 .bold()
             
-            Text("Local LLM is only available on Apple Silicon devices (M1/M2/M3 Macs).")
+            Text("Local LLM is only available on Apple Silicon devices.")
                 .multilineTextAlignment(.center)
                 .padding(.bottom, 10)
             
@@ -376,7 +611,7 @@ struct LocalLLMSettingsView: View {
             
             GroupBox {
                 VStack(alignment: .leading, spacing: 8) {
-                    InfoRow(label: "Model", value: "Llama 3.2 3B (4-bit Quantized)")
+                    InfoRow(label: "Model", value: "Qwen2.5 3B (4-bit Quantized)")
                     InfoRow(label: "Size", value: "~1.8GB")
                     InfoRow(label: "Optimized", value: "Apple Silicon")
                 }

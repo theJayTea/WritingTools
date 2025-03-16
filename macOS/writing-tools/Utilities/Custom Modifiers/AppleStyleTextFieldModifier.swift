@@ -7,13 +7,14 @@ struct AppleStyleTextFieldModifier: ViewModifier {
     let onSubmit: () -> Void
     
     @State private var isAnimating: Bool = false
+    @State private var isHovered: Bool = false
     
     func body(content: Content) -> some View {
         ZStack(alignment: .trailing) {
             HStack(spacing: 0) {
                 content
                     .font(.system(size: 14))
-                    .foregroundColor(.white)
+                    .foregroundColor(colorScheme == .dark ? .white : .primary)
                     .padding(12)
                     .onSubmit {
                         withAnimation {
@@ -29,7 +30,7 @@ struct AppleStyleTextFieldModifier: ViewModifier {
                 Spacer(minLength: 0)
             }
             
-            // Integrated send button
+            // Integrated send button with more subtle styling
             if !text.isEmpty {
                 Button(action: {
                     withAnimation {
@@ -41,50 +42,50 @@ struct AppleStyleTextFieldModifier: ViewModifier {
                         isAnimating = false
                     }
                 }) {
-                    Image(systemName: "paperplane.fill")
+                    Image(systemName: isLoading ? "hourglass" : "paperplane.fill")
                         .foregroundColor(.white)
-                        .font(.system(size: 14))
-                        .frame(width: 28, height: 28)
+                        .font(.system(size: 12))
+                        .frame(width: 24, height: 24)
                         .background(
-                            LinearGradient(
-                                gradient: Gradient(colors: [
-                                    Color(red: 0.2, green: 0.5, blue: 1.0),
-                                    Color(red: 0.6, green: 0.3, blue: 0.9)
-                                ]),
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
+                            colorScheme == .dark 
+                                ? Color.blue
+                                : Color.blue
                         )
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .clipShape(Circle())
+                        //.clipShape(RoundedRectangle(cornerRadius: 8))
+                        .scaleEffect(isHovered ? 1.05 : 1.0)
+                        .opacity(isHovered ? 1.0 : 0.9)
                 }
                 .buttonStyle(.plain)
-                .padding(.trailing, 2) 
+                .padding(.trailing, 8)
                 .transition(.opacity)
+                .onHover { hovering in
+                    isHovered = hovering
+                }
             }
         }
-        .frame(height: 32)
+        .frame(height: 36) // Slightly taller for better macOS alignment
         .background(
             ZStack {
-                Color.black.opacity(0.3)
-                    .blur(radius: 0.5)
+                if colorScheme == .dark {
+                    Color.black.opacity(0.2)
+                        .blur(radius: 0.5)
+                } else {
+                    Color(.textBackgroundColor)
+                }
                 
                 if isLoading {
-                    Color.black.opacity(0.2)
+                    Color.gray.opacity(0.1)
                 }
             }
         )
-        .cornerRadius(8)
+        .cornerRadius(6) // macOS uses subtler corner radii
         .overlay(
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: 6)
                 .strokeBorder(
-                    LinearGradient(
-                        gradient: Gradient(colors: [
-                            Color(red: 0.2, green: 0.5, blue: 1.0).opacity(isAnimating ? 0.8 : 0.1),
-                            Color(red: 0.6, green: 0.3, blue: 0.9).opacity(isAnimating ? 0.8 : 0.1)
-                        ]),
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
+                    isAnimating 
+                        ? Color.blue.opacity(0.8)
+                        : Color.gray.opacity(0.2),
                     lineWidth: isAnimating ? 2 : 0.5
                 )
                 .animation(.easeInOut(duration: 0.3), value: isAnimating)

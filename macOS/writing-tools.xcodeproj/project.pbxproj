@@ -7,18 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2A0D3B822D68F22000851AC8 /* MLX in Frameworks */ = {isa = PBXBuildFile; productRef = 2A0D3B812D68F22000851AC8 /* MLX */; };
-		2A0D3B842D68F22000851AC8 /* MLXFFT in Frameworks */ = {isa = PBXBuildFile; productRef = 2A0D3B832D68F22000851AC8 /* MLXFFT */; };
-		2A0D3B862D68F22000851AC8 /* MLXFast in Frameworks */ = {isa = PBXBuildFile; productRef = 2A0D3B852D68F22000851AC8 /* MLXFast */; };
-		2A0D3B882D68F22000851AC8 /* MLXLinalg in Frameworks */ = {isa = PBXBuildFile; productRef = 2A0D3B872D68F22000851AC8 /* MLXLinalg */; };
-		2A0D3B8A2D68F22000851AC8 /* MLXNN in Frameworks */ = {isa = PBXBuildFile; productRef = 2A0D3B892D68F22000851AC8 /* MLXNN */; };
-		2A0D3B8D2D68F23200851AC8 /* MLXLLM in Frameworks */ = {isa = PBXBuildFile; productRef = 2A0D3B8C2D68F23200851AC8 /* MLXLLM */; };
-		2A0D3B8F2D68F23200851AC8 /* MLXLMCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 2A0D3B8E2D68F23200851AC8 /* MLXLMCommon */; };
-		2A0D3B912D68F23200851AC8 /* MLXMNIST in Frameworks */ = {isa = PBXBuildFile; productRef = 2A0D3B902D68F23200851AC8 /* MLXMNIST */; };
-		2A0D3B932D68F23200851AC8 /* MLXVLM in Frameworks */ = {isa = PBXBuildFile; productRef = 2A0D3B922D68F23200851AC8 /* MLXVLM */; };
-		2A0D3B952D68F23200851AC8 /* StableDiffusion in Frameworks */ = {isa = PBXBuildFile; productRef = 2A0D3B942D68F23200851AC8 /* StableDiffusion */; };
-		2AA154122CF2636900D27D18 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 2AA154112CF2636900D27D18 /* MarkdownUI */; };
-		2AF5CC562D2AFE1C0050F923 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 2AF5CC552D2AFE1C0050F923 /* KeyboardShortcuts */; };
+		2A999C902D84D81A00DFB0A6 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 2A999C8F2D84D81A00DFB0A6 /* KeyboardShortcuts */; };
+		2A999C9E2D84D88000DFB0A6 /* AIProxy in Frameworks */ = {isa = PBXBuildFile; productRef = 2A999C9D2D84D88000DFB0A6 /* AIProxy */; };
+		2A999CA12D84D89700DFB0A6 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 2A999CA02D84D89700DFB0A6 /* MarkdownUI */; };
+		2A999CA42D84D91700DFB0A6 /* MLX in Frameworks */ = {isa = PBXBuildFile; productRef = 2A999CA32D84D91700DFB0A6 /* MLX */; };
+		2A999CA62D84D91800DFB0A6 /* MLXFFT in Frameworks */ = {isa = PBXBuildFile; productRef = 2A999CA52D84D91800DFB0A6 /* MLXFFT */; };
+		2A999CA82D84D91800DFB0A6 /* MLXFast in Frameworks */ = {isa = PBXBuildFile; productRef = 2A999CA72D84D91800DFB0A6 /* MLXFast */; };
+		2A999CAA2D84D91800DFB0A6 /* MLXLinalg in Frameworks */ = {isa = PBXBuildFile; productRef = 2A999CA92D84D91800DFB0A6 /* MLXLinalg */; };
+		2A999CAC2D84D91800DFB0A6 /* MLXNN in Frameworks */ = {isa = PBXBuildFile; productRef = 2A999CAB2D84D91800DFB0A6 /* MLXNN */; };
+		2A999CAF2D84D9B800DFB0A6 /* MLXEmbedders in Frameworks */ = {isa = PBXBuildFile; productRef = 2A999CAE2D84D9B800DFB0A6 /* MLXEmbedders */; };
+		2A999CB12D84D9B800DFB0A6 /* MLXLLM in Frameworks */ = {isa = PBXBuildFile; productRef = 2A999CB02D84D9B800DFB0A6 /* MLXLLM */; };
+		2A999CB32D84D9B800DFB0A6 /* MLXLMCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 2A999CB22D84D9B800DFB0A6 /* MLXLMCommon */; };
+		2A999CB52D84D9B800DFB0A6 /* MLXMNIST in Frameworks */ = {isa = PBXBuildFile; productRef = 2A999CB42D84D9B800DFB0A6 /* MLXMNIST */; };
+		2A999CB72D84D9B800DFB0A6 /* MLXVLM in Frameworks */ = {isa = PBXBuildFile; productRef = 2A999CB62D84D9B800DFB0A6 /* MLXVLM */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,18 +71,19 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2A0D3B822D68F22000851AC8 /* MLX in Frameworks */,
-				2A0D3B952D68F23200851AC8 /* StableDiffusion in Frameworks */,
-				2A0D3B882D68F22000851AC8 /* MLXLinalg in Frameworks */,
-				2AA154122CF2636900D27D18 /* MarkdownUI in Frameworks */,
-				2A0D3B932D68F23200851AC8 /* MLXVLM in Frameworks */,
-				2AF5CC562D2AFE1C0050F923 /* KeyboardShortcuts in Frameworks */,
-				2A0D3B8F2D68F23200851AC8 /* MLXLMCommon in Frameworks */,
-				2A0D3B8D2D68F23200851AC8 /* MLXLLM in Frameworks */,
-				2A0D3B912D68F23200851AC8 /* MLXMNIST in Frameworks */,
-				2A0D3B862D68F22000851AC8 /* MLXFast in Frameworks */,
-				2A0D3B8A2D68F22000851AC8 /* MLXNN in Frameworks */,
-				2A0D3B842D68F22000851AC8 /* MLXFFT in Frameworks */,
+				2A999CB72D84D9B800DFB0A6 /* MLXVLM in Frameworks */,
+				2A999CB52D84D9B800DFB0A6 /* MLXMNIST in Frameworks */,
+				2A999CB12D84D9B800DFB0A6 /* MLXLLM in Frameworks */,
+				2A999CA82D84D91800DFB0A6 /* MLXFast in Frameworks */,
+				2A999CAA2D84D91800DFB0A6 /* MLXLinalg in Frameworks */,
+				2A999CB32D84D9B800DFB0A6 /* MLXLMCommon in Frameworks */,
+				2A999CAF2D84D9B800DFB0A6 /* MLXEmbedders in Frameworks */,
+				2A999CAC2D84D91800DFB0A6 /* MLXNN in Frameworks */,
+				2A999CA62D84D91800DFB0A6 /* MLXFFT in Frameworks */,
+				2A999CA42D84D91700DFB0A6 /* MLX in Frameworks */,
+				2A999C9E2D84D88000DFB0A6 /* AIProxy in Frameworks */,
+				2A999CA12D84D89700DFB0A6 /* MarkdownUI in Frameworks */,
+				2A999C902D84D81A00DFB0A6 /* KeyboardShortcuts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -140,18 +142,19 @@
 			);
 			name = "writing-tools";
 			packageProductDependencies = (
-				2AA154112CF2636900D27D18 /* MarkdownUI */,
-				2AF5CC552D2AFE1C0050F923 /* KeyboardShortcuts */,
-				2A0D3B812D68F22000851AC8 /* MLX */,
-				2A0D3B832D68F22000851AC8 /* MLXFFT */,
-				2A0D3B852D68F22000851AC8 /* MLXFast */,
-				2A0D3B872D68F22000851AC8 /* MLXLinalg */,
-				2A0D3B892D68F22000851AC8 /* MLXNN */,
-				2A0D3B8C2D68F23200851AC8 /* MLXLLM */,
-				2A0D3B8E2D68F23200851AC8 /* MLXLMCommon */,
-				2A0D3B902D68F23200851AC8 /* MLXMNIST */,
-				2A0D3B922D68F23200851AC8 /* MLXVLM */,
-				2A0D3B942D68F23200851AC8 /* StableDiffusion */,
+				2A999C8F2D84D81A00DFB0A6 /* KeyboardShortcuts */,
+				2A999C9D2D84D88000DFB0A6 /* AIProxy */,
+				2A999CA02D84D89700DFB0A6 /* MarkdownUI */,
+				2A999CA32D84D91700DFB0A6 /* MLX */,
+				2A999CA52D84D91800DFB0A6 /* MLXFFT */,
+				2A999CA72D84D91800DFB0A6 /* MLXFast */,
+				2A999CA92D84D91800DFB0A6 /* MLXLinalg */,
+				2A999CAB2D84D91800DFB0A6 /* MLXNN */,
+				2A999CAE2D84D9B800DFB0A6 /* MLXEmbedders */,
+				2A999CB02D84D9B800DFB0A6 /* MLXLLM */,
+				2A999CB22D84D9B800DFB0A6 /* MLXLMCommon */,
+				2A999CB42D84D9B800DFB0A6 /* MLXMNIST */,
+				2A999CB62D84D9B800DFB0A6 /* MLXVLM */,
 			);
 			productName = "swift-writing-tools";
 			productReference = 2ABCBC1E2CDEB606001E4B5E /* writing-tools.app */;
@@ -233,10 +236,11 @@
 			mainGroup = 2ABCBC152CDEB606001E4B5E;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				2AA154102CF2636900D27D18 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
-				2AF5CC542D2AFE1C0050F923 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
-				2A0D3B802D68F22000851AC8 /* XCRemoteSwiftPackageReference "mlx-swift" */,
-				2A0D3B8B2D68F23200851AC8 /* XCRemoteSwiftPackageReference "mlx-swift-examples" */,
+				2A999C8E2D84D81A00DFB0A6 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+				2A999C9C2D84D88000DFB0A6 /* XCRemoteSwiftPackageReference "AIProxySwift" */,
+				2A999C9F2D84D89700DFB0A6 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
+				2A999CA22D84D91700DFB0A6 /* XCRemoteSwiftPackageReference "mlx-swift" */,
+				2A999CAD2D84D9B800DFB0A6 /* XCRemoteSwiftPackageReference "mlx-swift-examples" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2ABCBC1F2CDEB606001E4B5E /* Products */;
@@ -444,7 +448,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 8;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"writing-tools/Preview Content\"";
 				DEVELOPMENT_TEAM = MK2V998W66;
@@ -460,7 +464,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 3.1;
+				MARKETING_VERSION = 4;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.aryamirsepasi.writing-tools";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -479,7 +483,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 8;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"writing-tools/Preview Content\"";
 				DEVELOPMENT_TEAM = MK2V998W66;
@@ -495,7 +499,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 3.1;
+				MARKETING_VERSION = 4;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.aryamirsepasi.writing-tools";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -618,23 +622,23 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		2A0D3B802D68F22000851AC8 /* XCRemoteSwiftPackageReference "mlx-swift" */ = {
+		2A999C8E2D84D81A00DFB0A6 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ml-explore/mlx-swift";
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.21.3;
+				minimumVersion = 2.3.0;
 			};
 		};
-		2A0D3B8B2D68F23200851AC8 /* XCRemoteSwiftPackageReference "mlx-swift-examples" */ = {
+		2A999C9C2D84D88000DFB0A6 /* XCRemoteSwiftPackageReference "AIProxySwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ml-explore/mlx-swift-examples/";
+			repositoryURL = "https://github.com/lzell/AIProxySwift";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 2.21.2;
+				minimumVersion = 0.75.2;
 			};
 		};
-		2AA154102CF2636900D27D18 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
+		2A999C9F2D84D89700DFB0A6 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui";
 			requirement = {
@@ -642,76 +646,89 @@
 				minimumVersion = 2.4.1;
 			};
 		};
-		2AF5CC542D2AFE1C0050F923 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+		2A999CA22D84D91700DFB0A6 /* XCRemoteSwiftPackageReference "mlx-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
+			repositoryURL = "https://github.com/ml-explore/mlx-swift";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 2.2.4;
+				minimumVersion = 0.21.3;
+			};
+		};
+		2A999CAD2D84D9B800DFB0A6 /* XCRemoteSwiftPackageReference "mlx-swift-examples" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ml-explore/mlx-swift-examples";
+			requirement = {
+				branch = main;
+				kind = branch;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		2A0D3B812D68F22000851AC8 /* MLX */ = {
+		2A999C8F2D84D81A00DFB0A6 /* KeyboardShortcuts */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 2A0D3B802D68F22000851AC8 /* XCRemoteSwiftPackageReference "mlx-swift" */;
-			productName = MLX;
+			package = 2A999C8E2D84D81A00DFB0A6 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
 		};
-		2A0D3B832D68F22000851AC8 /* MLXFFT */ = {
+		2A999C9D2D84D88000DFB0A6 /* AIProxy */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 2A0D3B802D68F22000851AC8 /* XCRemoteSwiftPackageReference "mlx-swift" */;
-			productName = MLXFFT;
+			package = 2A999C9C2D84D88000DFB0A6 /* XCRemoteSwiftPackageReference "AIProxySwift" */;
+			productName = AIProxy;
 		};
-		2A0D3B852D68F22000851AC8 /* MLXFast */ = {
+		2A999CA02D84D89700DFB0A6 /* MarkdownUI */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 2A0D3B802D68F22000851AC8 /* XCRemoteSwiftPackageReference "mlx-swift" */;
-			productName = MLXFast;
-		};
-		2A0D3B872D68F22000851AC8 /* MLXLinalg */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2A0D3B802D68F22000851AC8 /* XCRemoteSwiftPackageReference "mlx-swift" */;
-			productName = MLXLinalg;
-		};
-		2A0D3B892D68F22000851AC8 /* MLXNN */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2A0D3B802D68F22000851AC8 /* XCRemoteSwiftPackageReference "mlx-swift" */;
-			productName = MLXNN;
-		};
-		2A0D3B8C2D68F23200851AC8 /* MLXLLM */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2A0D3B8B2D68F23200851AC8 /* XCRemoteSwiftPackageReference "mlx-swift-examples" */;
-			productName = MLXLLM;
-		};
-		2A0D3B8E2D68F23200851AC8 /* MLXLMCommon */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2A0D3B8B2D68F23200851AC8 /* XCRemoteSwiftPackageReference "mlx-swift-examples" */;
-			productName = MLXLMCommon;
-		};
-		2A0D3B902D68F23200851AC8 /* MLXMNIST */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2A0D3B8B2D68F23200851AC8 /* XCRemoteSwiftPackageReference "mlx-swift-examples" */;
-			productName = MLXMNIST;
-		};
-		2A0D3B922D68F23200851AC8 /* MLXVLM */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2A0D3B8B2D68F23200851AC8 /* XCRemoteSwiftPackageReference "mlx-swift-examples" */;
-			productName = MLXVLM;
-		};
-		2A0D3B942D68F23200851AC8 /* StableDiffusion */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2A0D3B8B2D68F23200851AC8 /* XCRemoteSwiftPackageReference "mlx-swift-examples" */;
-			productName = StableDiffusion;
-		};
-		2AA154112CF2636900D27D18 /* MarkdownUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2AA154102CF2636900D27D18 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
+			package = 2A999C9F2D84D89700DFB0A6 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
 			productName = MarkdownUI;
 		};
-		2AF5CC552D2AFE1C0050F923 /* KeyboardShortcuts */ = {
+		2A999CA32D84D91700DFB0A6 /* MLX */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 2AF5CC542D2AFE1C0050F923 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
-			productName = KeyboardShortcuts;
+			package = 2A999CA22D84D91700DFB0A6 /* XCRemoteSwiftPackageReference "mlx-swift" */;
+			productName = MLX;
+		};
+		2A999CA52D84D91800DFB0A6 /* MLXFFT */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A999CA22D84D91700DFB0A6 /* XCRemoteSwiftPackageReference "mlx-swift" */;
+			productName = MLXFFT;
+		};
+		2A999CA72D84D91800DFB0A6 /* MLXFast */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A999CA22D84D91700DFB0A6 /* XCRemoteSwiftPackageReference "mlx-swift" */;
+			productName = MLXFast;
+		};
+		2A999CA92D84D91800DFB0A6 /* MLXLinalg */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A999CA22D84D91700DFB0A6 /* XCRemoteSwiftPackageReference "mlx-swift" */;
+			productName = MLXLinalg;
+		};
+		2A999CAB2D84D91800DFB0A6 /* MLXNN */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A999CA22D84D91700DFB0A6 /* XCRemoteSwiftPackageReference "mlx-swift" */;
+			productName = MLXNN;
+		};
+		2A999CAE2D84D9B800DFB0A6 /* MLXEmbedders */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A999CAD2D84D9B800DFB0A6 /* XCRemoteSwiftPackageReference "mlx-swift-examples" */;
+			productName = MLXEmbedders;
+		};
+		2A999CB02D84D9B800DFB0A6 /* MLXLLM */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A999CAD2D84D9B800DFB0A6 /* XCRemoteSwiftPackageReference "mlx-swift-examples" */;
+			productName = MLXLLM;
+		};
+		2A999CB22D84D9B800DFB0A6 /* MLXLMCommon */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A999CAD2D84D9B800DFB0A6 /* XCRemoteSwiftPackageReference "mlx-swift-examples" */;
+			productName = MLXLMCommon;
+		};
+		2A999CB42D84D9B800DFB0A6 /* MLXMNIST */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A999CAD2D84D9B800DFB0A6 /* XCRemoteSwiftPackageReference "mlx-swift-examples" */;
+			productName = MLXMNIST;
+		};
+		2A999CB62D84D9B800DFB0A6 /* MLXVLM */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A999CAD2D84D9B800DFB0A6 /* XCRemoteSwiftPackageReference "mlx-swift-examples" */;
+			productName = MLXVLM;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

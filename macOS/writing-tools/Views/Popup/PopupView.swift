@@ -34,11 +34,15 @@ struct PopupView: View {
                         closeAction()
                     }
                 }) {
-                    Image(systemName: isEditMode ? "xmark.circle.fill" : "xmark.circle.fill")
-                        .font(.title2)
+                    Image(systemName: isEditMode ? "xmark" : "xmark")
+                        .font(.body)
                         .foregroundColor(.secondary)
+                        .frame(width: 28, height: 28)
+                        .background(Color(.controlBackgroundColor))
+                        .clipShape(Circle())
                 }
                 .buttonStyle(.plain)
+                .help(isEditMode ? "Exit Edit Mode" : "Close")
                 .padding(.top, 8)
                 .padding(.leading, 8)
                 
@@ -51,11 +55,15 @@ struct PopupView: View {
                     // Use a notification to trigger window size update
                     NotificationCenter.default.post(name: NSNotification.Name("EditModeChanged"), object: nil)
                 }) {
-                    Image(systemName: isEditMode ? "checkmark.circle.fill" : "square.and.pencil.circle.fill")
-                        .font(.title2)
+                    Image(systemName: isEditMode ? "checkmark" : "square.and.pencil")
+                        .font(.body)
                         .foregroundColor(.secondary)
+                        .frame(width: 28, height: 28)
+                        .background(Color(.controlBackgroundColor))
+                        .clipShape(Circle())
                 }
                 .buttonStyle(.plain)
+                .help(isEditMode ? "Save Changes" : "Edit Commands")
                 .padding(.top, 8)
                 .padding(.trailing, 8)
             }
@@ -266,52 +274,5 @@ struct PopupView: View {
             
             appState.isProcessing = false
         }
-    }
-}
-
-struct OptionButton: View {
-    let option: WritingOption
-    let action: () -> Void
-    let isLoading: Bool
-    
-    var body: some View {
-        Button(action: action) {
-            HStack {
-                Image(systemName: option.icon)
-                Text(option.localizedName)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-            }
-            .frame(maxWidth: 140)
-            .padding()
-            .background(Color(.controlBackgroundColor))
-            .cornerRadius(8)
-        }
-        .buttonStyle(LoadingButtonStyle(isLoading: isLoading))
-        .disabled(isLoading)
-    }
-}
-
-
-struct CustomOptionButton: View {
-    let command: CustomCommand
-    let action: () -> Void
-    let isLoading: Bool
-    
-    var body: some View {
-        Button(action: action) {
-            HStack {
-                Image(systemName: command.icon)
-                Text(command.name)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-            }
-            .frame(maxWidth: 140)
-            .padding()
-            .background(Color(.controlBackgroundColor))
-            .cornerRadius(8)
-        }
-        .buttonStyle(LoadingButtonStyle(isLoading: isLoading))
-        .disabled(isLoading)
     }
 }

@@ -186,7 +186,7 @@ struct OnboardingView: View {
                         }
                         
                         if settings.currentProvider == "local" {
-                            Text("(Llama 3.2)")
+                            Text("(Qwen2.5 3B 4-bit)")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
