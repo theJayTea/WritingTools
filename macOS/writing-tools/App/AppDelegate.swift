@@ -60,12 +60,146 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             
         }
         
+        // Register the main popup shortcut
         KeyboardShortcuts.onKeyUp(for: .showPopup) { [weak self] in
             if !AppSettings.shared.hotkeysPaused {
                 self?.showPopup()
             } else {
                 NSLog("Hotkeys are paused")
             }
+        }
+        
+        // Set up command-specific shortcuts
+        setupCommandShortcuts()
+        
+        // Register for command changes to update shortcuts
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(setupCommandShortcuts),
+            name: NSNotification.Name("CommandsChanged"),
+            object: nil
+        )
+    }
+    
+    // Setup and register all command shortcuts
+    @objc private func setupCommandShortcuts() {
+        // Only reset shortcuts for commands that should not have shortcuts
+        for command in appState.commandManager.commands.filter({ !$0.hasShortcut }) {
+            KeyboardShortcuts.reset(.commandShortcut(for: command.id))
+        }
+        
+        // Register handlers for commands with shortcuts enabled
+        for command in appState.commandManager.commands.filter({ $0.hasShortcut }) {
+            KeyboardShortcuts.onKeyUp(for: .commandShortcut(for: command.id)) { [weak self] in
+                guard let self = self, !AppSettings.shared.hotkeysPaused else { return }
+                
+                // Execute the command directly
+                self.executeCommandDirectly(command)
+            }
+        }
+    }
+    
+    // Executes a command without showing the popup
+    private func executeCommandDirectly(_ command: CommandModel) {
+        // Cancel any ongoing processing first
+        appState.activeProvider.cancel()
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            // Save the current app so we can return to it
+            if let currentFrontmostApp = NSWorkspace.shared.frontmostApplication {
+                self.appState.previousApplication = currentFrontmostApp
+            }
+            
+            let generalPasteboard = NSPasteboard.general
+            
+            // Get initial pasteboard content to restore later
+            let oldContents = generalPasteboard.string(forType: .string)
+            
+            // Clear and perform copy command to get selected text
+            generalPasteboard.clearContents()
+            let source = CGEventSource(stateID: .hidSystemState)
+            let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 0x08, keyDown: true)
+            let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 0x08, keyDown: false)
+            keyDown?.flags = .maskCommand
+            keyUp?.flags = .maskCommand
+            keyDown?.post(tap: .cghidEventTap)
+            keyUp?.post(tap: .cghidEventTap)
+            
+            // Wait for copy operation to complete
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                guard let self = self else { return }
+                
+                // Get the selected text
+                let selectedText = generalPasteboard.string(forType: .string) ?? ""
+                
+                // Restore original clipboard contents
+                generalPasteboard.clearContents()
+                if let oldContents = oldContents {
+                    generalPasteboard.setString(oldContents, forType: .string)
+                }
+                
+                // Skip if no text is selected
+                guard !selectedText.isEmpty else {
+                    NSLog("No text selected for command: \(command.name)")
+                    return
+                }
+                
+                // Store the selected text in app state
+                self.appState.selectedText = selectedText
+                
+                // Process the command
+                Task {
+                    await self.processCommandWithUI(command)
+                }
+            }
+        }
+    }
+    
+    // Process a command with appropriate UI feedback
+    private func processCommandWithUI(_ command: CommandModel) async {
+        // Set processing flag to prevent duplicate operations
+        if appState.isProcessing {
+            return
+        }
+        
+        appState.isProcessing = true
+        
+        do {
+            // Process the text with the AI provider
+            let result = try await appState.activeProvider.processText(
+                systemPrompt: command.prompt,
+                userPrompt: appState.selectedText,
+                images: []
+            )
+            
+            // Handle the result
+            await MainActor.run {
+                if command.useResponseWindow {
+                    // Show in response window
+                    let window = ResponseWindow(
+                        title: command.name,
+                        content: result,
+                        selectedText: appState.selectedText,
+                        option: nil
+                    )
+                    
+                    NSApp.activate(ignoringOtherApps: true)
+                    WindowManager.shared.addResponseWindow(window)
+                    window.makeKeyAndOrderFront(nil)
+                    window.orderFrontRegardless()
+                } else {
+                    // Replace text directly
+                    appState.replaceSelectedText(with: result)
+                }
+            }
+        } catch {
+            print("Error processing command \(command.name): \(error.localizedDescription)")
+        }
+        
+        await MainActor.run {
+            appState.isProcessing = false
         }
     }
     

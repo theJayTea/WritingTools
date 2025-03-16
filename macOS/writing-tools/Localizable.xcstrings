@@ -644,6 +644,9 @@
         }
       }
     },
+    "Command shortcut:" : {
+
+    },
     "Command Type" : {
       "localizations" : {
         "de" : {
@@ -659,6 +662,9 @@
           }
         }
       }
+    },
+    "Commands" : {
+
     },
     "Complete Setup" : {
       "localizations" : {
@@ -1039,6 +1045,9 @@
         }
       }
     },
+    "Enable keyboard shortcut for this command" : {
+
+    },
     "Error" : {
       "localizations" : {
         "de" : {
@@ -1338,6 +1347,9 @@
         }
       }
     },
+    "Keyboard Shortcut" : {
+
+    },
     "Loading model..." : {
       "localizations" : {
         "de" : {
@@ -1454,6 +1466,9 @@
           }
         }
       }
+    },
+    "Manage your writing tools and their keyboard shortcuts" : {
+
     },
     "Mistral" : {
       "localizations" : {
@@ -2306,6 +2321,9 @@
           }
         }
       }
+    },
+    "Tip: This shortcut will execute the command directly without opening the popup window." : {
+
     },
     "Version: 3.0 (Based on Windows Port version 7.1)" : {
       "extractionState" : "stale",

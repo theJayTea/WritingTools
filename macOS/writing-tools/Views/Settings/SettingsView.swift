@@ -4,6 +4,11 @@ import KeyboardShortcuts
 
 extension KeyboardShortcuts.Name {
     static let showPopup = Self("showPopup")
+    
+    // Generate a shortcut name for a specific command
+    static func commandShortcut(for id: UUID) -> Self {
+        return Self("command_\(id.uuidString)")
+    }
 }
 
 struct SettingsView: View {
@@ -11,6 +16,7 @@ struct SettingsView: View {
     @ObservedObject var settings = AppSettings.shared
     @State private var selectedTab: SettingsTab = .general
     @State private var needsSaving: Bool = false
+    @State private var showingCommandsManager = false
     
     var showOnlyApiSetup: Bool = false
     
@@ -128,11 +134,39 @@ struct SettingsView: View {
                     .padding(.vertical, 2)
             }
             
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Commands")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                
+                Text("Manage your writing tools and their keyboard shortcuts")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                
+                Button(action: {
+                    showingCommandsManager = true
+                }) {
+                    HStack {
+                        Image(systemName: "list.bullet.rectangle")
+                        Text("Manage Commands")
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 12)
+                    .background(Color(.controlBackgroundColor))
+                    .cornerRadius(8)
+                }
+                .buttonStyle(.plain)
+            }
+            
             Spacer()
             
             if !showOnlyApiSetup {
                 saveButton
             }
+        }
+        .sheet(isPresented: $showingCommandsManager) {
+            CommandsView(commandManager: appState.commandManager)
         }
     }
     

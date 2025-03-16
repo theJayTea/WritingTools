@@ -27,6 +27,9 @@ class CommandManager: ObservableObject {
         if let index = commands.firstIndex(where: { $0.id == command.id }) {
             commands[index] = command
             saveCommands()
+            
+            // Notify that commands have changed to update shortcuts
+            NotificationCenter.default.post(name: NSNotification.Name("CommandsChanged"), object: nil)
         }
     }
     

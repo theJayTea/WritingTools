@@ -8,14 +8,16 @@ struct CommandModel: Codable, Identifiable, Equatable {
     var icon: String
     var useResponseWindow: Bool
     var isBuiltIn: Bool
+    var hasShortcut: Bool
     
-    init(id: UUID = UUID(), name: String, prompt: String, icon: String, useResponseWindow: Bool = false, isBuiltIn: Bool = false) {
+    init(id: UUID = UUID(), name: String, prompt: String, icon: String, useResponseWindow: Bool = false, isBuiltIn: Bool = false, hasShortcut: Bool = false) {
         self.id = id
         self.name = name
         self.prompt = prompt
         self.icon = icon
         self.useResponseWindow = useResponseWindow
         self.isBuiltIn = isBuiltIn
+        self.hasShortcut = hasShortcut
     }
     
     // Helper to create from WritingOption for migration
@@ -26,7 +28,8 @@ struct CommandModel: Codable, Identifiable, Equatable {
             prompt: option.systemPrompt,
             icon: option.icon,
             useResponseWindow: false,
-            isBuiltIn: true
+            isBuiltIn: true,
+            hasShortcut: false
         )
     }
     
@@ -38,7 +41,8 @@ struct CommandModel: Codable, Identifiable, Equatable {
             prompt: command.prompt,
             icon: command.icon,
             useResponseWindow: command.useResponseWindow,
-            isBuiltIn: false
+            isBuiltIn: false,
+            hasShortcut: false
         )
     }
 }
@@ -79,7 +83,8 @@ extension CommandModel {
                     If the text is completely incompatible (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".
                     """,
             icon: "magnifyingglass",
-            isBuiltIn: true
+            isBuiltIn: true,
+            hasShortcut: false
         )
     }
     
@@ -105,7 +110,8 @@ extension CommandModel {
                     If the text is completely incompatible (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".
                     """,
             icon: "arrow.triangle.2.circlepath",
-            isBuiltIn: true
+            isBuiltIn: true,
+            hasShortcut: false
         )
     }
     
@@ -131,7 +137,8 @@ extension CommandModel {
                     If the text is completely incompatible (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".
                     """,
             icon: "face.smiling",
-            isBuiltIn: true
+            isBuiltIn: true,
+            hasShortcut: false
         )
     }
     
@@ -157,7 +164,8 @@ extension CommandModel {
                     If the text is completely incompatible (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".
                     """,
             icon: "briefcase",
-            isBuiltIn: true
+            isBuiltIn: true,
+            hasShortcut: false
         )
     }
     
@@ -183,7 +191,8 @@ extension CommandModel {
                     If the text is completely incompatible (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".
                     """,
             icon: "scissors",
-            isBuiltIn: true
+            isBuiltIn: true,
+            hasShortcut: false
         )
     }
     
@@ -209,7 +218,8 @@ extension CommandModel {
                     If the text is completely incompatible (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".
                     """,
             icon: "doc.text",
-            isBuiltIn: true
+            isBuiltIn: true,
+            hasShortcut: false
         )
     }
     
@@ -235,7 +245,8 @@ extension CommandModel {
                     If the text is completely incompatible (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".
                     """,
             icon: "list.bullet",
-            isBuiltIn: true
+            isBuiltIn: true,
+            hasShortcut: false
         )
     }
     
@@ -261,7 +272,8 @@ extension CommandModel {
                     If the text is completely incompatible (e.g., totally random gibberish), output "ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST".
                     """,
             icon: "tablecells",
-            isBuiltIn: true
+            isBuiltIn: true,
+            hasShortcut: false
         )
     }
 } 
