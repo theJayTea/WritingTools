@@ -9,6 +9,12 @@
             "value" : "."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -21,6 +27,12 @@
       "extractionState" : "stale",
       "localizations" : {
         "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Llama 3.2)"
+          }
+        },
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "(Llama 3.2)"
@@ -42,6 +54,12 @@
             "value" : "(Qwen2.5 3B 4-bit)"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Qwen2.5 3B 4-bit)"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -53,6 +71,12 @@
     "%lld%%" : {
       "localizations" : {
         "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%"
+          }
+        },
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld%%"
@@ -74,6 +98,12 @@
             "value" : "• Hilft Ihnen, klar und selbstbewusst zu schreiben"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Le ayuda a escribir con claridad y confianza"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -88,6 +118,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "• Verbessert Ihr Schreiben mit KI"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Mejora tu escritura con IA"
           }
         },
         "fr" : {
@@ -106,6 +142,12 @@
             "value" : "• Unterstützt benutzerdefinierte Befehle für alles, was Sie möchten"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Comandos personalizados para todo lo que desee"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -120,6 +162,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "• Funktioniert in jeder Anwendung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Funciona en cualquier aplicación"
           }
         },
         "fr" : {
@@ -138,6 +186,12 @@
             "value" : "1. Klicken Sie auf die Schaltfläche unten, um die Systemeinstellungen zu öffnen"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1. Haga clic en el botón de abajo para abrir Configuración del sistema"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -152,6 +206,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "2. Klicken Sie auf die Schaltfläche '+' im Bereich Barrierefreiheit"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2. Haga clic en el botón «+» de la sección de accesibilidad"
           }
         },
         "fr" : {
@@ -170,6 +230,12 @@
             "value" : "3. Navigieren Sie zu Anwendungen und wählen Sie Schreibwerkzeuge aus"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3. Navegue hasta Aplicaciones y seleccione herramientas de escritura"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -184,6 +250,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "4. Aktivieren Sie das Kontrollkästchen neben Schreibwerkzeuge"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "4. Active la casilla junto a herramientas de escritura"
           }
         },
         "fr" : {
@@ -202,6 +274,12 @@
             "value" : "Ein Befehl mit diesem Namen existiert bereits. Bitte wählen Sie einen anderen Namen."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ya existe un comando con este nombre. Por favor, elija un nombre diferente."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -216,6 +294,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eine neue Version ist verfügbar!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ya está disponible una nueva versión."
           }
         },
         "fr" : {
@@ -234,6 +318,12 @@
             "value" : "Über WritingTools"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acerca de WritingTools"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -243,7 +333,26 @@
       }
     },
     "Activate Writing Tools:" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Writing Tools aktivieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activar WritingTools:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activer les outils d'écriture :"
+          }
+        }
+      }
     },
     "Add Custom Command" : {
       "localizations" : {
@@ -251,6 +360,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Benutzerdefinierten Befehl hinzufügen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir comando personalizado"
           }
         },
         "fr" : {
@@ -270,6 +385,12 @@
             "value" : "Neue Schaltfläche Hinzufügen"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir nuevo botón"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -286,6 +407,12 @@
             "value" : "Fügen Sie eine hinzu, um loszulegen"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade uno para empezar"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -295,7 +422,20 @@
       }
     },
     "Advanced Options" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erweiterte Optionen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Options avancées"
+          }
+        }
+      }
     },
     "AI Provider" : {
       "localizations" : {
@@ -330,7 +470,20 @@
       }
     },
     "API Configuration" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API Konfiguration"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuration de l'API"
+          }
+        }
+      }
     },
     "API Key" : {
       "localizations" : {
@@ -365,7 +518,20 @@
       }
     },
     "Appearance Settings" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erscheinungsbild Einstellungen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paramètres d'apparence"
+          }
+        }
+      }
     },
     "Apple Silicon Required" : {
       "localizations" : {
@@ -593,7 +759,20 @@
       }
     },
     "Choose how the app windows will appear" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wählen Sie, wie die App-Fenster angezeigt werden"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisir l'apparence des fenêtres de l'application"
+          }
+        }
+      }
     },
     "Choose your theme:" : {
       "extractionState" : "stale",
@@ -645,7 +824,20 @@
       }
     },
     "Command shortcut:" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Befehlskurzbefehl:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raccourci de commande :"
+          }
+        }
+      }
     },
     "Command Type" : {
       "localizations" : {
@@ -664,7 +856,20 @@
       }
     },
     "Commands" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Befehle"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Commandes"
+          }
+        }
+      }
     },
     "Complete Setup" : {
       "localizations" : {
@@ -700,7 +905,20 @@
       }
     },
     "Connection Settings" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbindungseinstellungen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paramètres de connexion"
+          }
+        }
+      }
     },
     "Copied!" : {
       "localizations" : {
@@ -896,7 +1114,20 @@
       }
     },
     "Documentation" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dokumentation"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documentation"
+          }
+        }
+      }
     },
     "Download Model" : {
       "localizations" : {
@@ -1011,7 +1242,20 @@
       }
     },
     "Edit Commands" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Befehl ändern"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier la commande"
+          }
+        }
+      }
     },
     "Email: developer@aryamirsepasi.com" : {
       "localizations" : {
@@ -1046,7 +1290,20 @@
       }
     },
     "Enable keyboard shortcut for this command" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tastenkombination für diesen Befehl aktivieren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activer le raccourci clavier pour cette commande"
+          }
+        }
+      }
     },
     "Error" : {
       "localizations" : {
@@ -1065,7 +1322,20 @@
       }
     },
     "Exit Edit Mode" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bearbeitungsmodus schließen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitter le mode édition"
+          }
+        }
+      }
     },
     "Finish" : {
       "localizations" : {
@@ -1149,7 +1419,20 @@
       }
     },
     "General" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allgemeines"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Général"
+          }
+        }
+      }
     },
     "General Settings" : {
       "localizations" : {
@@ -1248,7 +1531,20 @@
       }
     },
     "Global Keyboard Shortcut" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Globaler Tastaturkurzbefehl"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raccourci clavier global"
+          }
+        }
+      }
     },
     "Global Shortcut:" : {
       "localizations" : {
@@ -1348,7 +1644,20 @@
       }
     },
     "Keyboard Shortcut" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tastaturkurzbefehl"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raccourci clavier"
+          }
+        }
+      }
     },
     "Loading model..." : {
       "localizations" : {
@@ -1433,7 +1742,20 @@
       }
     },
     "Local LLM is only available on Apple Silicon devices." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lokale LLM ist nur auf Apple Silicon Geräten verfügbar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le LLM local n'est disponible que sur les appareils Apple Silicon."
+          }
+        }
+      }
     },
     "Local LLMs: use the instructions on" : {
       "localizations" : {
@@ -1468,7 +1790,20 @@
       }
     },
     "Manage your writing tools and their keyboard shortcuts" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwalten Sie Ihre Schreibwerkzeuge und deren Tastenkombinationen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gérer vos outils d'écriture et leurs raccourcis clavier"
+          }
+        }
+      }
     },
     "Mistral" : {
       "localizations" : {
@@ -1535,7 +1870,20 @@
       }
     },
     "Model Configuration" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modellkonfiguration"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuration du modèle"
+          }
+        }
+      }
     },
     "Model Information" : {
       "extractionState" : "stale",
@@ -1603,7 +1951,20 @@
       }
     },
     "Model Selection" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modellauswahl"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélection du modèle"
+          }
+        }
+      }
     },
     "Name" : {
       "localizations" : {
@@ -1809,6 +2170,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouvrir les paramètres système"
+          }
+        }
+      }
+    },
+    "Open Writing Tools" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WritingTools öffnen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir l'écritureOutils"
           }
         }
       }
@@ -2121,10 +2498,36 @@
       }
     },
     "Save Changes" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Änderungen speichern"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer les modifications"
+          }
+        }
+      }
     },
     "Select AI Service" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "KI-Dienst auswählen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionner le service d'IA"
+          }
+        }
+      }
     },
     "Select Icon" : {
       "localizations" : {
@@ -2298,6 +2701,12 @@
             "value" : "Dies ist ein integrierter Befehl. Ihre Änderungen werden gespeichert, aber Sie können bei Bedarf später auf die ursprüngliche Konfiguration zurücksetzen."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se trata de un comando integrado. Tus cambios se guardarán, pero puedes restablecer la configuración original más tarde si es necesario."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2314,6 +2723,12 @@
             "value" : "Dadurch werden alle integrierten Befehle auf ihre ursprünglichen Einstellungen zurückgesetzt, alle gelöschten integrierten Befehle wiederhergestellt und Ihre benutzerdefinierten Befehle beibehalten. Diese Aktion kann nicht rückgängig gemacht werden."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esto restablecerá todos los comandos incorporados a su configuración original, restaurará cualquier comando incorporado eliminado y mantendrá sus comandos personalizados. Esta acción no se puede deshacer."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2323,7 +2738,26 @@
       }
     },
     "Tip: This shortcut will execute the command directly without opening the popup window." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipp: Diese Tastenkombination führt den Befehl direkt aus, ohne das Popup-Fenster zu öffnen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consejo: Este atajo ejecutará el comando directamente sin abrir la ventana emergente."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conseil : ce raccourci exécute directement la commande sans ouvrir la fenêtre contextuelle."
+          }
+        }
+      }
     },
     "Version: 3.0 (Based on Windows Port version 7.1)" : {
       "extractionState" : "stale",
@@ -2332,6 +2766,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Version: 3.0 (Basierend auf Windows-Port-Version 7.1)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versión: 3.0 (basada en la versión 7.1 de Windows Port)"
           }
         },
         "fr" : {
@@ -2343,11 +2783,18 @@
       }
     },
     "Version: 3.1 (Based on Windows Port version 7.1)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Version: 3.1 (Basierend auf Windows-Port-Version 7.1)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versión: 3.1 (basada en la versión 7.1 de Windows Port)"
           }
         },
         "fr" : {
@@ -2358,12 +2805,40 @@
         }
       }
     },
+    "Version: 4.0 (Based on Windows Port version 7.1)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version: 4.0 (Basierend auf Windows-Port-Version 7.1)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versión: 4.0 (Basada en Windows Port versión 7.1)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version : 4.0 (basée sur Windows Port version 7.1)"
+          }
+        }
+      }
+    },
     "What should your AI do with your selected text? (Prompt)" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Was soll Ihre KI mit Ihrem ausgewählten Text tun? (Prompt)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Qué debería hacer tu IA con el texto seleccionado? (Pregunta)"
           }
         },
         "fr" : {
@@ -2382,6 +2857,12 @@
             "value" : "Wenn aktiviert, werden Antworten in einem Chat-Fenster angezeigt, anstatt den ausgewählten Text zu ersetzen."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si está activada, las respuestas aparecerán en una ventana de chat en lugar de sustituir al texto seleccionado."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2391,7 +2872,48 @@
       }
     },
     "Window Style" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fensterstil"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estilo ventana"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Style de fenêtre"
+          }
+        }
+      }
+    },
+    "Writing Tools" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Writing Tools"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Writing Tools"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Writing Tools"
+          }
+        }
+      }
     },
     "Writing Tools is a free & lightweight tool that helps you improve your writing with AI, similar to Apple's new Apple Intelligence feature." : {
       "localizations" : {
@@ -2399,6 +2921,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "WritingTools ist ein kostenloses und leichtgewichtiges Tool, das Ihnen hilft, Ihr Schreiben mit Hilfe von KI zu verbessern, ähnlich wie Apples neue Apple Intelligence Funktion."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WritingTools es una herramienta gratuita y ligera que te ayuda a mejorar tu escritura con IA, similar a la nueva función Apple Intelligence de Apple."
           }
         },
         "fr" : {

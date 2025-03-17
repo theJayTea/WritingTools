@@ -34,7 +34,7 @@ class OpenAIProvider: ObservableObject, AIProvider {
         self.config = config
     }
     
-    func processText(systemPrompt: String? = "You are a helpful writing assistant.", userPrompt: String, images: [Data] = []) async throws -> String {
+    func processText(systemPrompt: String? = "You are a helpful writing assistant.", userPrompt: String, images: [Data] = [], streaming: Bool = false) async throws -> String {
         // OpenAI's text completion endpoint doesn't support images, so we ignore the images parameter
         
         isProcessing = true

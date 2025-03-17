@@ -20,9 +20,18 @@ class OllamaProvider: ObservableObject, AIProvider {
         self.config = config
     }
     
-    func processText(systemPrompt: String? = "You are a helpful writing assistant.", userPrompt: String, images: [Data] = []) async throws -> String {
+    func processText(systemPrompt: String? = "You are a helpful writing assistant.", userPrompt: String, images: [Data] = [], streaming: Bool = false) async throws -> String {
         isProcessing = true
         defer { isProcessing = false }
+        
+        // Extract OCR text from images (if any) and append to user prompt.
+         var combinedPrompt = userPrompt
+         if !images.isEmpty {
+             let ocrText = await OCRManager.shared.extractText(from: images)
+             if !ocrText.isEmpty {
+                 combinedPrompt += "\nExtracted Text: \(ocrText)"
+             }
+         }
         
         // Construct the endpoint URL.
         guard let url = URL(string: "\(config.baseURL)/generate") else {
@@ -32,7 +41,7 @@ class OllamaProvider: ObservableObject, AIProvider {
         // Build the request payload.
         var requestBody: [String: Any] = [
             "model": config.model,
-            "prompt": userPrompt,
+            "prompt": combinedPrompt,
             "stream": false
         ]
         if let system = systemPrompt {

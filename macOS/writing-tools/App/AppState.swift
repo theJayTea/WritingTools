@@ -157,7 +157,8 @@ class AppState: ObservableObject {
                 let result = try await activeProvider.processText(
                     systemPrompt: prompt,
                     userPrompt: selectedText,
-                    images: []
+                    images: [],
+                    streaming: false
                 )
                 
                 // Determine what to do with the result based on command settings

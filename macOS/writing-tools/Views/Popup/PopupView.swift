@@ -171,7 +171,8 @@ struct PopupView: View {
             let result = try await appState.activeProvider.processText(
                 systemPrompt: systemPrompt,
                 userPrompt: userText,
-                images: appState.selectedImages
+                images: appState.selectedImages,
+                streaming: false
             )
             
             // Handle the result on the main thread
@@ -247,7 +248,8 @@ struct PopupView: View {
                 let result = try await appState.activeProvider.processText(
                     systemPrompt: systemPrompt,
                     userPrompt: userPrompt,
-                    images: appState.selectedImages
+                    images: appState.selectedImages,
+                    streaming: false
                 )
                 
                 // Always show response in a new window

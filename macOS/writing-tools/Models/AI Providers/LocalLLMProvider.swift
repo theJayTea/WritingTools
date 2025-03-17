@@ -250,7 +250,7 @@ class LocalLLMProvider: ObservableObject, AIProvider {
         }
     }
     
-    func processText(systemPrompt: String?, userPrompt: String, images: [Data]) async throws -> String {
+    func processText(systemPrompt: String?, userPrompt: String, images: [Data], streaming: Bool = false) async throws -> String {
         guard isPlatformSupported else {
             throw NSError(
                 domain: "LocalLLM",
@@ -275,8 +275,17 @@ class LocalLLMProvider: ObservableObject, AIProvider {
             }
         }
         
-        let finalPrompt = systemPrompt.map { "\($0)\n\n\(userPrompt)" }
-            ?? userPrompt
+        // Extract OCR text from images (if any) and append to user prompt.
+         var combinedPrompt = userPrompt
+         if !images.isEmpty {
+             let ocrText = await OCRManager.shared.extractText(from: images)
+             if !ocrText.isEmpty {
+                 combinedPrompt += "\nExtracted Text: \(ocrText)"
+             }
+         }
+        
+        let finalPrompt = systemPrompt.map { "\($0)\n\n\(combinedPrompt)" }
+            ?? combinedPrompt
         
         let modelContainer = try await load()
         MLXRandom.seed(UInt64(Date.timeIntervalSinceReferenceDate * 1000))

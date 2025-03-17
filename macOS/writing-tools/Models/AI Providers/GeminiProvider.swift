@@ -40,7 +40,7 @@ class GeminiProvider: ObservableObject, AIProvider {
         aiProxyService = AIProxy.geminiDirectService(unprotectedAPIKey: config.apiKey)
     }
     
-    func processText(systemPrompt: String? = "You are a helpful writing assistant.", userPrompt: String, images: [Data] = []) async throws -> String {
+    func processText(systemPrompt: String? = "You are a helpful writing assistant.", userPrompt: String, images: [Data] = [], streaming: Bool = false) async throws -> String {
         isProcessing = true
         defer { isProcessing = false }
         
