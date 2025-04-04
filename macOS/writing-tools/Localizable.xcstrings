@@ -17,6 +17,22 @@
         }
       }
     },
+    "(Llama 3.2)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Llama 3.2)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Llama 3.2)"
+          }
+        }
+      }
+    },
     "%lld%%" : {
       "localizations" : {
         "de" : {
@@ -243,9 +259,23 @@
       }
     },
     "Add one to get started" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fügen Sie eine hinzu, um loszulegen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoutez-en un pour commencer"
+          }
+        }
+      }
     },
     "AI Provider" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -262,6 +292,7 @@
       }
     },
     "AI Provider Settings" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -294,6 +325,7 @@
       }
     },
     "Appearance" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -305,6 +337,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apparence"
+          }
+        }
+      }
+    },
+    "Apple Silicon Required" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Silicon erforderlich"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Silicon requis"
           }
         }
       }
@@ -374,6 +422,7 @@
       }
     },
     "Basic Settings" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -406,7 +455,20 @@
       }
     },
     "Built-in Commands" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Integrierte Befehle"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Commandes intégrées"
+          }
+        }
+      }
     },
     "Button Name" : {
       "localizations" : {
@@ -505,6 +567,7 @@
       }
     },
     "Choose your theme:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -521,10 +584,36 @@
       }
     },
     "Close" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schließen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer"
+          }
+        }
+      }
     },
     "Command Name" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Befehlsname"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nom de la commande"
+          }
+        }
+      }
     },
     "Command Type" : {
       "localizations" : {
@@ -609,7 +698,20 @@
       }
     },
     "Copy All" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle kopieren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tout copier"
+          }
+        }
+      }
     },
     "Created with care by Jesai, a high school student." : {
       "localizations" : {
@@ -692,7 +794,20 @@
       }
     },
     "Delete command" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Befehl löschen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer la commande"
+          }
+        }
+      }
     },
     "Delete Model" : {
       "localizations" : {
@@ -823,7 +938,20 @@
       }
     },
     "Edit command" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Befehl bearbeiten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier la commande"
+          }
+        }
+      }
     },
     "Edit Command" : {
       "localizations" : {
@@ -922,6 +1050,22 @@
         }
       }
     },
+    "Gemini" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini"
+          }
+        }
+      }
+    },
     "Gemini AI" : {
       "localizations" : {
         "de" : {
@@ -955,6 +1099,7 @@
       }
     },
     "General Settings" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1163,12 +1308,29 @@
         }
       }
     },
-    "Local LLM (Llama 3.2 3b)" : {
+    "Local LLM" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Local LLM (Llama 3.2 3b)"
+            "value" : "Lokale LLM"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local LLM"
+          }
+        }
+      }
+    },
+    "Local LLM (Llama 3.2 3b)" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lokale LLM (Llama 3.2 3b)"
           }
         },
         "fr" : {
@@ -1180,17 +1342,34 @@
       }
     },
     "Local LLM (Llama 3.2)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Local LLM (Llama 3.2)"
+            "value" : "Lokale LLM (Llama 3.2)"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Local LLM (Llama 3.2)"
+          }
+        }
+      }
+    },
+    "Local LLM is only available on Apple Silicon devices (M1/M2/M3 Macs)." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lokale LLM ist nur auf Apple Silicon Geräten (M1/M2/M3 Macs) verfügbar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LLM local n'est disponible que sur les appareils Apple Silicon (Mac M1/M2/M3)."
           }
         }
       }
@@ -1223,6 +1402,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gérer les commandes"
+          }
+        }
+      }
+    },
+    "Mistral" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mistral"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mistral"
           }
         }
       }
@@ -1276,6 +1471,7 @@
       }
     },
     "Model Information" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1388,10 +1584,36 @@
       }
     },
     "No built-in commands" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine integrierten Befehle"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas de commandes intégrées"
+          }
+        }
+      }
     },
     "No custom commands yet" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch keine benutzerdefinierten Befehle"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas encore de commandes personnalisées"
+          }
+        }
+      }
     },
     "OK" : {
       "localizations" : {
@@ -1421,6 +1643,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ollama"
+          }
+        }
+      }
+    },
+    "Ollama (local, but requires separate installation)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ollama (lokal, erfordert aber eine separate Installation)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ollama (local, mais nécessite une installation séparée)"
           }
         }
       }
@@ -1521,6 +1759,22 @@
         }
       }
     },
+    "OpenAI (GPT-4/3.5)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OpenAI (GPT-4/3.5)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OpenAI (GPT-4/3.5)"
+          }
+        }
+      }
+    },
     "OpenAI models include: gpt-4o, gpt-4o-mini, etc." : {
       "localizations" : {
         "de" : {
@@ -1565,6 +1819,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ID d'organisation (optionnel)"
+          }
+        }
+      }
+    },
+    "Please select a different AI provider." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bitte wählen Sie einen anderen KI-Anbieter."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veuillez sélectionner un autre fournisseur d'IA."
+          }
+        }
+      }
+    },
+    "Please use one of the online models instead:" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bitte verwenden Sie stattdessen eines der Online-Modelle:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veuillez plutôt utiliser l'un des modèles en ligne :"
           }
         }
       }
@@ -1781,6 +2067,7 @@
       }
     },
     "Set your keyboard shortcut:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1797,6 +2084,7 @@
       }
     },
     "Shortcut:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1959,6 +2247,7 @@
       }
     },
     "Version: 3.0 (Based on Windows Port version 7.1)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1970,6 +2259,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Version : 3.0 (Basé sur la version 7.1 du port Windows)"
+          }
+        }
+      }
+    },
+    "Version: 3.1 (Based on Windows Port version 7.1)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version: 3.1 (Basierend auf Windows-Port-Version 7.1)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version : 3.1 (Basé sur la version 7.1 du port Windows)"
           }
         }
       }
