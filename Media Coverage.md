@@ -22,6 +22,8 @@
 Cover page feature on the Vous et Vote Mac (VVMac) French Magazine, Issue 185 (macOS version specifically)
 https://www.vvmac.com/pages/LL_COUV/COUV_185.jpg
 
+[https://www.computer-wd.com/2024/12/best-pc-software-of-2024.html](https://www.computer-wd.com/2024/12/best-pc-software-of-2024.html)
+
 [https://www.phonandroid.com/cette-application-gratuite-apporte-les-outils-dapple-intelligence-sur-windows-11.html](https://www.phonandroid.com/cette-application-gratuite-apporte-les-outils-dapple-intelligence-sur-windows-11.html)
 
 [https://www.lesnumeriques.com/intelligence-artificielle/envie-d-apple-intelligence-sur-votre-pc-windows-c-est-possible-n227816.html](https://www.lesnumeriques.com/intelligence-artificielle/envie-d-apple-intelligence-sur-votre-pc-windows-c-est-possible-n227816.html)
@@ -39,6 +41,8 @@ https://www.vvmac.com/pages/LL_COUV/COUV_185.jpg
 [https://www.pcforalla.se/article/2570283/nytt-gratisprogram-gor-det-enkelt-att-sammanfatta-texter-med-ai.html](https://www.pcforalla.se/article/2570283/nytt-gratisprogram-gor-det-enkelt-att-sammanfatta-texter-med-ai.html)
 
 [https://www.computer-wd.com/2024/10/new-computer-programs-to-try-now.html](https://www.computer-wd.com/2024/10/new-computer-programs-to-try-now.html)
+
+[https://www.computer-wd.com/2024/10/add-writing-tools-to-windows.html](https://www.computer-wd.com/2024/10/add-writing-tools-to-windows.html)
 
 [https://www.applnn.com/34940.html](https://www.applnn.com/34940.html)
 
