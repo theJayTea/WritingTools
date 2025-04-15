@@ -30,6 +30,10 @@ https://www.vvmac.com/pages/LL_COUV/COUV_185.jpg
 
 [https://www.maxiapple.com/2025/01/writingtools-writing-tools-ai-ia-macos-mac-windows-pc-alternative-apple-intelligence-gratuit.html](https://www.maxiapple.com/2025/01/writingtools-writing-tools-ai-ia-macos-mac-windows-pc-alternative-apple-intelligence-gratuit.html)
 
+[https://www.html.it/magazine/writing-tools-lultimo-update-introduce-la-versione-6-le-novita/](https://www.html.it/magazine/writing-tools-lultimo-update-introduce-la-versione-6-le-novita/)
+
+[https://www.html.it/magazine/writing-tools-porta-le-opzioni-di-apple-intelligence-su-windows/](https://www.html.it/magazine/writing-tools-porta-le-opzioni-di-apple-intelligence-su-windows/)
+
 [https://tinhte.vn/thread/mang-apple-intelligence-len-windows-chay-gemini-1-5-flash-thong-minh-hon-ho-tro-san-tieng-viet.3840902/](https://tinhte.vn/thread/mang-apple-intelligence-len-windows-chay-gemini-1-5-flash-thong-minh-hon-ho-tro-san-tieng-viet.3840902/)
 
 [https://shiftdelete.net/yok-artik-lise-ogrencisi-apple-intelligence-ozelliklerini-windows-11e-getirdi](https://shiftdelete.net/yok-artik-lise-ogrencisi-apple-intelligence-ozelliklerini-windows-11e-getirdi)
