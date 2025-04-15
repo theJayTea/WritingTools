@@ -1,4 +1,4 @@
-# For fun, I've listed some of the articles on Writing Tools that I've happened to find
+## For fun, I've listed some of the articles on Writing Tools that I've happened to find!
 
 1. [https://www.howtogeek.com/if-you-like-apple-intelligences-writing-tool-try-this-open-source-app-as-its-windows-counterpart/](https://www.howtogeek.com/if-you-like-apple-intelligences-writing-tool-try-this-open-source-app-as-its-windows-counterpart/)
 
