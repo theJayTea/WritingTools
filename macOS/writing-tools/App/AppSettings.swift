@@ -8,8 +8,8 @@ class AppSettings: ObservableObject {
     
     // MARK: - Published Settings
     @Published var themeStyle: String {
-        didSet { 
-            defaults.set(themeStyle, forKey: "theme_style") 
+        didSet {
+            defaults.set(themeStyle, forKey: "theme_style")
             // Also update the useGradientTheme flag for backward compatibility
             useGradientTheme = (themeStyle != "standard")
         }
@@ -96,6 +96,9 @@ class AppSettings: ObservableObject {
         didSet { defaults.set(ollamaKeepAlive, forKey: "ollama_keep_alive") }
     }
     
+    @Published var ollamaImageMode: OllamaImageMode {
+        didSet { defaults.set(ollamaImageMode.rawValue, forKey: "ollama_image_mode") }
+    }
     
     // MARK: - Init
     private init() {
@@ -132,6 +135,9 @@ class AppSettings: ObservableObject {
         self.hotKeyCode = defaults.integer(forKey: "hotKey_keyCode")
         self.hotKeyModifiers = defaults.integer(forKey: "hotKey_modifiers")
         self.hotkeysPaused = defaults.bool(forKey: "hotkeys_paused")
+        
+        let ollamaImageModeRaw = defaults.string(forKey: "ollama_image_mode") ?? OllamaImageMode.ocr.rawValue
+        self.ollamaImageMode = OllamaImageMode(rawValue: ollamaImageModeRaw) ?? .ocr
     }
     
     // MARK: - Convenience

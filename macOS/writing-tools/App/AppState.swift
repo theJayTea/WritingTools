@@ -53,8 +53,6 @@ class AppState: ObservableObject {
         let openAIConfig = OpenAIConfig(
             apiKey: asettings.openAIApiKey,
             baseURL: asettings.openAIBaseURL,
-            organization: asettings.openAIOrganization,
-            project: asettings.openAIProject,
             model: asettings.openAIModel
         )
         self.openAIProvider = OpenAIProvider(config: openAIConfig)
@@ -107,9 +105,7 @@ class AppState: ObservableObject {
         asettings.openAIProject = project
         asettings.openAIModel = model
         
-        let config = OpenAIConfig(apiKey: apiKey, baseURL: baseURL,
-                                  organization: organization, project: project,
-                                  model: model)
+        let config = OpenAIConfig(apiKey: apiKey, baseURL: baseURL, model: model)
         openAIProvider = OpenAIProvider(config: config)
     }
     

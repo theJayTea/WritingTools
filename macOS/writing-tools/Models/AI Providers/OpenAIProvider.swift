@@ -1,13 +1,12 @@
 import Foundation
+import AIProxy
 
 struct OpenAIConfig: Codable {
     var apiKey: String
     var baseURL: String
-    var organization: String?
-    var project: String?
     var model: String
     
-    static let defaultBaseURL = "https://api.openai.com/v1"
+    static let defaultBaseURL = "https://api.openai.com"
     static let defaultModel = "gpt-4o"
 }
 
@@ -28,65 +27,105 @@ enum OpenAIModel: String, CaseIterable {
 @MainActor
 class OpenAIProvider: ObservableObject, AIProvider {
     @Published var isProcessing = false
-    private var config: OpenAIConfig
-    
-    init(config: OpenAIConfig) {
-        self.config = config
-    }
+        private var config: OpenAIConfig
+        private var aiProxyService: OpenAIService?
+        private var currentTask: Task<Void, Never>?
+        
+        init(config: OpenAIConfig) {
+            self.config = config
+            setupAIProxyService()
+        }
+        
+        private func setupAIProxyService() {
+            guard !config.apiKey.isEmpty else { return }
+            
+            // Use custom base URL if provided, otherwise use default
+            let baseURL = config.baseURL.isEmpty ? OpenAIConfig.defaultBaseURL : config.baseURL
+            
+            aiProxyService = AIProxy.openAIDirectService(
+                unprotectedAPIKey: config.apiKey,
+                baseURL: baseURL
+            )
+        }
     
     func processText(systemPrompt: String? = "You are a helpful writing assistant.", userPrompt: String, images: [Data] = [], streaming: Bool = false) async throws -> String {
-        // OpenAI's text completion endpoint doesn't support images, so we ignore the images parameter
-        
-        isProcessing = true
-        defer { isProcessing = false }
-        
-        guard !config.apiKey.isEmpty else {
-            throw NSError(domain: "OpenAIAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "API key is missing."])
+            isProcessing = true
+            defer { isProcessing = false }
+            
+            guard !config.apiKey.isEmpty else {
+                throw NSError(domain: "OpenAIAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "API key is missing."])
+            }
+            
+            if aiProxyService == nil {
+                setupAIProxyService()
+            }
+            
+            guard let openAIService = aiProxyService else {
+                throw NSError(domain: "OpenAIAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to initialize AIProxy service."])
+            }
+            
+            var messages: [OpenAIChatCompletionRequestBody.Message] = []
+            
+            if let systemPrompt = systemPrompt {
+                messages.append(.system(content: .text(systemPrompt)))
+            }
+            
+            // Handle text and images
+            if images.isEmpty {
+                messages.append(.user(content: .text(userPrompt)))
+            } else {
+                var parts: [OpenAIChatCompletionRequestBody.Message.ContentPart] = [.text(userPrompt)]
+                
+                for imageData in images {
+                    let dataString = "data:image/jpeg;base64," + imageData.base64EncodedString()
+                    if let dataURL = URL(string: dataString) {
+                        parts.append(.imageURL(dataURL, detail: .auto))
+                    }
+                }
+                
+                messages.append(.user(content: .parts(parts)))
+            }
+            
+            do {
+                if streaming {
+                    var compiledResponse = ""
+                    let stream = try await openAIService.streamingChatCompletionRequest(body: .init(
+                        model: config.model,
+                        messages: messages
+                    ))
+                    
+                    for try await chunk in stream {
+                        if Task.isCancelled { break }
+                        if let content = chunk.choices.first?.delta.content {
+                            compiledResponse += content
+                        }
+                    }
+                    return compiledResponse
+                    
+                } else {
+                    let response = try await openAIService.chatCompletionRequest(body: .init(
+                        model: config.model,
+                        messages: messages
+                    ))
+                    
+                    return response.choices.first?.message.content ?? ""
+                }
+                
+            } catch AIProxyError.unsuccessfulRequest(let statusCode, let responseBody) {
+                print("Received non-200 status code: \(statusCode) with response body: \(responseBody)")
+                throw NSError(domain: "OpenAIAPI",
+                              code: statusCode,
+                              userInfo: [NSLocalizedDescriptionKey: "API error: \(responseBody)"])
+            } catch {
+                print("Could not create OpenAI chat completion: \(error.localizedDescription)")
+                throw error
+            }
         }
-        
-        let baseURL = config.baseURL.isEmpty ? OpenAIConfig.defaultBaseURL : config.baseURL
-        guard let url = URL(string: "\(baseURL)/chat/completions") else {
-            throw NSError(domain: "OpenAIAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid URL."])
-        }
-        
-        let requestBody: [String: Any] = [
-            "model": config.model,
-            "messages": [
-                ["role": "system", "content": systemPrompt ?? "You are a helpful writing assistant."],
-                ["role": "user", "content": userPrompt]
-            ],
-            "temperature": 0.5
-        ]
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(config.apiKey)", forHTTPHeaderField: "Authorization")
-        
-        if let organization = config.organization, !organization.isEmpty {
-            request.setValue(organization, forHTTPHeaderField: "OpenAI-Organization")
-        }
-        
-        request.httpBody = try JSONSerialization.data(withJSONObject: requestBody)
-        
-        let (data, response) = try await URLSession.shared.data(for: request)
-        
-        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-            throw NSError(domain: "OpenAIAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Server returned an error."])
-        }
-        
-        guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let choices = json["choices"] as? [[String: Any]],
-              let firstChoice = choices.first,
-              let message = firstChoice["message"] as? [String: Any],
-              let content = message["content"] as? String else {
-            throw NSError(domain: "OpenAIAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to parse response."])
-        }
-        
-        return content
-    }
+
     
     func cancel() {
+        isProcessing = false
+        currentTask = nil
         isProcessing = false
     }
 }

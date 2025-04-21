@@ -8,17 +8,16 @@ struct GeminiConfig: Codable {
 
 enum GeminiModel: String, CaseIterable {
     case twofashlite = "gemini-2.0-flash-lite"
-    case twoflash = "gemini-2.0-flash-exp"
-    case twoflashthinking = "gemini-2.0-flash-thinking-exp-01-21"
-    case twopro = "gemini-2.0-pro-exp-02-05"
+    case twoflash = "gemini-2.0-flash"
+    case twofiveflash = "gemini-2.5-flash-preview-04-17"
+    case twofivepro = "gemini-2.5-pro-preview-03-25"
     
     var displayName: String {
         switch self {
-        case .twofashlite: return "Gemini 2.0 Flash Lite (intelligent | very fast | 30 uses/min)"
-        case .twoflash: return "Gemini 2.0 Flash (very intelligent | fast | 15 uses/min)"
-        case .twoflashthinking: return "Gemini 2.0 Flash Thinking (most intelligent | slow | 10 uses/min)"
-        case .twopro: return "Gemini 2.0 Pro (most intelligent | slow | 2 uses/min)"
-            
+        case .twofashlite: return "Gemini 2.0 Flash Lite (Agile Intelligence | Blazing Fast | ~30 uses/min)"
+        case .twoflash: return "Gemini 2.0 Flash (Balanced Intelligence | Swift | ~15 uses/min)"
+        case .twofiveflash: return "Gemini 2.5 Flash (Enhanced Intelligence | Measured Pace | ~10 uses/min)"
+        case .twofivepro: return "Gemini 2.5 Pro (Peak Intelligence | Deliberate Speed | ~5 uses/min)"
         }
     }
 }
@@ -78,7 +77,7 @@ class GeminiProvider: ObservableObject, AIProvider {
         do {
             let response = try await geminiService.generateContentRequest(body: requestBody, model: config.modelName)
             
-            if let usage = response.usageMetadata {
+            /*if let usage = response.usageMetadata {
                 print("""
                      Gemini API Usage:
                      
@@ -86,7 +85,7 @@ class GeminiProvider: ObservableObject, AIProvider {
                       \(usage.candidatesTokenCount ?? 0) candidate tokens
                       \(usage.totalTokenCount ?? 0) total tokens
                      """)
-            }
+            }*/
             
             for part in response.candidates?.first?.content?.parts ?? [] {
                 switch part {
@@ -94,6 +93,8 @@ class GeminiProvider: ObservableObject, AIProvider {
                     return text
                 case .functionCall(name: let functionName, args: let arguments):
                     print("Function call received: \(functionName) with args: \(arguments ?? [:])")
+                case .inlineData(mimeType: _, base64Data: _):
+                    print("Image generation?")
                 }
             }
             

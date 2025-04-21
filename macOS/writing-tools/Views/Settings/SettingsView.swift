@@ -188,11 +188,12 @@ struct SettingsView: View {
                     Text("Standard").tag("standard")
                     Text("Gradient").tag("gradient")
                     Text("Glass").tag("glass")
+                    Text("OLED").tag("oled") 
                 }
                 .pickerStyle(.segmented)
                 .padding(.vertical, 4)
-                .onChange(of: settings.themeStyle) { oldValue, newValue in 
-                    needsSaving = true 
+                .onChange(of: settings.themeStyle) { oldValue, newValue in
+                    needsSaving = true
                 }
             }
             
@@ -328,11 +329,11 @@ struct SettingsView: View {
                             needsSaving = true 
                         }
                     
-                    TextField("Base URL", text: $settings.mistralBaseURL)
+                    /*TextField("Base URL", text: $settings.mistralBaseURL)
                         .textFieldStyle(.roundedBorder)
                         .onChange(of: settings.mistralBaseURL) { oldValue, newValue in 
                             needsSaving = true 
-                        }
+                        }*/
                 }
                 
                 VStack(alignment: .leading, spacing: 8) {
@@ -379,7 +380,7 @@ struct SettingsView: View {
                     
                     TextField("Base URL", text: $settings.openAIBaseURL)
                         .textFieldStyle(.roundedBorder)
-                        .onChange(of: settings.openAIBaseURL) { oldValue, newValue in 
+                        .onChange(of: settings.openAIBaseURL) { oldValue, newValue in
                             needsSaving = true 
                         }
                 }
@@ -400,29 +401,6 @@ struct SettingsView: View {
                         .foregroundColor(.secondary)
                 }
                 
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Advanced Options")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                    
-                    TextField("Organization ID (Optional)", text: Binding(
-                        get: { settings.openAIOrganization ?? "" },
-                        set: { 
-                            settings.openAIOrganization = $0.isEmpty ? nil : $0 
-                            needsSaving = true
-                        }
-                    ))
-                    .textFieldStyle(.roundedBorder)
-                    
-                    TextField("Project ID (Optional)", text: Binding(
-                        get: { settings.openAIProject ?? "" },
-                        set: { 
-                            settings.openAIProject = $0.isEmpty ? nil : $0 
-                            needsSaving = true
-                        }
-                    ))
-                    .textFieldStyle(.roundedBorder)
-                }
             }
             .padding(.bottom, 4)
                             
@@ -466,6 +444,26 @@ struct SettingsView: View {
                         .onChange(of: settings.ollamaKeepAlive) { oldValue, newValue in 
                             needsSaving = true 
                         }
+                }
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Image Recognition")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    
+                    Picker("Image Mode", selection: $settings.ollamaImageMode) {
+                        ForEach(OllamaImageMode.allCases) { mode in
+                            Text(mode.displayName).tag(mode)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .onChange(of: settings.ollamaImageMode) { oldValue, newValue in
+                        needsSaving = true
+                    }
+
+                    Text("Choose between performing OCR locally or using an Ollama vision-enabled model for image input.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                 }
                 
                 VStack(alignment: .leading, spacing: 4) {
@@ -539,6 +537,9 @@ struct SettingsView: View {
                 keepAlive: settings.ollamaKeepAlive
             )
         }
+        
+        // Save ollama image mode
+        UserDefaults.standard.set(settings.ollamaImageMode.rawValue, forKey: "ollama_image_mode")
         
         // Set current provider
         appState.setCurrentProvider(settings.currentProvider)

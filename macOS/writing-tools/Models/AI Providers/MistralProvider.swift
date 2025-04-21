@@ -103,14 +103,14 @@ class MistralProvider: ObservableObject, AIProvider {
                     model: config.model
                 ))
                 
-                if let usage = response.usage {
+                /*if let usage = response.usage {
                     print("""
                             Used:
                              \(usage.promptTokens ?? 0) prompt tokens
                              \(usage.completionTokens ?? 0) completion tokens
                              \(usage.totalTokens ?? 0) total tokens
                             """)
-                }
+                }*/
                 
                 return response.choices.first?.message.content ?? ""
             }

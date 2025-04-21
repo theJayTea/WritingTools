@@ -4,6 +4,7 @@ enum AppTheme: String {
     case standard = "standard"
     case gradient = "gradient"
     case glass = "glass"
+    case oled = "oled"
 }
 
 struct WindowBackground: ViewModifier {
@@ -57,7 +58,11 @@ struct WindowBackground: ViewModifier {
                         }
                     case .glass:
                         GlassmorphicBackground()
+                        
+                    case .oled:
+                        Color.black
                     }
+                    
                 }
                 .clipShape(
                     RoundedRectangle(

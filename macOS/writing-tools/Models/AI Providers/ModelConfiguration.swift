@@ -35,7 +35,7 @@ extension ModelConfiguration: @retroactive Equatable {
     )
     
     public static let gemma3_4B_it_4bit = ModelConfiguration(
-        id: "mlx-community/gemma-3-4b-it-4bit"
+        id: "mlx-community/gemma-3-text-4b-it-4bit"
     )
     
 }

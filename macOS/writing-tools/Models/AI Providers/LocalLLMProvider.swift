@@ -41,7 +41,7 @@ class LocalLLMProvider: ObservableObject, AIProvider {
     }
     
     // Use default model from registry.
-    let modelConfiguration : ModelConfiguration = .qwen2_5_3b_4bit
+    let modelConfiguration : ModelConfiguration = .phi4_mini_instruct_4bit
     //let modelConfiguration = ModelRegistry.llama3_2_3B_4bit
     let generateParameters = GenerateParameters(temperature: 0.6)
     let maxTokens = 100000

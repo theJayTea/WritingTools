@@ -22,27 +22,8 @@
 		2A999CB72D84D9B800DFB0A6 /* MLXVLM in Frameworks */ = {isa = PBXBuildFile; productRef = 2A999CB62D84D9B800DFB0A6 /* MLXVLM */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		2ABCBC302CDEB607001E4B5E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 2ABCBC162CDEB606001E4B5E /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 2ABCBC1D2CDEB606001E4B5E;
-			remoteInfo = "swift-writing-tools";
-		};
-		2ABCBC3A2CDEB607001E4B5E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 2ABCBC162CDEB606001E4B5E /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 2ABCBC1D2CDEB606001E4B5E;
-			remoteInfo = "swift-writing-tools";
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXFileReference section */
 		2ABCBC1E2CDEB606001E4B5E /* writing-tools.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "writing-tools.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		2ABCBC2F2CDEB607001E4B5E /* writing-toolsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "writing-toolsTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		2ABCBC392CDEB607001E4B5E /* writing-toolsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "writing-toolsUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -87,20 +68,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		2ABCBC2C2CDEB607001E4B5E /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		2ABCBC362CDEB607001E4B5E /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -116,8 +83,6 @@
 			isa = PBXGroup;
 			children = (
 				2ABCBC1E2CDEB606001E4B5E /* writing-tools.app */,
-				2ABCBC2F2CDEB607001E4B5E /* writing-toolsTests.xctest */,
-				2ABCBC392CDEB607001E4B5E /* writing-toolsUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -160,46 +125,6 @@
 			productReference = 2ABCBC1E2CDEB606001E4B5E /* writing-tools.app */;
 			productType = "com.apple.product-type.application";
 		};
-		2ABCBC2E2CDEB607001E4B5E /* writing-toolsTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 2ABCBC462CDEB607001E4B5E /* Build configuration list for PBXNativeTarget "writing-toolsTests" */;
-			buildPhases = (
-				2ABCBC2B2CDEB607001E4B5E /* Sources */,
-				2ABCBC2C2CDEB607001E4B5E /* Frameworks */,
-				2ABCBC2D2CDEB607001E4B5E /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				2ABCBC312CDEB607001E4B5E /* PBXTargetDependency */,
-			);
-			name = "writing-toolsTests";
-			packageProductDependencies = (
-			);
-			productName = "swift-writing-toolsTests";
-			productReference = 2ABCBC2F2CDEB607001E4B5E /* writing-toolsTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		2ABCBC382CDEB607001E4B5E /* writing-toolsUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 2ABCBC492CDEB607001E4B5E /* Build configuration list for PBXNativeTarget "writing-toolsUITests" */;
-			buildPhases = (
-				2ABCBC352CDEB607001E4B5E /* Sources */,
-				2ABCBC362CDEB607001E4B5E /* Frameworks */,
-				2ABCBC372CDEB607001E4B5E /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				2ABCBC3B2CDEB607001E4B5E /* PBXTargetDependency */,
-			);
-			name = "writing-toolsUITests";
-			packageProductDependencies = (
-			);
-			productName = "swift-writing-toolsUITests";
-			productReference = 2ABCBC392CDEB607001E4B5E /* writing-toolsUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -212,14 +137,6 @@
 				TargetAttributes = {
 					2ABCBC1D2CDEB606001E4B5E = {
 						CreatedOnToolsVersion = 16.1;
-					};
-					2ABCBC2E2CDEB607001E4B5E = {
-						CreatedOnToolsVersion = 16.1;
-						TestTargetID = 2ABCBC1D2CDEB606001E4B5E;
-					};
-					2ABCBC382CDEB607001E4B5E = {
-						CreatedOnToolsVersion = 16.1;
-						TestTargetID = 2ABCBC1D2CDEB606001E4B5E;
 					};
 				};
 			};
@@ -248,28 +165,12 @@
 			projectRoot = "";
 			targets = (
 				2ABCBC1D2CDEB606001E4B5E /* writing-tools */,
-				2ABCBC2E2CDEB607001E4B5E /* writing-toolsTests */,
-				2ABCBC382CDEB607001E4B5E /* writing-toolsUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		2ABCBC1C2CDEB606001E4B5E /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		2ABCBC2D2CDEB607001E4B5E /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		2ABCBC372CDEB607001E4B5E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -286,34 +187,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		2ABCBC2B2CDEB607001E4B5E /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		2ABCBC352CDEB607001E4B5E /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		2ABCBC312CDEB607001E4B5E /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 2ABCBC1D2CDEB606001E4B5E /* writing-tools */;
-			targetProxy = 2ABCBC302CDEB607001E4B5E /* PBXContainerItemProxy */;
-		};
-		2ABCBC3B2CDEB607001E4B5E /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 2ABCBC1D2CDEB606001E4B5E /* writing-tools */;
-			targetProxy = 2ABCBC3A2CDEB607001E4B5E /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		2ABCBC412CDEB607001E4B5E /* Debug */ = {
@@ -448,7 +322,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"writing-tools/Preview Content\"";
 				DEVELOPMENT_TEAM = MK2V998W66;
@@ -483,7 +357,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"writing-tools/Preview Content\"";
 				DEVELOPMENT_TEAM = MK2V998W66;
@@ -508,78 +382,6 @@
 			};
 			name = Release;
 		};
-		2ABCBC472CDEB607001E4B5E /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = MK2V998W66;
-				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 15.1;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.aryamirsepasi.swift-writing-toolsTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/writing-tools.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/writing-tools";
-			};
-			name = Debug;
-		};
-		2ABCBC482CDEB607001E4B5E /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = MK2V998W66;
-				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 15.1;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.aryamirsepasi.swift-writing-toolsTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/writing-tools.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/writing-tools";
-			};
-			name = Release;
-		};
-		2ABCBC4A2CDEB607001E4B5E /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = MK2V998W66;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.aryamirsepasi.swift-writing-toolsUITests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = "swift-writing-tools";
-			};
-			name = Debug;
-		};
-		2ABCBC4B2CDEB607001E4B5E /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = MK2V998W66;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.aryamirsepasi.swift-writing-toolsUITests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = "swift-writing-tools";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -597,24 +399,6 @@
 			buildConfigurations = (
 				2ABCBC442CDEB607001E4B5E /* Debug */,
 				2ABCBC452CDEB607001E4B5E /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		2ABCBC462CDEB607001E4B5E /* Build configuration list for PBXNativeTarget "writing-toolsTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				2ABCBC472CDEB607001E4B5E /* Debug */,
-				2ABCBC482CDEB607001E4B5E /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		2ABCBC492CDEB607001E4B5E /* Build configuration list for PBXNativeTarget "writing-toolsUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				2ABCBC4A2CDEB607001E4B5E /* Debug */,
-				2ABCBC4B2CDEB607001E4B5E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

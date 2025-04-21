@@ -12,9 +12,10 @@ struct writing_toolsApp: App {
                 .hidden()
         }
         .windowStyle(.hiddenTitleBar)
-        .defaultSize(width: 0, height: 0)
+        .windowResizability(.contentSize)
         .commands {
-            CommandGroup(replacing: .newItem) {}
+            SidebarCommands()
+            ToolbarCommands()
         }
     }
 }
