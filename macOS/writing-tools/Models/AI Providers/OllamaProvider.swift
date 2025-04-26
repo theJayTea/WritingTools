@@ -11,18 +11,51 @@ struct OllamaConfig: Codable {
     static let defaultKeepAlive = "5m"
 }
 
+enum OllamaImageMode: String, CaseIterable, Identifiable {
+    case ocr
+    case ollama
+
+    var id: String { rawValue }
+    var displayName: String {
+        switch self {
+        case .ocr: return "OCR (Apple Vision)"
+        case .ollama: return "Ollama Image Recognition"
+        }
+    }
+}
+
 @MainActor
 class OllamaProvider: ObservableObject, AIProvider {
     @Published var isProcessing = false
     private var config: OllamaConfig
     
+    // ADD: Image mode settings reference
+    private var imageMode: OllamaImageMode { AppSettings.shared.ollamaImageMode }
+
     init(config: OllamaConfig) {
         self.config = config
     }
     
-    func processText(systemPrompt: String? = "You are a helpful writing assistant.", userPrompt: String, images: [Data] = []) async throws -> String {
+    func processText(systemPrompt: String? = "You are a helpful writing assistant.", userPrompt: String, images: [Data] = [], streaming: Bool = false) async throws -> String {
         isProcessing = true
         defer { isProcessing = false }
+        
+        // Determine if we are using OCR or Ollama's own image-recognition
+        var combinedPrompt = userPrompt
+        var imagesForOllama: [Data] = []
+
+        if !images.isEmpty {
+            switch imageMode {
+            case .ocr:
+                let ocrText = await OCRManager.shared.extractText(from: images)
+                if !ocrText.isEmpty {
+                    combinedPrompt += "\nExtracted Text: \(ocrText)"
+                }
+                // Do NOT send images to Ollama
+            case .ollama:
+                imagesForOllama = images // Pass images as base64 to Ollama API
+            }
+        }
         
         // Construct the endpoint URL.
         guard let url = URL(string: "\(config.baseURL)/generate") else {
@@ -32,7 +65,7 @@ class OllamaProvider: ObservableObject, AIProvider {
         // Build the request payload.
         var requestBody: [String: Any] = [
             "model": config.model,
-            "prompt": userPrompt,
+            "prompt": combinedPrompt,
             "stream": false
         ]
         if let system = systemPrompt {
@@ -41,8 +74,10 @@ class OllamaProvider: ObservableObject, AIProvider {
         if let keepAlive = config.keepAlive, !keepAlive.isEmpty {
             requestBody["keep_alive"] = keepAlive
         }
-        if !images.isEmpty {
-            let base64Images = images.map { $0.base64EncodedString() }
+        
+        // Only add images to payload if in .ollama image mode
+        if !imagesForOllama.isEmpty {
+            let base64Images = imagesForOllama.map { $0.base64EncodedString() }
             requestBody["images"] = base64Images
         }
         

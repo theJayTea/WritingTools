@@ -1,4 +1,5 @@
 import SwiftUI
+import KeyboardShortcuts
 
 struct CommandEditor: View {
     @Binding var command: CommandModel
@@ -13,6 +14,7 @@ struct CommandEditor: View {
     @State private var prompt: String
     @State private var selectedIcon: String
     @State private var useResponseWindow: Bool
+    @State private var hasShortcut: Bool
     @State private var showingIconPicker = false
     @State private var isNameDuplicate = false
     @State private var showDuplicateAlert = false
@@ -27,6 +29,7 @@ struct CommandEditor: View {
         _prompt = State(initialValue: command.wrappedValue.prompt)
         _selectedIcon = State(initialValue: command.wrappedValue.icon)
         _useResponseWindow = State(initialValue: command.wrappedValue.useResponseWindow)
+        _hasShortcut = State(initialValue: command.wrappedValue.hasShortcut)
     }
     
     var body: some View {
@@ -90,6 +93,43 @@ struct CommandEditor: View {
                                 .padding(.horizontal)
                         }
                         
+                        // Keyboard Shortcut
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Keyboard Shortcut")
+                                .font(.headline)
+                                .foregroundColor(.primary)
+                                .padding(.horizontal)
+                            
+                            VStack(alignment: .leading, spacing: 12) {
+                                Toggle("Enable keyboard shortcut for this command", isOn: $hasShortcut)
+                                    .padding(.horizontal)
+                                
+                                if hasShortcut {
+                                    HStack {
+                                        Text("Command shortcut:")
+                                            .foregroundColor(.secondary)
+                                        
+                                        KeyboardShortcuts.Recorder(
+                                            for: .commandShortcut(for: command.id),
+                                            onChange: { shortcut in
+                                                // Ensure hasShortcut stays true if a shortcut is set
+                                                if shortcut != nil {
+                                                    hasShortcut = true
+                                                }
+                                            }
+                                        )
+                                    }
+                                    .padding(.horizontal)
+                                    
+                                    Text("Tip: This shortcut will execute the command directly without opening the popup window.")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                        .padding(.horizontal)
+                                }
+                            }
+                            .padding(.vertical, 4)
+                        }
+                        
                         // Prompt
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Prompt")
@@ -136,15 +176,24 @@ struct CommandEditor: View {
                             .buttonStyle(.bordered)
                             
                             Button(action: {
+                                // If hasShortcut is false but there is a shortcut set, remove it
+                                if !hasShortcut {
+                                    KeyboardShortcuts.reset(.commandShortcut(for: command.id))
+                                }
+                                
                                 // Save changes back to the command
                                 var updatedCommand = command
                                 updatedCommand.name = name
                                 updatedCommand.prompt = prompt
                                 updatedCommand.icon = selectedIcon
                                 updatedCommand.useResponseWindow = useResponseWindow
+                                updatedCommand.hasShortcut = hasShortcut
                                 
                                 // Update the binding
                                 command = updatedCommand
+                                
+                                // Post notification that commands have changed to update shortcuts
+                                NotificationCenter.default.post(name: NSNotification.Name("CommandsChanged"), object: nil)
                                 
                                 // Call the save action
                                 onSave()

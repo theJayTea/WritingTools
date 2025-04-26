@@ -40,44 +40,39 @@ struct ResponseView: View {
                 Button(action: { viewModel.copyContent() }) {
                     Label(viewModel.showCopyConfirmation ? "Copied!" : "Copy All",
                           systemImage: viewModel.showCopyConfirmation ? "checkmark" : "doc.on.doc")
-                        .frame(minWidth: 80)
+                    .frame(minWidth: 80)
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(.borderedProminent)
                 .animation(.easeInOut, value: viewModel.showCopyConfirmation)
                 
                 Spacer()
                 
-                /*HStack(spacing: 12) {
+                HStack(spacing: 12) {
                     Button(action: { viewModel.fontSize -= 1 }) {
-                        Image(systemName: "textformat.size.smaller")
-                            .foregroundColor(.primary)
+                        Label("Decrease text size", systemImage: "textformat.size.smaller")
+                            .labelStyle(.iconOnly)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.borderless)
                     .disabled(viewModel.fontSize <= 10)
-                    .help("Decrease text size")
+                    .keyboardShortcut("-", modifiers: .command)
                     
                     Button(action: { viewModel.fontSize += 1 }) {
-                        Image(systemName: "textformat.size.larger")
-                            .foregroundColor(.primary)
+                        Label("Increase text size", systemImage: "textformat.size.larger")
+                            .labelStyle(.iconOnly)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.borderless)
                     .disabled(viewModel.fontSize >= 20)
-                    .help("Increase text size")
+                    .keyboardShortcut("+", modifiers: .command)
                     
                     Button(action: {
-                        viewModel.clearConversation()
-                        // Add first message again
-                        viewModel.messages.append(ChatMessage(
-                            role: "assistant",
-                            content: viewModel.initialContent
-                        ))
+                        viewModel.fontSize = 14
                     }) {
-                        Image(systemName: "arrow.counterclockwise")
-                            .foregroundColor(.primary)
+                        Label("Reset Font Size", systemImage: "arrow.counterclockwise")
+                            .labelStyle(.iconOnly)
                     }
-                    .buttonStyle(.plain)
-                    .help("Clear conversation")
-                }*/
+                    .buttonStyle(.borderless)
+                    .keyboardShortcut("r", modifiers: .command)
+                }
             }
             .padding()
             .background(Color(.windowBackgroundColor))
@@ -146,23 +141,31 @@ struct ChatMessageView: View {
             
             // If it's assistant, push bubble to the left
             if message.role == "assistant" {
-                bubbleView(role: message.role)
+                bubbleView(role: message.role).transition(.move(edge: .leading))
                 Spacer(minLength: 15)
             } else {
                 Spacer(minLength: 15)
-                bubbleView(role: message.role)
+                bubbleView(role: message.role).transition(.move(edge: .trailing))
             }
         }
         .padding(.top, 4)
+        .animation(.spring(), value: message.role)
     }
     
     @ViewBuilder
     private func bubbleView(role: String) -> some View {
         VStack(alignment: role == "assistant" ? .leading : .trailing, spacing: 2) {
             Markdown(message.content)
-                .font(.system(size: fontSize))
+                .markdownTextStyle(\.text){
+                    FontSize(fontSize)
+                }
+                .markdownTextStyle(\.code){
+                    
+                }
                 .textSelection(.enabled)
                 .chatBubbleStyle(isFromUser: message.role == "user")
+                .accessibilityLabel(role == "user" ? "Your message" : "Assistant's response")
+                .accessibilityValue(message.content)
             
             // Time stamp
             Text(message.timestamp.formatted(.dateTime.hour().minute()))
@@ -189,7 +192,7 @@ extension View {
 // Update ResponseViewModel to handle chat messages
 @MainActor
 final class ResponseViewModel: ObservableObject, Sendable {
-
+    
     @Published var messages: [ChatMessage] = []
     @Published var fontSize: CGFloat = 14
     @Published var showCopyConfirmation: Bool = false
@@ -240,11 +243,13 @@ final class ResponseViewModel: ObservableObject, Sendable {
                     systemPrompt: """
                     You are a writing and coding assistant. Your sole task is to respond to the user's instruction thoughtfully and comprehensively.
                     If the instruction is a question, provide a detailed answer. But always return the best and most accurate answer and not different options. 
-                    If it's a request for help, provide clear guidance and examples where appropriate. Make sure tu use the language used or specified by the user instruction.
+                    If it's a request for help, provide clear guidance and examples where appropriate. Make sure to use the language used or specified by the user instruction.
                     Use Markdown formatting to make your response more readable.
+                    DO NOT ANSWER OR RESPOND TO THE USER'S TEXT CONTENT.
                     """,
                     userPrompt: contextualPrompt,
-                    images: AppState.shared.selectedImages
+                    images: AppState.shared.selectedImages,
+                    streaming: true
                 )
                 
                 DispatchQueue.main.async {
@@ -270,10 +275,10 @@ final class ResponseViewModel: ObservableObject, Sendable {
         let conversationText = messages.map { message in
             return "\(message.role.capitalized): \(message.content)" // Format each message with role
         }.joined(separator: "\n\n") // Join messages with double newlines for readability
-
+        
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(conversationText, forType: .string)
-
+        
         showCopyConfirmation = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             self.showCopyConfirmation = false

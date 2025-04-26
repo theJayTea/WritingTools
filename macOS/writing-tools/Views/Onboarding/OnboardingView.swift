@@ -82,7 +82,7 @@ struct OnboardingView: View {
             .padding()
             .background(Color(.windowBackgroundColor))
         }
-        .frame(width: 600, height: 700)
+        .frame(width: 600, height: 600)
         .background(
             Rectangle()
                 .fill(Color.clear)
@@ -169,6 +169,7 @@ struct OnboardingView: View {
                 GroupBox {
                     VStack(alignment: .leading) {
                         Picker("Provider", selection: $settings.currentProvider) {
+                            // Remove Local LLM option for Intel Macs
                             if LocalLLMProvider.isAppleSilicon {
                                 Text("Local LLM").tag("local")
                             }
@@ -179,14 +180,14 @@ struct OnboardingView: View {
                         }
                         .pickerStyle(.menu)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .onChange(of: settings.currentProvider, initial: false) { oldValue, newValue in
+                        .onChange(of: settings.currentProvider) { oldValue, newValue in
                             if newValue == "local" && !LocalLLMProvider.isAppleSilicon {
                                 settings.currentProvider = "gemini"
                             }
                         }
                         
                         if settings.currentProvider == "local" {
-                            Text("(Llama 3.2)")
+                            Text("(Llama 3.2 3B 4-bit)")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -251,9 +252,6 @@ struct OnboardingView: View {
                 TextField("API Key", text: $settings.mistralApiKey)
                     .textFieldStyle(.roundedBorder)
                 
-                TextField("Base URL", text: $settings.mistralBaseURL)
-                    .textFieldStyle(.roundedBorder)
-                
                 Picker("Model", selection: $settings.mistralModel) {
                     ForEach(MistralModel.allCases, id: \.self) { model in
                         Text(model.displayName).tag(model.rawValue)
@@ -288,18 +286,6 @@ struct OnboardingView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
                 
-                TextField("Organization ID (Optional)", text: Binding(
-                    get: { settings.openAIOrganization ?? "" },
-                    set: { settings.openAIOrganization = $0.isEmpty ? nil : $0 }
-                ))
-                .textFieldStyle(.roundedBorder)
-                
-                TextField("Project ID (Optional)", text: Binding(
-                    get: { settings.openAIProject ?? "" },
-                    set: { settings.openAIProject = $0.isEmpty ? nil : $0 }
-                ))
-                .textFieldStyle(.roundedBorder)
-                
                 Button("Get OpenAI API Key") {
                     if let url = URL(string: "https://platform.openai.com/account/api-keys") {
                         NSWorkspace.shared.open(url)
@@ -321,6 +307,22 @@ struct OnboardingView: View {
                 
                 TextField("Keep Alive Time", text: $settings.ollamaKeepAlive)
                     .textFieldStyle(.roundedBorder)
+                
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Image Recognition Mode")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Picker("Image Mode", selection: $settings.ollamaImageMode) {
+                        ForEach(OllamaImageMode.allCases) { mode in
+                            Text(mode.displayName).tag(mode)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+
+                    Text("Choose between local OCR or Ollama's built-in vision capabilities.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
                 
                 LinkText()
                 

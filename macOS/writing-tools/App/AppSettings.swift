@@ -8,9 +8,8 @@ class AppSettings: ObservableObject {
     
     // MARK: - Published Settings
     @Published var themeStyle: String {
-        didSet { 
-            defaults.set(themeStyle, forKey: "theme_style") 
-            // Also update the useGradientTheme flag for backward compatibility
+        didSet {
+            defaults.set(themeStyle, forKey: "theme_style")
             useGradientTheme = (themeStyle != "standard")
         }
     }
@@ -21,6 +20,10 @@ class AppSettings: ObservableObject {
     
     @Published var geminiModel: GeminiModel {
         didSet { defaults.set(geminiModel.rawValue, forKey: "gemini_model") }
+    }
+    
+    @Published var geminiCustomModel: String {
+        didSet { defaults.set(geminiCustomModel, forKey: "gemini_custom_model") }
     }
     
     @Published var openAIApiKey: String {
@@ -96,6 +99,9 @@ class AppSettings: ObservableObject {
         didSet { defaults.set(ollamaKeepAlive, forKey: "ollama_keep_alive") }
     }
     
+    @Published var ollamaImageMode: OllamaImageMode {
+        didSet { defaults.set(ollamaImageMode.rawValue, forKey: "ollama_image_mode") }
+    }
     
     // MARK: - Init
     private init() {
@@ -108,6 +114,8 @@ class AppSettings: ObservableObject {
         self.geminiApiKey = defaults.string(forKey: "gemini_api_key") ?? ""
         let geminiModelStr = defaults.string(forKey: "gemini_model") ?? GeminiModel.twoflash.rawValue
         self.geminiModel = GeminiModel(rawValue: geminiModelStr) ?? .twoflash
+        
+        self.geminiCustomModel = defaults.string(forKey: "gemini_custom_model") ?? ""
         
         self.openAIApiKey = defaults.string(forKey: "openai_api_key") ?? ""
         self.openAIBaseURL = defaults.string(forKey: "openai_base_url") ?? OpenAIConfig.defaultBaseURL
@@ -132,6 +140,9 @@ class AppSettings: ObservableObject {
         self.hotKeyCode = defaults.integer(forKey: "hotKey_keyCode")
         self.hotKeyModifiers = defaults.integer(forKey: "hotKey_modifiers")
         self.hotkeysPaused = defaults.bool(forKey: "hotkeys_paused")
+        
+        let ollamaImageModeRaw = defaults.string(forKey: "ollama_image_mode") ?? OllamaImageMode.ocr.rawValue
+        self.ollamaImageMode = OllamaImageMode(rawValue: ollamaImageModeRaw) ?? .ocr
     }
     
     // MARK: - Convenience

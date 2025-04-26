@@ -59,7 +59,11 @@ class PopupWindow: NSWindow {
         level = .floating
         collectionBehavior = [.transient, .ignoresCycle]
         hasShadow = true
-        isMovableByWindowBackground = true
+        
+        // Use system standard shadow instead of custom one
+        standardWindowButton(.closeButton)?.isHidden = true
+        standardWindowButton(.miniaturizeButton)?.isHidden = true
+        standardWindowButton(.zoomButton)?.isHidden = true
         
         let closeAction: () -> Void = { [weak self] in
             self?.close()

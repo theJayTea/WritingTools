@@ -44,17 +44,21 @@ class AppState: ObservableObject {
         let asettings = AppSettings.shared
         self.currentProvider = asettings.currentProvider
         
-        // Initialize Gemini
-        let geminiConfig = GeminiConfig(apiKey: asettings.geminiApiKey,
-                                        modelName: asettings.geminiModel.rawValue)
+        // Initialize Gemini with custom model support
+        let geminiModelEnum = asettings.geminiModel
+        let geminiModelName = (geminiModelEnum == .custom)
+            ? asettings.geminiCustomModel
+            : geminiModelEnum.rawValue
+        let geminiConfig = GeminiConfig(
+            apiKey: asettings.geminiApiKey,
+            modelName: geminiModelName
+        )
         self.geminiProvider = GeminiProvider(config: geminiConfig)
         
         // Initialize OpenAI
         let openAIConfig = OpenAIConfig(
             apiKey: asettings.openAIApiKey,
             baseURL: asettings.openAIBaseURL,
-            organization: asettings.openAIOrganization,
-            project: asettings.openAIProject,
             model: asettings.openAIModel
         )
         self.openAIProvider = OpenAIProvider(config: openAIConfig)
@@ -84,17 +88,22 @@ class AppState: ObservableObject {
         
         // Perform migration from old system to new CommandManager if needed
         MigrationHelper.shared.migrateIfNeeded(
-            commandManager: commandManager, 
+            commandManager: commandManager,
             customCommandsManager: customCommandsManager
         )
     }
     
     // For Gemini changes
-    func saveGeminiConfig(apiKey: String, model: GeminiModel) {
+    func saveGeminiConfig(apiKey: String, model: GeminiModel, customModelName: String? = nil) {
         AppSettings.shared.geminiApiKey = apiKey
         AppSettings.shared.geminiModel = model
-        
-        let config = GeminiConfig(apiKey: apiKey, modelName: model.rawValue)
+        if model == .custom, let custom = customModelName {
+            AppSettings.shared.geminiCustomModel = custom   // persist custom
+        }
+
+        // choose actual modelName
+        let modelName = (model == .custom) ? (customModelName ?? "") : model.rawValue
+        let config = GeminiConfig(apiKey: apiKey, modelName: modelName)
         geminiProvider = GeminiProvider(config: config)
     }
     
@@ -107,9 +116,7 @@ class AppState: ObservableObject {
         asettings.openAIProject = project
         asettings.openAIModel = model
         
-        let config = OpenAIConfig(apiKey: apiKey, baseURL: baseURL,
-                                  organization: organization, project: project,
-                                  model: model)
+        let config = OpenAIConfig(apiKey: apiKey, baseURL: baseURL, model: model)
         openAIProvider = OpenAIProvider(config: config)
     }
     
@@ -157,7 +164,8 @@ class AppState: ObservableObject {
                 let result = try await activeProvider.processText(
                     systemPrompt: prompt,
                     userPrompt: selectedText,
-                    images: []
+                    images: [],
+                    streaming: false
                 )
                 
                 // Determine what to do with the result based on command settings
