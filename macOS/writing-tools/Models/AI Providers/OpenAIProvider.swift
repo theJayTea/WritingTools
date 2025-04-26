@@ -126,6 +126,5 @@ class OpenAIProvider: ObservableObject, AIProvider {
     func cancel() {
         isProcessing = false
         currentTask = nil
-        isProcessing = false
     }
 }
