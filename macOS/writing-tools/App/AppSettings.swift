@@ -10,7 +10,6 @@ class AppSettings: ObservableObject {
     @Published var themeStyle: String {
         didSet {
             defaults.set(themeStyle, forKey: "theme_style")
-            // Also update the useGradientTheme flag for backward compatibility
             useGradientTheme = (themeStyle != "standard")
         }
     }
@@ -21,6 +20,10 @@ class AppSettings: ObservableObject {
     
     @Published var geminiModel: GeminiModel {
         didSet { defaults.set(geminiModel.rawValue, forKey: "gemini_model") }
+    }
+    
+    @Published var geminiCustomModel: String {
+        didSet { defaults.set(geminiCustomModel, forKey: "gemini_custom_model") }
     }
     
     @Published var openAIApiKey: String {
@@ -111,6 +114,8 @@ class AppSettings: ObservableObject {
         self.geminiApiKey = defaults.string(forKey: "gemini_api_key") ?? ""
         let geminiModelStr = defaults.string(forKey: "gemini_model") ?? GeminiModel.twoflash.rawValue
         self.geminiModel = GeminiModel(rawValue: geminiModelStr) ?? .twoflash
+        
+        self.geminiCustomModel = defaults.string(forKey: "gemini_custom_model") ?? ""
         
         self.openAIApiKey = defaults.string(forKey: "openai_api_key") ?? ""
         self.openAIBaseURL = defaults.string(forKey: "openai_base_url") ?? OpenAIConfig.defaultBaseURL

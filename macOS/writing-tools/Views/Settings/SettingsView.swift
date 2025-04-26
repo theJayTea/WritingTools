@@ -1,5 +1,4 @@
 import SwiftUI
-import Carbon.HIToolbox
 import KeyboardShortcuts
 
 extension KeyboardShortcuts.Name {
@@ -42,7 +41,7 @@ struct SettingsView: View {
                 Text("Local LLMs: use the instructions on")
                     .font(.caption)
                     .foregroundColor(.secondary)
-                Text("GitHub Page")
+                Text("GitHub Page.")
                     .font(.caption)
                     .foregroundColor(.blue)
                     .underline()
@@ -51,9 +50,6 @@ struct SettingsView: View {
                             NSWorkspace.shared.open(url)
                         }
                     }
-                Text(".")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
             }
         }
     }
@@ -85,7 +81,7 @@ struct SettingsView: View {
                 .fill(Color.clear)
                 .windowBackground(useGradient: settings.useGradientTheme)
         )
-        .onChange(of: selectedTab) { oldValue, newValue in 
+        .onChange(of: selectedTab) { oldValue, newValue in
             // Save selected tab for next time
             UserDefaults.standard.set(selectedTab.rawValue, forKey: "lastSettingsTab")
         }
@@ -188,7 +184,7 @@ struct SettingsView: View {
                     Text("Standard").tag("standard")
                     Text("Gradient").tag("gradient")
                     Text("Glass").tag("glass")
-                    Text("OLED").tag("oled") 
+                    Text("OLED").tag("oled")
                 }
                 .pickerStyle(.segmented)
                 .padding(.vertical, 4)
@@ -234,7 +230,7 @@ struct SettingsView: View {
                 }
                 
                 if settings.currentProvider == "local" {
-                    Text("(Qwen2.5 3B 4-bit)")
+                    Text("(Llama3.2 3B 4-bit)")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -279,19 +275,19 @@ struct SettingsView: View {
                     Text("API Configuration")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
-                    
+
                     TextField("API Key", text: $settings.geminiApiKey)
                         .textFieldStyle(.roundedBorder)
-                        .onChange(of: settings.geminiApiKey) { oldValue, newValue in 
-                            needsSaving = true 
+                        .onChange(of: settings.geminiApiKey) { _, _ in
+                            needsSaving = true
                         }
                 }
-                
+
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Model Selection")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
-                    
+
                     Picker("Model", selection: $settings.geminiModel) {
                         ForEach(GeminiModel.allCases, id: \.self) { model in
                             Text(model.displayName).tag(model)
@@ -299,13 +295,22 @@ struct SettingsView: View {
                     }
                     .pickerStyle(.menu)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .onChange(of: settings.geminiModel) { oldValue, newValue in 
-                        needsSaving = true 
+                    .onChange(of: settings.geminiModel) { _, _ in
+                        needsSaving = true
+                    }
+
+                    if settings.geminiModel == .custom {         // ADD: show field for custom
+                        TextField("Custom Model Name", text: $settings.geminiCustomModel)
+                            .textFieldStyle(.roundedBorder)
+                            .onChange(of: settings.geminiCustomModel) { _, _ in
+                                needsSaving = true
+                            }
+                            .padding(.top, 4)
                     }
                 }
             }
             .padding(.bottom, 4)
-                            
+
             Button("Get API Key") {
                 if let url = URL(string: "https://aistudio.google.com/app/apikey") {
                     NSWorkspace.shared.open(url)
@@ -325,14 +330,14 @@ struct SettingsView: View {
                     
                     TextField("API Key", text: $settings.mistralApiKey)
                         .textFieldStyle(.roundedBorder)
-                        .onChange(of: settings.mistralApiKey) { oldValue, newValue in 
-                            needsSaving = true 
+                        .onChange(of: settings.mistralApiKey) { oldValue, newValue in
+                            needsSaving = true
                         }
                     
                     /*TextField("Base URL", text: $settings.mistralBaseURL)
                         .textFieldStyle(.roundedBorder)
-                        .onChange(of: settings.mistralBaseURL) { oldValue, newValue in 
-                            needsSaving = true 
+                        .onChange(of: settings.mistralBaseURL) { oldValue, newValue in
+                            needsSaving = true
                         }*/
                 }
                 
@@ -348,8 +353,8 @@ struct SettingsView: View {
                     }
                     .pickerStyle(.menu)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .onChange(of: settings.mistralModel) { oldValue, newValue in 
-                        needsSaving = true 
+                    .onChange(of: settings.mistralModel) { oldValue, newValue in
+                        needsSaving = true
                     }
                 }
             }
@@ -374,14 +379,14 @@ struct SettingsView: View {
                     
                     TextField("API Key", text: $settings.openAIApiKey)
                         .textFieldStyle(.roundedBorder)
-                        .onChange(of: settings.openAIApiKey) { oldValue, newValue in 
-                            needsSaving = true 
+                        .onChange(of: settings.openAIApiKey) { oldValue, newValue in
+                            needsSaving = true
                         }
                     
                     TextField("Base URL", text: $settings.openAIBaseURL)
                         .textFieldStyle(.roundedBorder)
                         .onChange(of: settings.openAIBaseURL) { oldValue, newValue in
-                            needsSaving = true 
+                            needsSaving = true
                         }
                 }
                 
@@ -392,8 +397,8 @@ struct SettingsView: View {
                     
                     TextField("Model Name", text: $settings.openAIModel)
                         .textFieldStyle(.roundedBorder)
-                        .onChange(of: settings.openAIModel) { oldValue, newValue in 
-                            needsSaving = true 
+                        .onChange(of: settings.openAIModel) { oldValue, newValue in
+                            needsSaving = true
                         }
                     
                     Text("OpenAI models include: gpt-4o, gpt-4o-mini, etc.")
@@ -423,8 +428,8 @@ struct SettingsView: View {
                     
                     TextField("Ollama Base URL", text: $settings.ollamaBaseURL)
                         .textFieldStyle(.roundedBorder)
-                        .onChange(of: settings.ollamaBaseURL) { oldValue, newValue in 
-                            needsSaving = true 
+                        .onChange(of: settings.ollamaBaseURL) { oldValue, newValue in
+                            needsSaving = true
                         }
                 }
                 
@@ -435,14 +440,14 @@ struct SettingsView: View {
                     
                     TextField("Ollama Model", text: $settings.ollamaModel)
                         .textFieldStyle(.roundedBorder)
-                        .onChange(of: settings.ollamaModel) { oldValue, newValue in 
-                            needsSaving = true 
+                        .onChange(of: settings.ollamaModel) { oldValue, newValue in
+                            needsSaving = true
                         }
                     
                     TextField("Keep Alive Time", text: $settings.ollamaKeepAlive)
                         .textFieldStyle(.roundedBorder)
-                        .onChange(of: settings.ollamaKeepAlive) { oldValue, newValue in 
-                            needsSaving = true 
+                        .onChange(of: settings.ollamaKeepAlive) { oldValue, newValue in
+                            needsSaving = true
                         }
                 }
                 
@@ -515,7 +520,11 @@ struct SettingsView: View {
         
         // Save provider-specific settings
         if settings.currentProvider == "gemini" {
-            appState.saveGeminiConfig(apiKey: settings.geminiApiKey, model: settings.geminiModel)
+            appState.saveGeminiConfig(
+                apiKey: settings.geminiApiKey,
+                model: settings.geminiModel,
+                customModelName: settings.geminiCustomModel   // ADD: pass custom
+            )
         } else if settings.currentProvider == "mistral" {
             appState.saveMistralConfig(
                 apiKey: settings.mistralApiKey,
@@ -646,7 +655,7 @@ struct LocalLLMSettingsView: View {
             
             GroupBox {
                 VStack(alignment: .leading, spacing: 8) {
-                    InfoRow(label: "Model", value: "Qwen2.5 3B (4-bit Quantized)")
+                    InfoRow(label: "Model", value: "Llama 3.2 3B (4-bit Quantized)")
                     InfoRow(label: "Size", value: "~1.8GB")
                     InfoRow(label: "Optimized", value: "Apple Silicon")
                 }

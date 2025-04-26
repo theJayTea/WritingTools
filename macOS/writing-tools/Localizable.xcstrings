@@ -23,8 +23,30 @@
         }
       }
     },
+    "(Llama 3.2 3B 4-bit)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Llama 3.2 3B 4-bit)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Llama 3.2 3B 4-bit)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Llama 3.2 3B 4-bit)"
+          }
+        }
+      }
+    },
     "(Llama 3.2)" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -46,7 +68,30 @@
         }
       }
     },
+    "(Llama3.2 3B 4-bit)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Llama3.2 3B 4-bit)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Llama3.2 3B 4-bit)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Llama3.2 3B 4-bit)"
+          }
+        }
+      }
+    },
     "(Qwen2.5 3B 4-bit)" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -377,7 +422,7 @@
       }
     },
     "Add New Button" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -422,12 +467,18 @@
       }
     },
     "Advanced Options" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erweiterte Optionen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opciones avanzadas"
           }
         },
         "fr" : {
@@ -703,12 +754,18 @@
       }
     },
     "Basic Settings" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Grundeinstellungen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes básicos"
           }
         },
         "fr" : {
@@ -962,12 +1019,18 @@
       }
     },
     "Choose your theme:" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wählen Sie Ihr Thema:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige tu tema:"
           }
         },
         "fr" : {
@@ -1141,6 +1204,12 @@
             "value" : "Verbindungseinstellungen"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes de conexión"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1157,6 +1226,12 @@
             "value" : "Kopiert!"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Copiado!"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1166,12 +1241,18 @@
       }
     },
     "Copy" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kopieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copia"
           }
         },
         "fr" : {
@@ -1190,6 +1271,12 @@
             "value" : "Alle kopieren"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar todo"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1204,6 +1291,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sorgfältig erstellt von Jesai, einem Gymnasiasten."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creado con esmero por Jesai, estudiante de secundaria."
           }
         },
         "fr" : {
@@ -1222,6 +1315,12 @@
             "value" : "Benutzerdefiniert"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A medida"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1238,10 +1337,38 @@
             "value" : "Benutzerdefinierte Befehle"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comandos personalizados"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Commandes personnalisées"
+          }
+        }
+      }
+    },
+    "Custom Model Name" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benutzerdefinierter Modellname"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre de modelo personalizado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nom du modèle personnalisé"
           }
         }
       }
@@ -1252,6 +1379,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Passen Sie Ihr Erlebnis an"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personalice su experiencia"
           }
         },
         "fr" : {
@@ -1270,6 +1403,12 @@
             "value" : "Textgröße verkleinern"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reducir el tamaño del texto"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1284,6 +1423,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Löschen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar"
           }
         },
         "fr" : {
@@ -1302,6 +1447,12 @@
             "value" : "Befehl löschen"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar comando"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1316,6 +1467,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Model löschen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar modelo"
           }
         },
         "fr" : {
@@ -1334,6 +1491,12 @@
             "value" : "Änderung beschreiben…"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Describa su cambio..."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1348,6 +1511,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Antwort im Fenster anzeigen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar respuesta en ventana"
           }
         },
         "fr" : {
@@ -1366,6 +1535,12 @@
             "value" : "Dokumentation"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documentación"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1380,6 +1555,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Model herunterladen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descargar modelo"
           }
         },
         "fr" : {
@@ -1398,6 +1579,12 @@
             "value" : "Update herunterladen"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descargar actualización"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1412,6 +1599,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Model wird heruntergeladen…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descargar modelo..."
           }
         },
         "fr" : {
@@ -1430,6 +1623,12 @@
             "value" : "Doppelter Befehlsname"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre de comando duplicado"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1444,6 +1643,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Integrierten Befehl Bearbeiten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar comando incorporado"
           }
         },
         "fr" : {
@@ -1462,6 +1667,12 @@
             "value" : "Befehl bearbeiten"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar comando"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1476,6 +1687,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Befehl bearbeiten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar comando"
           }
         },
         "fr" : {
@@ -1494,6 +1711,12 @@
             "value" : "Befehl ändern"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar comandos"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1505,6 +1728,12 @@
     "Email: developer@aryamirsepasi.com" : {
       "localizations" : {
         "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email: developer@aryamirsepasi.com"
+          }
+        },
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Email: developer@aryamirsepasi.com"
@@ -1526,6 +1755,12 @@
             "value" : "Email: jesaitarun@gmail.com"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email: jesaitarun@gmail.com"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1542,6 +1777,12 @@
             "value" : "Tastenkombination für diesen Befehl aktivieren"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activar el atajo de teclado para este comando"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1553,6 +1794,12 @@
     "Error" : {
       "localizations" : {
         "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error"
+          }
+        },
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Error"
@@ -1574,6 +1821,12 @@
             "value" : "Bearbeitungsmodus schließen"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salir del modo Edición"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1588,6 +1841,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fertigstellen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acabado"
           }
         },
         "fr" : {
@@ -1673,6 +1932,12 @@
             "value" : "Gemini Einstellungen"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuración de la IA Gemini"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1687,6 +1952,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Allgemeines"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "General"
           }
         },
         "fr" : {
@@ -1705,6 +1976,12 @@
             "value" : "Allgemeine Einstellungen"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes generales"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1719,6 +1996,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "API-Schlüssel erhalten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtener clave API"
           }
         },
         "fr" : {
@@ -1737,6 +2020,12 @@
             "value" : "Mistral API Schlüssel erhalten"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtener clave API de Mistral"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1751,6 +2040,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "OpenAI API Schlüssel erhalten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtener la clave API de OpenAI"
           }
         },
         "fr" : {
@@ -1769,10 +2064,38 @@
             "value" : "GitHub-Seite"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Página de GitHub"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Page GitHub"
+          }
+        }
+      }
+    },
+    "GitHub Page." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub Seite."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Página de GitHub."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Page GitHub."
           }
         }
       }
@@ -1783,6 +2106,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Glas"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vidrio"
           }
         },
         "fr" : {
@@ -1801,6 +2130,12 @@
             "value" : "Globaler Tastaturkurzbefehl"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atajo de teclado global"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1815,6 +2150,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Globaler Shortcut:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atajo global:"
           }
         },
         "fr" : {
@@ -1833,6 +2174,12 @@
             "value" : "Gradient"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gradiente"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1847,6 +2194,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "So aktivieren Sie den Barrierefreiheitszugang:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cómo habilitar el acceso a la accesibilidad:"
           }
         },
         "fr" : {
@@ -1865,6 +2218,12 @@
             "value" : "Icon"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Icono"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1879,6 +2238,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bild-Modus"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modo Imagen"
           }
         },
         "fr" : {
@@ -1897,6 +2262,12 @@
             "value" : "Bild-Erkennung"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reconocimiento de imágenes"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1911,6 +2282,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bilderkennungsmodus"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modo de reconocimiento de imágenes"
           }
         },
         "fr" : {
@@ -1929,6 +2306,12 @@
             "value" : "Textgröße vergrößern"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aumentar el tamaño del texto"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1943,6 +2326,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lebenszeit beibehalten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantener vivo el tiempo"
           }
         },
         "fr" : {
@@ -1984,6 +2373,12 @@
             "value" : "Tastaturkurzbefehl"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atajo de teclado"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1998,6 +2393,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modell wird geladen..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cargando modelo..."
           }
         },
         "fr" : {
@@ -2016,6 +2417,12 @@
             "value" : "Lokale LLM"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LLM local"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2025,12 +2432,18 @@
       }
     },
     "Local LLM (Llama 3.2 3b)" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lokale LLM (Llama 3.2 3b)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LLM local (Llama 3.2 3b)"
           }
         },
         "fr" : {
@@ -2042,12 +2455,18 @@
       }
     },
     "Local LLM (Llama 3.2)" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lokale LLM (Llama 3.2)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LLM local (Llama 3.2 3b)"
           }
         },
         "fr" : {
@@ -2066,6 +2485,12 @@
             "value" : "Lokale LLM ist nur auf Apple Silicon Geräten (M1/M2/M3 Macs) verfügbar."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LLM local sólo está disponible en dispositivos Apple Silicon (Macs M1/M2/M3)."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2080,6 +2505,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lokale LLM ist nur auf Apple Silicon Geräten verfügbar."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LLM local sólo está disponible en dispositivos Apple Silicon."
           }
         },
         "fr" : {
@@ -2098,6 +2529,12 @@
             "value" : "Lokale LLMs: Verwenden Sie die Anweisungen auf"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LLM locales: utilice las instrucciones de"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2114,6 +2551,12 @@
             "value" : "Befehle Verwalten"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestionar comandos"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2128,6 +2571,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Verwalten Sie Ihre Schreibwerkzeuge und deren Tastenkombinationen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestiona tus herramientas de escritura y sus atajos de teclado"
           }
         },
         "fr" : {
@@ -2190,6 +2639,12 @@
             "value" : "Mistral AI Einstellungen"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mistral AI Ajustes"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2204,6 +2659,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Model"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelo"
           }
         },
         "fr" : {
@@ -2222,6 +2683,12 @@
             "value" : "Modellkonfiguration"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuración del modelo"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2231,12 +2698,18 @@
       }
     },
     "Model Information" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Model Information"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Información sobre el modelo"
           }
         },
         "fr" : {
@@ -2255,6 +2728,12 @@
             "value" : "Model Name"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre del modelo"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2269,6 +2748,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Das Modell muss vor der ersten Verwendung heruntergeladen werden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es necesario descargar el modelo antes de utilizarlo por primera vez"
           }
         },
         "fr" : {
@@ -2287,6 +2772,12 @@
             "value" : "Model ist bereit"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelo listo"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2301,6 +2792,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modellauswahl"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selección de modelos"
           }
         },
         "fr" : {
@@ -2319,6 +2816,12 @@
             "value" : "Name"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2333,6 +2836,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Neuer Befehl"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuevo mando"
           }
         },
         "fr" : {
@@ -2351,6 +2860,12 @@
             "value" : "Weiter"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siguiente"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2365,6 +2880,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Keine integrierten Befehle"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay comandos integrados"
           }
         },
         "fr" : {
@@ -2383,6 +2904,12 @@
             "value" : "Noch keine benutzerdefinierten Befehle"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún no hay comandos personalizados"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2394,6 +2921,12 @@
     "OK" : {
       "localizations" : {
         "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
@@ -2437,6 +2970,12 @@
             "value" : "Ollama"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ollama"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2451,6 +2990,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ollama (lokal, erfordert aber eine separate Installation)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ollama (local, pero requiere instalación independiente)"
           }
         },
         "fr" : {
@@ -2469,6 +3014,12 @@
             "value" : "Ollama Basis-URL"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL de la base de Ollama"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2483,6 +3034,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ollama-Dokumentation"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documentación de Ollama"
           }
         },
         "fr" : {
@@ -2501,6 +3058,12 @@
             "value" : "Ollama Model"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelo Ollama"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2515,6 +3078,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ollama-Anbietereinstellungen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuración del proveedor de Ollama"
           }
         },
         "fr" : {
@@ -2533,6 +3102,12 @@
             "value" : "Systemeinstellungen öffnen"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir la configuración del sistema"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2547,6 +3122,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "WritingTools öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Herramientas de escritura abierta"
           }
         },
         "fr" : {
@@ -2609,6 +3190,12 @@
             "value" : "OpenAI-Modelle wie: gpt-4o, gpt-4o-mini, etc."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los modelos OpenAI incluyen: gpt-4o, gpt-4o-mini, etc."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2625,6 +3212,12 @@
             "value" : "OpenAI-Einstellungen"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuración de OpenAI"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2634,12 +3227,18 @@
       }
     },
     "Organization ID (Optional)" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Organisations-ID (optional)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID de la organización (opcional)"
           }
         },
         "fr" : {
@@ -2658,6 +3257,12 @@
             "value" : "Bitte wählen Sie einen anderen KI-Anbieter."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccione otro proveedor de AI."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2672,6 +3277,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bitte verwenden Sie stattdessen eines der Online-Modelle:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En su lugar, utilice uno de los modelos en línea:"
           }
         },
         "fr" : {
@@ -2706,12 +3317,18 @@
       }
     },
     "Project ID (Optional)" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Projekt-ID (optional)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID del proyecto (opcional)"
           }
         },
         "fr" : {
@@ -2728,6 +3345,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Prompt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pregunte a"
           }
         },
         "fr" : {
@@ -2769,6 +3392,12 @@
             "value" : "Anbieter"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proveedor"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2783,6 +3412,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Neu setzen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer"
           }
         },
         "fr" : {
@@ -2801,6 +3436,12 @@
             "value" : "Setzen Sie alle integrierten Befehle in ihren ursprünglichen Zustand zurück, einschließlich der Wiederherstellung gelöschter Befehle"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer todos los comandos incorporados a su estado original, incluida la restauración de los que se hayan eliminado."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2815,6 +3456,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Integrierte Befehle zurücksetzen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer comandos incorporados"
           }
         },
         "fr" : {
@@ -2833,6 +3480,12 @@
             "value" : "Schriftgröße zurücksetzen"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer tamaño de fuente"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2849,6 +3502,12 @@
             "value" : "Integrierte Befehle zurücksetzen"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer valores por defecto"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2863,6 +3522,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erneut versuchen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reintentar"
           }
         },
         "fr" : {
@@ -2904,6 +3569,12 @@
             "value" : "Speichern"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2918,6 +3589,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Änderungen speichern"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar cambios"
           }
         },
         "fr" : {
@@ -2936,6 +3613,12 @@
             "value" : "KI-Dienst auswählen"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccione el servicio AI"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2952,6 +3635,12 @@
             "value" : "Symbol auswählen"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccionar icono"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2961,12 +3650,18 @@
       }
     },
     "Set your keyboard shortcut:" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Legen Sie Ihre Tastaturkürzel fest:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Establece el atajo de teclado:"
           }
         },
         "fr" : {
@@ -2978,12 +3673,18 @@
       }
     },
     "Shortcut:" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Shortcut:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atajo:"
           }
         },
         "fr" : {
@@ -3002,6 +3703,12 @@
             "value" : "Antwort im Chat-Fenster anzeigen"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar respuesta en la ventana de chat"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3016,6 +3723,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Standard"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estándar"
           }
         },
         "fr" : {
@@ -3080,6 +3793,12 @@
             "value" : "Die neueste Version ist bereits installiert!"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La última versión ya está instalada."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3096,6 +3815,12 @@
             "value" : "Die macOS-Version wurde von Arya Mirsepasi erstellt"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La versión para macOS ha sido creada por Arya Mirsepasi"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3110,6 +3835,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Thema"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tema"
           }
         },
         "fr" : {
@@ -3187,7 +3918,7 @@
       }
     },
     "Version: 3.0 (Based on Windows Port version 7.1)" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3210,7 +3941,7 @@
       }
     },
     "Version: 3.1 (Based on Windows Port version 7.1)" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3370,6 +4101,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ihre Nachricht"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Su mensaje"
           }
         },
         "fr" : {

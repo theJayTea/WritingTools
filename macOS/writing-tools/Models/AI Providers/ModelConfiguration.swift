@@ -3,7 +3,7 @@ import MLXLMCommon
 
 // This struct defines a simple configuration for an MLX LLM.
 
-extension ModelConfiguration: @retroactive Equatable {
+extension ModelConfiguration {
 
     public static func == (lhs: MLXLMCommon.ModelConfiguration, rhs: MLXLMCommon.ModelConfiguration) -> Bool {
            return lhs.name == rhs.name
