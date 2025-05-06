@@ -86,7 +86,7 @@ class AppSettings: ObservableObject {
         didSet { defaults.set(mistralModel, forKey: "mistral_model") }
     }
     
-    // New Ollama settings:
+    // Ollama settings:
     @Published var ollamaBaseURL: String {
         didSet { defaults.set(ollamaBaseURL, forKey: "ollama_base_url") }
     }
@@ -102,6 +102,11 @@ class AppSettings: ObservableObject {
     @Published var ollamaImageMode: OllamaImageMode {
         didSet { defaults.set(ollamaImageMode.rawValue, forKey: "ollama_image_mode") }
     }
+    
+    // Store the ID (rawValue) of the selected local LLM model type
+        @Published var selectedLocalLLMId: String? {
+            didSet { defaults.set(selectedLocalLLMId, forKey: "selected_local_llm_id") }
+        }
     
     // MARK: - Init
     private init() {
@@ -143,6 +148,8 @@ class AppSettings: ObservableObject {
         
         let ollamaImageModeRaw = defaults.string(forKey: "ollama_image_mode") ?? OllamaImageMode.ocr.rawValue
         self.ollamaImageMode = OllamaImageMode(rawValue: ollamaImageModeRaw) ?? .ocr
+        
+        self.selectedLocalLLMId = defaults.string(forKey: "selected_local_llm_id")
     }
     
     // MARK: - Convenience

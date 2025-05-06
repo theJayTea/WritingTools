@@ -2,6 +2,7 @@
   "sourceLanguage" : "en",
   "strings" : {
     "." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -24,6 +25,7 @@
       }
     },
     "(Llama 3.2 3B 4-bit)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -69,6 +71,7 @@
       }
     },
     "(Llama3.2 3B 4-bit)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -113,6 +116,28 @@
         }
       }
     },
+    "%@ Ready" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ Bereit"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ está listo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ Prêt"
+          }
+        }
+      }
+    },
     "%lld%%" : {
       "localizations" : {
         "de" : {
@@ -136,6 +161,7 @@
       }
     },
     "• Helps you write with clarity and confidence" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -158,6 +184,7 @@
       }
     },
     "• Improves your writing with AI" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -180,6 +207,7 @@
       }
     },
     "• Support Custom Commands for anything you want" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -202,6 +230,7 @@
       }
     },
     "• Works in any application" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -224,6 +253,7 @@
       }
     },
     "1. Click the button below to open System Settings" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -246,6 +276,7 @@
       }
     },
     "2. Click the '+' button in the accessibility section" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -268,6 +299,7 @@
       }
     },
     "3. Navigate to Applications and select writing-tools" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -290,6 +322,7 @@
       }
     },
     "4. Enable the checkbox next to writing-tools" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -383,6 +416,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Writing Tools aktivieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activar WritingTools:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activer les outils d'écriture :"
+          }
+        }
+      }
+    },
+    "Activate WritingTools:" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktivieren Sie WritingTools:"
           }
         },
         "es" : {
@@ -621,6 +676,28 @@
         }
       }
     },
+    "Appearance Theme" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erscheinungsbild Thema"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tema de apariencia"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thème d'apparence"
+          }
+        }
+      }
+    },
     "Apple Silicon Required" : {
       "localizations" : {
         "de" : {
@@ -643,7 +720,30 @@
         }
       }
     },
+    "Are you sure you want to delete the downloaded model %@? You'll need to download it again to use it." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sind Sie sicher, dass Sie das heruntergeladene Modell %@ löschen wollen? Sie müssen es erneut herunterladen, um es zu verwenden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Estás seguro de que quieres borrar el modelo %@ descargado? Tendrás que volver a descargarlo para poder utilizarlo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Êtes-vous sûr de vouloir supprimer le modèle téléchargé %@ ? Vous devrez le télécharger à nouveau pour l'utiliser."
+          }
+        }
+      }
+    },
     "Are you sure you want to delete the downloaded model? You'll need to download it again to use local processing." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -753,6 +853,28 @@
         }
       }
     },
+    "Base URL (Optional)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Basis-URL (optional)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL base (opcional)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL de base (facultatif)"
+          }
+        }
+      }
+    },
     "Basic Settings" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -842,6 +964,28 @@
         }
       }
     },
+    "Can process images directly" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kann Bilder direkt verarbeiten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puede procesar imágenes directamente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peut traiter directement les images"
+          }
+        }
+      }
+    },
     "Cancel" : {
       "localizations" : {
         "de" : {
@@ -860,6 +1004,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Annuler"
+          }
+        }
+      }
+    },
+    "Cannot proceed due to error." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kann aufgrund eines Fehlers nicht fortfahren."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se puede continuar debido a un error."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de poursuivre en raison d'une erreur."
           }
         }
       }
@@ -952,7 +1118,52 @@
         }
       }
     },
+    "Checking status..." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überprüfung des Status..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprobando estado..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérification du statut..."
+          }
+        }
+      }
+    },
+    "Choose a model to download and use for local processing." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wählen Sie ein Modell aus, das Sie herunterladen und für die lokale Verarbeitung verwenden möchten."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elija un modelo para descargarlo y utilizarlo para el procesamiento local."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez un modèle à télécharger et à utiliser pour le traitement local."
+          }
+        }
+      }
+    },
     "Choose between local OCR or Ollama's built-in vision capabilities." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -997,6 +1208,7 @@
       }
     },
     "Choose how the app windows will appear" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1014,6 +1226,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Choisir l'apparence des fenêtres de l'application"
+          }
+        }
+      }
+    },
+    "Choose how the popup window looks." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wählen Sie aus, wie das Popup-Fenster aussehen soll."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elija el aspecto de la ventana emergente."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez l'aspect de la fenêtre contextuelle."
           }
         }
       }
@@ -1037,6 +1271,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Choisissez votre thème:"
+          }
+        }
+      }
+    },
+    "Click the '+' button (you may need to unlock first)." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klicken Sie auf die Schaltfläche „+“ (eventuell müssen Sie sie erst entsperren)."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haz clic en el botón «+» (puede que tengas que desbloquearlo primero)."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cliquez sur le bouton « + » (il se peut que vous deviez d'abord déverrouiller)."
+          }
+        }
+      }
+    },
+    "Click the button below to open System Settings > Privacy & Security > Accessibility." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klicken Sie auf die Schaltfläche unten, um Systemeinstellungen > Datenschutz und Sicherheit > Barrierefreiheit zu öffnen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haga clic en el botón de abajo para abrir Configuración del sistema > Privacidad y seguridad > Accesibilidad."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cliquez sur le bouton ci-dessous pour ouvrir les Paramètres du système > Confidentialité et sécurité > Accessibilité."
           }
         }
       }
@@ -1192,6 +1470,94 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Concis"
+          }
+        }
+      }
+    },
+    "Configure Google Gemini AI" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konfigurieren Sie Google Gemini AI"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurar Google Gemini AI"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurer Google Gemini AI"
+          }
+        }
+      }
+    },
+    "Configure Mistral AI" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mistral AI konfigurieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurar Mistral AI"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurer Mistral AI"
+          }
+        }
+      }
+    },
+    "Configure Ollama (Self-Hosted)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ollama konfigurieren (Selbstgehostet)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurar Ollama (autoalojado)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurer Ollama (auto-hébergé)"
+          }
+        }
+      }
+    },
+    "Configure OpenAI (ChatGPT)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OpenAI konfigurieren (ChatGPT)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurar OpenAI (ChatGPT)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurer OpenAI (ChatGPT)"
           }
         }
       }
@@ -1417,7 +1783,30 @@
         }
       }
     },
+    "Default models: %@, gpt-4o, gpt-4o-mini, etc." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardmodelle: %@, gpt-4o, gpt-4o-mini, usw."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelos por defecto: %@, gpt-4o, gpt-4o-mini, etc."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modèles par défaut : %@, gpt-4o, gpt-4o-mini, etc."
+          }
+        }
+      }
+    },
     "Delete" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1435,6 +1824,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Supprimer"
+          }
+        }
+      }
+    },
+    "Delete %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ löschen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar %@."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer %@"
           }
         }
       }
@@ -1549,7 +1960,30 @@
         }
       }
     },
+    "Download %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ herunterladen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descargar %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Télécharger %@"
+          }
+        }
+      }
+    },
     "Download Model" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1593,7 +2027,30 @@
         }
       }
     },
+    "Downloading %@..." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ wird heruntergeladen…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descargando %@..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Téléchargement de %@..."
+          }
+        }
+      }
+    },
     "Downloading model..." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1791,7 +2248,30 @@
         }
       }
     },
+    "Ensure the toggle switch next to 'WritingTools' is turned ON." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stellen Sie sicher, dass der Kippschalter neben „WritingTools“ eingeschaltet ist."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asegúrese de que el conmutador situado junto a «Herramientas de escritura» está activado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assurez-vous que l'interrupteur à bascule situé à côté de « WritingTools » est activé."
+          }
+        }
+      }
+    },
     "Error" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1831,6 +2311,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Quitter le mode édition"
+          }
+        }
+      }
+    },
+    "Filter" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtern"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtre"
           }
         }
       }
@@ -1881,6 +2383,7 @@
       }
     },
     "Gemini" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1924,7 +2427,30 @@
         }
       }
     },
+    "Gemini AI (Google)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini AI (Google)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini AI (Google)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini AI (Google)"
+          }
+        }
+      }
+    },
     "Gemini AI Settings" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2012,6 +2538,28 @@
         }
       }
     },
+    "Get Gemini API Key" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini API-Schlüssel erhalten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtener clave API Gemini"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtenir la clé API de Gemini"
+          }
+        }
+      }
+    },
     "Get Mistral API Key" : {
       "localizations" : {
         "de" : {
@@ -2057,6 +2605,7 @@
       }
     },
     "GitHub Page" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2144,7 +2693,30 @@
         }
       }
     },
+    "Global Shortcut" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Globale Abkürzung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acceso directo global"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raccourci global"
+          }
+        }
+      }
+    },
     "Global Shortcut:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2184,6 +2756,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dégradé"
+          }
+        }
+      }
+    },
+    "Helps you write with clarity and confidence" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hilft Ihnen, mit Klarheit und Selbstvertrauen zu schreiben"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le ayuda a escribir con claridad y confianza"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous aide à écrire avec clarté et confiance"
           }
         }
       }
@@ -2298,6 +2892,28 @@
         }
       }
     },
+    "Improves your writing with AI" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbessert Ihr Schreiben mit AI"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mejora tu escritura con IA"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Améliorez votre écriture grâce à l'IA"
+          }
+        }
+      }
+    },
     "Increase text size" : {
       "localizations" : {
         "de" : {
@@ -2338,6 +2954,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Durée de maintien actif"
+          }
+        }
+      }
+    },
+    "Keep Alive Time (e.g., 5m, 1h)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lebenserhaltungszeit (z. B. 5 m, 1 h)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiempo de mantenimiento de la vida (por ejemplo, 5m, 1h)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Durée de maintien en vie (par exemple, 5m, 1h)"
           }
         }
       }
@@ -2387,7 +3025,52 @@
         }
       }
     },
+    "Loading %@..." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ wird geladen…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cargando %@..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chargement de %@..."
+          }
+        }
+      }
+    },
+    "Loading model into memory..." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modell in den Speicher laden..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cargando modelo en memoria..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chargement du modèle en mémoire..."
+          }
+        }
+      }
+    },
     "Loading model..." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2477,7 +3160,52 @@
         }
       }
     },
+    "Local LLM (On-Device)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local LLM (On-Device)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LLM local (en el dispositivo)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LLM local (sur l'appareil)"
+          }
+        }
+      }
+    },
+    "Local LLM Error" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local LLM Error"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error LLM local"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur locale LLM"
+          }
+        }
+      }
+    },
     "Local LLM is only available on Apple Silicon devices (M1/M2/M3 Macs)." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2500,6 +3228,7 @@
       }
     },
     "Local LLM is only available on Apple Silicon devices." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2517,6 +3246,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le LLM local n'est disponible que sur les appareils Apple Silicon."
+          }
+        }
+      }
+    },
+    "Local LLM processing is only available on Apple Silicon (M1/M2/M3/M4 etc.) devices." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die lokale LLM-Verarbeitung ist nur auf Apple Silicon-Geräten (M1/M2/M3/M4 usw.) verfügbar."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El procesamiento LLM local sólo está disponible en dispositivos Apple Silicon (M1/M2/M3/M4 etc.)."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le traitement LLM local n'est disponible que sur les appareils Apple Silicon (M1/M2/M3/M4 etc.)."
           }
         }
       }
@@ -2588,6 +3339,7 @@
       }
     },
     "Mistral" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2632,6 +3384,7 @@
       }
     },
     "Mistral AI Settings" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2743,6 +3496,7 @@
       }
     },
     "Model needs to be downloaded before first use" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2765,6 +3519,7 @@
       }
     },
     "Model ready" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2826,6 +3581,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nom"
+          }
+        }
+      }
+    },
+    "Navigate to your Applications folder and select 'WritingTools'." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navigieren Sie zu Ihrem Anwendungsordner und wählen Sie „WritingTools“."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vaya a la carpeta Aplicaciones y seleccione 'WritingTools'."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Naviguez dans votre dossier Applications et sélectionnez « WritingTools »."
           }
         }
       }
@@ -2918,6 +3695,28 @@
         }
       }
     },
+    "None Selected" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine ausgewählt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ninguno Seleccionado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune sélection"
+          }
+        }
+      }
+    },
     "OK" : {
       "localizations" : {
         "de" : {
@@ -2985,6 +3784,7 @@
       }
     },
     "Ollama (local, but requires separate installation)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3002,6 +3802,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ollama (local, mais nécessite une installation séparée)"
+          }
+        }
+      }
+    },
+    "Ollama (Self-Hosted)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ollama (Selbstgehostet)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ollama (autoalojado)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ollama (auto-hébergé)"
           }
         }
       }
@@ -3072,7 +3894,30 @@
         }
       }
     },
+    "Ollama Model Name" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ollama Modell Name"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre del modelo Ollama"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ollama Nom du modèle"
+          }
+        }
+      }
+    },
     "Ollama Provider Settings" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3094,7 +3939,30 @@
         }
       }
     },
+    "Open Accessibility Settings" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zugänglichkeitseinstellungen öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir la configuración de accesibilidad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les paramètres d'accessibilité"
+          }
+        }
+      }
+    },
     "Open System Settings" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3160,7 +4028,30 @@
         }
       }
     },
+    "OpenAI (ChatGPT)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OpenAI (ChatGPT)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OpenAI (ChatGPT)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OpenAI (ChatGPT)"
+          }
+        }
+      }
+    },
     "OpenAI (GPT-4/3.5)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3205,6 +4096,7 @@
       }
     },
     "OpenAI Settings" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3249,7 +4141,30 @@
         }
       }
     },
+    "Please select a different AI Provider in the settings if you are on an Intel Mac." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bitte wählen Sie einen anderen AI-Provider in den Einstellungen, wenn Sie einen Intel-Mac verwenden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Por favor, seleccione un proveedor de AI diferente en la configuración si usted está en un Mac Intel."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si vous utilisez un Mac Intel, veuillez sélectionner un autre fournisseur d'IA dans les paramètres."
+          }
+        }
+      }
+    },
     "Please select a different AI provider." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3271,7 +4186,52 @@
         }
       }
     },
+    "Please select a model from the dropdown above to see its status and download options." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bitte wählen Sie ein Modell aus der obigen Dropdown-Liste aus, um den Status und die Download-Optionen anzuzeigen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccione un modelo del menú desplegable de arriba para ver su estado y las opciones de descarga."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veuillez sélectionner un modèle dans la liste déroulante ci-dessus pour voir son statut et ses options de téléchargement."
+          }
+        }
+      }
+    },
+    "Please select a provider." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bitte wählen Sie einen Anbieter."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccione un proveedor."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veuillez sélectionner un fournisseur."
+          }
+        }
+      }
+    },
     "Please use one of the online models instead:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3406,6 +4366,28 @@
         }
       }
     },
+    "Provider Configuration" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anbieter-Konfiguration"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuración del proveedor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuration du fournisseur"
+          }
+        }
+      }
+    },
     "Reset" : {
       "localizations" : {
         "de" : {
@@ -3517,6 +4499,7 @@
       }
     },
     "Retry" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3534,6 +4517,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Réessayer"
+          }
+        }
+      }
+    },
+    "Retry Download" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download wiederholen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reintentar descarga"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réessayer le téléchargement"
           }
         }
       }
@@ -3649,6 +4654,72 @@
         }
       }
     },
+    "Select Local Model" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lokales Modell auswählen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccionar modelo local"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionnez le modèle local"
+          }
+        }
+      }
+    },
+    "Select the AI service you want to use." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wählen Sie den KI-Dienst aus, den Sie nutzen möchten."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccione el servicio de IA que desea utilizar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionnez le service d'IA que vous souhaitez utiliser."
+          }
+        }
+      }
+    },
+    "Set the keyboard shortcut to activate WritingTools from anywhere." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Legen Sie das Tastaturkürzel fest, um WritingTools von überall aus zu aktivieren."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Establezca el atajo de teclado para activar WritingTools desde cualquier lugar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Définissez le raccourci clavier pour activer WritingTools de n'importe où."
+          }
+        }
+      }
+    },
     "Set your keyboard shortcut:" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3739,6 +4810,28 @@
         }
       }
     },
+    "Status: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status: %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estado: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status: %@"
+          }
+        }
+      }
+    },
     "Summary" : {
       "comment" : "ID for summarization",
       "localizations" : {
@@ -3762,6 +4855,28 @@
         }
       }
     },
+    "Supports Custom Commands" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unterstützt benutzerdefinierte Befehle"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Admite comandos personalizados"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prend en charge les commandes personnalisées"
+          }
+        }
+      }
+    },
     "Table" : {
       "comment" : "ID for table conversion",
       "localizations" : {
@@ -3781,6 +4896,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tableau"
+          }
+        }
+      }
+    },
+    "Text-only model" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reines Textmodell"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelo sólo texto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modèle texte uniquement"
           }
         }
       }
@@ -3917,6 +5054,28 @@
         }
       }
     },
+    "Use local OCR or Ollama's vision model for images." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwenden Sie die lokale OCR oder das Bildverarbeitungsmodell von Ollama für Bilder."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utilizar el OCR local o el modelo de visión de Ollama para las imágenes."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utilisez l'OCR local ou le modèle de vision d'Ollama pour les images."
+          }
+        }
+      }
+    },
     "Version: 3.0 (Based on Windows Port version 7.1)" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3985,6 +5144,28 @@
         }
       }
     },
+    "Vision-capable model" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vision-fähiges Modell"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelo con capacidad de visión"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modèle capable de vision"
+          }
+        }
+      }
+    },
     "What should your AI do with your selected text? (Prompt)" : {
       "localizations" : {
         "de" : {
@@ -4047,6 +5228,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Style de fenêtre"
+          }
+        }
+      }
+    },
+    "Works in any application" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funktioniert in jeder Anwendung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funciona en cualquier aplicación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fonctionne dans n'importe quelle application"
           }
         }
       }

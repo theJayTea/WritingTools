@@ -8,7 +8,7 @@ class AppState: ObservableObject {
     @Published var openAIProvider: OpenAIProvider
     @Published var mistralProvider: MistralProvider
     @Published var ollamaProvider: OllamaProvider
-    @Published var localLLMProvider: LocalLLMProvider
+    @Published var localLLMProvider: LocalModelProvider
     
     @Published var customInstruction: String = ""
     @Published var selectedText: String = ""
@@ -71,7 +71,7 @@ class AppState: ObservableObject {
         )
         self.mistralProvider = MistralProvider(config: mistralConfig)
         
-        self.localLLMProvider = LocalLLMProvider()
+        self.localLLMProvider = LocalModelProvider()
         
         
         // Initialize OllamaProvider with its settings.
