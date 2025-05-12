@@ -104,9 +104,9 @@ class AppSettings: ObservableObject {
     }
     
     // Store the ID (rawValue) of the selected local LLM model type
-        @Published var selectedLocalLLMId: String? {
-            didSet { defaults.set(selectedLocalLLMId, forKey: "selected_local_llm_id") }
-        }
+    @Published var selectedLocalLLMId: String? {
+        didSet { defaults.set(selectedLocalLLMId, forKey: "selected_local_llm_id") }
+    }
     
     // MARK: - Init
     private init() {

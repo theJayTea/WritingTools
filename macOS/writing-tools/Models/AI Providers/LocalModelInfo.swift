@@ -5,8 +5,8 @@ import MLXLMCommon
 
 enum LocalModelType: String, CaseIterable, Identifiable {
     // LLM Models
-    case qwen3_4b = "qwen3_4b_4bit"
     case llama = "llama3_2_3B_4bit"
+    case qwen3_4b = "qwen3_4b_4bit"
     case gemma = "gemma_2_2b_it_4bit"
     
     // VLM Models
@@ -17,12 +17,12 @@ enum LocalModelType: String, CaseIterable, Identifiable {
     // User-friendly display names
     var displayName: String {
         switch self {
-        // LLM Models
-        case .qwen3_4b: return "Qwen 3.0 (4B, 4-bit)"
+            // LLM Models
         case .llama: return "Llama 3.2 (3B, 4-bit)"
+        case .qwen3_4b: return "Qwen 3.0 (4B, 4-bit)"
         case .gemma: return "Gemma 2 IT (2B, 4-bit)"
             
-        // VLM Models
+            // VLM Models
         case .qwen25VL: return "Qwen 2.5 VL (3B, 4-bit) 📷"
         }
     }
@@ -40,12 +40,12 @@ enum LocalModelType: String, CaseIterable, Identifiable {
     // Corresponding ModelConfiguration from LLMRegistry or VLMRegistry
     var configuration: ModelConfiguration {
         switch self {
-        // LLM configurations
-        case .qwen3_4b: return LLMRegistry.qwen3_4b_4bit
+            // LLM configurations
         case .llama: return LLMRegistry.llama3_2_3B_4bit
+        case .qwen3_4b: return LLMRegistry.qwen3_4b_4bit
         case .gemma: return LLMRegistry.gemma_2_2b_it_4bit
             
-        // VLM configurations
+            // VLM configurations
         case .qwen25VL: return VLMRegistry.qwen2_5VL3BInstruct4Bit
         }
     }

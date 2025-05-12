@@ -232,8 +232,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         menu.addItem(NSMenuItem(title: "Settings", action: #selector(showSettings), keyEquivalent: ","))
         menu.addItem(NSMenuItem(title: "About", action: #selector(showAbout), keyEquivalent: "i"))
         // New Pause/Resume item:
-            let hotkeyTitle = AppSettings.shared.hotkeysPaused ? "Resume" : "Pause"
-            menu.addItem(NSMenuItem(title: hotkeyTitle, action: #selector(toggleHotkeys), keyEquivalent: "p"))
+        let hotkeyTitle = AppSettings.shared.hotkeysPaused ? "Resume" : "Pause"
+        menu.addItem(NSMenuItem(title: hotkeyTitle, action: #selector(toggleHotkeys), keyEquivalent: "p"))
         menu.addItem(NSMenuItem(title: "Reset App", action: #selector(resetApp), keyEquivalent: "r"))
         menu.addItem(NSMenuItem.separator())
         menu.addItem(NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
@@ -363,111 +363,111 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
     
     @MainActor private func showPopup() {
-            appState.activeProvider.cancel()
+        appState.activeProvider.cancel()
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
             
-            DispatchQueue.main.async { [weak self] in
+            if let currentFrontmostApp = NSWorkspace.shared.frontmostApplication {
+                self.appState.previousApplication = currentFrontmostApp
+            }
+            
+            self.closePopupWindow()
+            
+            let generalPasteboard = NSPasteboard.general
+            let oldContents = generalPasteboard.string(forType: .string)
+            
+            // Clear and perform copy command to get current selection
+            generalPasteboard.clearContents()
+            let source = CGEventSource(stateID: .hidSystemState)
+            let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 0x08, keyDown: true)
+            let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 0x08, keyDown: false)
+            keyDown?.flags = .maskCommand
+            keyUp?.flags = .maskCommand
+            keyDown?.post(tap: .cghidEventTap)
+            keyUp?.post(tap: .cghidEventTap)
+            
+            // Wait for the copy operation to complete, then process the pasteboard
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
                 guard let self = self else { return }
                 
-                if let currentFrontmostApp = NSWorkspace.shared.frontmostApplication {
-                    self.appState.previousApplication = currentFrontmostApp
+                var foundImages: [Data] = []
+                var selectedText = ""
+                
+                // First check for file URLs (for Finder selections)
+                let classes = [NSURL.self]
+                let options: [NSPasteboard.ReadingOptionKey: Any] = [
+                    .urlReadingFileURLsOnly: true,
+                    .urlReadingContentsConformToTypes: [
+                        "public.image",
+                        "public.png",
+                        "public.jpeg",
+                        "public.tiff",
+                        "com.compuserve.gif"
+                    ]
+                ]
+                
+                if let urls = generalPasteboard.readObjects(forClasses: classes, options: options) as? [URL] {
+                    for url in urls {
+                        if let imageData = try? Data(contentsOf: url) {
+                            if NSImage(data: imageData) != nil {
+                                foundImages.append(imageData)
+                                NSLog("Loaded image data from file: \(url.lastPathComponent)")
+                            }
+                        }
+                    }
                 }
                 
-                self.closePopupWindow()
-                
-                let generalPasteboard = NSPasteboard.general
-                let oldContents = generalPasteboard.string(forType: .string)
-                
-                // Clear and perform copy command to get current selection
-                generalPasteboard.clearContents()
-                let source = CGEventSource(stateID: .hidSystemState)
-                let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 0x08, keyDown: true)
-                let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 0x08, keyDown: false)
-                keyDown?.flags = .maskCommand
-                keyUp?.flags = .maskCommand
-                keyDown?.post(tap: .cghidEventTap)
-                keyUp?.post(tap: .cghidEventTap)
-                
-                // Wait for the copy operation to complete, then process the pasteboard
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
-                    guard let self = self else { return }
-                    
-                    var foundImages: [Data] = []
-                    var selectedText = ""
-                    
-                    // First check for file URLs (for Finder selections)
-                    let classes = [NSURL.self]
-                    let options: [NSPasteboard.ReadingOptionKey: Any] = [
-                        .urlReadingFileURLsOnly: true,
-                        .urlReadingContentsConformToTypes: [
-                            "public.image",
-                            "public.png",
-                            "public.jpeg",
-                            "public.tiff",
-                            "com.compuserve.gif"
-                        ]
+                // If no file URLs found, check for direct image data
+                if foundImages.isEmpty {
+                    let supportedImageTypes = [
+                        NSPasteboard.PasteboardType("public.png"),
+                        NSPasteboard.PasteboardType("public.jpeg"),
+                        NSPasteboard.PasteboardType("public.tiff"),
+                        NSPasteboard.PasteboardType("com.compuserve.gif"),
+                        NSPasteboard.PasteboardType("public.image")
                     ]
                     
-                    if let urls = generalPasteboard.readObjects(forClasses: classes, options: options) as? [URL] {
-                        for url in urls {
-                            if let imageData = try? Data(contentsOf: url) {
-                                if NSImage(data: imageData) != nil {
-                                    foundImages.append(imageData)
-                                    NSLog("Loaded image data from file: \(url.lastPathComponent)")
-                                }
-                            }
+                    for type in supportedImageTypes {
+                        if let data = generalPasteboard.data(forType: type) {
+                            foundImages.append(data)
+                            NSLog("Found direct image data of type: \(type)")
+                            break
                         }
                     }
-                    
-                    // If no file URLs found, check for direct image data
-                    if foundImages.isEmpty {
-                        let supportedImageTypes = [
-                            NSPasteboard.PasteboardType("public.png"),
-                            NSPasteboard.PasteboardType("public.jpeg"),
-                            NSPasteboard.PasteboardType("public.tiff"),
-                            NSPasteboard.PasteboardType("com.compuserve.gif"),
-                            NSPasteboard.PasteboardType("public.image")
-                        ]
-                        
-                        for type in supportedImageTypes {
-                            if let data = generalPasteboard.data(forType: type) {
-                                foundImages.append(data)
-                                NSLog("Found direct image data of type: \(type)")
-                                break
-                            }
-                        }
-                    }
-                    
-                    // Get any text content
-                    selectedText = generalPasteboard.string(forType: .string) ?? ""
-                    
-                    // Restore original pasteboard contents
-                    generalPasteboard.clearContents()
-                    if let oldContents = oldContents {
-                        generalPasteboard.setString(oldContents, forType: .string)
-                    }
-                    
-                    // Update app state and show popup
-                    self.appState.selectedImages = foundImages
-                    self.appState.selectedText = selectedText
-                    
-                    let window = PopupWindow(appState: self.appState)
-                    window.delegate = self
-                    self.popupWindow = window
-                    
-                    // Set window size based on content
-                    if !selectedText.isEmpty || !foundImages.isEmpty {
-                        window.setContentSize(NSSize(width: 400, height: 400))
-                    } else {
-                        window.setContentSize(NSSize(width: 400, height: 100))
-                    }
-                    
-                    window.positionNearMouse()
-                    NSApp.activate(ignoringOtherApps: true)
-                    window.makeKeyAndOrderFront(nil)
-                    window.orderFrontRegardless()
                 }
+                
+                // Get any text content
+                selectedText = generalPasteboard.string(forType: .string) ?? ""
+                
+                // Restore original pasteboard contents
+                generalPasteboard.clearContents()
+                if let oldContents = oldContents {
+                    generalPasteboard.setString(oldContents, forType: .string)
+                }
+                
+                // Update app state and show popup
+                self.appState.selectedImages = foundImages
+                self.appState.selectedText = selectedText
+                
+                let window = PopupWindow(appState: self.appState)
+                window.delegate = self
+                self.popupWindow = window
+                
+                // Set window size based on content
+                if !selectedText.isEmpty || !foundImages.isEmpty {
+                    window.setContentSize(NSSize(width: 400, height: 400))
+                } else {
+                    window.setContentSize(NSSize(width: 400, height: 100))
+                }
+                
+                window.positionNearMouse()
+                NSApp.activate(ignoringOtherApps: true)
+                window.makeKeyAndOrderFront(nil)
+                window.orderFrontRegardless()
             }
         }
+    }
     
     // Closes and cleans up the popup window
     private func closePopupWindow() {
@@ -512,7 +512,7 @@ extension AppDelegate {
         
         // Register services provider
         NSApp.servicesProvider = self
-
+        
         // Register the service
         NSUpdateDynamicServices()
     }

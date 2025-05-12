@@ -3,7 +3,7 @@ import SwiftUI
 struct AboutView: View {
     @ObservedObject private var settings = AppSettings.shared
     @State private var updateChecker = UpdateChecker.shared
-
+    
     var body: some View {
         VStack(spacing: 20) {
             Text("About Writing Tools")
@@ -35,7 +35,7 @@ struct AboutView: View {
             }
             
             Divider()
-
+            
             Text("Version: 4.1 (Based on Windows Port version 7.1)")
                 .font(.caption)
             

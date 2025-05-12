@@ -222,7 +222,7 @@ struct PopupView: View {
         isCustomLoading = true
         processCustomInstruction(customText)
     }
-
+    
     private func processCustomInstruction(_ instruction: String) {
         guard !instruction.isEmpty else { return }
         appState.isProcessing = true

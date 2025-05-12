@@ -3985,6 +3985,7 @@
       }
     },
     "Open Writing Tools" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5123,6 +5124,7 @@
       }
     },
     "Version: 4.0 (Based on Windows Port version 7.1)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5140,6 +5142,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Version : 4.0 (basée sur Windows Port version 7.1)"
+          }
+        }
+      }
+    },
+    "Version: 4.1 (Based on Windows Port version 7.1)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version: 4.1 (Basierend auf Windows-Port-Version 7.1)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versión: 4.1 (Basada en Windows Port versión 7.1)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version : 4.1 (basée sur Windows Port version 7.1)"
           }
         }
       }
@@ -5255,6 +5279,7 @@
       }
     },
     "Writing Tools" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
