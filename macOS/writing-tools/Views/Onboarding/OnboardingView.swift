@@ -44,15 +44,8 @@ struct OnboardingView: View {
             }
             
             // Bottom navigation area
-            VStack(spacing: 16) {
-                // Progress indicators
-                HStack(spacing: 8) {
-                    ForEach(0..<steps.count, id: \.self) { index in
-                        Circle()
-                            .fill(currentStep >= index ? Color.accentColor : Color.gray.opacity(0.3))
-                            .frame(width: 8, height: 8)
-                    }
-                }
+            VStack(spacing: 8) {
+                
                 
                 // Navigation buttons
                 HStack {
@@ -63,6 +56,17 @@ struct OnboardingView: View {
                             }
                         }
                         .buttonStyle(.bordered)
+                    }
+                    
+                    Spacer()
+                    
+                    // Progress indicators
+                    HStack(spacing: 8) {
+                        ForEach(0..<steps.count, id: \.self) { index in
+                            Circle()
+                                .fill(currentStep >= index ? Color.accentColor : Color.gray.opacity(0.3))
+                                .frame(width: 8, height: 8)
+                        }
                     }
                     
                     Spacer()
@@ -82,7 +86,7 @@ struct OnboardingView: View {
             .padding()
             .background(Color(.windowBackgroundColor))
         }
-        .frame(width: 600, height: 600)
+        .frame(width: 600, height: 700)
         .background(
             Rectangle()
                 .fill(Color.clear)
@@ -94,276 +98,336 @@ struct OnboardingView: View {
         VStack(spacing: 20) {
             Image(systemName: "sparkles")
                 .resizable()
+                .scaledToFit()
                 .frame(width: 60, height: 60)
                 .foregroundColor(.accentColor)
             
             Text(steps[0].title)
                 .font(.largeTitle)
                 .bold()
+                .multilineTextAlignment(.center)
             
-            VStack(alignment: .center, spacing: 10) {
-                Text("• Improves your writing with AI")
-                Text("• Works in any application")
-                Text("• Helps you write with clarity and confidence")
-                Text("• Support Custom Commands for anything you want")
+            Text(steps[0].description)
+                .font(.title3)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+            
+            VStack(alignment: .leading, spacing: 10) {
+                Label("Improves your writing with AI", systemImage: "brain.head.profile")
+                Label("Works in any application", systemImage: "app.badge")
+                Label("Helps you write with clarity and confidence", systemImage: "text.badge.checkmark")
+                Label("Supports Custom Commands", systemImage: "list.bullet.rectangle.portrait")
             }
             .font(.title3)
+            .padding(.top)
         }
+        .padding(.vertical, 40)
     }
     
     private var accessibilityStep: some View {
         VStack(spacing: 20) {
+            Image(systemName: "figure.wave.circle.fill")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 60, height: 60)
+                .foregroundColor(.blue)
+            
             Text(steps[1].title)
                 .font(.title)
                 .bold()
             
             Text(steps[1].description)
                 .multilineTextAlignment(.center)
+                .foregroundColor(.secondary)
             
             GroupBox {
                 VStack(alignment: .leading, spacing: 15) {
                     Text("How to enable accessibility access:")
                         .font(.headline)
                     
-                    Text("1. Click the button below to open System Settings")
-                    Text("2. Click the '+' button in the accessibility section")
-                    Text("3. Navigate to Applications and select writing-tools")
-                    Text("4. Enable the checkbox next to writing-tools")
+                    Label(
+                        "Click the button below to open System Settings > Privacy & Security > Accessibility.",
+                        systemImage: "1.circle"
+                    )
+                    Label(
+                        "Click the '+' button (you may need to unlock first).",
+                        systemImage: "2.circle"
+                    )
+                    Label(
+                        "Navigate to your Applications folder and select 'WritingTools'.",
+                        systemImage: "3.circle"
+                    )
+                    Label(
+                        "Ensure the toggle switch next to 'WritingTools' is turned ON.",
+                        systemImage: "4.circle"
+                    )
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.vertical, 4)
+                .padding(.vertical, 8)
             }
             
-            Button("Open System Settings") {
-                NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!)
+            Button {
+                NSWorkspace.shared.open(
+                    URL(
+                        string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
+                    )!
+                )
+            } label: {
+                Label("Open Accessibility Settings", systemImage: "gearshape")
             }
             .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            
+            //  Add a check status button
+            /*
+             Button("Check Status") {
+             if isAccessibilityEnabled() {
+             // Show confirmation
+             } else {
+             // Show reminder
+             }
+             }
+             */
         }
+        .padding(.vertical, 40)
     }
     
     private var customizationStep: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: 16) { // Increased spacing
                 Text("Customize Your Experience")
                     .font(.title)
                     .bold()
+                    .padding(.bottom, 4)
                 
-                // Shortcut Settings
-                GroupBox {
-                    KeyboardShortcuts.Recorder("Global Shortcut:", name: .showPopup)
-                        .padding(.vertical, 4)
-                }
-                
-                // Theme Settings
-                GroupBox {
-                    Picker("Theme", selection: $settings.themeStyle) {
-                        Text("Standard").tag("standard")
-                        Text("Gradient").tag("gradient")
-                        Text("Glass").tag("glass")
-                    }
-                    .pickerStyle(.segmented)
-                    .padding(.vertical, 4)
-                }
-                
-                // AI Provider Selection
-                GroupBox {
+                // --- Shortcut Settings ---
+                GroupBox("Global Shortcut") {
                     VStack(alignment: .leading) {
+                        Text("Set the keyboard shortcut to activate WritingTools from anywhere.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 4)
+                        KeyboardShortcuts.Recorder(
+                            "Activate WritingTools:",
+                            name: .showPopup
+                        )
+                    }
+                    .padding(.vertical, 8)
+                }
+                
+                // --- Theme Settings ---
+                GroupBox("Appearance Theme") {
+                    VStack(alignment: .leading) {
+                        Text("Choose how the popup window looks.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 4)
+                        Picker("Theme", selection: $settings.themeStyle) {
+                            Text("Standard").tag("standard")
+                            Text("Gradient").tag("gradient")
+                            Text("Glass").tag("glass")
+                            Text("OLED").tag("oled")
+                        }
+                        .pickerStyle(.segmented)
+                    }
+                    .padding(.vertical, 8)
+                }
+                
+                // --- AI Provider Selection ---
+                GroupBox("AI Provider") {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Select the AI service you want to use.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 4)
+                        
                         Picker("Provider", selection: $settings.currentProvider) {
-                            // Remove Local LLM option for Intel Macs
-                            if LocalLLMProvider.isAppleSilicon {
-                                Text("Local LLM").tag("local")
+                            // Conditionally show Local LLM
+                            if LocalModelProvider.isAppleSilicon {
+                                Text("Local LLM (On-Device)").tag("local")
                             }
-                            Text("Gemini AI").tag("gemini")
-                            Text("OpenAI").tag("openai")
+                            Text("Gemini AI (Google)").tag("gemini")
+                            Text("OpenAI (ChatGPT)").tag("openai")
                             Text("Mistral AI").tag("mistral")
-                            Text("Ollama").tag("ollama")
+                            Text("Ollama (Self-Hosted)").tag("ollama")
                         }
                         .pickerStyle(.menu)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .onChange(of: settings.currentProvider) { oldValue, newValue in
-                            if newValue == "local" && !LocalLLMProvider.isAppleSilicon {
+                        .onChange(of: settings.currentProvider) { _, newValue in
+                            // Fallback for Intel Macs selecting Local LLM
+                            if newValue == "local" && !LocalModelProvider.isAppleSilicon {
                                 settings.currentProvider = "gemini"
                             }
+                            // Reset API keys or specific settings if needed when provider changes?
                         }
                         
-                        if settings.currentProvider == "local" {
-                            Text("(Llama 3.2 3B 4-bit)")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
                     }
-                    .padding(.vertical, 4)
+                    .padding(.vertical, 8)
                 }
                 
-                // Provider-specific settings
-                providerSpecificSettings
+                // --- Provider-specific settings ---
+                GroupBox("Provider Configuration") {
+                    providerSpecificSettings
+                        .padding(.vertical, 8)
+                }
+                
             }
             .padding()
         }
     }
     
+    // --- Provider Specific Settings View Builder ---
+    @ViewBuilder
     private var providerSpecificSettings: some View {
-        Group {
-            if settings.currentProvider == "gemini" {
-                geminiSettings
-            } else if settings.currentProvider == "mistral" {
-                mistralSettings
-            } else if settings.currentProvider == "openai" {
-                openAISettings
-            } else if settings.currentProvider == "ollama" {
-                ollamaSettings
-            } else if settings.currentProvider == "local" {
-                if LocalLLMProvider.isAppleSilicon {
-                    LocalLLMSettingsView(evaluator: appState.localLLMProvider)
-                } else {
-                    localLLMNotSupportedView
-                }
-            }
+        switch settings.currentProvider {
+        case "gemini":
+            geminiSettings
+        case "mistral":
+            mistralSettings
+        case "openai":
+            openAISettings
+        case "ollama":
+            ollamaSettings
+        case "local":
+            LocalLLMSettingsView(provider: appState.localLLMProvider)
+        default:
+            Text("Please select a provider.")
+                .foregroundColor(.secondary)
         }
     }
     
+    // --- Settings Views for each provider ---
     private var geminiSettings: some View {
-        GroupBox("Gemini AI Settings") {
-            VStack(alignment: .leading, spacing: 12) {
-                TextField("API Key", text: $settings.geminiApiKey)
-                    .textFieldStyle(.roundedBorder)
-                
-                Picker("Model", selection: $settings.geminiModel) {
-                    ForEach(GeminiModel.allCases, id: \.self) { model in
-                        Text(model.displayName).tag(model)
-                    }
-                }
-                .pickerStyle(.menu)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                
-                Button("Get API Key") {
-                    if let url = URL(string: "https://aistudio.google.com/app/apikey") {
-                        NSWorkspace.shared.open(url)
-                    }
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Configure Google Gemini AI")
+                .font(.headline)
+            TextField("API Key", text: $settings.geminiApiKey)
+                .textFieldStyle(.roundedBorder)
+            
+            Picker("Model", selection: $settings.geminiModel) {
+                ForEach(GeminiModel.allCases, id: \.self) { model in
+                    Text(model.displayName).tag(model)
                 }
             }
-            .padding(.vertical, 4)
+            .pickerStyle(.menu)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            
+            // Show custom model field if needed
+            if settings.geminiModel == .custom {
+                TextField("Custom Model Name", text: $settings.geminiCustomModel)
+                    .textFieldStyle(.roundedBorder)
+                    .padding(.top, 4)
+            }
+            
+            Button("Get Gemini API Key") {
+                if let url = URL(string: "https://aistudio.google.com/app/apikey") {
+                    NSWorkspace.shared.open(url)
+                }
+            }
+            .buttonStyle(.link)
         }
     }
     
     private var mistralSettings: some View {
-        GroupBox("Mistral AI Settings") {
-            VStack(alignment: .leading, spacing: 12) {
-                TextField("API Key", text: $settings.mistralApiKey)
-                    .textFieldStyle(.roundedBorder)
-                
-                Picker("Model", selection: $settings.mistralModel) {
-                    ForEach(MistralModel.allCases, id: \.self) { model in
-                        Text(model.displayName).tag(model.rawValue)
-                    }
-                }
-                .pickerStyle(.menu)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                
-                Button("Get Mistral API Key") {
-                    if let url = URL(string: "https://console.mistral.ai/api-keys/") {
-                        NSWorkspace.shared.open(url)
-                    }
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Configure Mistral AI")
+                .font(.headline)
+            TextField("API Key", text: $settings.mistralApiKey)
+                .textFieldStyle(.roundedBorder)
+            
+            Picker("Model", selection: $settings.mistralModel) {
+                ForEach(MistralModel.allCases, id: \.self) { model in
+                    Text(model.displayName).tag(model.rawValue)
                 }
             }
-            .padding(.vertical, 4)
+            .pickerStyle(.menu)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            
+            Button("Get Mistral API Key") {
+                if let url = URL(string: "https://console.mistral.ai/api-keys/") {
+                    NSWorkspace.shared.open(url)
+                }
+            }
+            .buttonStyle(.link)
         }
     }
     
     private var openAISettings: some View {
-        GroupBox("OpenAI Settings") {
-            VStack(alignment: .leading, spacing: 12) {
-                TextField("API Key", text: $settings.openAIApiKey)
-                    .textFieldStyle(.roundedBorder)
-                
-                TextField("Base URL", text: $settings.openAIBaseURL)
-                    .textFieldStyle(.roundedBorder)
-                
-                TextField("Model Name", text: $settings.openAIModel)
-                    .textFieldStyle(.roundedBorder)
-                
-                Text("OpenAI models include: gpt-4o, gpt-4o-mini, etc.")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                
-                Button("Get OpenAI API Key") {
-                    if let url = URL(string: "https://platform.openai.com/account/api-keys") {
-                        NSWorkspace.shared.open(url)
-                    }
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Configure OpenAI (ChatGPT)")
+                .font(.headline)
+            TextField("API Key", text: $settings.openAIApiKey)
+                .textFieldStyle(.roundedBorder)
+            
+            TextField("Base URL (Optional)", text: $settings.openAIBaseURL)
+                .textFieldStyle(.roundedBorder)
+            
+            TextField("Model Name", text: $settings.openAIModel)
+                .textFieldStyle(.roundedBorder)
+            
+            Text("Default models: \(OpenAIConfig.defaultModel), gpt-4o, gpt-4o-mini, etc.")
+                .font(.caption)
+                .foregroundColor(.secondary)
+            
+            Button("Get OpenAI API Key") {
+                if let url = URL(string: "https://platform.openai.com/account/api-keys") {
+                    NSWorkspace.shared.open(url)
                 }
             }
-            .padding(.vertical, 4)
+            .buttonStyle(.link)
         }
     }
     
     private var ollamaSettings: some View {
-        GroupBox("Ollama Provider Settings") {
-            VStack(alignment: .leading, spacing: 12) {
-                TextField("Ollama Base URL", text: $settings.ollamaBaseURL)
-                    .textFieldStyle(.roundedBorder)
-                
-                TextField("Ollama Model", text: $settings.ollamaModel)
-                    .textFieldStyle(.roundedBorder)
-                
-                TextField("Keep Alive Time", text: $settings.ollamaKeepAlive)
-                    .textFieldStyle(.roundedBorder)
-                
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Image Recognition Mode")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                    Picker("Image Mode", selection: $settings.ollamaImageMode) {
-                        ForEach(OllamaImageMode.allCases) { mode in
-                            Text(mode.displayName).tag(mode)
-                        }
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Configure Ollama (Self-Hosted)")
+                .font(.headline)
+            TextField("Ollama Base URL", text: $settings.ollamaBaseURL)
+                .textFieldStyle(.roundedBorder)
+            
+            TextField("Ollama Model Name", text: $settings.ollamaModel)
+                .textFieldStyle(.roundedBorder)
+            
+            TextField("Keep Alive Time (e.g., 5m, 1h)", text: $settings.ollamaKeepAlive)
+                .textFieldStyle(.roundedBorder)
+            
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Image Recognition Mode")
+                    .font(.subheadline) // Consistent font
+                    .foregroundColor(.secondary)
+                Picker("Image Mode", selection: $settings.ollamaImageMode) {
+                    ForEach(OllamaImageMode.allCases) { mode in
+                        Text(mode.displayName).tag(mode)
                     }
-                    .pickerStyle(.segmented)
-
-                    Text("Choose between local OCR or Ollama's built-in vision capabilities.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
                 }
+                .pickerStyle(.segmented)
                 
-                LinkText()
-                
-                Button("Ollama Documentation") {
-                    if let url = URL(string: "https://ollama.ai/download") {
-                        NSWorkspace.shared.open(url)
-                    }
+                Text("Use local OCR or Ollama's vision model for images.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            
+            SettingsView.LinkText()
+            
+            Button("Ollama Documentation") {
+                if let url = URL(string: "https://ollama.ai/download") {
+                    NSWorkspace.shared.open(url)
                 }
             }
-            .padding(.vertical, 4)
+            .buttonStyle(.link)
         }
     }
     
-    private var localLLMNotSupportedView: some View {
-        GroupBox {
-            VStack(alignment: .center, spacing: 16) {
-                Image(systemName: "xmark.circle")
-                    .font(.system(size: 40))
-                    .foregroundColor(.red)
-                
-                Text("Apple Silicon Required")
-                    .font(.title3)
-                    .bold()
-                
-                Text("Local LLM is only available on Apple Silicon devices (M1/M2/M3 Macs).")
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-                
-                Text("Please select a different AI provider.")
-                    .font(.headline)
-                    .padding(.top, 8)
-            }
-            .padding()
-            .frame(maxWidth: .infinity)
-        }
-    }
     
+    // --- Save Settings and Finish ---
     private func saveSettingsAndFinish() {
-        // Save provider-specific settings based on the selected provider
         if settings.currentProvider == "gemini" {
-            appState.saveGeminiConfig(apiKey: settings.geminiApiKey, model: settings.geminiModel)
+            appState.saveGeminiConfig(
+                apiKey: settings.geminiApiKey,
+                model: settings.geminiModel,
+                customModelName: settings.geminiCustomModel // Pass custom model name
+            )
         } else if settings.currentProvider == "mistral" {
             appState.saveMistralConfig(
                 apiKey: settings.mistralApiKey,
@@ -384,45 +448,24 @@ struct OnboardingView: View {
                 model: settings.ollamaModel,
                 keepAlive: settings.ollamaKeepAlive
             )
+            UserDefaults.standard.set(settings.ollamaImageMode.rawValue, forKey: "ollama_image_mode")
         }
         
-        // Set current provider
+        // Set current provider in AppState (persists via AppSettings)
         appState.setCurrentProvider(settings.currentProvider)
         
-        // Save shortcut settings (handled by KeyboardShortcuts.Recorder)
-        
         // Mark onboarding as complete
-        UserDefaults.standard.set(true, forKey: "has_completed_onboarding")
+        settings.hasCompletedOnboarding = true // Use the AppSettings property
         
-        // Clean up windows
+        print("Onboarding complete. Settings saved.")
+        
         WindowManager.shared.cleanupWindows()
     }
 }
 
+// OnboardingStep struct
 struct OnboardingStep {
     let title: String
     let description: String
     let isPermissionStep: Bool
-}
-
-struct LinkText: View {
-    var body: some View {
-        HStack(spacing: 4) {
-            Text("Local LLMs: use the instructions on")
-                .font(.caption)
-                .foregroundColor(.secondary)
-            Text("GitHub Page")
-                .font(.caption)
-                .foregroundColor(.blue)
-                .underline()
-                .onTapGesture {
-                    if let url = URL(string: "https://github.com/theJayTea/WritingTools?tab=readme-ov-file#-optional-ollama-local-llm-instructions") {
-                        NSWorkspace.shared.open(url)
-                    }
-                }
-            Text(".")
-                .font(.caption)
-                .foregroundColor(.secondary)
-        }
-    }
 }

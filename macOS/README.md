@@ -6,22 +6,9 @@ Core functionality works well, and it is still an ongoing work in progress.
 
 ---
 
-## Working Features
-- All of the tools, including the new response windows and the manual chat option.
-- Input Window even when no text is selected
-- Gemini, OpenAI and Local LLM Support.
-- The Gradient Theme (Dark Mode and Light Mode are supported).
-- Initial Setup, Settings, and About pages.
-
----
-
-## Not Yet Available
-- All of the original port's features are now available; however, more optimizations and improvements are coming soon.
-
----
-
 ## System Requirements
-Due to the accessibility features the app uses (e.g., automatically selecting the window containing the text and pasting the updated version), **the minimum macOS version required is 14.0**.
+Due to the accessibility features the app uses (e.g., automatically selecting the window containing the text and pasting the updated version), **the minimum macOS version required is 14.0**. You also have to allow this accessibility access in System Settings. 
+> System Settings → Privacy & Security → Accessibility → Press the plus (+) button → Add *writing-tools* and enable access.
 
 ---
 
@@ -72,14 +59,10 @@ This guide will help you properly set up the Writing Tools macOS project in Xcod
 
 ## Credits
 
-The macOS port is being developed by **Aryamirsepasi**.
+The macOS port is being developed by **Aryamirsepasi**. [GitHub](https://github.com/Aryamirsepasi)
 
-GitHub: [https://github.com/Aryamirsepasi](https://github.com/Aryamirsepasi)
+The amazing gemini picture processing functionality was created by **Joaov41**. [GitHub](https://github.com/Joaov41)
 
-The amazing picture processing functionality was created by **Joaov41**
-GitHub: [https://github.com/Joaov41](https://github.com/Joaov41)
+Special Thanks to @sindresorhus for developing a great and stable keyboard shortcuts package for Swift. [GitHub](https://github.com/sindresorhus/KeyboardShortcuts)
 
-Special Thanks to @sindresorhus for developing an amazing and stable keyboard shortcuts package for Swift. 
-
-GitHub: [https://github.com/sindresorhus/KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts)
-
+Huge shoutout to MLX Swift Team, creating local LLM compatibility on Apple silicon Macs. [GitHub](https://github.com/ml-explore/mlx-swift-examples)

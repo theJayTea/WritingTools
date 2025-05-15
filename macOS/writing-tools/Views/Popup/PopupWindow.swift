@@ -13,11 +13,11 @@ class PopupWindow: NSWindow {
         self.appState = appState
         
         super.init(
-                    contentRect: NSRect(x: 0, y: 0, width: windowWidth, height: 100),
-                    styleMask: [.borderless, .fullSizeContentView],
-                    backing: .buffered,
-                    defer: true
-                )
+            contentRect: NSRect(x: 0, y: 0, width: windowWidth, height: 100),
+            styleMask: [.borderless, .fullSizeContentView],
+            backing: .buffered,
+            defer: true
+        )
         
         self.isReleasedWhenClosed = false
         
@@ -245,29 +245,29 @@ class PopupWindow: NSWindow {
         return nil
     }
     
-     func positionNearMouse() {
-            let mouseLocation = NSEvent.mouseLocation
-            guard let screen = NSScreen.screens.first(where: { $0.frame.contains(mouseLocation) }) ?? NSScreen.main else { return }
-            
-            let padding: CGFloat = 10
-            var windowFrame = frame
-            windowFrame.size.width = windowWidth  // Ensure width stays fixed
-            
-            // Position below mouse by default
-            windowFrame.origin.x = mouseLocation.x - (windowWidth / 2)  // Center horizontally on mouse
-            windowFrame.origin.y = mouseLocation.y - windowFrame.height - padding
-            
-            // Keep window within screen bounds
-            windowFrame.origin.x = max(screen.visibleFrame.minX + padding,
-                                     min(windowFrame.origin.x,
-                                         screen.visibleFrame.maxX - windowWidth - padding))
-            
-            if windowFrame.minY < screen.visibleFrame.minY {
-                windowFrame.origin.y = mouseLocation.y + padding
-            }
-            
-            setFrame(windowFrame, display: true)
+    func positionNearMouse() {
+        let mouseLocation = NSEvent.mouseLocation
+        guard let screen = NSScreen.screens.first(where: { $0.frame.contains(mouseLocation) }) ?? NSScreen.main else { return }
+        
+        let padding: CGFloat = 10
+        var windowFrame = frame
+        windowFrame.size.width = windowWidth  // Ensure width stays fixed
+        
+        // Position below mouse by default
+        windowFrame.origin.x = mouseLocation.x - (windowWidth / 2)  // Center horizontally on mouse
+        windowFrame.origin.y = mouseLocation.y - windowFrame.height - padding
+        
+        // Keep window within screen bounds
+        windowFrame.origin.x = max(screen.visibleFrame.minX + padding,
+                                   min(windowFrame.origin.x,
+                                       screen.visibleFrame.maxX - windowWidth - padding))
+        
+        if windowFrame.minY < screen.visibleFrame.minY {
+            windowFrame.origin.y = mouseLocation.y + padding
         }
+        
+        setFrame(windowFrame, display: true)
+    }
     
     // Close via ESC Key
     override func keyDown(with event: NSEvent) {

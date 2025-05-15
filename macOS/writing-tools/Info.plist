@@ -22,7 +22,7 @@
 	<true/>
 	<key>NSServices</key>
 	<array/>
-	<key>NSAppleEventsUsageDescription</key>
-	<string>WritingTools needs accessibility access to help improve your writing across applications.</string>
+	<key>NSAccessibilityUsageDescription</key>
+<string>WritingTools needs access to control your computer to simulate copy and paste actions, allowing it to retrieve selected text and insert AI-generated results.</string>
 </dict>
 </plist>

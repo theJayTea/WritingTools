@@ -8,7 +8,7 @@ class AppState: ObservableObject {
     @Published var openAIProvider: OpenAIProvider
     @Published var mistralProvider: MistralProvider
     @Published var ollamaProvider: OllamaProvider
-    @Published var localLLMProvider: LocalLLMProvider
+    @Published var localLLMProvider: LocalModelProvider
     
     @Published var customInstruction: String = ""
     @Published var selectedText: String = ""
@@ -47,8 +47,8 @@ class AppState: ObservableObject {
         // Initialize Gemini with custom model support
         let geminiModelEnum = asettings.geminiModel
         let geminiModelName = (geminiModelEnum == .custom)
-            ? asettings.geminiCustomModel
-            : geminiModelEnum.rawValue
+        ? asettings.geminiCustomModel
+        : geminiModelEnum.rawValue
         let geminiConfig = GeminiConfig(
             apiKey: asettings.geminiApiKey,
             modelName: geminiModelName
@@ -71,7 +71,7 @@ class AppState: ObservableObject {
         )
         self.mistralProvider = MistralProvider(config: mistralConfig)
         
-        self.localLLMProvider = LocalLLMProvider()
+        self.localLLMProvider = LocalModelProvider()
         
         
         // Initialize OllamaProvider with its settings.
@@ -100,7 +100,7 @@ class AppState: ObservableObject {
         if model == .custom, let custom = customModelName {
             AppSettings.shared.geminiCustomModel = custom   // persist custom
         }
-
+        
         // choose actual modelName
         let modelName = (model == .custom) ? (customModelName ?? "") : model.rawValue
         let config = GeminiConfig(apiKey: apiKey, modelName: modelName)
