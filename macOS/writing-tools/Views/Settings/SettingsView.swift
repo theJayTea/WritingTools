@@ -217,9 +217,12 @@ struct SettingsView: View {
                     }
                     Text("Gemini AI").tag("gemini")
                     Text("OpenAI").tag("openai")
+                    Text("Anthropic").tag("anthropic")
                     Text("Mistral AI").tag("mistral")
                     Text("Ollama").tag("ollama")
+                    Text("OpenRouter").tag("openrouter")
                 }
+                
                 .pickerStyle(.menu)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .onChange(of: settings.currentProvider) { oldValue, newValue in
@@ -253,13 +256,97 @@ struct SettingsView: View {
                 geminiSettings
             } else if settings.currentProvider == "mistral" {
                 mistralSettings
+            } else if settings.currentProvider == "anthropic" {
+                anthropicSettings
             } else if settings.currentProvider == "openai" {
                 openAISettings
             } else if settings.currentProvider == "ollama" {
                 ollamaSettings
+            } else if settings.currentProvider == "openrouter" {
+                openRouterSettings
             } else if settings.currentProvider == "local" {
                 LocalLLMSettingsView(provider: appState.localLLMProvider)
             }
+        }
+    }
+    
+    private var openRouterSettings: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Configure OpenRouter")
+                .font(.headline)
+            TextField("API Key", text: $settings.openRouterApiKey)
+                .textFieldStyle(.roundedBorder)
+                .onChange(of: settings.openRouterApiKey) { _, _ in needsSaving = true }
+            
+            Picker("Model", selection: $settings.openRouterModel) {
+                ForEach(OpenRouterModel.allCases, id: \.self) { model in
+                    Text(model.displayName).tag(model.rawValue)
+                }
+            }
+            .pickerStyle(.menu)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .onChange(of: settings.openRouterModel) { _, _ in needsSaving = true }
+            
+            if settings.openRouterModel == OpenRouterModel.custom.rawValue {
+                TextField("Custom Model Name", text: $settings.openRouterCustomModel)
+                    .textFieldStyle(.roundedBorder)
+                    .onChange(of: settings.openRouterCustomModel) { _, _ in needsSaving = true }
+                    .padding(.top, 4)
+            }
+            
+            Button("Get OpenRouter API Key") {
+                if let url = URL(string: "https://openrouter.ai/keys") {
+                    NSWorkspace.shared.open(url)
+                }
+            }
+            .buttonStyle(.link)
+        }
+    }
+    
+    private var anthropicSettings: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Group {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("API Configuration")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    
+                    TextField("API Key", text: $settings.anthropicApiKey)
+                        .textFieldStyle(.roundedBorder)
+                        .onChange(of: settings.anthropicApiKey) { _, _ in needsSaving = true }
+                }
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Model Selection")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    
+                    Picker("Model", selection: $settings.anthropicModel) {
+                        ForEach(AnthropicModel.allCases, id: \.self) { model in
+                            Text(model.displayName).tag(model.rawValue)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .onChange(of: settings.anthropicModel) { _, _ in needsSaving = true }
+                    
+                    TextField("Or Custom Model Name", text: $settings.anthropicModel)
+                        .textFieldStyle(.roundedBorder)
+                        .font(.caption)
+                        .onChange(of: settings.anthropicModel) { _, _ in needsSaving = true }
+                    Text("E.g., \(AnthropicModel.claude3Haiku.rawValue), \(AnthropicModel.claude3Sonnet.rawValue), etc.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            .padding(.bottom, 4)
+            
+            Button("Get Anthropic API Key") {
+                if let url = URL(string: "https://console.anthropic.com/settings/keys") {
+                    NSWorkspace.shared.open(url)
+                }
+            }
+            .buttonStyle(.link)
         }
     }
     
@@ -526,7 +613,20 @@ struct SettingsView: View {
                 baseURL: settings.mistralBaseURL,
                 model: settings.mistralModel
             )
-        } else if settings.currentProvider == "openai" {
+        } else if settings.currentProvider == "anthropic" {
+            appState.saveAnthropicConfig(
+                apiKey: settings.anthropicApiKey,
+                model: settings.anthropicModel
+            )
+        }
+        else if settings.currentProvider == "openrouter" {
+            appState.saveOpenRouterConfig(
+                apiKey: settings.openRouterApiKey,
+                model: OpenRouterModel(rawValue: settings.openRouterModel) ?? .gpt4o,
+                customModelName: settings.openRouterCustomModel
+            )
+        }
+        else if settings.currentProvider == "openai" {
             appState.saveOpenAIConfig(
                 apiKey: settings.openAIApiKey,
                 baseURL: settings.openAIBaseURL,

@@ -32,11 +32,14 @@ struct AboutView: View {
                 
                 Link("Email: developer@aryamirsepasi.com",
                      destination: URL(string: "mailto:developer@aryamirsepasi.com")!)
+                
+                Link("Check out ProseKey AI (iOS port of WritingTools)",
+                     destination: URL(string: "https://apps.apple.com/us/app/prosekey-ai/id6741180175")!)
             }
             
             Divider()
             
-            Text("Version: 4.1 (Based on Windows Port version 7.1)")
+            Text("Version: 4.2 (Based on Windows Port version 7.1)")
                 .font(.caption)
             
             // Update checker section

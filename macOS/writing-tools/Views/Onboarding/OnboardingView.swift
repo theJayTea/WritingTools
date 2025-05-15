@@ -243,15 +243,17 @@ struct OnboardingView: View {
                             .padding(.bottom, 4)
                         
                         Picker("Provider", selection: $settings.currentProvider) {
-                            // Conditionally show Local LLM
                             if LocalModelProvider.isAppleSilicon {
                                 Text("Local LLM (On-Device)").tag("local")
                             }
                             Text("Gemini AI (Google)").tag("gemini")
                             Text("OpenAI (ChatGPT)").tag("openai")
                             Text("Mistral AI").tag("mistral")
+                            Text("Anthropic (Claude)").tag("anthropic")
                             Text("Ollama (Self-Hosted)").tag("ollama")
+                            Text("OpenRouter").tag("openrouter")
                         }
+                        
                         .pickerStyle(.menu)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .onChange(of: settings.currentProvider) { _, newValue in
@@ -285,10 +287,14 @@ struct OnboardingView: View {
             geminiSettings
         case "mistral":
             mistralSettings
+        case "anthropic":
+            anthropicSettings
         case "openai":
             openAISettings
         case "ollama":
             ollamaSettings
+        case "openrouter":
+            openRouterSettings
         case "local":
             LocalLLMSettingsView(provider: appState.localLLMProvider)
         default:
@@ -296,6 +302,37 @@ struct OnboardingView: View {
                 .foregroundColor(.secondary)
         }
     }
+    
+    private var openRouterSettings: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Configure OpenRouter")
+                .font(.headline)
+            TextField("API Key", text: $settings.openRouterApiKey)
+                .textFieldStyle(.roundedBorder)
+            
+            Picker("Model", selection: $settings.openRouterModel) {
+                ForEach(OpenRouterModel.allCases, id: \.self) { model in
+                    Text(model.displayName).tag(model.rawValue)
+                }
+            }
+            .pickerStyle(.menu)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            
+            if settings.openRouterModel == OpenRouterModel.custom.rawValue {
+                TextField("Custom Model Name", text: $settings.openRouterCustomModel)
+                    .textFieldStyle(.roundedBorder)
+                    .padding(.top, 4)
+            }
+            
+            Button("Get OpenRouter API Key") {
+                if let url = URL(string: "https://openrouter.ai/keys") {
+                    NSWorkspace.shared.open(url)
+                }
+            }
+            .buttonStyle(.link)
+        }
+    }
+    
     
     // --- Settings Views for each provider ---
     private var geminiSettings: some View {
@@ -322,6 +359,38 @@ struct OnboardingView: View {
             
             Button("Get Gemini API Key") {
                 if let url = URL(string: "https://aistudio.google.com/app/apikey") {
+                    NSWorkspace.shared.open(url)
+                }
+            }
+            .buttonStyle(.link)
+        }
+    }
+    
+    private var anthropicSettings: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Configure Anthropic (Claude)")
+                .font(.headline)
+            TextField("API Key", text: $settings.anthropicApiKey)
+                .textFieldStyle(.roundedBorder)
+            
+            Picker("Model", selection: $settings.anthropicModel) {
+                ForEach(AnthropicModel.allCases, id: \.self) { model in
+                    Text(model.displayName).tag(model.rawValue)
+                }
+            }
+            .pickerStyle(.menu)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            
+            TextField("Or Custom Model Name", text: $settings.anthropicModel)
+                .textFieldStyle(.roundedBorder)
+                .font(.caption) // Differentiate it
+            
+            Text("E.g., \(AnthropicModel.allCases.map { $0.rawValue }.joined(separator: ", "))")
+                .font(.caption)
+                .foregroundColor(.secondary)
+            
+            Button("Get Anthropic API Key") {
+                if let url = URL(string: "https://console.anthropic.com/settings/keys") {
                     NSWorkspace.shared.open(url)
                 }
             }
@@ -442,7 +511,21 @@ struct OnboardingView: View {
                 project: settings.openAIProject,
                 model: settings.openAIModel
             )
-        } else if settings.currentProvider == "ollama" {
+        } else if settings.currentProvider == "anthropic" {
+            appState.saveAnthropicConfig(
+                apiKey: settings.anthropicApiKey,
+                model: settings.anthropicModel
+            )
+        }
+        else if settings.currentProvider == "openrouter" {
+            appState.saveOpenRouterConfig(
+                apiKey: settings.openRouterApiKey,
+                model: OpenRouterModel(rawValue: settings.openRouterModel) ?? .gpt4o,
+                customModelName: settings.openRouterCustomModel
+            )
+        }
+        
+        else if settings.currentProvider == "ollama" {
             appState.saveOllamaConfig(
                 baseURL: settings.ollamaBaseURL,
                 model: settings.ollamaModel,

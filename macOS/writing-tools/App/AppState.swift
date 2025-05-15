@@ -7,8 +7,10 @@ class AppState: ObservableObject {
     @Published var geminiProvider: GeminiProvider
     @Published var openAIProvider: OpenAIProvider
     @Published var mistralProvider: MistralProvider
+    @Published var anthropicProvider: AnthropicProvider
     @Published var ollamaProvider: OllamaProvider
     @Published var localLLMProvider: LocalModelProvider
+    @Published var openRouterProvider: OpenRouterProvider
     
     @Published var customInstruction: String = ""
     @Published var selectedText: String = ""
@@ -30,10 +32,14 @@ class AppState: ObservableObject {
             return openAIProvider
         case "gemini":
             return geminiProvider
+        case "anthropic":
+            return anthropicProvider
         case "ollama":
             return ollamaProvider
         case "mistral":
             return mistralProvider
+        case "openrouter":
+            return openRouterProvider
         default:
             return localLLMProvider
         }
@@ -73,6 +79,12 @@ class AppState: ObservableObject {
         
         self.localLLMProvider = LocalModelProvider()
         
+        // Iniltialize Anthropic
+        let anthropicConfig = AnthropicConfig(
+            apiKey: asettings.anthropicApiKey,
+            model: asettings.anthropicModel
+        )
+        self.anthropicProvider = AnthropicProvider(config: anthropicConfig)
         
         // Initialize OllamaProvider with its settings.
         let ollamaConfig = OllamaConfig(
@@ -82,7 +94,22 @@ class AppState: ObservableObject {
         )
         self.ollamaProvider = OllamaProvider(config: ollamaConfig)
         
-        if asettings.openAIApiKey.isEmpty && asettings.geminiApiKey.isEmpty && asettings.mistralApiKey.isEmpty {
+        // Initialize OpenRouter
+        let openRouterModelEnum = OpenRouterModel(rawValue: asettings.openRouterModel) ?? .gpt4o
+        let openRouterModelName = (openRouterModelEnum == .custom)
+            ? asettings.openRouterCustomModel
+            : openRouterModelEnum.rawValue
+        let openRouterConfig = OpenRouterConfig(
+            apiKey: asettings.openRouterApiKey,
+            model: openRouterModelName
+        )
+        self.openRouterProvider = OpenRouterProvider(config: openRouterConfig)
+
+        if asettings.openAIApiKey.isEmpty &&
+            asettings.geminiApiKey.isEmpty &&
+            asettings.mistralApiKey.isEmpty &&
+            asettings.openRouterApiKey.isEmpty &&
+            asettings.anthropicApiKey.isEmpty {
             print("Warning: No API keys configured.")
         }
         
@@ -141,6 +168,18 @@ class AppState: ObservableObject {
         mistralProvider = MistralProvider(config: config)
     }
     
+    // For Anthropic changes
+    func saveAnthropicConfig(apiKey: String, model: String) {
+        let asettings = AppSettings.shared
+        asettings.anthropicApiKey = apiKey
+        asettings.anthropicModel = model
+        
+        let config = AnthropicConfig(apiKey: apiKey, model: model)
+        anthropicProvider = AnthropicProvider(config: config)
+        print("AppState: Anthropic config saved and provider updated.")
+    }
+    
+    
     // For updating Ollama settings
     func saveOllamaConfig(baseURL: String, model: String, keepAlive: String) {
         let asettings = AppSettings.shared
@@ -151,6 +190,19 @@ class AppState: ObservableObject {
         let config = OllamaConfig(baseURL: baseURL, model: model, keepAlive: keepAlive)
         ollamaProvider = OllamaProvider(config: config)
     }
+    
+    // For updating OpenRouter settings
+    func saveOpenRouterConfig(apiKey: String, model: OpenRouterModel, customModelName: String? = nil) {
+        AppSettings.shared.openRouterApiKey = apiKey
+        AppSettings.shared.openRouterModel = model.rawValue
+        if model == .custom, let custom = customModelName {
+            AppSettings.shared.openRouterCustomModel = custom
+        }
+        let modelName = (model == .custom) ? (customModelName ?? "") : model.rawValue
+        let config = OpenRouterConfig(apiKey: apiKey, model: modelName)
+        openRouterProvider = OpenRouterProvider(config: config)
+    }
+
     
     // Process a command (unified method for all command types)
     func processCommand(_ command: CommandModel) {

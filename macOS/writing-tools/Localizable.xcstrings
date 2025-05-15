@@ -588,6 +588,12 @@
         }
       }
     },
+    "Anthropic" : {
+
+    },
+    "Anthropic (Claude)" : {
+
+    },
     "API Configuration" : {
       "localizations" : {
         "de" : {
@@ -1096,6 +1102,9 @@
         }
       }
     },
+    "Check out ProseKey AI on the App Store (iOS port of WritingTools" : {
+
+    },
     "Checking for updates..." : {
       "localizations" : {
         "de" : {
@@ -1474,6 +1483,9 @@
         }
       }
     },
+    "Configure Anthropic (Claude)" : {
+
+    },
     "Configure Google Gemini AI" : {
       "localizations" : {
         "de" : {
@@ -1561,6 +1573,9 @@
           }
         }
       }
+    },
+    "Configure OpenRouter" : {
+
     },
     "Connection Settings" : {
       "localizations" : {
@@ -2094,6 +2109,19 @@
         }
       }
     },
+    "E.g., %@" : {
+
+    },
+    "E.g., %@, %@, etc." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "E.g., %1$@, %2$@, etc."
+          }
+        }
+      }
+    },
     "Edit Built-In Command" : {
       "localizations" : {
         "de" : {
@@ -2516,6 +2544,9 @@
         }
       }
     },
+    "Get Anthropic API Key" : {
+
+    },
     "Get API Key" : {
       "localizations" : {
         "de" : {
@@ -2603,6 +2634,9 @@
           }
         }
       }
+    },
+    "Get OpenRouter API Key" : {
+
     },
     "GitHub Page" : {
       "extractionState" : "stale",
@@ -4118,6 +4152,12 @@
           }
         }
       }
+    },
+    "OpenRouter" : {
+
+    },
+    "Or Custom Model Name" : {
+
     },
     "Organization ID (Optional)" : {
       "extractionState" : "manual",
