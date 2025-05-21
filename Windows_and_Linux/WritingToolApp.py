@@ -352,6 +352,7 @@ class WritingToolApp(QtWidgets.QApplication):
             kbrd.release('c')
             kbrd.release(pykeyboard.Key.ctrl.value)
 
+        time.sleep(sleep_duration)
         press_ctrl_c()
 
         # Wait for the clipboard to update
