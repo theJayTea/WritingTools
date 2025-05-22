@@ -3,19 +3,19 @@ import SwiftUI
 struct IconPickerView: View {
     @Environment(\.dismiss) var dismiss
     @Binding var selectedIcon: String
-    
+
     // Default icon set from the original implementation
     let availableIcons: [String]
-    
+
+    @State private var searchText = ""
+
     // Default initialization with our pre-selected set of icons
     init(selectedIcon: Binding<String>, availableIcons: [String]? = nil) {
         self._selectedIcon = selectedIcon
         if let icons = availableIcons {
             self.availableIcons = icons
         } else {
-            // Use the original list of icons with 20 additional ones
             self.availableIcons = [
-                // Original icons
                 "star.fill", "heart.fill", "bolt.fill", "leaf.fill", "globe",
                 "text.bubble.fill", "pencil", "doc.fill", "book.fill", "bookmark.fill",
                 "tag.fill", "checkmark.circle.fill", "bell.fill", "flag.fill", "paperclip",
@@ -34,26 +34,31 @@ struct IconPickerView: View {
                 "arrow.uturn.backward.circle.fill", "arrow.uturn.forward.circle.fill",
                 "arrow.uturn.left.circle.fill", "arrow.uturn.right.circle.fill",
                 "arrow.uturn.up.circle.fill", "arrow.uturn.down.circle.fill",
-                
-                // Additional 20 modern SF symbols
                 "bubble.left.and.text.bubble.right.fill", "text.word.spacing", "captions.bubble.fill",
                 "text.alignleft", "text.alignright", "text.aligncenter", "text.badge.checkmark",
-                "text.badge.minus", "text.badge.plus", "text.bubble.fill", "gearshape", 
+                "text.badge.minus", "text.badge.plus", "text.bubble.fill", "gearshape",
                 "sparkle.magnifyingglass", "highlighter", "scribble.variable", "pencil.and.outline",
                 "square.and.pencil", "pencil.circle", "pencil.circle.fill", "pencil.tip",
                 "rectangle.and.paperclip", "doc.richtext", "doc.plaintext", "doc.append",
                 "doc.text.below.ecg", "doc.viewfinder", "sparkles", "wand.and.rays",
                 "dial.min", "dial.min.fill", "text.line.first.and.arrowtriangle.forward",
-                "paragraph", "list.bullet.circle", "list.number", "list.star", "list.bullet.indent", 
-                "photo.stack", "square.stack.3d.up", "square.stack.3d.down.right", "tray.full.fill", 
+                "paragraph", "list.bullet.circle", "list.number", "list.star", "list.bullet.indent",
+                "photo.stack", "square.stack.3d.up", "square.stack.3d.down.right", "tray.full.fill",
                 "slider.horizontal.3"
             ]
         }
     }
-    
-    // Use a more compact grid layout with more columns
+
     let columns = Array(repeating: GridItem(.flexible(), spacing: 12), count: 8)
-    
+
+    var filteredIcons: [String] {
+        if searchText.isEmpty {
+            return availableIcons
+        } else {
+            return availableIcons.filter { $0.localizedCaseInsensitiveContains(searchText) }
+        }
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             // Header
@@ -69,11 +74,30 @@ struct IconPickerView: View {
                 .buttonStyle(.plain)
             }
             .padding()
-            
+
+            // Search field
+            HStack {
+                TextField("Search", text: $searchText)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.horizontal)
+
+                Spacer()
+
+                Button(action: { searchText = "" }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title2)
+                        .foregroundColor(.secondary)
+                }
+                .buttonStyle(.plain)
+                .padding()
+            }
+            .cornerRadius(8)
+            .padding()
+
             // Icons grid
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(availableIcons, id: \.self) { icon in
+                    ForEach(filteredIcons, id: \.self) { icon in
                         Button(action: {
                             selectedIcon = icon
                             dismiss()
@@ -90,8 +114,14 @@ struct IconPickerView: View {
                 }
                 .padding()
             }
-            
+
         }
         .frame(width: 480, height: 480)
     }
-} 
+}
+
+struct IconPickerView_Previews: PreviewProvider {
+    static var previews: some View {
+        IconPickerView(selectedIcon: .constant("star.fill"))
+    }
+}

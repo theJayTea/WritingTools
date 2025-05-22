@@ -1353,6 +1353,9 @@
         }
       }
     },
+    "Clear" : {
+
+    },
     "Click the '+' button (you may need to unlock first)." : {
       "localizations" : {
         "de" : {
@@ -4870,6 +4873,9 @@
           }
         }
       }
+    },
+    "Search" : {
+
     },
     "Select AI Service" : {
       "localizations" : {
