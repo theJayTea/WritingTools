@@ -56,6 +56,12 @@
             "value" : "(Llama 3.2)"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Llama 3.2)"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -97,6 +103,12 @@
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Qwen2.5 3B 4-bit)"
+          }
+        },
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "(Qwen2.5 3B 4-bit)"
@@ -584,6 +596,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Paramètres du fournisseur d'IA"
+          }
+        }
+      }
+    },
+    "Anthropic" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anthropic"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anthropic"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anthropic"
+          }
+        }
+      }
+    },
+    "Anthropic (Claude)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anthropic (Claude)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anthropic (Claude)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anthropic (Claude)"
           }
         }
       }
@@ -1096,6 +1152,28 @@
         }
       }
     },
+    "Check out ProseKey AI (iOS port of WritingTools)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Probieren Sie ProseKey AI aus (iOS-Portierung von WritingTools)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Echa un vistazo a ProseKey AI (adaptación para iOS de WritingTools)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Découvrez ProseKey AI (port iOS de WritingTools)"
+          }
+        }
+      }
+    },
     "Checking for updates..." : {
       "localizations" : {
         "de" : {
@@ -1474,6 +1552,28 @@
         }
       }
     },
+    "Configure Anthropic (Claude)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anthropic konfigurieren (Claude)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurar Antrópico (Claude)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurer Anthropic (Claude)"
+          }
+        }
+      }
+    },
     "Configure Google Gemini AI" : {
       "localizations" : {
         "de" : {
@@ -1558,6 +1658,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Configurer OpenAI (ChatGPT)"
+          }
+        }
+      }
+    },
+    "Configure OpenRouter" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OpenRouter konfigurieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurar OpenRouter"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurer OpenRouter"
           }
         }
       }
@@ -2094,6 +2216,56 @@
         }
       }
     },
+    "E.g., %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E.g., %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E.g., %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E.g., %@"
+          }
+        }
+      }
+    },
+    "E.g., %@, %@, etc." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E.g., %1$@, %2$@, etc."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "E.g., %1$@, %2$@, etc."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E.g., %1$@, %2$@, etc."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E.g., %1$@, %2$@, etc."
+          }
+        }
+      }
+    },
     "Edit Built-In Command" : {
       "localizations" : {
         "de" : {
@@ -2516,6 +2688,28 @@
         }
       }
     },
+    "Get Anthropic API Key" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anthropic API-Schlüssel erhalten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtenga la clave API de Anthropic"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtenir la clé de l'API Anthropic"
+          }
+        }
+      }
+    },
     "Get API Key" : {
       "localizations" : {
         "de" : {
@@ -2600,6 +2794,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Obtenir la clé API OpenAI"
+          }
+        }
+      }
+    },
+    "Get OpenRouter API Key" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OpenRouter-API-Schlüssel erhalten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtener la clave API de OpenRouter"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtenir la clé API OpenRouter"
           }
         }
       }
@@ -4119,6 +4335,50 @@
         }
       }
     },
+    "OpenRouter" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OpenRouter"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OpenRouter"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OpenRouter"
+          }
+        }
+      }
+    },
+    "Or Custom Model Name" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oder Benutzerdefinierter Modellname"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O nombre de modelo personalizado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ou Nom De Modèle Personnalisé"
+          }
+        }
+      }
+    },
     "Organization ID (Optional)" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5147,6 +5407,7 @@
       }
     },
     "Version: 4.1 (Based on Windows Port version 7.1)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5164,6 +5425,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Version : 4.1 (basée sur Windows Port version 7.1)"
+          }
+        }
+      }
+    },
+    "Version: 4.2 (Based on Windows Port version 7.1)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version: 4.2 (Basierend auf Windows-Port-Version 7.1)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versión: 4.2 (Basada en Windows Port versión 7.1)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version : 4.2 (basée sur Windows Port version 7.1)"
           }
         }
       }

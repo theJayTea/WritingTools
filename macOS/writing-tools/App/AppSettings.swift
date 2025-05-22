@@ -103,6 +103,24 @@ class AppSettings: ObservableObject {
         didSet { defaults.set(ollamaImageMode.rawValue, forKey: "ollama_image_mode") }
     }
     
+    @Published var anthropicApiKey: String {
+        didSet { defaults.set(anthropicApiKey, forKey: "anthropic_api_key") }
+    }
+    
+    @Published var anthropicModel: String {
+        didSet { defaults.set(anthropicModel, forKey: "anthropic_model") }
+    }
+    
+    @Published var openRouterApiKey: String {
+        didSet { defaults.set(openRouterApiKey, forKey: "openrouter_api_key") }
+    }
+    @Published var openRouterModel: String {
+        didSet { defaults.set(openRouterModel, forKey: "openrouter_model") }
+    }
+    @Published var openRouterCustomModel: String {
+        didSet { defaults.set(openRouterCustomModel, forKey: "openrouter_custom_model") }
+    }
+    
     // Store the ID (rawValue) of the selected local LLM model type
     @Published var selectedLocalLLMId: String? {
         didSet { defaults.set(selectedLocalLLMId, forKey: "selected_local_llm_id") }
@@ -149,7 +167,15 @@ class AppSettings: ObservableObject {
         let ollamaImageModeRaw = defaults.string(forKey: "ollama_image_mode") ?? OllamaImageMode.ocr.rawValue
         self.ollamaImageMode = OllamaImageMode(rawValue: ollamaImageModeRaw) ?? .ocr
         
+        self.anthropicApiKey = defaults.string(forKey: "anthropic_api_key") ?? ""
+        self.anthropicModel = defaults.string(forKey: "anthropic_model") ?? AnthropicConfig.defaultModel
+        
         self.selectedLocalLLMId = defaults.string(forKey: "selected_local_llm_id")
+        
+        self.openRouterApiKey = defaults.string(forKey: "openrouter_api_key") ?? ""
+        self.openRouterModel = defaults.string(forKey: "openrouter_model") ?? OpenRouterConfig.defaultModel
+        self.openRouterCustomModel = defaults.string(forKey: "openrouter_custom_model") ?? ""
+
     }
     
     // MARK: - Convenience

@@ -4,7 +4,7 @@ import AppKit
 @Observable
 final class UpdateChecker {
     static let shared = UpdateChecker()
-    private let currentVersion = 4.1 // Current app version
+    private let currentVersion = 4.2 // Current app version
     private let updateCheckURL = "https://raw.githubusercontent.com/theJayTea/WritingTools/main/macOS/Latest_Version_for_Update_Check.txt"
     private let updateDownloadURL = "https://github.com/theJayTea/WritingTools/releases"
     
