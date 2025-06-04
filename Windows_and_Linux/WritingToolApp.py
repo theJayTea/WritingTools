@@ -59,6 +59,7 @@ class WritingToolApp(QtWidgets.QApplication):
         self.output_queue = ""
         self.last_replace = 0
         self.hotkey_listener = None
+        self.text_correction_hotkey_listener = None  # Added for new hotkey
         self.paused = False
         self.toggle_action = None
 
@@ -99,6 +100,9 @@ class WritingToolApp(QtWidgets.QApplication):
             # Initialize update checker
             self.update_checker = UpdateChecker(self)
             self.update_checker.check_updates_async()
+
+            # Start the new hotkey listener
+            self.start_text_correction_hotkey_listener()
 
         self.recent_triggers = []  # Track recent hotkey triggers
         self.TRIGGER_WINDOW = 1.5  # Time window in seconds
@@ -248,6 +252,109 @@ class WritingToolApp(QtWidgets.QApplication):
         logging.debug('Registering hotkey')
         self.start_hotkey_listener()
         logging.debug('Hotkey registered')
+
+    def on_text_correction_hotkey_pressed(self):
+        """
+        Handles the text correction hotkey press event.
+        Gets selected text, sends it to an AI provider for correction,
+        and pastes the result.
+        """
+        logging.info("Text correction hotkey pressed")
+
+        selected_text = self.get_selected_text()
+        if not selected_text or not selected_text.strip():
+            logging.info("No text selected for correction.")
+            return
+
+        logging.debug(f"Selected text for correction: '{selected_text}'")
+
+        prompt = f"添削して添削後の文章のみ出力して。 === {selected_text}"
+        system_instruction = "You are an AI assistant that corrects text. Output only the corrected text."
+
+        # Run AI call and pasting in a separate thread to avoid freezing UI
+        threading.Thread(target=self._process_text_correction_thread, args=(system_instruction, prompt), daemon=True).start()
+
+    def _process_text_correction_thread(self, system_instruction: str, prompt: str):
+        """
+        Thread function to process text correction and paste the result.
+        """
+        try:
+            logging.info("Calling AI provider for text correction.")
+            if not self.current_provider:
+                logging.error("No current AI provider configured.")
+                self.show_message_signal.emit("Error", "AI provider not configured. Please check settings.")
+                return
+
+            corrected_text = self.current_provider.get_response(system_instruction, prompt, return_response=True)
+
+            if not corrected_text or not corrected_text.strip():
+                logging.info("AI provider returned no text or empty text.")
+                # Optionally, notify the user if the AI returns nothing.
+                # self.show_message_signal.emit("Info", "AI did not return a correction.")
+                return
+
+            logging.info(f"Received corrected text: '{corrected_text}'")
+
+            # Paste the corrected text
+            logging.debug("Attempting to paste corrected text.")
+            clipboard_backup = pyperclip.paste()
+            pyperclip.copy(corrected_text)
+
+            # Simulate Ctrl+V
+            kbrd = pykeyboard.Controller()
+            # Using .value for Key.ctrl might be necessary on some systems, but often direct 'ctrl' works.
+            # For pynput, Key.ctrl is an object, not a string.
+            with kbrd.pressed(pykeyboard.Key.ctrl):
+                kbrd.press('v')
+                kbrd.release('v')
+
+            # Short delay to ensure paste completes before restoring clipboard
+            time.sleep(0.1)
+            pyperclip.copy(clipboard_backup)
+            logging.info("Corrected text pasted.")
+
+        except Exception as e:
+            logging.error(f"Error during text correction or pasting: {e}", exc_info=True)
+            # Notify the user of the error
+            self.show_message_signal.emit("Error", f"Failed to correct text: {e}")
+
+    def start_text_correction_hotkey_listener(self):
+        """
+        Create listener for the text correction hotkey (Ctrl+Shift+C).
+        """
+        shortcut = 'ctrl+shift+c'
+        # Parse the shortcut string, for example ctrl+alt+h -> <ctrl>+<alt>+h
+        parsed_shortcut = '+'.join([f'<{t}>' if len(t) > 1 else t for t in shortcut.split('+')])
+        logging.debug(f'Registering global hotkey for text correction: {parsed_shortcut}')
+        try:
+            if self.text_correction_hotkey_listener is not None:
+                self.text_correction_hotkey_listener.stop()
+
+            def on_activate():
+                if self.paused:
+                    logging.debug('Text correction hotkey pressed while paused, ignoring.')
+                    return
+                logging.debug('Text correction hotkey triggered')
+                # It's better to emit a signal here if this method needs to interact with Qt objects
+                # For now, directly calling the method for simplicity as it only logs.
+                self.on_text_correction_hotkey_pressed()
+
+            hotkey = pykeyboard.HotKey(
+                pykeyboard.HotKey.parse(parsed_shortcut),
+                on_activate
+            )
+
+            def for_canonical(f):
+                return lambda k: f(self.text_correction_hotkey_listener.canonical(k))
+
+            self.text_correction_hotkey_listener = pykeyboard.Listener(
+                on_press=for_canonical(hotkey.press),
+                on_release=for_canonical(hotkey.release)
+            )
+            self.text_correction_hotkey_listener.start()
+            logging.debug(f'Text correction hotkey {parsed_shortcut} registered.')
+        except Exception as e:
+            logging.error(f'Failed to register text correction hotkey: {e}')
 
     def on_hotkey_pressed(self):
         """
@@ -816,8 +923,10 @@ class WritingToolApp(QtWidgets.QApplication):
         """
         Exit the application.
         """
-        logging.debug('Stopping the listener')
+        logging.debug('Stopping the listeners')
         if self.hotkey_listener is not None:
             self.hotkey_listener.stop()
+        if self.text_correction_hotkey_listener is not None:
+            self.text_correction_hotkey_listener.stop()
         logging.debug('Exiting application')
         self.quit()
