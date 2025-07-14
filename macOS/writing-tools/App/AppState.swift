@@ -259,16 +259,24 @@ class AppState: ObservableObject {
     
     // Helper method to replace selected text
     func replaceSelectedText(with newText: String) {
+        // Store original selection for comparison
+        let originalSelection = selectedText
+
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(newText, forType: .string)
-        
+
         // Reactivate previous application and paste
         if let previousApp = previousApplication {
             previousApp.activate()
-            
+
             // Wait briefly for activation then paste once
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 self.simulatePaste()
+
+                // Check if paste was successful after a brief delay
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    self.checkPasteSuccess(originalSelection: originalSelection, transformedText: newText)
+                }
             }
         }
     }
@@ -276,17 +284,82 @@ class AppState: ObservableObject {
     // Simulate paste command
     private func simulatePaste() {
         guard let source = CGEventSource(stateID: .hidSystemState) else { return }
-        
+
         // Create a Command + V key down event
         let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: true)
         keyDown?.flags = .maskCommand
-        
+
         // Create a Command + V key up event
         let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: false)
         keyUp?.flags = .maskCommand
-        
+
         // Post the events to the HID event system
         keyDown?.post(tap: .cghidEventTap)
         keyUp?.post(tap: .cghidEventTap)
+    }
+
+    // Check if paste was successful by getting current selection
+    private func checkPasteSuccess(originalSelection: String, transformedText: String) {
+        // Get current selection to check if paste was successful
+        getCurrentSelection { [weak self] currentSelection in
+            guard let self = self else { return }
+
+            // If selection is the same as original, paste failed (non-editable page)
+            if currentSelection == originalSelection && !originalSelection.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                print("Paste failed - showing modal window for non-editable page")
+                self.showNonEditableModal(transformedText: transformedText, originalText: originalSelection)
+            }
+        }
+    }
+
+    // Get current selection by simulating copy
+    private func getCurrentSelection(completion: @escaping (String) -> Void) {
+        // Store current clipboard content
+        let originalClipboard = NSPasteboard.general.string(forType: .string)
+
+        // Clear clipboard and simulate copy
+        NSPasteboard.general.clearContents()
+
+        guard let source = CGEventSource(stateID: .hidSystemState) else {
+            completion("")
+            return
+        }
+
+        // Create a Command + C key down event
+        let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 0x08, keyDown: true)
+        keyDown?.flags = .maskCommand
+
+        // Create a Command + C key up event
+        let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 0x08, keyDown: false)
+        keyUp?.flags = .maskCommand
+
+        // Post the events
+        keyDown?.post(tap: .cghidEventTap)
+        keyUp?.post(tap: .cghidEventTap)
+
+        // Wait for copy operation to complete
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            let currentSelection = NSPasteboard.general.string(forType: .string) ?? ""
+
+            // Restore original clipboard content
+            NSPasteboard.general.clearContents()
+            if let originalClipboard = originalClipboard {
+                NSPasteboard.general.setString(originalClipboard, forType: .string)
+            }
+
+            completion(currentSelection)
+        }
+    }
+
+    // Show non-editable modal window
+    private func showNonEditableModal(transformedText: String, originalText: String) {
+        DispatchQueue.main.async {
+            let modal = NonEditableModalWindow(
+                transformedText: transformedText,
+                originalText: originalText
+            )
+
+            WindowManager.shared.addNonEditableModal(modal)
+        }
     }
 }

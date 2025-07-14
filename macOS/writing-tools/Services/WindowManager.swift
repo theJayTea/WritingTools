@@ -10,6 +10,7 @@ class WindowManager: NSObject, NSWindowDelegate {
     private var settingsWindow = NSMapTable<NSWindow, NSHostingView<SettingsView>>.strongToWeakObjects()
     private var popupWindow = NSMapTable<PopupWindow, NSHostingView<PopupView>>.strongToWeakObjects()
     private var responseWindows = NSHashTable<ResponseWindow>.weakObjects()
+    private var nonEditableModals = NSHashTable<NonEditableModalWindow>.weakObjects()
     
     // Execute operation on main thread
     private func performOnMainThread(_ operation: @escaping () -> Void) {
@@ -48,6 +49,29 @@ class WindowManager: NSObject, NSWindowDelegate {
         performOnMainThread { [weak self] in
             guard let self = self else { return }
             self.responseWindows.remove(window)
+        }
+    }
+
+    // Add a new non-editable modal
+    func addNonEditableModal(_ window: NonEditableModalWindow) {
+        performOnMainThread { [weak self] in
+            guard let self = self, !window.isReleasedWhenClosed else {
+                print("Error: Attempted to add a released non-editable modal.")
+                return
+            }
+            if !self.nonEditableModals.contains(window) {
+                self.nonEditableModals.add(window)
+                window.delegate = self
+            }
+            window.makeKeyAndOrderFront(nil)
+        }
+    }
+
+    // Remove a non-editable modal
+    func removeNonEditableModal(_ window: NonEditableModalWindow) {
+        performOnMainThread { [weak self] in
+            guard let self = self else { return }
+            self.nonEditableModals.remove(window)
         }
     }
     
