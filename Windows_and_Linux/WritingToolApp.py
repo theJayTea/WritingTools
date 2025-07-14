@@ -17,6 +17,7 @@ from PySide6.QtWidgets import QApplication, QMessageBox
 
 import ui.AboutWindow
 import ui.CustomPopupWindow
+import ui.NonEditableModal
 import ui.OnboardingWindow
 import ui.ResponseWindow
 import ui.SettingsWindow
@@ -61,6 +62,7 @@ class WritingToolApp(QtWidgets.QApplication):
         self.hotkey_listener = None
         self.paused = False
         self.toggle_action = None
+        self.non_editable_modal = None  # Keep reference to modal window
 
         self._ = gettext.gettext
 
@@ -254,13 +256,19 @@ class WritingToolApp(QtWidgets.QApplication):
         Handle the hotkey press event.
         """
         logging.debug('Hotkey pressed')
-        
+
         # Check for spam triggers
         if self.check_trigger_spam():
             logging.warning('Hotkey spam detected - quitting application')
             self.exit_app()
             return
-            
+
+        # Close existing non-editable modal if open
+        if self.non_editable_modal is not None:
+            logging.debug('Closing existing non-editable modal')
+            self.non_editable_modal.close()
+            self.non_editable_modal = None
+
         # Original hotkey handling continues...
         if self.current_provider:
             logging.debug("Cancelling current provider's request")
@@ -487,6 +495,7 @@ class WritingToolApp(QtWidgets.QApplication):
     def replace_text(self, new_text):
         """
         Replaces the text by pasting in the LLM generated text. With "Key Points" and "Summary", invokes a window with the output instead.
+        If pasting fails (non-editable page), shows the text in a modal window.
         """
         error_message = 'ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST'
 
@@ -512,7 +521,7 @@ class WritingToolApp(QtWidgets.QApplication):
                 # For Summary and Key Points, show in response window
                 if hasattr(self, 'current_response_window'):
                     self.current_response_window.append_text(new_text)
-                    
+
                     # If this is the initial response, add it to chat history
                     if len(self.current_response_window.chat_history) == 1:  # Only original text exists
                         self.current_response_window.chat_history.append({
@@ -520,11 +529,15 @@ class WritingToolApp(QtWidgets.QApplication):
                             "content": self.output_queue.rstrip('\n')
                         })
                 else:
-                    # For other options, use the original clipboard-based replacement
+                    # For other options, try clipboard-based replacement with fallback
                     clipboard_backup = pyperclip.paste()
                     cleaned_text = self.output_queue.rstrip('\n')
+
+                    # Get current selection before attempting paste
+                    original_selection = self.get_selected_text(sleep_duration=0.1)
+
                     pyperclip.copy(cleaned_text)
-                    
+
                     kbrd = pykeyboard.Controller()
                     def press_ctrl_v():
                         kbrd.press(pykeyboard.Key.ctrl.value)
@@ -534,6 +547,22 @@ class WritingToolApp(QtWidgets.QApplication):
 
                     press_ctrl_v()
                     time.sleep(0.2)
+
+                    # Check if selection changed (indicating successful paste)
+                    new_selection = self.get_selected_text(sleep_duration=0.1)
+
+                    # If selection is the same, paste failed (non-editable page)
+                    if original_selection == new_selection and original_selection.strip():
+                        logging.debug('Paste failed - showing modal window for non-editable page')
+                        # noinspection PyTypeChecker
+                        QtCore.QMetaObject.invokeMethod(
+                            self,
+                            "_show_non_editable_modal",
+                            QtCore.Qt.ConnectionType.QueuedConnection,
+                            QtCore.Q_ARG(str, cleaned_text),
+                            QtCore.Q_ARG(str, original_selection)
+                        )
+
                     pyperclip.copy(clipboard_backup)
 
                 if not hasattr(self, 'current_response_window'):
@@ -543,6 +572,35 @@ class WritingToolApp(QtWidgets.QApplication):
                 logging.error(f'Error processing output: {e}')
         else:
             logging.debug('No new text to process')
+
+    @Slot(str, str)
+    def _show_non_editable_modal(self, transformed_text, original_text):
+        """
+        Show a modal window with the transformed text when pasting fails (non-editable page).
+        """
+        logging.debug('Showing non-editable modal window')
+        try:
+            # Close existing modal if any
+            if self.non_editable_modal is not None:
+                self.non_editable_modal.close()
+                self.non_editable_modal = None
+
+            # Create and show the modal window
+            self.non_editable_modal = ui.NonEditableModal.NonEditableModal(self, transformed_text, original_text)
+
+            # Connect close event to clean up reference
+            self.non_editable_modal.finished.connect(self._on_modal_closed)
+
+            # Show the modal (use exec() to make it truly modal and keep it open)
+            self.non_editable_modal.exec()
+
+        except Exception as e:
+            logging.error(f'Error showing non-editable modal: {e}', exc_info=True)
+
+    @Slot()
+    def _on_modal_closed(self):
+        """Clean up modal reference when it's closed"""
+        self.non_editable_modal = None
 
     def create_tray_icon(self):
         """

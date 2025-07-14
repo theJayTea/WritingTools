@@ -49,6 +49,7 @@ If you find value in it, it would mean the world to me if you could support us a
 - Select _any_ text on your PC and invoke Writing Tools with `ctrl+space`.
 - Choose **Proofread**, **Rewrite**, **Friendly**, **Professional**, **Concise**, or even enter **custom instructions** (e.g., _"add comments to this code"_, _"make it title case"_, _"translate to French"_).
 - Your text will instantly be replaced with the AI-optimized version. Use `ctrl+z` to revert.
+- If the text is in a non-editable field (e.g., a webpage), the transformed text will be shown in a modal window instead of replacing it.
 
 ### 2️⃣ Powerful content summarization that you can chat with:
 - Select all text in any webpage, document, email, etc., with `ctrl+a`, or select the transcript of a YouTube video (from its description).
