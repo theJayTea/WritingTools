@@ -8,7 +8,10 @@ Windows_and_Linux/config.json
 **/*.mo
 **/pot_files
 
+# Windows_and_Linux
+**/dist
+
 # others
 **/.vscode
 note perso.md
-myvenv
+**/myvenv

@@ -92,7 +92,7 @@ class MarkdownTextBrowser(QtWidgets.QTextBrowser):
         
         if self.minimumHeight() != new_height:
             self.setMinimumHeight(new_height)
-            self.setMaximumHeight(new_height)  # Force fixed height
+            self.setMaximumHeight(new_height) # Force fixed height
             
             # Update scroll area if needed
             scroll_area = self.get_scroll_area()
@@ -153,6 +153,97 @@ class MarkdownTextBrowser(QtWidgets.QTextBrowser):
         self._update_size()
 
 
+class MessageContainer(QtWidgets.QWidget):
+    """Container for individual messages with copy functionality - ONLY ADDITION"""
+    
+    def __init__(self, parent=None, is_user=False, text="", text_display=None):
+        super().__init__(parent)
+        self.markdown_text = text
+        self.is_user = is_user
+        self.text_display = text_display
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
+        
+        # Main layout for the message container
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        layout.addWidget(self.text_display)
+        
+        # Add copy button for assistant messages only (positioned absolutely)
+        if not is_user:
+            self.copy_btn = QtWidgets.QToolButton(self)
+            # Use the copy_md icon (SVG format)
+            icon_name = f'copy_md_{"dark" if colorMode == "dark" else "light"}.svg'
+            icon_path = os.path.join(os.path.dirname(sys.argv[0]), 'icons', icon_name)
+            
+            self.copy_btn.setIcon(QtGui.QIcon(icon_path))
+            self.copy_btn.setStyleSheet(f"""
+                QToolButton {{
+                    background-color: {'rgba(68, 68, 68, 0.9)' if colorMode == 'dark' else 'rgba(240, 240, 240, 0.9)'};
+                    border: 1px solid {'#666' if colorMode == 'dark' else '#ccc'};
+                    border-radius: 6px;
+                    padding: 0px;
+                }}
+                QToolButton:hover {{
+                    background-color: {'rgba(85, 85, 85, 0.9)' if colorMode == 'dark' else 'rgba(224, 224, 224, 0.9)'};
+                }}
+            """)
+            self.copy_btn.setToolTip(_("Copy as Markdown"))
+            self.copy_btn.clicked.connect(self.copy_content)
+            self.copy_btn.setFixedSize(32, 32)
+            self.copy_btn.setIconSize(QtCore.QSize(30, 30))  # Icon takes almost full button size
+            self.copy_btn.hide()  # Initially hidden
+            
+        # Install event filter to handle hover
+        self.installEventFilter(self)
+    
+    def eventFilter(self, obj, event):
+        """Handle mouse enter/leave events to show/hide copy button"""
+        if obj == self and not self.is_user:
+            if event.type() == QtCore.QEvent.Type.Enter:
+                if hasattr(self, 'copy_btn'):
+                    self.copy_btn.show()
+            elif event.type() == QtCore.QEvent.Type.Leave:
+                if hasattr(self, 'copy_btn'):
+                    self.copy_btn.hide()
+        return super().eventFilter(obj, event)
+    
+    def resizeEvent(self, event):
+        """Position the copy button in the top-right corner"""
+        super().resizeEvent(event)
+        if hasattr(self, 'copy_btn') and not self.is_user:
+            # Position button in top-right corner with some margin
+            btn_size = self.copy_btn.size()
+            self.copy_btn.move(
+                self.width() - btn_size.width() - 8,  # 8px from right edge
+                8  # 8px from top edge
+            )
+    
+    def copy_content(self):
+        """Copy the message content to clipboard with visual feedback"""
+        QtWidgets.QApplication.clipboard().setText(self.markdown_text)
+        
+        # Visual feedback: temporarily change button color
+        if hasattr(self, 'copy_btn'):
+            original_style = self.copy_btn.styleSheet()
+            
+            # Success feedback style
+            success_style = f"""
+                QToolButton {{
+                    background-color: {'rgba(76, 175, 80, 0.9)' if colorMode == 'dark' else 'rgba(76, 175, 80, 0.9)'};
+                    border: 1px solid {'#4CAF50' if colorMode == 'dark' else '#4CAF50'};
+                    border-radius: 6px;
+                    padding: 0px;
+                }}
+            """
+            
+            # Apply success style
+            self.copy_btn.setStyleSheet(success_style)
+            
+            # Reset to original style after 500ms
+            QtCore.QTimer.singleShot(500, lambda: self.copy_btn.setStyleSheet(original_style))
+
+
 class ChatContentScrollArea(QScrollArea):
     """Improved scrollable container for chat messages with dynamic sizing and proper spacing"""
     
@@ -165,6 +256,9 @@ class ChatContentScrollArea(QScrollArea):
     def setup_ui(self):
         self.setWidgetResizable(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        
+        # Force scroll bar to be visible when needed
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         
         # Main container widget with explicit size policy
@@ -181,60 +275,47 @@ class ChatContentScrollArea(QScrollArea):
         self.layout.setContentsMargins(15, 15, 15, 15)  # Adjusted margins
         self.layout.addStretch()
         
-        # Enhanced scroll area styling
-        self.setStyleSheet("""
-            QScrollArea {
+        # Enhanced scroll area styling with better visibility
+        self.setStyleSheet(f"""
+            QScrollArea {{
                 background-color: transparent;
                 border: none;
-            }
-            QScrollArea > QWidget > QWidget {
+            }}
+            QScrollArea > QWidget > QWidget {{
                 background-color: transparent;
-            }
-            QScrollBar:vertical {
-                background-color: transparent;
-                width: 12px;
+            }}
+            QScrollBar:vertical {{
+                background-color: {'rgba(50, 50, 50, 0.3)' if colorMode == 'dark' else 'rgba(200, 200, 200, 0.3)'};
+                width: 14px;
                 margin: 0px;
-            }
-            QScrollBar::handle:vertical {
-                background-color: rgba(128, 128, 128, 0.5);
-                min-height: 20px;
-                border-radius: 6px;
+                border-radius: 7px;
+            }}
+            QScrollBar::handle:vertical {{
+                background-color: {'rgba(150, 150, 150, 0.8)' if colorMode == 'dark' else 'rgba(100, 100, 100, 0.8)'};
+                min-height: 30px;
+                border-radius: 7px;
                 margin: 2px;
-            }
-            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+            }}
+            QScrollBar::handle:vertical:hover {{
+                background-color: {'rgba(180, 180, 180, 0.9)' if colorMode == 'dark' else 'rgba(80, 80, 80, 0.9)'};
+            }}
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
                 height: 0px;
-            }
+            }}
         """)
 
     def add_message(self, text, is_user=False):
         # Remove bottom stretch
         self.layout.takeAt(self.layout.count() - 1)
         
-        # Create message container with improved width
-        msg_container = QtWidgets.QWidget()
-        msg_container.setSizePolicy(
-            QtWidgets.QSizePolicy.Policy.Expanding,
-            QtWidgets.QSizePolicy.Policy.Minimum
-        )
-        
-        # Message layout with minimal margins
-        msg_layout = QtWidgets.QVBoxLayout(msg_container)
-        msg_layout.setContentsMargins(0, 0, 0, 0)
-        msg_layout.setSpacing(0)
-        
-        # Create text display with updated width
-        text_display = MarkdownTextBrowser(is_user_message=is_user)
-        
-        # Enable tables extension in markdown2
+        # Create text display first (ORIGINAL APPROACH)
+        text_display = MarkdownTextBrowser(self.content_widget, is_user_message=is_user)
         html = markdown2.markdown(text, extras=['tables'])
         text_display.setHtml(html)
+        text_display._update_size()
         
-        # Calculate proper text display size using full width
-        text_display.document().setTextWidth(self.width() - 20)
-        doc_size = text_display.document().size()
-        text_display.setMinimumHeight(int(doc_size.height() + 16))
-        
-        msg_layout.addWidget(text_display)
+        # Wrap in MessageContainer for copy functionality
+        msg_container = MessageContainer(self.content_widget, is_user=is_user, text=text, text_display=text_display)
         
         self.layout.addWidget(msg_container)
         self.layout.addStretch()
@@ -289,12 +370,14 @@ class ChatContentScrollArea(QScrollArea):
             item = self.layout.itemAt(i)
             if item and item.widget():
                 container = item.widget()
-                text_display = container.layout().itemAt(0).widget()
-                if isinstance(text_display, MarkdownTextBrowser):
-                    # Recalculate text width and height
+                if isinstance(container, MessageContainer):
+                    # Recalculate text width and height for MessageContainer
+                    text_display = container.text_display
                     text_display.document().setTextWidth(available_width)
                     doc_size = text_display.document().size()
-                    text_display.setMinimumHeight(int(doc_size.height() + 20))  # Reduced padding
+                    exact_height = int(doc_size.height() + 20)  # Reduced padding
+                    text_display.setMinimumHeight(exact_height)
+                    text_display.setMaximumHeight(exact_height)  # ORIGINAL: Fixed height for all messages
 
 
 class ResponseWindow(QtWidgets.QWidget):
@@ -380,9 +463,9 @@ class ResponseWindow(QtWidgets.QWidget):
             
         content_layout.addLayout(top_bar)
 
-        # Copy controls with matching text size
+        # Copy controls with matching text size - MODIFIED: Individual copy buttons now available
         copy_bar = QtWidgets.QHBoxLayout()
-        copy_hint = QtWidgets.QLabel(_("Select to copy with formatting"))
+        copy_hint = QtWidgets.QLabel(_("Hover over assistant responses for individual copy buttons"))
         copy_hint.setStyleSheet(f"color: {'#aaaaaa' if colorMode == 'dark' else '#666666'}; font-size: 14px;")
         copy_bar.addWidget(copy_hint)
         copy_bar.addStretch()
@@ -546,8 +629,9 @@ class ResponseWindow(QtWidgets.QWidget):
         for i in range(self.chat_area.layout.count() - 1):  # Skip stretch item
             item = self.chat_area.layout.itemAt(i)
             if item and item.widget():
-                text_display = item.widget().layout().itemAt(0).widget()
-                if isinstance(text_display, MarkdownTextBrowser):
+                container = item.widget()
+                if isinstance(container, MessageContainer):
+                    text_display = container.text_display
                     if action == 'in':
                         text_display.zoom_in()
                     elif action == 'out':
