@@ -463,17 +463,12 @@ class ResponseWindow(QtWidgets.QWidget):
             
         content_layout.addLayout(top_bar)
 
-        # Copy controls with matching text size - MODIFIED: Individual copy buttons now available
+        # Copy hint only - individual copy buttons are now on each message
         copy_bar = QtWidgets.QHBoxLayout()
         copy_hint = QtWidgets.QLabel(_("Hover over assistant responses for individual copy buttons"))
         copy_hint.setStyleSheet(f"color: {'#aaaaaa' if colorMode == 'dark' else '#666666'}; font-size: 14px;")
         copy_bar.addWidget(copy_hint)
         copy_bar.addStretch()
-        
-        copy_md_btn = QtWidgets.QPushButton(_("Copy as Markdown"))
-        copy_md_btn.setStyleSheet(self.get_button_style())
-        copy_md_btn.clicked.connect(self.copy_first_response)  # Updated to only copy first response
-        copy_bar.addWidget(copy_md_btn)
         content_layout.addLayout(copy_bar)
 
         # Loading indicator
@@ -548,29 +543,6 @@ class ResponseWindow(QtWidgets.QWidget):
         
         content_layout.addLayout(bottom_bar)
 
-    # Method to get first response text
-    def get_first_response_text(self):
-        """Get the first model response text from chat history"""
-        try:
-            # Check chat history exists
-            if not self.chat_history:
-                return None
-                
-            # Find first assistant message
-            for msg in self.chat_history:
-                if msg["role"] == "assistant":
-                    return msg["content"]
-                    
-            return None
-        except Exception as e:
-            logging.error(f"Error getting first response: {e}")
-            return None
-
-    def copy_first_response(self):
-        """Copy only the first model response as Markdown"""
-        response_text = self.get_first_response_text()
-        if response_text:
-            QtWidgets.QApplication.clipboard().setText(response_text)
 
     def get_button_style(self):
         return f"""
