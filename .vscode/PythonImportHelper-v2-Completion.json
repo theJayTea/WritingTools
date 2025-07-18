@@ -1,0 +1,1111 @@
+[
+    {
+        "label": "webbrowser",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "webbrowser",
+        "description": "webbrowser",
+        "detail": "webbrowser",
+        "documentation": {}
+    },
+    {
+        "label": "QtCore",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtGui",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtWidgets",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtCore",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtGui",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtWidgets",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtCore",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtWidgets",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtCore",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtGui",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtWidgets",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtCore",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtWidgets",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtGui",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtCore",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtWidgets",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtWidgets",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtCore",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtGui",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtWidgets",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "UIUtils",
+        "importPath": "ui.UIUtils",
+        "description": "ui.UIUtils",
+        "isExtraImport": true,
+        "detail": "ui.UIUtils",
+        "documentation": {}
+    },
+    {
+        "label": "colorMode",
+        "importPath": "ui.UIUtils",
+        "description": "ui.UIUtils",
+        "isExtraImport": true,
+        "detail": "ui.UIUtils",
+        "documentation": {}
+    },
+    {
+        "label": "ThemeBackground",
+        "importPath": "ui.UIUtils",
+        "description": "ui.UIUtils",
+        "isExtraImport": true,
+        "detail": "ui.UIUtils",
+        "documentation": {}
+    },
+    {
+        "label": "colorMode",
+        "importPath": "ui.UIUtils",
+        "description": "ui.UIUtils",
+        "isExtraImport": true,
+        "detail": "ui.UIUtils",
+        "documentation": {}
+    },
+    {
+        "label": "UIUtils",
+        "importPath": "ui.UIUtils",
+        "description": "ui.UIUtils",
+        "isExtraImport": true,
+        "detail": "ui.UIUtils",
+        "documentation": {}
+    },
+    {
+        "label": "colorMode",
+        "importPath": "ui.UIUtils",
+        "description": "ui.UIUtils",
+        "isExtraImport": true,
+        "detail": "ui.UIUtils",
+        "documentation": {}
+    },
+    {
+        "label": "UIUtils",
+        "importPath": "ui.UIUtils",
+        "description": "ui.UIUtils",
+        "isExtraImport": true,
+        "detail": "ui.UIUtils",
+        "documentation": {}
+    },
+    {
+        "label": "colorMode",
+        "importPath": "ui.UIUtils",
+        "description": "ui.UIUtils",
+        "isExtraImport": true,
+        "detail": "ui.UIUtils",
+        "documentation": {}
+    },
+    {
+        "label": "UIUtils",
+        "importPath": "ui.UIUtils",
+        "description": "ui.UIUtils",
+        "isExtraImport": true,
+        "detail": "ui.UIUtils",
+        "documentation": {}
+    },
+    {
+        "label": "colorMode",
+        "importPath": "ui.UIUtils",
+        "description": "ui.UIUtils",
+        "isExtraImport": true,
+        "detail": "ui.UIUtils",
+        "documentation": {}
+    },
+    {
+        "label": "colorMode",
+        "importPath": "ui.UIUtils",
+        "description": "ui.UIUtils",
+        "isExtraImport": true,
+        "detail": "ui.UIUtils",
+        "documentation": {}
+    },
+    {
+        "label": "logging",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "logging",
+        "description": "logging",
+        "detail": "logging",
+        "documentation": {}
+    },
+    {
+        "label": "sys",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "sys",
+        "description": "sys",
+        "detail": "sys",
+        "documentation": {}
+    },
+    {
+        "label": "json",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "json",
+        "description": "json",
+        "detail": "json",
+        "documentation": {}
+    },
+    {
+        "label": "os",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
+        "documentation": {}
+    },
+    {
+        "label": "partial",
+        "importPath": "functools",
+        "description": "functools",
+        "isExtraImport": true,
+        "detail": "functools",
+        "documentation": {}
+    },
+    {
+        "label": "Qt",
+        "importPath": "PySide6.QtCore",
+        "description": "PySide6.QtCore",
+        "isExtraImport": true,
+        "detail": "PySide6.QtCore",
+        "documentation": {}
+    },
+    {
+        "label": "Qt",
+        "importPath": "PySide6.QtCore",
+        "description": "PySide6.QtCore",
+        "isExtraImport": true,
+        "detail": "PySide6.QtCore",
+        "documentation": {}
+    },
+    {
+        "label": "Slot",
+        "importPath": "PySide6.QtCore",
+        "description": "PySide6.QtCore",
+        "isExtraImport": true,
+        "detail": "PySide6.QtCore",
+        "documentation": {}
+    },
+    {
+        "label": "QLocale",
+        "importPath": "PySide6.QtCore",
+        "description": "PySide6.QtCore",
+        "isExtraImport": true,
+        "detail": "PySide6.QtCore",
+        "documentation": {}
+    },
+    {
+        "label": "Signal",
+        "importPath": "PySide6.QtCore",
+        "description": "PySide6.QtCore",
+        "isExtraImport": true,
+        "detail": "PySide6.QtCore",
+        "documentation": {}
+    },
+    {
+        "label": "Slot",
+        "importPath": "PySide6.QtCore",
+        "description": "PySide6.QtCore",
+        "isExtraImport": true,
+        "detail": "PySide6.QtCore",
+        "documentation": {}
+    },
+    {
+        "label": "QDialog",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QHBoxLayout",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QLabel",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QLineEdit",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QPlainTextEdit",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QPushButton",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QRadioButton",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QVBoxLayout",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QWidget",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QHBoxLayout",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QRadioButton",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QScrollArea",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QHBoxLayout",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QRadioButton",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QScrollArea",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QVBoxLayout",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QApplication",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QMessageBox",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "markdown2",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "markdown2",
+        "description": "markdown2",
+        "detail": "markdown2",
+        "documentation": {}
+    },
+    {
+        "label": "AIProvider",
+        "importPath": "aiprovider",
+        "description": "aiprovider",
+        "isExtraImport": true,
+        "detail": "aiprovider",
+        "documentation": {}
+    },
+    {
+        "label": "GeminiProvider",
+        "importPath": "aiprovider",
+        "description": "aiprovider",
+        "isExtraImport": true,
+        "detail": "aiprovider",
+        "documentation": {}
+    },
+    {
+        "label": "OllamaProvider",
+        "importPath": "aiprovider",
+        "description": "aiprovider",
+        "isExtraImport": true,
+        "detail": "aiprovider",
+        "documentation": {}
+    },
+    {
+        "label": "OpenAICompatibleProvider",
+        "importPath": "aiprovider",
+        "description": "aiprovider",
+        "isExtraImport": true,
+        "detail": "aiprovider",
+        "documentation": {}
+    },
+    {
+        "label": "QImage",
+        "importPath": "PySide6.QtGui",
+        "description": "PySide6.QtGui",
+        "isExtraImport": true,
+        "detail": "PySide6.QtGui",
+        "documentation": {}
+    },
+    {
+        "label": "QImage",
+        "importPath": "PySide6.QtGui",
+        "description": "PySide6.QtGui",
+        "isExtraImport": true,
+        "detail": "PySide6.QtGui",
+        "documentation": {}
+    },
+    {
+        "label": "QPixmap",
+        "importPath": "PySide6.QtGui",
+        "description": "PySide6.QtGui",
+        "isExtraImport": true,
+        "detail": "PySide6.QtGui",
+        "documentation": {}
+    },
+    {
+        "label": "QCursor",
+        "importPath": "PySide6.QtGui",
+        "description": "PySide6.QtGui",
+        "isExtraImport": true,
+        "detail": "PySide6.QtGui",
+        "documentation": {}
+    },
+    {
+        "label": "QGuiApplication",
+        "importPath": "PySide6.QtGui",
+        "description": "PySide6.QtGui",
+        "isExtraImport": true,
+        "detail": "PySide6.QtGui",
+        "documentation": {}
+    },
+    {
+        "label": "AutostartManager",
+        "importPath": "ui.AutostartManager",
+        "description": "ui.AutostartManager",
+        "isExtraImport": true,
+        "detail": "ui.AutostartManager",
+        "documentation": {}
+    },
+    {
+        "label": "darkdetect",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "darkdetect",
+        "description": "darkdetect",
+        "detail": "darkdetect",
+        "documentation": {}
+    },
+    {
+        "label": "ABC",
+        "importPath": "abc",
+        "description": "abc",
+        "isExtraImport": true,
+        "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "abstractmethod",
+        "importPath": "abc",
+        "description": "abc",
+        "isExtraImport": true,
+        "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "google.generativeai",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "google.generativeai",
+        "description": "google.generativeai",
+        "detail": "google.generativeai",
+        "documentation": {}
+    },
+    {
+        "label": "HarmBlockThreshold",
+        "importPath": "google.generativeai.types",
+        "description": "google.generativeai.types",
+        "isExtraImport": true,
+        "detail": "google.generativeai.types",
+        "documentation": {}
+    },
+    {
+        "label": "HarmCategory",
+        "importPath": "google.generativeai.types",
+        "description": "google.generativeai.types",
+        "isExtraImport": true,
+        "detail": "google.generativeai.types",
+        "documentation": {}
+    },
+    {
+        "label": "Client",
+        "importPath": "ollama",
+        "description": "ollama",
+        "isExtraImport": true,
+        "detail": "ollama",
+        "documentation": {}
+    },
+    {
+        "label": "OpenAI",
+        "importPath": "openai",
+        "description": "openai",
+        "isExtraImport": true,
+        "detail": "openai",
+        "documentation": {}
+    },
+    {
+        "label": "WritingToolApp",
+        "importPath": "WritingToolApp",
+        "description": "WritingToolApp",
+        "isExtraImport": true,
+        "detail": "WritingToolApp",
+        "documentation": {}
+    },
+    {
+        "label": "subprocess",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "subprocess",
+        "description": "subprocess",
+        "detail": "subprocess",
+        "documentation": {}
+    },
+    {
+        "label": "threading",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "threading",
+        "description": "threading",
+        "detail": "threading",
+        "documentation": {}
+    },
+    {
+        "label": "time",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "time",
+        "description": "time",
+        "detail": "time",
+        "documentation": {}
+    },
+    {
+        "label": "HTTPError",
+        "importPath": "urllib.error",
+        "description": "urllib.error",
+        "isExtraImport": true,
+        "detail": "urllib.error",
+        "documentation": {}
+    },
+    {
+        "label": "URLError",
+        "importPath": "urllib.request",
+        "description": "urllib.request",
+        "isExtraImport": true,
+        "detail": "urllib.request",
+        "documentation": {}
+    },
+    {
+        "label": "urlopen",
+        "importPath": "urllib.request",
+        "description": "urllib.request",
+        "isExtraImport": true,
+        "detail": "urllib.request",
+        "documentation": {}
+    },
+    {
+        "label": "gettext",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "gettext",
+        "description": "gettext",
+        "detail": "gettext",
+        "documentation": {}
+    },
+    {
+        "label": "signal",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "signal",
+        "description": "signal",
+        "detail": "signal",
+        "documentation": {}
+    },
+    {
+        "label": "pyperclip",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "pyperclip",
+        "description": "pyperclip",
+        "detail": "pyperclip",
+        "documentation": {}
+    },
+    {
+        "label": "keyboard",
+        "importPath": "pynput",
+        "description": "pynput",
+        "isExtraImport": true,
+        "detail": "pynput",
+        "documentation": {}
+    },
+    {
+        "label": "ui.AboutWindow",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "ui.AboutWindow",
+        "description": "ui.AboutWindow",
+        "detail": "ui.AboutWindow",
+        "documentation": {}
+    },
+    {
+        "label": "ui.CustomPopupWindow",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "ui.CustomPopupWindow",
+        "description": "ui.CustomPopupWindow",
+        "detail": "ui.CustomPopupWindow",
+        "documentation": {}
+    },
+    {
+        "label": "ui.OnboardingWindow",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "ui.OnboardingWindow",
+        "description": "ui.OnboardingWindow",
+        "detail": "ui.OnboardingWindow",
+        "documentation": {}
+    },
+    {
+        "label": "ui.ResponseWindow",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "ui.ResponseWindow",
+        "description": "ui.ResponseWindow",
+        "detail": "ui.ResponseWindow",
+        "documentation": {}
+    },
+    {
+        "label": "ui.SettingsWindow",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "ui.SettingsWindow",
+        "description": "ui.SettingsWindow",
+        "detail": "ui.SettingsWindow",
+        "documentation": {}
+    },
+    {
+        "label": "UpdateChecker",
+        "importPath": "update_checker",
+        "description": "update_checker",
+        "isExtraImport": true,
+        "detail": "update_checker",
+        "documentation": {}
+    },
+    {
+        "label": "AboutWindow",
+        "kind": 6,
+        "importPath": "Windows_and_Linux.ui.AboutWindow",
+        "description": "Windows_and_Linux.ui.AboutWindow",
+        "peekOfCode": "class AboutWindow(QtWidgets.QWidget):\n    \"\"\"\n    The about window for the application.\n    \"\"\"\n    def __init__(self):\n        super().__init__()\n        self.init_ui()\n    def init_ui(self):\n        \"\"\"\n        Initialize the user interface for the about window.",
+        "detail": "Windows_and_Linux.ui.AboutWindow",
+        "documentation": {}
+    },
+    {
+        "label": "_",
+        "kind": 5,
+        "importPath": "Windows_and_Linux.ui.AboutWindow",
+        "description": "Windows_and_Linux.ui.AboutWindow",
+        "peekOfCode": "_ = lambda x: x\nclass AboutWindow(QtWidgets.QWidget):\n    \"\"\"\n    The about window for the application.\n    \"\"\"\n    def __init__(self):\n        super().__init__()\n        self.init_ui()\n    def init_ui(self):\n        \"\"\"",
+        "detail": "Windows_and_Linux.ui.AboutWindow",
+        "documentation": {}
+    },
+    {
+        "label": "AutostartManager",
+        "kind": 6,
+        "importPath": "Windows_and_Linux.ui.AutostartManager",
+        "description": "Windows_and_Linux.ui.AutostartManager",
+        "peekOfCode": "class AutostartManager:\n    \"\"\"\n    Manages the autostart functionality for Writing Tools.\n    Handles setting/removing autostart registry entries on Windows.\n    \"\"\"\n    @staticmethod\n    def is_compiled():\n        \"\"\"\n        Check if we're running from a compiled exe or source.\n        \"\"\"",
+        "detail": "Windows_and_Linux.ui.AutostartManager",
+        "documentation": {}
+    },
+    {
+        "label": "ButtonEditDialog",
+        "kind": 6,
+        "importPath": "Windows_and_Linux.ui.CustomPopupWindow",
+        "description": "Windows_and_Linux.ui.CustomPopupWindow",
+        "peekOfCode": "class ButtonEditDialog(QDialog):\n    \"\"\"\n    Dialog for editing or creating a button's properties\n    (name/title, system instruction, open_in_window, etc.).\n    \"\"\"\n    def __init__(self, parent=None, button_data=None, title=\"Edit Button\"):\n        super().__init__(parent)\n        self.button_data = button_data if button_data else {\n            \"prefix\": \"Make this change to the following text:\\n\\n\",\n            \"instruction\": \"\",",
+        "detail": "Windows_and_Linux.ui.CustomPopupWindow",
+        "documentation": {}
+    },
+    {
+        "label": "DraggableButton",
+        "kind": 6,
+        "importPath": "Windows_and_Linux.ui.CustomPopupWindow",
+        "description": "Windows_and_Linux.ui.CustomPopupWindow",
+        "peekOfCode": "class DraggableButton(QtWidgets.QPushButton):\n    def __init__(self, parent_popup, key, text):\n        super().__init__(text, parent_popup)\n        self.popup = parent_popup\n        self.key = key\n        self.drag_start_position = None\n        self.setAcceptDrops(True)\n        self.icon_container = None\n        # Enable mouse tracking and hover events, and styled background\n        self.setMouseTracking(True)",
+        "detail": "Windows_and_Linux.ui.CustomPopupWindow",
+        "documentation": {}
+    },
+    {
+        "label": "CustomPopupWindow",
+        "kind": 6,
+        "importPath": "Windows_and_Linux.ui.CustomPopupWindow",
+        "description": "Windows_and_Linux.ui.CustomPopupWindow",
+        "peekOfCode": "class CustomPopupWindow(QtWidgets.QWidget):\n    def __init__(self, app, selected_text):\n        super().__init__()\n        self.app = app\n        self.selected_text = selected_text\n        self.edit_mode = False\n        self.has_text = bool(selected_text.strip())\n        self.drag_label = None\n        self.edit_button = None\n        self.reset_button = None",
+        "detail": "Windows_and_Linux.ui.CustomPopupWindow",
+        "documentation": {}
+    },
+    {
+        "label": "_",
+        "kind": 5,
+        "importPath": "Windows_and_Linux.ui.CustomPopupWindow",
+        "description": "Windows_and_Linux.ui.CustomPopupWindow",
+        "peekOfCode": "_ = lambda x: x\n################################################################################\n# Default `options.json` content to restore when the user presses \"Reset\"\n################################################################################\nDEFAULT_OPTIONS_JSON = r\"\"\"{\n  \"Proofread\": {\n    \"prefix\": \"Proofread this:\\n\\n\",\n    \"instruction\": \"You are a grammar proofreading assistant.\\nOutput ONLY the corrected text without any additional comments.\\nMaintain the original text structure and writing style.\\nRespond in the same language as the input (e.g., English US, French).\\nDo not answer or respond to the user's text content.\\nIf the text is absolutely incompatible with this (e.g., totally random gibberish), output \\\"ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST\\\".\",\n    \"icon\": \"icons/magnifying-glass\",\n    \"open_in_window\": false",
+        "detail": "Windows_and_Linux.ui.CustomPopupWindow",
+        "documentation": {}
+    },
+    {
+        "label": "DEFAULT_OPTIONS_JSON",
+        "kind": 5,
+        "importPath": "Windows_and_Linux.ui.CustomPopupWindow",
+        "description": "Windows_and_Linux.ui.CustomPopupWindow",
+        "peekOfCode": "DEFAULT_OPTIONS_JSON = r\"\"\"{\n  \"Proofread\": {\n    \"prefix\": \"Proofread this:\\n\\n\",\n    \"instruction\": \"You are a grammar proofreading assistant.\\nOutput ONLY the corrected text without any additional comments.\\nMaintain the original text structure and writing style.\\nRespond in the same language as the input (e.g., English US, French).\\nDo not answer or respond to the user's text content.\\nIf the text is absolutely incompatible with this (e.g., totally random gibberish), output \\\"ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST\\\".\",\n    \"icon\": \"icons/magnifying-glass\",\n    \"open_in_window\": false\n  },\n  \"Rewrite\": {\n    \"prefix\": \"Rewrite this:\\n\\n\",\n    \"instruction\": \"You are a writing assistant.\\nRewrite the text provided by the user to improve phrasing.\\nOutput ONLY the rewritten text without additional comments.\\nRespond in the same language as the input (e.g., English US, French).\\nDo not answer or respond to the user's text content.\\nIf the text is absolutely incompatible with proofreading (e.g., totally random gibberish), output \\\"ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST\\\".\",",
+        "detail": "Windows_and_Linux.ui.CustomPopupWindow",
+        "documentation": {}
+    },
+    {
+        "label": "OnboardingWindow",
+        "kind": 6,
+        "importPath": "Windows_and_Linux.ui.OnboardingWindow",
+        "description": "Windows_and_Linux.ui.OnboardingWindow",
+        "peekOfCode": "class OnboardingWindow(QtWidgets.QWidget):\n    # Closing signal\n    close_signal = QtCore.Signal()\n    def __init__(self, app):\n        super().__init__()\n        self.app = app\n        self.shortcut = 'ctrl+space'\n        self.theme = 'gradient'\n        self.content_layout = None\n        self.shortcut_input = None",
+        "detail": "Windows_and_Linux.ui.OnboardingWindow",
+        "documentation": {}
+    },
+    {
+        "label": "_",
+        "kind": 5,
+        "importPath": "Windows_and_Linux.ui.OnboardingWindow",
+        "description": "Windows_and_Linux.ui.OnboardingWindow",
+        "peekOfCode": "_ = lambda x: x\nclass OnboardingWindow(QtWidgets.QWidget):\n    # Closing signal\n    close_signal = QtCore.Signal()\n    def __init__(self, app):\n        super().__init__()\n        self.app = app\n        self.shortcut = 'ctrl+space'\n        self.theme = 'gradient'\n        self.content_layout = None",
+        "detail": "Windows_and_Linux.ui.OnboardingWindow",
+        "documentation": {}
+    },
+    {
+        "label": "MarkdownTextBrowser",
+        "kind": 6,
+        "importPath": "Windows_and_Linux.ui.ResponseWindow",
+        "description": "Windows_and_Linux.ui.ResponseWindow",
+        "peekOfCode": "class MarkdownTextBrowser(QtWidgets.QTextBrowser):\n    \"\"\"Enhanced text browser for displaying Markdown content with improved sizing\"\"\"\n    def __init__(self, parent=None, is_user_message=False):\n        super().__init__(parent)\n        self.setReadOnly(True)\n        self.setOpenExternalLinks(True)\n        self.zoom_factor = 1.2\n        self.base_font_size = 14\n        self.is_user_message = is_user_message\n        # Critical: Remove scrollbars to prevent extra space",
+        "detail": "Windows_and_Linux.ui.ResponseWindow",
+        "documentation": {}
+    },
+    {
+        "label": "ChatContentScrollArea",
+        "kind": 6,
+        "importPath": "Windows_and_Linux.ui.ResponseWindow",
+        "description": "Windows_and_Linux.ui.ResponseWindow",
+        "peekOfCode": "class ChatContentScrollArea(QScrollArea):\n    \"\"\"Improved scrollable container for chat messages with dynamic sizing and proper spacing\"\"\"\n    def __init__(self, parent=None):\n        super().__init__(parent)\n        self.content_widget = None\n        self.layout = None\n        self.setup_ui()\n    def setup_ui(self):\n        self.setWidgetResizable(True)\n        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)",
+        "detail": "Windows_and_Linux.ui.ResponseWindow",
+        "documentation": {}
+    },
+    {
+        "label": "ResponseWindow",
+        "kind": 6,
+        "importPath": "Windows_and_Linux.ui.ResponseWindow",
+        "description": "Windows_and_Linux.ui.ResponseWindow",
+        "peekOfCode": "class ResponseWindow(QtWidgets.QWidget):\n    \"\"\"Enhanced response window with improved sizing and zoom handling\"\"\"\n    def __init__(self, app, title=_(\"Response\"), parent=None):\n        super().__init__(parent)\n        self.app = app\n        self.original_title = title\n        self.setWindowTitle(title)\n        self.option = title.replace(\" Result\", \"\")\n        self.selected_text = None\n        self.input_field = None",
+        "detail": "Windows_and_Linux.ui.ResponseWindow",
+        "documentation": {}
+    },
+    {
+        "label": "_",
+        "kind": 5,
+        "importPath": "Windows_and_Linux.ui.ResponseWindow",
+        "description": "Windows_and_Linux.ui.ResponseWindow",
+        "peekOfCode": "_ = lambda x: x\nclass MarkdownTextBrowser(QtWidgets.QTextBrowser):\n    \"\"\"Enhanced text browser for displaying Markdown content with improved sizing\"\"\"\n    def __init__(self, parent=None, is_user_message=False):\n        super().__init__(parent)\n        self.setReadOnly(True)\n        self.setOpenExternalLinks(True)\n        self.zoom_factor = 1.2\n        self.base_font_size = 14\n        self.is_user_message = is_user_message",
+        "detail": "Windows_and_Linux.ui.ResponseWindow",
+        "documentation": {}
+    },
+    {
+        "label": "SettingsWindow",
+        "kind": 6,
+        "importPath": "Windows_and_Linux.ui.SettingsWindow",
+        "description": "Windows_and_Linux.ui.SettingsWindow",
+        "peekOfCode": "class SettingsWindow(QtWidgets.QWidget):\n    \"\"\"\n    The settings window for the application.\n    Now with scrolling support for better usability on smaller screens.\n    \"\"\"\n    close_signal = QtCore.Signal()\n    def __init__(self, app, providers_only=False):\n        super().__init__()\n        self.app = app\n        self.current_provider_layout = None",
+        "detail": "Windows_and_Linux.ui.SettingsWindow",
+        "documentation": {}
+    },
+    {
+        "label": "_",
+        "kind": 5,
+        "importPath": "Windows_and_Linux.ui.SettingsWindow",
+        "description": "Windows_and_Linux.ui.SettingsWindow",
+        "peekOfCode": "_ = lambda x: x\nclass SettingsWindow(QtWidgets.QWidget):\n    \"\"\"\n    The settings window for the application.\n    Now with scrolling support for better usability on smaller screens.\n    \"\"\"\n    close_signal = QtCore.Signal()\n    def __init__(self, app, providers_only=False):\n        super().__init__()\n        self.app = app",
+        "detail": "Windows_and_Linux.ui.SettingsWindow",
+        "documentation": {}
+    },
+    {
+        "label": "UIUtils",
+        "kind": 6,
+        "importPath": "Windows_and_Linux.ui.UIUtils",
+        "description": "Windows_and_Linux.ui.UIUtils",
+        "peekOfCode": "class UIUtils:\n    @classmethod\n    def clear_layout(cls, layout):\n        \"\"\"\n        Clear the layout of all widgets.\n        \"\"\"\n        while ((child := layout.takeAt(0)) != None):\n            #If the child is a layout, delete it\n            if child.layout():\n                cls.clear_layout(child.layout())",
+        "detail": "Windows_and_Linux.ui.UIUtils",
+        "documentation": {}
+    },
+    {
+        "label": "ThemeBackground",
+        "kind": 6,
+        "importPath": "Windows_and_Linux.ui.UIUtils",
+        "description": "Windows_and_Linux.ui.UIUtils",
+        "peekOfCode": "class ThemeBackground(QtWidgets.QWidget):\n    \"\"\"\n    A custom widget that creates a background for the application based on the selected theme.\n    \"\"\"\n    def __init__(self, parent=None, theme='gradient', is_popup=False, border_radius=0):\n        super().__init__(parent)\n        self.setAttribute(QtCore.Qt.WA_StyledBackground, True)\n        self.theme = theme\n        self.is_popup = is_popup\n        self.border_radius = border_radius",
+        "detail": "Windows_and_Linux.ui.UIUtils",
+        "documentation": {}
+    },
+    {
+        "label": "colorMode",
+        "kind": 5,
+        "importPath": "Windows_and_Linux.ui.UIUtils",
+        "description": "Windows_and_Linux.ui.UIUtils",
+        "peekOfCode": "colorMode = 'dark' if darkdetect.isDark() else 'light'\nclass UIUtils:\n    @classmethod\n    def clear_layout(cls, layout):\n        \"\"\"\n        Clear the layout of all widgets.\n        \"\"\"\n        while ((child := layout.takeAt(0)) != None):\n            #If the child is a layout, delete it\n            if child.layout():",
+        "detail": "Windows_and_Linux.ui.UIUtils",
+        "documentation": {}
+    },
+    {
+        "label": "AIProviderSetting",
+        "kind": 6,
+        "importPath": "Windows_and_Linux.aiprovider",
+        "description": "Windows_and_Linux.aiprovider",
+        "peekOfCode": "class AIProviderSetting(ABC):\n    \"\"\"\n    Abstract base class for a provider setting (e.g., API key, model selection).\n    \"\"\"\n    def __init__(self, name: str, display_name: str = None, default_value: str = None, description: str = None):\n        self.name = name\n        self.display_name = display_name if display_name else name\n        self.default_value = default_value if default_value else \"\"\n        self.description = description if description else \"\"\n    @abstractmethod",
+        "detail": "Windows_and_Linux.aiprovider",
+        "documentation": {}
+    },
+    {
+        "label": "TextSetting",
+        "kind": 6,
+        "importPath": "Windows_and_Linux.aiprovider",
+        "description": "Windows_and_Linux.aiprovider",
+        "peekOfCode": "class TextSetting(AIProviderSetting):\n    \"\"\"\n    A text-based setting (for API keys, URLs, etc.).\n    \"\"\"\n    def __init__(self, name: str, display_name: str = None, default_value: str = None, description: str = None):\n        super().__init__(name, display_name, default_value, description)\n        self.internal_value = default_value\n        self.input = None\n    def render_to_layout(self, layout: QVBoxLayout):\n        row_layout = QtWidgets.QHBoxLayout()",
+        "detail": "Windows_and_Linux.aiprovider",
+        "documentation": {}
+    },
+    {
+        "label": "DropdownSetting",
+        "kind": 6,
+        "importPath": "Windows_and_Linux.aiprovider",
+        "description": "Windows_and_Linux.aiprovider",
+        "peekOfCode": "class DropdownSetting(AIProviderSetting):\n    \"\"\"\n    A dropdown setting (e.g., for selecting a model).\n    \"\"\"\n    def __init__(self, name: str, display_name: str = None, default_value: str = None,\n                 description: str = None, options: list = None):\n        super().__init__(name, display_name, default_value, description)\n        self.options = options if options else []\n        self.internal_value = default_value\n        self.dropdown = None",
+        "detail": "Windows_and_Linux.aiprovider",
+        "documentation": {}
+    },
+    {
+        "label": "AIProvider",
+        "kind": 6,
+        "importPath": "Windows_and_Linux.aiprovider",
+        "description": "Windows_and_Linux.aiprovider",
+        "peekOfCode": "class AIProvider(ABC):\n    \"\"\"\n    Abstract base class for AI providers.\n    All providers must implement:\n      • get_response(system_instruction, prompt) -> str\n      • after_load() to create their client or model instance\n      • before_load() to cleanup any existing client\n      • cancel() to cancel an ongoing request\n    \"\"\"\n    def __init__(self, app, provider_name: str, settings: List[AIProviderSetting],",
+        "detail": "Windows_and_Linux.aiprovider",
+        "documentation": {}
+    },
+    {
+        "label": "GeminiProvider",
+        "kind": 6,
+        "importPath": "Windows_and_Linux.aiprovider",
+        "description": "Windows_and_Linux.aiprovider",
+        "peekOfCode": "class GeminiProvider(AIProvider):\n    \"\"\"\n    Provider for Google's Gemini API.\n    Uses google.generativeai.GenerativeModel.generate_content() to generate text.\n    Streaming is no longer offered so we always do a single-shot call.\n    \"\"\"\n    def __init__(self, app):\n        self.close_requested = False\n        self.model = None\n        settings = [",
+        "detail": "Windows_and_Linux.aiprovider",
+        "documentation": {}
+    },
+    {
+        "label": "OpenAICompatibleProvider",
+        "kind": 6,
+        "importPath": "Windows_and_Linux.aiprovider",
+        "description": "Windows_and_Linux.aiprovider",
+        "peekOfCode": "class OpenAICompatibleProvider(AIProvider):\n    \"\"\"\n    Provider for OpenAI-compatible APIs.\n    Uses self.client.chat.completions.create() to obtain a response.\n    Streaming is fully removed.\n    \"\"\"\n    def __init__(self, app):\n        self.close_requested = None\n        self.client = None\n        settings = [",
+        "detail": "Windows_and_Linux.aiprovider",
+        "documentation": {}
+    },
+    {
+        "label": "OllamaProvider",
+        "kind": 6,
+        "importPath": "Windows_and_Linux.aiprovider",
+        "description": "Windows_and_Linux.aiprovider",
+        "peekOfCode": "class OllamaProvider(AIProvider):\n    \"\"\"\n    Provider for connecting to an Ollama server.\n    Uses the /chat endpoint of the Ollama server to generate a response.\n    Streaming is not used.\n    \"\"\"\n    def __init__(self, app):\n        self.close_requested = None\n        self.client = None\n        self.app = app",
+        "detail": "Windows_and_Linux.aiprovider",
+        "documentation": {}
+    },
+    {
+        "label": "main",
+        "kind": 2,
+        "importPath": "Windows_and_Linux.main",
+        "description": "Windows_and_Linux.main",
+        "peekOfCode": "def main():\n    \"\"\"\n    The main entry point of the application.\n    \"\"\"\n    app = WritingToolApp(sys.argv)\n    app.setQuitOnLastWindowClosed(False)\n    sys.exit(app.exec())\nif __name__ == '__main__':\n    main()",
+        "detail": "Windows_and_Linux.main",
+        "documentation": {}
+    },
+    {
+        "label": "run_pyinstaller_build",
+        "kind": 2,
+        "importPath": "Windows_and_Linux.pyinstaller-build-script",
+        "description": "Windows_and_Linux.pyinstaller-build-script",
+        "peekOfCode": "def run_pyinstaller_build():\n    pyinstaller_command = [\n        \"pyinstaller\",\n        \"--onefile\",\n        \"--windowed\",\n        \"--icon=icons/app_icon.ico\",\n        \"--name=Writing Tools\",\n        \"--clean\",\n        \"--noconfirm\",\n        # Exclude unnecessary modules",
+        "detail": "Windows_and_Linux.pyinstaller-build-script",
+        "documentation": {}
+    },
+    {
+        "label": "UpdateChecker",
+        "kind": 6,
+        "importPath": "Windows_and_Linux.update_checker",
+        "description": "Windows_and_Linux.update_checker",
+        "peekOfCode": "class UpdateChecker:\n    def __init__(self, app):\n        self.app = app\n    def _fetch_latest_version(self):\n        \"\"\"\n        Fetch the latest version number from GitHub.\n        Returns the version number or None if failed.\n        \"\"\"\n        try:\n            with urlopen(UPDATE_CHECK_URL, timeout=5) as response:",
+        "detail": "Windows_and_Linux.update_checker",
+        "documentation": {}
+    },
+    {
+        "label": "CURRENT_VERSION",
+        "kind": 5,
+        "importPath": "Windows_and_Linux.update_checker",
+        "description": "Windows_and_Linux.update_checker",
+        "peekOfCode": "CURRENT_VERSION = 7\nUPDATE_CHECK_URL = \"https://raw.githubusercontent.com/theJayTea/WritingTools/main/Windows_and_Linux/Latest_Version_for_Update_Check.txt\"\nUPDATE_DOWNLOAD_URL = \"https://github.com/theJayTea/WritingTools/releases\"\nclass UpdateChecker:\n    def __init__(self, app):\n        self.app = app\n    def _fetch_latest_version(self):\n        \"\"\"\n        Fetch the latest version number from GitHub.\n        Returns the version number or None if failed.",
+        "detail": "Windows_and_Linux.update_checker",
+        "documentation": {}
+    },
+    {
+        "label": "UPDATE_CHECK_URL",
+        "kind": 5,
+        "importPath": "Windows_and_Linux.update_checker",
+        "description": "Windows_and_Linux.update_checker",
+        "peekOfCode": "UPDATE_CHECK_URL = \"https://raw.githubusercontent.com/theJayTea/WritingTools/main/Windows_and_Linux/Latest_Version_for_Update_Check.txt\"\nUPDATE_DOWNLOAD_URL = \"https://github.com/theJayTea/WritingTools/releases\"\nclass UpdateChecker:\n    def __init__(self, app):\n        self.app = app\n    def _fetch_latest_version(self):\n        \"\"\"\n        Fetch the latest version number from GitHub.\n        Returns the version number or None if failed.\n        \"\"\"",
+        "detail": "Windows_and_Linux.update_checker",
+        "documentation": {}
+    },
+    {
+        "label": "UPDATE_DOWNLOAD_URL",
+        "kind": 5,
+        "importPath": "Windows_and_Linux.update_checker",
+        "description": "Windows_and_Linux.update_checker",
+        "peekOfCode": "UPDATE_DOWNLOAD_URL = \"https://github.com/theJayTea/WritingTools/releases\"\nclass UpdateChecker:\n    def __init__(self, app):\n        self.app = app\n    def _fetch_latest_version(self):\n        \"\"\"\n        Fetch the latest version number from GitHub.\n        Returns the version number or None if failed.\n        \"\"\"\n        try:",
+        "detail": "Windows_and_Linux.update_checker",
+        "documentation": {}
+    },
+    {
+        "label": "WritingToolApp",
+        "kind": 6,
+        "importPath": "Windows_and_Linux.WritingToolApp",
+        "description": "Windows_and_Linux.WritingToolApp",
+        "peekOfCode": "class WritingToolApp(QtWidgets.QApplication):\n    \"\"\"\n    The main application class for Writing Tools.\n    \"\"\"\n    output_ready_signal = Signal(str)\n    show_message_signal = Signal(str, str)  # a signal for showing message boxes\n    hotkey_triggered_signal = Signal()\n    followup_response_signal = Signal(str)\n    def __init__(self, argv):\n        super().__init__(argv)",
+        "detail": "Windows_and_Linux.WritingToolApp",
+        "documentation": {}
+    },
+    {
+        "label": "_",
+        "kind": 5,
+        "importPath": "Windows_and_Linux.WritingToolApp",
+        "description": "Windows_and_Linux.WritingToolApp",
+        "peekOfCode": "_ = gettext.gettext\nclass WritingToolApp(QtWidgets.QApplication):\n    \"\"\"\n    The main application class for Writing Tools.\n    \"\"\"\n    output_ready_signal = Signal(str)\n    show_message_signal = Signal(str, str)  # a signal for showing message boxes\n    hotkey_triggered_signal = Signal()\n    followup_response_signal = Signal(str)\n    def __init__(self, argv):",
+        "detail": "Windows_and_Linux.WritingToolApp",
+        "documentation": {}
+    }
+]
