@@ -11,13 +11,13 @@ struct OpenAIConfig: Codable {
 }
 
 enum OpenAIModel: String, CaseIterable {
-    case gpt4 = "gpt-4"
+    case gpt4 = "gpt-4.1"
     case gpt4o = "gpt-4o"
     case gpt4oMini = "gpt-4o-mini"
     
     var displayName: String {
         switch self {
-        case .gpt4: return "GPT-4 (Most Capable)"
+        case .gpt4: return "GPT-4.1 (Most Capable)"
         case .gpt4o: return "GPT-4o (Optimized)"
         case .gpt4oMini: return "GPT-4o Mini (Lightweight)"
         }
@@ -92,7 +92,7 @@ class OpenAIProvider: ObservableObject, AIProvider {
                     let stream = try await openAIService.streamingChatCompletionRequest(body: .init(
                         model: config.model,
                         messages: messages
-                    ))
+                    ), secondsToWait: 60)
                     
                     for try await chunk in stream {
                         if Task.isCancelled { break }
@@ -106,7 +106,7 @@ class OpenAIProvider: ObservableObject, AIProvider {
                     let response = try await openAIService.chatCompletionRequest(body: .init(
                         model: config.model,
                         messages: messages
-                    ))
+                    ), secondsToWait: 60)
                     
                     return response.choices.first?.message.content ?? ""
                 }
