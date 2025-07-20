@@ -7,3 +7,11 @@ Windows_and_Linux/config.json
 **/__pycache__
 **/*.mo
 **/pot_files
+
+# windows
+**/.vscode
+**/myvenv
+
+# others
+**/.vercel
+notes.md
