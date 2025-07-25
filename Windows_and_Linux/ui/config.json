@@ -1,0 +1,20 @@
+{
+    "shortcut": "ctrl+space",
+    "theme": "gradient",
+    "providers": {
+        "Gemini (Recommended)": {
+            "api_key": "AIzaSyBgwR_NL6_C0obinXXl2nVDXJUL1d3Zlvs\n",
+            "model_name": "gemini-2.0-flash"
+        },
+        "Ollama (For Experts)": {
+            "api_base": "http://localhost:11434",
+            "api_model": "gemma3n:e2b",
+            "keep_alive": "5"
+        },
+        "OpenAI Compatible (For Experts)": {}
+    },
+    "locale": "en",
+    "streaming": false,
+    "provider": "Ollama (For Experts)",
+    "update_available": true
+}

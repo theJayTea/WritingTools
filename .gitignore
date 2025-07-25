@@ -1,9 +1,24 @@
 # macOS system files
 
 .DS_Store
-Windows_and_Linux/config.json
 
 .idea
 **/__pycache__
 **/*.mo
 **/pot_files
+
+# windows
+**/.vscode
+**/myvenv
+
+# others
+**/.vercel
+# temporarary 3C0D
+notes.md
+
+# PyInstaller build artifacts
+/Windows_and_Linux/build/
+/Windows_and_Linux/dist/
+*.spec
+# Local configuration files
+/Windows_and_Linux/config/
