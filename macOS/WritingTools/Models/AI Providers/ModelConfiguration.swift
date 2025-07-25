@@ -34,8 +34,4 @@ extension ModelConfiguration {
         id: "stelterlab/Teuken-7B-instruct-commercial-v0.4-MLX-4bit"
     )
     
-    public static let gemma3_4B_it_4bit = ModelConfiguration(
-        id: "mlx-community/gemma-3-text-4b-it-4bit"
-    )
-    
 }

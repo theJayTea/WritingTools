@@ -191,7 +191,12 @@ struct PopupView: View {
                     window.orderFrontRegardless()
                 } else {
                     // Directly apply the text if no response window
-                    appState.replaceSelectedText(with: result)
+                    if command.preserveFormatting {
+                        appState.replaceSelectedTextPreservingAttributes(with: result)
+                    } else {
+                        appState.replaceSelectedText(with: result)
+                    }
+
                 }
                 
                 // Now close the popup after response is received

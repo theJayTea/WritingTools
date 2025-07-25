@@ -10,7 +10,6 @@
 		420ADBB92E2D2FB400D4A564 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 420ADBB82E2D2FB400D4A564 /* MarkdownUI */; };
 		420ADBBC2E2D2FCB00D4A564 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 420ADBBB2E2D2FCB00D4A564 /* KeyboardShortcuts */; };
 		420ADBBF2E2D300F00D4A564 /* AIProxy in Frameworks */ = {isa = PBXBuildFile; productRef = 420ADBBE2E2D300F00D4A564 /* AIProxy */; };
-		420B81B82E2D86DD008D014D /* WritingTools.icon in Resources */ = {isa = PBXBuildFile; fileRef = 420B81B72E2D86DD008D014D /* WritingTools.icon */; };
 		42655EE02E2D3380000EB2FE /* MLXEmbedders in Frameworks */ = {isa = PBXBuildFile; productRef = 42655EDF2E2D3380000EB2FE /* MLXEmbedders */; };
 		42655EE22E2D3380000EB2FE /* MLXLLM in Frameworks */ = {isa = PBXBuildFile; productRef = 42655EE12E2D3380000EB2FE /* MLXLLM */; };
 		42655EE42E2D3380000EB2FE /* MLXLMCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 42655EE32E2D3380000EB2FE /* MLXLMCommon */; };
@@ -21,8 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		420B81B72E2D86DD008D014D /* WritingTools.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = WritingTools.icon; sourceTree = "<group>"; };
-		420B81BA2E2D86FC008D014D /* WritingTools.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = WritingTools.app; path = "/Users/arya/Projects/Private/Code/Published/WritingTools macOS/Current/WritingTools/macOS/build/Debug/WritingTools.app"; sourceTree = "<absolute>"; };
+		4293055F2E2FD66E00685531 /* WritingTools.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WritingTools.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -71,7 +69,7 @@
 			isa = PBXGroup;
 			children = (
 				2ABCBC202CDEB606001E4B5E /* WritingTools */,
-				420B81B72E2D86DD008D014D /* WritingTools.icon */,
+				4293055F2E2FD66E00685531 /* WritingTools.app */,
 			);
 			sourceTree = "<group>";
 		};
@@ -107,7 +105,7 @@
 				42655EEC2E2D3890000EB2FE /* LiquidGlass */,
 			);
 			productName = "swift-writing-tools";
-			productReference = 420B81BA2E2D86FC008D014D /* WritingTools.app */;
+			productReference = 4293055F2E2FD66E00685531 /* WritingTools.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -159,7 +157,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				420B81B82E2D86DD008D014D /* WritingTools.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -307,7 +304,7 @@
 		2ABCBC442CDEB607001E4B5E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = WritingTools;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				AUTOMATION_APPLE_EVENTS = YES;
@@ -316,7 +313,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 16;
+				CURRENT_PROJECT_VERSION = 18;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"WritingTools/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
@@ -350,7 +347,7 @@
 		2ABCBC452CDEB607001E4B5E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = WritingTools;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				AUTOMATION_APPLE_EVENTS = YES;
@@ -359,7 +356,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 16;
+				CURRENT_PROJECT_VERSION = 18;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"WritingTools/Preview Content\"";
 				DEVELOPMENT_TEAM = "";

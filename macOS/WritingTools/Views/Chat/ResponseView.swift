@@ -35,11 +35,6 @@ struct ResponseView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            HStack {
-                WindowControlButtons()   // traffic lights
-                Spacer()
-            }
-            .contentShape(Rectangle())   // draggable
             // Enhanced toolbar with more controls
             HStack(spacing: 16) {
                 Button(action: { viewModel.copyContent() }) {
@@ -122,7 +117,6 @@ struct ResponseView: View {
             .background(Color(.windowBackgroundColor))
         }
         .windowBackground(useGradient: settings.useGradientTheme)
-        .ignoresSafeArea(.container, edges: .top)
     }
     
     private func sendMessage() {

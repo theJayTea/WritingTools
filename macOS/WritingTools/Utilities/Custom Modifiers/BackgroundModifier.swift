@@ -1,4 +1,3 @@
-import LiquidGlass
 import SwiftUI
 
 enum AppTheme: String {
@@ -6,7 +5,6 @@ enum AppTheme: String {
     case gradient
     case glass
     case oled
-    case liquidGlass
 }
 
 struct WindowBackground: ViewModifier {
@@ -28,51 +26,34 @@ struct WindowBackground: ViewModifier {
     }
 
     func body(content: Content) -> some View {
-        Group {
-            // --- ➌ LiquidGlass branch ------------------------------------
-            if currentTheme == .liquidGlass {
-                content
-                    .glass(radius: cornerRadius ?? 15)
-                    .clipShape( // keep geometry identical
-                        RoundedRectangle(
-                            cornerRadius: cornerRadius ?? 0,
-                            style: .continuous)
-                    )
-            }
-            // --- ➍ Existing themes ---------------------------------------
-            else {
-                content
-                    .background(
-                        Group {
-                            switch currentTheme {
-                            case .standard:
-                                Color(.windowBackgroundColor)
-                            case .gradient:
-                                colorScheme == .light
-                                    ? LinearGradient(
-                                        colors: [Color(hex: "f1c6bc"), Color(hex: "b4bbef"),
-                                                 Color(hex: "e9d686"), Color(hex: "b9c7ee")],
-                                        startPoint: .topLeading, endPoint: .bottomTrailing)
-                                    : LinearGradient(
-                                        colors: [Color(hex: "18323D"), Color(hex: "164066"),
-                                                 Color(hex: "35423E"), Color(hex: "4E4246")],
-                                        startPoint: .topLeading, endPoint: .bottomTrailing)
-                            case .glass:
-                                GlassmorphicBackground()
-                            case .oled:
-                                Color.black
-                            case .liquidGlass:
-                                Color.clear
-                            }
-                        }
-                        .clipShape(
-                            RoundedRectangle(
-                                cornerRadius: cornerRadius ?? 0,
-                                style: .continuous)
-                        )
-                    )
-            }
-        }
+        content
+            .background(
+                Group {
+                    switch currentTheme {
+                    case .standard:
+                        Color(.windowBackgroundColor)
+                    case .gradient:
+                        colorScheme == .light
+                            ? LinearGradient(
+                                colors: [Color(hex: "f1c6bc"), Color(hex: "b4bbef"),
+                                         Color(hex: "e9d686"), Color(hex: "b9c7ee")],
+                                startPoint: .topLeading, endPoint: .bottomTrailing)
+                            : LinearGradient(
+                                colors: [Color(hex: "18323D"), Color(hex: "164066"),
+                                         Color(hex: "35423E"), Color(hex: "4E4246")],
+                                startPoint: .topLeading, endPoint: .bottomTrailing)
+                    case .glass:
+                        GlassmorphicBackground()
+                    case .oled:
+                        Color.black
+                    }
+                }
+                .clipShape(
+                    RoundedRectangle(
+                        cornerRadius: cornerRadius ?? 0,
+                        style: .continuous)
+                )
+            )
     }
 }
 

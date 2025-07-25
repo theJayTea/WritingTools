@@ -26,6 +26,8 @@ class AppState: ObservableObject {
     // Current provider with UI binding support
     @Published private(set) var currentProvider: String
     
+    @Published var selectedAttributedText: NSAttributedString? = nil
+    
     var activeProvider: any AIProvider {
         switch currentProvider {
         case "openai":
@@ -227,7 +229,7 @@ class AppState: ObservableObject {
                         title: "\(command.name) Result",
                         content: result,
                         selectedText: selectedText,
-                        option: nil // Using nil since this is using the generic CommandModel
+                        option: nil 
                     )
                     
                     WindowManager.shared.addResponseWindow(window)
@@ -273,6 +275,34 @@ class AppState: ObservableObject {
         }
     }
     
+    func replaceSelectedTextPreservingAttributes(with corrected: String) {
+        guard let original = selectedAttributedText else {
+            replaceSelectedText(with: corrected)   // fallback
+            return
+        }
+        
+        let mutable = NSMutableAttributedString(attributedString: original)
+        mutable.applyCharacterDiff(from: original.string, to: corrected)
+        
+        // Clipboard + paste
+        NSPasteboard.general.clearContents()
+        if let rtfData = try? mutable.data(
+                from: NSRange(location: 0, length: mutable.length),
+                documentAttributes: [.documentType: NSAttributedString.DocumentType.rtf]) {
+            NSPasteboard.general.setData(rtfData, forType: .rtf)
+        }
+        NSPasteboard.general.setString(corrected, forType: .string)
+        
+        if let previous = previousApplication {
+            previous.activate()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                self.simulatePaste()
+            }
+        }
+    }
+
+
+    
     // Simulate paste command
     private func simulatePaste() {
         guard let source = CGEventSource(stateID: .hidSystemState) else { return }
@@ -290,3 +320,40 @@ class AppState: ObservableObject {
         keyUp?.post(tap: .cghidEventTap)
     }
 }
+
+extension NSMutableAttributedString {
+    /// Transforms *self* so that `self.string == new`, preserving
+    /// per-character attributes wherever possible.
+    func applyCharacterDiff(from old: String, to new: String) {
+        // Build the diff
+        let diff = Array(new).difference(from: Array(old))
+
+        // Collect removals & insertions with their offsets
+        var removals: [Int] = []
+        var insertions: [(offset: Int, char: Character)] = []
+
+        for change in diff {
+            switch change {
+            case let .remove(offset, _, _):
+                removals.append(offset)
+            case let .insert(offset, element, _):
+                insertions.append((offset, element))
+            }
+        }
+
+        // Apply removals back-to-front
+        for index in removals.sorted(by: >) {
+            deleteCharacters(in: NSRange(location: index, length: 1))
+        }
+
+        // Apply insertions front-to-back
+        for (index, ch) in insertions.sorted(by: { $0.offset < $1.offset }) {
+            let inherited = index > 0
+                ? attributes(at: index - 1, effectiveRange: nil)
+                : [:]
+            let piece = NSAttributedString(string: String(ch), attributes: inherited)
+            insert(piece, at: index)
+        }
+    }
+}
+

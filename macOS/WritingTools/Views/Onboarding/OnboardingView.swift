@@ -228,7 +228,6 @@ struct OnboardingView: View {
                             Text("Gradient").tag("gradient")
                             Text("Glass").tag("glass")
                             Text("OLED").tag("oled")
-                            Text("LiquidGlass").tag("liquidGlass")
                         }
                         .pickerStyle(.segmented)
                     }

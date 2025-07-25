@@ -112,47 +112,61 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 self.appState.previousApplication = currentFrontmostApp
             }
             
-            let generalPasteboard = NSPasteboard.general
+            let pb = NSPasteboard.general
             
-            // Get initial pasteboard content to restore later
-            let oldContents = generalPasteboard.string(forType: .string)
+            // Keep original plain-text clipboard so we can restore it
+            let oldPlain = pb.string(forType: .string)
             
-            // Clear and perform copy command to get selected text
-            generalPasteboard.clearContents()
-            let source = CGEventSource(stateID: .hidSystemState)
-            let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 0x08, keyDown: true)
-            let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 0x08, keyDown: false)
-            keyDown?.flags = .maskCommand
-            keyUp?.flags = .maskCommand
-            keyDown?.post(tap: .cghidEventTap)
-            keyUp?.post(tap: .cghidEventTap)
+            // Clear & issue ⌘-C
+            pb.clearContents()
+            let src = CGEventSource(stateID: .hidSystemState)
+            let kd  = CGEvent(keyboardEventSource: src, virtualKey: 0x08, keyDown: true)
+            let ku  = CGEvent(keyboardEventSource: src, virtualKey: 0x08, keyDown: false)
+            kd?.flags = .maskCommand
+            ku?.flags = .maskCommand
+            kd?.post(tap: .cghidEventTap)
+            ku?.post(tap: .cghidEventTap)
             
-            // Wait for copy operation to complete
+            // Wait for copy to complete
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
                 guard let self = self else { return }
                 
-                // Get the selected text
-                let selectedText = generalPasteboard.string(forType: .string) ?? ""
-                
-                // Restore original clipboard contents
-                generalPasteboard.clearContents()
-                if let oldContents = oldContents {
-                    generalPasteboard.setString(oldContents, forType: .string)
+                // ---------- Capture rich text if present ----------
+                var rich: NSAttributedString?
+                if let rtf = pb.data(forType: .rtf) {
+                    rich = try? NSAttributedString(
+                        data: rtf,
+                        options: [.documentType: NSAttributedString.DocumentType.rtf],
+                        documentAttributes: nil
+                    )
+                } else if let html = pb.data(forType: .html) {
+                    rich = try? NSAttributedString(
+                        data: html,
+                        options: [.documentType: NSAttributedString.DocumentType.html],
+                        documentAttributes: nil
+                    )
                 }
                 
-                // Skip if no text is selected
+                let selectedText = rich?.string ?? pb.string(forType: .string) ?? ""
+                
+                // Restore original clipboard contents
+                pb.clearContents()
+                if let oldPlain {
+                    pb.setString(oldPlain, forType: .string)
+                }
+                
+                // Skip if nothing selected
                 guard !selectedText.isEmpty else {
                     NSLog("No text selected for command: \(command.name)")
                     return
                 }
                 
-                // Store the selected text in app state
+                // Persist selection in app state
+                self.appState.selectedAttributedText = rich
                 self.appState.selectedText = selectedText
                 
-                // Process the command
-                Task {
-                    await self.processCommandWithUI(command)
-                }
+                // Run the command
+                Task { await self.processCommandWithUI(command) }
             }
         }
     }
@@ -311,18 +325,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         
         settingsWindow = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 540, height: 460),
-            styleMask: [.titled, .closable, .resizable, .fullSizeContentView],
+            styleMask: [.titled, .closable, .resizable],
             backing: .buffered,
             defer: false
         )
-        settingsWindow?.titleVisibility = .hidden
-        settingsWindow?.titlebarAppearsTransparent = true
-        settingsWindow?.isMovableByWindowBackground = true
         settingsWindow?.isReleasedWhenClosed = false
-        
-        for type in [.closeButton, .miniaturizeButton, .zoomButton] as [NSWindow.ButtonType] {
-            settingsWindow?.standardWindowButton(type)?.isHidden = true
-        }
         
         let settingsView = SettingsView(appState: appState, showOnlyApiSetup: false)
         settingsHostingView = NSHostingView(rootView: settingsView)
@@ -346,18 +353,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         
         aboutWindow = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 400, height: 400),
-            styleMask: [.titled, .closable, .fullSizeContentView],
+            styleMask: [.titled, .closable],
             backing: .buffered,
             defer: false
         )
-        aboutWindow?.titleVisibility = .hidden
-        aboutWindow?.titlebarAppearsTransparent = true
-        aboutWindow?.isMovableByWindowBackground = true
         aboutWindow?.isReleasedWhenClosed = false
-        
-        for type in [.closeButton, .miniaturizeButton, .zoomButton] as [NSWindow.ButtonType] {
-            aboutWindow?.standardWindowButton(type)?.isHidden = true
-        }
         
         let aboutView = AboutView()
         aboutHostingView = NSHostingView(rootView: aboutView)
@@ -379,24 +379,24 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
-            if let currentFrontmostApp = NSWorkspace.shared.frontmostApplication {
-                self.appState.previousApplication = currentFrontmostApp
+            if let frontApp = NSWorkspace.shared.frontmostApplication {
+                self.appState.previousApplication = frontApp
             }
             
             self.closePopupWindow()
             
-            let generalPasteboard = NSPasteboard.general
-            let oldContents = generalPasteboard.string(forType: .string)
+            let pb = NSPasteboard.general
+            let oldPlain = pb.string(forType: .string)
             
-            // Clear and perform copy command to get current selection
-            generalPasteboard.clearContents()
-            let source = CGEventSource(stateID: .hidSystemState)
-            let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 0x08, keyDown: true)
-            let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 0x08, keyDown: false)
-            keyDown?.flags = .maskCommand
-            keyUp?.flags = .maskCommand
-            keyDown?.post(tap: .cghidEventTap)
-            keyUp?.post(tap: .cghidEventTap)
+            // Clear & copy current selection
+            pb.clearContents()
+            let src = CGEventSource(stateID: .hidSystemState)
+            let kd  = CGEvent(keyboardEventSource: src, virtualKey: 0x08, keyDown: true)
+            let ku  = CGEvent(keyboardEventSource: src, virtualKey: 0x08, keyDown: false)
+            kd?.flags = .maskCommand
+            ku?.flags = .maskCommand
+            kd?.post(tap: .cghidEventTap)
+            ku?.post(tap: .cghidEventTap)
             
             // Wait for the copy operation to complete, then process the pasteboard
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
@@ -418,7 +418,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                     ]
                 ]
                 
-                if let urls = generalPasteboard.readObjects(forClasses: classes, options: options) as? [URL] {
+                if let urls = pb.readObjects(forClasses: classes, options: options) as? [URL] {
                     for url in urls {
                         if let imageData = try? Data(contentsOf: url) {
                             if NSImage(data: imageData) != nil {
@@ -440,7 +440,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                     ]
                     
                     for type in supportedImageTypes {
-                        if let data = generalPasteboard.data(forType: type) {
+                        if let data = pb.data(forType: type) {
                             foundImages.append(data)
                             NSLog("Found direct image data of type: \(type)")
                             break
@@ -448,25 +448,41 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                     }
                 }
                 
-                // Get any text content
-                selectedText = generalPasteboard.string(forType: .string) ?? ""
-                
-                // Restore original pasteboard contents
-                generalPasteboard.clearContents()
-                if let oldContents = oldContents {
-                    generalPasteboard.setString(oldContents, forType: .string)
+                // ------ Capture rich text ------
+                var rich: NSAttributedString?
+                if let rtf = pb.data(forType: .rtf) {
+                    rich = try? NSAttributedString(
+                        data: rtf,
+                        options: [.documentType: NSAttributedString.DocumentType.rtf],
+                        documentAttributes: nil
+                    )
+                } else if let html = pb.data(forType: .html) {
+                    rich = try? NSAttributedString(
+                        data: html,
+                        options: [.documentType: NSAttributedString.DocumentType.html],
+                        documentAttributes: nil
+                    )
                 }
                 
-                // Update app state and show popup
-                self.appState.selectedImages = foundImages
-                self.appState.selectedText = selectedText
+                let plainText = rich?.string ?? pb.string(forType: .string) ?? ""
                 
+                // Restore clipboard
+                pb.clearContents()
+                if let oldPlain {
+                    pb.setString(oldPlain, forType: .string)
+                }
+                
+                // Store selection in app state
+                self.appState.selectedAttributedText = rich
+                self.appState.selectedText           = plainText
+                self.appState.selectedImages         = foundImages
+                
+                // ------ Show popup window ------
                 let window = PopupWindow(appState: self.appState)
                 window.delegate = self
                 self.popupWindow = window
                 
-                // Set window size based on content
-                if !selectedText.isEmpty || !foundImages.isEmpty {
+                if !plainText.isEmpty || !foundImages.isEmpty {
                     window.setContentSize(NSSize(width: 400, height: 400))
                 } else {
                     window.setContentSize(NSSize(width: 400, height: 100))

@@ -47,42 +47,38 @@ struct SettingsView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            HStack {
-                WindowControlButtons()
-                Spacer()
-            }
-            .contentShape(Rectangle())          // draggable
-            
-            Picker("", selection: $selectedTab) {
-                ForEach(SettingsTab.allCases) { tab in
-                    Text(tab.rawValue).tag(tab)
+        TabView(selection: $selectedTab) {
+            generalPane
+                .tabItem {
+                    Image(systemName: "gear")
+                    Text("General")
                 }
-            }
-            .pickerStyle(.segmented)
-            .padding(.horizontal, 16)
-            .padding(.top, 10)
+                .tag(SettingsTab.general)
             
-            Group {
-                switch selectedTab {
-                case .general:     generalPane
-                case .appearance:  appearancePane
-                case .aiProvider:  aiProviderPane
+            appearancePane
+                .tabItem {
+                    Image(systemName: "paintbrush")
+                    Text("Appearance")
                 }
-            }
-            .padding(20)
+                .tag(SettingsTab.appearance)
+            
+            aiProviderPane
+                .tabItem {
+                    Image("cpu")
+                    Text("AI Provider")
+                }
+                .tag(SettingsTab.aiProvider)
         }
+        .padding(20)
         .frame(width: 540, height: showOnlyApiSetup ? 400 : 460)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .windowBackground(useGradient: settings.useGradientTheme)
-        .ignoresSafeArea(.container, edges: [.top, .bottom])
         .onAppear(perform: restoreLastTab)
         .onChange(of: selectedTab) { _, newValue in
             UserDefaults.standard.set(newValue.rawValue,
                                       forKey: "lastSettingsTab")
             updateWindowTitle(to: newValue)
         }
-        
     }
     
     private func restoreLastTab() {
@@ -102,12 +98,6 @@ struct SettingsView: View {
                 ?? false
             }) {
                 window.title = "\(tab.rawValue) Settings"
-                
-                // disable unused buttons
-                window.standardWindowButton(.miniaturizeButton)?
-                    .isEnabled = false
-                window.standardWindowButton(.zoomButton)?
-                    .isEnabled = false
             }
         }
     }
@@ -181,7 +171,6 @@ struct SettingsView: View {
                     Text("Gradient").tag("gradient")
                     Text("Glass").tag("glass")
                     Text("OLED").tag("oled")
-                    Text("LiquidGlass").tag("liquidGlass")
                 }
                 .pickerStyle(.segmented)
                 .padding(.vertical, 4)

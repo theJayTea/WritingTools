@@ -4,7 +4,7 @@ class ResponseWindow: NSWindow {
     init(title: String, content: String, selectedText: String, option: WritingOption? = nil) {
         super.init(
             contentRect: NSRect(x: 0, y: 0, width: 600, height: 500),
-            styleMask: [.titled, .closable, .resizable, .miniaturizable, .fullSizeContentView],
+            styleMask: [.titled, .closable, .resizable, .miniaturizable],
             backing: .buffered,
             defer: false
         )
@@ -12,13 +12,6 @@ class ResponseWindow: NSWindow {
         self.title = title
         self.minSize = NSSize(width: 400, height: 300)
         self.isReleasedWhenClosed = false
-        self.titleVisibility = .hidden
-        self.titlebarAppearsTransparent = true
-        self.isMovableByWindowBackground = true
-        
-        for type in [.closeButton, .miniaturizeButton, .zoomButton] as [NSWindow.ButtonType] {
-            self.standardWindowButton(type)?.isHidden = true
-        }
         
         let contentView = ResponseView(
             content: content,

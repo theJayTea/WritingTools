@@ -58,30 +58,36 @@ class PopupWindow: NSWindow {
         isOpaque = false
         level = .floating
         collectionBehavior = [.transient, .ignoresCycle]
-        hasShadow = true
-        
-        // Use system standard shadow instead of custom one
-        standardWindowButton(.closeButton)?.isHidden = true
-        standardWindowButton(.miniaturizeButton)?.isHidden = true
-        standardWindowButton(.zoomButton)?.isHidden = true
-        
+
+        hasShadow = false
+
         let closeAction: () -> Void = { [weak self] in
             self?.close()
-            if let previousApp = self?.appState.previousApplication {
-                previousApp.activate()
-            }
+            self?.appState.previousApplication?.activate()
         }
-        
-        let popupView = PopupView(appState: appState, closeAction: closeAction)
-        let hostingView = FirstResponderHostingView(rootView: popupView) // Use custom view
+
+        let popupView = PopupView(appState: appState,
+                                  closeAction: closeAction)
+
+        let hostingView = FirstResponderHostingView(rootView: popupView)
+
+        hostingView.wantsLayer = true
+        hostingView.layer?.cornerRadius = 12
+        hostingView.layer?.maskedCorners = [
+            .layerMinXMinYCorner,
+            .layerMaxXMinYCorner,
+            .layerMinXMaxYCorner,
+            .layerMaxXMaxYCorner
+        ]
+        hostingView.layer?.masksToBounds = true
+
         contentView = hostingView
         retainedHostingView = hostingView
-        
-        // Set up first responder
-        self.initialFirstResponder = hostingView
-        self.makeFirstResponder(hostingView)
-        self.makeKey()
-        
+
+        initialFirstResponder = hostingView
+        makeFirstResponder(hostingView)
+        makeKey()
+
         updateWindowSize()
     }
     
