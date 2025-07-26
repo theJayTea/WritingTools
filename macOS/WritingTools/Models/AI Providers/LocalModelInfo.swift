@@ -34,6 +34,8 @@ enum LocalModelType: String, CaseIterable, Identifiable {
         switch self {
         case .qwen25VL:
             return true
+        case .gemma3:
+            return true
         default:
             return false
         }
