@@ -847,6 +847,9 @@
         }
       }
     },
+    "Assign per‑command shortcuts for instant actions without the popup." : {
+
+    },
     "Assistant's response" : {
       "localizations" : {
         "de" : {
@@ -1358,6 +1361,7 @@
       }
     },
     "Click the '+' button (you may need to unlock first)." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1380,6 +1384,7 @@
       }
     },
     "Click the button below to open System Settings > Privacy & Security > Accessibility." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1843,6 +1848,9 @@
         }
       }
     },
+    "Custom commands & per-command shortcuts" : {
+
+    },
     "Custom Model Name" : {
       "localizations" : {
         "de" : {
@@ -1866,6 +1874,7 @@
       }
     },
     "Customize Your Experience" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2424,7 +2433,11 @@
         }
       }
     },
+    "Enable Screenshot OCR (Optional)" : {
+
+    },
     "Ensure the toggle switch next to 'WritingTools' is turned ON." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2534,6 +2547,9 @@
           }
         }
       }
+    },
+    "Finish and Start Using WritingTools" : {
+
     },
     "Friendly" : {
       "comment" : "ID for friendly tone",
@@ -2981,7 +2997,11 @@
         }
       }
     },
+    "Granted" : {
+
+    },
     "Helps you write with clarity and confidence" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3003,7 +3023,11 @@
         }
       }
     },
+    "How it works" : {
+
+    },
     "How to enable accessibility access:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3046,6 +3070,9 @@
           }
         }
       }
+    },
+    "If enabled, you can run OCR on screenshot snippets. This requires Screen Recording permission." : {
+
     },
     "Image Mode" : {
       "localizations" : {
@@ -3113,7 +3140,11 @@
         }
       }
     },
+    "Improve your writing with one shortcut" : {
+
+    },
     "Improves your writing with AI" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3156,6 +3187,9 @@
           }
         }
       }
+    },
+    "Input Monitoring is NOT required. WritingTools only posts copy/paste commands." : {
+
     },
     "Keep Alive Time" : {
       "localizations" : {
@@ -3470,6 +3504,9 @@
           }
         }
       }
+    },
+    "Local LLM keeps data on‑device; cloud providers receive selected content for processing." : {
+
     },
     "Local LLM processing is only available on Apple Silicon (M1/M2/M3/M4 etc.) devices." : {
       "localizations" : {
@@ -3807,6 +3844,7 @@
       }
     },
     "Navigate to your Applications folder and select 'WritingTools'." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3937,6 +3975,9 @@
           }
         }
       }
+    },
+    "Notes" : {
+
     },
     "OK" : {
       "localizations" : {
@@ -4161,6 +4202,7 @@
       }
     },
     "Open Accessibility Settings" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4181,6 +4223,15 @@
           }
         }
       }
+    },
+    "Open Commands Manager" : {
+
+    },
+    "Open Full Settings" : {
+
+    },
+    "Open Privacy & Security" : {
+
     },
     "Open System Settings" : {
       "extractionState" : "stale",
@@ -4475,6 +4526,7 @@
       }
     },
     "Please select a provider." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4518,6 +4570,12 @@
           }
         }
       }
+    },
+    "Preserves formatting for supported apps" : {
+
+    },
+    "Press your global shortcut to open the popup. Select text or images in any app and run a command. Built‑in commands are available and you can add your own." : {
+
     },
     "Professional" : {
       "comment" : "ID for professional tone",
@@ -4653,6 +4711,12 @@
           }
         }
       }
+    },
+    "Refresh Status" : {
+
+    },
+    "Required" : {
+
     },
     "Reset" : {
       "localizations" : {
@@ -4875,6 +4939,9 @@
           }
         }
       }
+    },
+    "Select a provider." : {
+
     },
     "Select AI Service" : {
       "localizations" : {
@@ -5122,6 +5189,7 @@
       }
     },
     "Supports Custom Commands" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5319,6 +5387,12 @@
           }
         }
       }
+    },
+    "Tips" : {
+
+    },
+    "Use “Proofread” to preserve formatting while fixing grammar/spelling." : {
+
     },
     "Use local OCR or Ollama's vision model for images." : {
       "localizations" : {
@@ -5548,7 +5622,11 @@
         }
       }
     },
+    "Works in any app that supports copy & paste" : {
+
+    },
     "Works in any application" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5614,6 +5692,15 @@
           }
         }
       }
+    },
+    "WritingTools briefly copies your selection, sends it to your chosen AI provider (or a local model), and then pastes the result back—preserving formatting when supported." : {
+
+    },
+    "You can revoke any permission later in System Settings." : {
+
+    },
+    "You’re ready to go!" : {
+
     },
     "Your message" : {
       "localizations" : {

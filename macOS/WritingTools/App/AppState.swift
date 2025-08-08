@@ -208,55 +208,44 @@ class AppState: ObservableObject {
     
     // Process a command (unified method for all command types)
     func processCommand(_ command: CommandModel) {
-        guard !selectedText.isEmpty else { return }
-        
-        isProcessing = true
-        
-        Task {
-            do {
-                let prompt = command.prompt
-                let result = try await activeProvider.processText(
-                    systemPrompt: prompt,
-                    userPrompt: selectedText,
-                    images: [],
-                    streaming: false
-                )
-                
-                // Determine what to do with the result based on command settings
-                if command.useResponseWindow {
-                    // Display in response window
-                    let window = ResponseWindow(
-                        title: "\(command.name) Result",
-                        content: result,
-                        selectedText: selectedText,
-                        option: nil 
-                    )
-                    
-                    WindowManager.shared.addResponseWindow(window)
-                    window.makeKeyAndOrderFront(nil)
-                    window.orderFrontRegardless()
-                } else {
-                    // Replace selected text by setting clipboard and pasting
-                    NSPasteboard.general.clearContents()
-                    NSPasteboard.general.setString(result, forType: .string)
-                    
-                    // Reactivate previous application and paste
-                    if let previousApp = previousApplication {
-                        previousApp.activate()
-                        
-                        // Wait briefly for activation then paste once
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                            self.simulatePaste()
-                        }
-                    }
-                }
-            } catch {
-                // Handle error
-                print("Error processing command: \(error)")
+      guard !selectedText.isEmpty else { return }
+
+      isProcessing = true
+
+      Task {
+        do {
+          let prompt = command.prompt
+          let result = try await activeProvider.processText(
+            systemPrompt: prompt,
+            userPrompt: selectedText,
+            images: [],
+            streaming: false
+          )
+
+          if command.useResponseWindow {
+            let window = ResponseWindow(
+              title: "\(command.name) Result",
+              content: result,
+              selectedText: selectedText,
+              option: nil
+            )
+
+            WindowManager.shared.addResponseWindow(window)
+            window.makeKeyAndOrderFront(nil)
+            window.orderFrontRegardless()
+          } else {
+            if command.preserveFormatting, selectedAttributedText != nil {
+              replaceSelectedTextPreservingAttributes(with: result)
+            } else {
+              replaceSelectedText(with: result)
             }
-            
-            isProcessing = false
+          }
+        } catch {
+          print("Error processing command: \(error)")
         }
+
+        isProcessing = false
+      }
     }
     
     // Helper method to replace selected text
@@ -276,29 +265,38 @@ class AppState: ObservableObject {
     }
     
     func replaceSelectedTextPreservingAttributes(with corrected: String) {
-        guard let original = selectedAttributedText else {
-            replaceSelectedText(with: corrected)   // fallback
-            return
+      guard let original = selectedAttributedText else {
+        replaceSelectedText(with: corrected)
+        return
+      }
+
+      let mutable = NSMutableAttributedString(attributedString: original)
+      mutable.applyCharacterDiff(from: original.string, to: corrected)
+
+      let pb = NSPasteboard.general
+      pb.clearContents()
+
+      // Prefer RTF, then plain string
+      if let rtfData = try? mutable.data(
+        from: NSRange(location: 0, length: mutable.length),
+        documentAttributes: [
+          .documentType: NSAttributedString.DocumentType.rtf,
+        ]
+      ) {
+        pb.declareTypes([.rtf, .string], owner: nil)
+        pb.setData(rtfData, forType: .rtf)
+        pb.setString(corrected, forType: .string)
+      } else {
+        // Fallback to plain text if we couldn't build RTF
+        pb.setString(corrected, forType: .string)
+      }
+
+      if let previous = previousApplication {
+        previous.activate()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+          self.simulatePaste()
         }
-        
-        let mutable = NSMutableAttributedString(attributedString: original)
-        mutable.applyCharacterDiff(from: original.string, to: corrected)
-        
-        // Clipboard + paste
-        NSPasteboard.general.clearContents()
-        if let rtfData = try? mutable.data(
-                from: NSRange(location: 0, length: mutable.length),
-                documentAttributes: [.documentType: NSAttributedString.DocumentType.rtf]) {
-            NSPasteboard.general.setData(rtfData, forType: .rtf)
-        }
-        NSPasteboard.general.setString(corrected, forType: .string)
-        
-        if let previous = previousApplication {
-            previous.activate()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                self.simulatePaste()
-            }
-        }
+      }
     }
 
 

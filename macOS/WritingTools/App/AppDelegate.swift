@@ -54,7 +54,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 self?.recreateStatusBarItem()
             }
             
-            if !UserDefaults.standard.bool(forKey: "has_completed_onboarding") {
+            if UserDefaults.standard.bool(forKey: "has_completed_onboarding") {
                 self?.showOnboarding()
             }
             
@@ -101,121 +101,167 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     
     // Executes a command without showing the popup
     private func executeCommandDirectly(_ command: CommandModel) {
-        // Cancel any ongoing processing first
-        appState.activeProvider.cancel()
-        
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            // Save the current app so we can return to it
-            if let currentFrontmostApp = NSWorkspace.shared.frontmostApplication {
-                self.appState.previousApplication = currentFrontmostApp
-            }
-            
-            let pb = NSPasteboard.general
-            
-            // Keep original plain-text clipboard so we can restore it
-            let oldPlain = pb.string(forType: .string)
-            
-            // Clear & issue ⌘-C
-            pb.clearContents()
-            let src = CGEventSource(stateID: .hidSystemState)
-            let kd  = CGEvent(keyboardEventSource: src, virtualKey: 0x08, keyDown: true)
-            let ku  = CGEvent(keyboardEventSource: src, virtualKey: 0x08, keyDown: false)
-            kd?.flags = .maskCommand
-            ku?.flags = .maskCommand
-            kd?.post(tap: .cghidEventTap)
-            ku?.post(tap: .cghidEventTap)
-            
-            // Wait for copy to complete
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-                guard let self = self else { return }
-                
-                // ---------- Capture rich text if present ----------
-                var rich: NSAttributedString?
-                if let rtf = pb.data(forType: .rtf) {
-                    rich = try? NSAttributedString(
-                        data: rtf,
-                        options: [.documentType: NSAttributedString.DocumentType.rtf],
-                        documentAttributes: nil
-                    )
-                } else if let html = pb.data(forType: .html) {
-                    rich = try? NSAttributedString(
-                        data: html,
-                        options: [.documentType: NSAttributedString.DocumentType.html],
-                        documentAttributes: nil
-                    )
-                }
-                
-                let selectedText = rich?.string ?? pb.string(forType: .string) ?? ""
-                
-                // Restore original clipboard contents
-                pb.clearContents()
-                if let oldPlain {
-                    pb.setString(oldPlain, forType: .string)
-                }
-                
-                // Skip if nothing selected
-                guard !selectedText.isEmpty else {
-                    NSLog("No text selected for command: \(command.name)")
-                    return
-                }
-                
-                // Persist selection in app state
-                self.appState.selectedAttributedText = rich
-                self.appState.selectedText = selectedText
-                
-                // Run the command
-                Task { await self.processCommandWithUI(command) }
-            }
+      // Cancel any ongoing processing first
+      appState.activeProvider.cancel()
+
+      // Helper: wait for pasteboard update
+      func waitForPasteboardUpdate(
+        _ pb: NSPasteboard,
+        initialChangeCount: Int,
+        timeout: TimeInterval = 0.6
+      ) async {
+        let start = Date()
+        while pb.changeCount == initialChangeCount,
+          Date().timeIntervalSince(start) < timeout
+        {
+          try? await Task.sleep(nanoseconds: 20_000_000) // 20ms
         }
+      }
+
+      // Helper: read attributed selection (flat-RTFD, RTFD, RTF, HTML)
+      func readAttributedSelection(from pb: NSPasteboard) -> NSAttributedString? {
+        if let flatRtfd = pb.data(
+          forType: NSPasteboard.PasteboardType("com.apple.flat-rtfd")
+        ),
+          let att = try? NSAttributedString(
+            data: flatRtfd,
+            options: [.documentType: NSAttributedString.DocumentType.rtfd],
+            documentAttributes: nil
+          )
+        {
+          return att
+        }
+
+        if let rtfd = pb.data(forType: .rtfd),
+          let att = try? NSAttributedString(
+            data: rtfd,
+            options: [.documentType: NSAttributedString.DocumentType.rtfd],
+            documentAttributes: nil
+          )
+        {
+          return att
+        }
+
+        if let rtf = pb.data(forType: .rtf),
+          let att = try? NSAttributedString(
+            data: rtf,
+            options: [.documentType: NSAttributedString.DocumentType.rtf],
+            documentAttributes: nil
+          )
+        {
+          return att
+        }
+
+        if let html = pb.data(forType: .html),
+          let att = try? NSAttributedString(
+            data: html,
+            options: [.documentType: NSAttributedString.DocumentType.html],
+            documentAttributes: nil
+          )
+        {
+          return att
+        }
+
+        return nil
+      }
+
+      Task { @MainActor in
+        // Save the current app so we can return to it
+        if let currentFrontmostApp = NSWorkspace.shared.frontmostApplication {
+          self.appState.previousApplication = currentFrontmostApp
+        }
+
+        let pb = NSPasteboard.general
+
+        // Keep original plain-text clipboard so we can restore it
+        let oldPlain = pb.string(forType: .string)
+
+        // Clear & issue ⌘-C
+        pb.clearContents()
+        let src = CGEventSource(stateID: .hidSystemState)
+        let kd = CGEvent(keyboardEventSource: src, virtualKey: 0x08, keyDown: true)
+        let ku = CGEvent(keyboardEventSource: src, virtualKey: 0x08, keyDown: false)
+        kd?.flags = .maskCommand
+        ku?.flags = .maskCommand
+
+        let initialChange = pb.changeCount
+        kd?.post(tap: .cghidEventTap)
+        ku?.post(tap: .cghidEventTap)
+
+        // Wait for the pasteboard to actually update
+        await waitForPasteboardUpdate(pb, initialChangeCount: initialChange)
+
+        // Capture rich text if present
+        let rich = readAttributedSelection(from: pb)
+        let selectedText = rich?.string ?? pb.string(forType: .string) ?? ""
+
+        // Restore original clipboard contents (plain text)
+        pb.clearContents()
+        if let oldPlain {
+          pb.setString(oldPlain, forType: .string)
+        }
+
+        // Skip if nothing selected
+        guard !selectedText.isEmpty else {
+          NSLog("No text selected for command: \(command.name)")
+          return
+        }
+
+        // Persist selection in app state
+        self.appState.selectedAttributedText = rich
+        self.appState.selectedText = selectedText
+
+        // Run the command (processCommandWithUI should honor preserveFormatting)
+        Task { await self.processCommandWithUI(command) }
+      }
     }
     
     // Process a command with appropriate UI feedback
     private func processCommandWithUI(_ command: CommandModel) async {
-        // Set processing flag to prevent duplicate operations
-        if appState.isProcessing {
-            return
-        }
-        
-        appState.isProcessing = true
-        
-        do {
-            // Process the text with the AI provider
-            let result = try await appState.activeProvider.processText(
-                systemPrompt: command.prompt,
-                userPrompt: appState.selectedText,
-                images: [],
-                streaming: false
-            )
-            
-            // Handle the result
-            await MainActor.run {
-                if command.useResponseWindow {
-                    // Show in response window
-                    let window = ResponseWindow(
-                        title: command.name,
-                        content: result,
-                        selectedText: appState.selectedText,
-                        option: nil
-                    )
-                    
-                    NSApp.activate(ignoringOtherApps: true)
-                    WindowManager.shared.addResponseWindow(window)
-                    window.makeKeyAndOrderFront(nil)
-                    window.orderFrontRegardless()
-                } else {
-                    // Replace text directly
-                    appState.replaceSelectedText(with: result)
-                }
-            }
-        } catch {
-            print("Error processing command \(command.name): \(error.localizedDescription)")
-        }
-        
+      // Set processing flag to prevent duplicate operations
+      if appState.isProcessing {
+        return
+      }
+
+      appState.isProcessing = true
+
+      do {
+        let result = try await appState.activeProvider.processText(
+          systemPrompt: command.prompt,
+          userPrompt: appState.selectedText,
+          images: [],
+          streaming: false
+        )
+
         await MainActor.run {
-            appState.isProcessing = false
+          if command.useResponseWindow {
+            let window = ResponseWindow(
+              title: command.name,
+              content: result,
+              selectedText: appState.selectedText,
+              option: nil
+            )
+
+            NSApp.activate(ignoringOtherApps: true)
+            WindowManager.shared.addResponseWindow(window)
+            window.makeKeyAndOrderFront(nil)
+            window.orderFrontRegardless()
+          } else {
+            // Preserve formatting when requested and we captured it
+            if command.preserveFormatting, appState.selectedAttributedText != nil {
+              appState.replaceSelectedTextPreservingAttributes(with: result)
+            } else {
+              appState.replaceSelectedText(with: result)
+            }
+          }
         }
+      } catch {
+        print("Error processing command \(command.name): \(error.localizedDescription)")
+      }
+
+      await MainActor.run {
+        appState.isProcessing = false
+      }
     }
     
     // Called when app is about to close - performs cleanup
@@ -373,127 +419,175 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         }
     }
     
-    @MainActor private func showPopup() {
-        appState.activeProvider.cancel()
-        
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            if let frontApp = NSWorkspace.shared.frontmostApplication {
-                self.appState.previousApplication = frontApp
-            }
-            
-            self.closePopupWindow()
-            
-            let pb = NSPasteboard.general
-            let oldPlain = pb.string(forType: .string)
-            
-            // Clear & copy current selection
-            pb.clearContents()
-            let src = CGEventSource(stateID: .hidSystemState)
-            let kd  = CGEvent(keyboardEventSource: src, virtualKey: 0x08, keyDown: true)
-            let ku  = CGEvent(keyboardEventSource: src, virtualKey: 0x08, keyDown: false)
-            kd?.flags = .maskCommand
-            ku?.flags = .maskCommand
-            kd?.post(tap: .cghidEventTap)
-            ku?.post(tap: .cghidEventTap)
-            
-            // Wait for the copy operation to complete, then process the pasteboard
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
-                guard let self = self else { return }
-                
-                var foundImages: [Data] = []
-                var selectedText = ""
-                
-                // First check for file URLs (for Finder selections)
-                let classes = [NSURL.self]
-                let options: [NSPasteboard.ReadingOptionKey: Any] = [
-                    .urlReadingFileURLsOnly: true,
-                    .urlReadingContentsConformToTypes: [
-                        "public.image",
-                        "public.png",
-                        "public.jpeg",
-                        "public.tiff",
-                        "com.compuserve.gif"
-                    ]
-                ]
-                
-                if let urls = pb.readObjects(forClasses: classes, options: options) as? [URL] {
-                    for url in urls {
-                        if let imageData = try? Data(contentsOf: url) {
-                            if NSImage(data: imageData) != nil {
-                                foundImages.append(imageData)
-                                NSLog("Loaded image data from file: \(url.lastPathComponent)")
-                            }
-                        }
-                    }
-                }
-                
-                // If no file URLs found, check for direct image data
-                if foundImages.isEmpty {
-                    let supportedImageTypes = [
-                        NSPasteboard.PasteboardType("public.png"),
-                        NSPasteboard.PasteboardType("public.jpeg"),
-                        NSPasteboard.PasteboardType("public.tiff"),
-                        NSPasteboard.PasteboardType("com.compuserve.gif"),
-                        NSPasteboard.PasteboardType("public.image")
-                    ]
-                    
-                    for type in supportedImageTypes {
-                        if let data = pb.data(forType: type) {
-                            foundImages.append(data)
-                            NSLog("Found direct image data of type: \(type)")
-                            break
-                        }
-                    }
-                }
-                
-                // ------ Capture rich text ------
-                var rich: NSAttributedString?
-                if let rtf = pb.data(forType: .rtf) {
-                    rich = try? NSAttributedString(
-                        data: rtf,
-                        options: [.documentType: NSAttributedString.DocumentType.rtf],
-                        documentAttributes: nil
-                    )
-                } else if let html = pb.data(forType: .html) {
-                    rich = try? NSAttributedString(
-                        data: html,
-                        options: [.documentType: NSAttributedString.DocumentType.html],
-                        documentAttributes: nil
-                    )
-                }
-                
-                let plainText = rich?.string ?? pb.string(forType: .string) ?? ""
-                
-                // Restore clipboard
-                pb.clearContents()
-                if let oldPlain {
-                    pb.setString(oldPlain, forType: .string)
-                }
-                
-                // Store selection in app state
-                self.appState.selectedAttributedText = rich
-                self.appState.selectedText           = plainText
-                self.appState.selectedImages         = foundImages
-                
-                // ------ Show popup window ------
-                let window = PopupWindow(appState: self.appState)
-                window.delegate = self
-                self.popupWindow = window
-                
-                if !plainText.isEmpty || !foundImages.isEmpty {
-                    window.setContentSize(NSSize(width: 400, height: 400))
-                } else {
-                    window.setContentSize(NSSize(width: 400, height: 100))
-                }
-                
-                window.positionNearMouse()
-                NSApp.activate(ignoringOtherApps: true)
-                window.makeKeyAndOrderFront(nil)
-                window.orderFrontRegardless()
-            }
+    @MainActor
+    private func showPopup() {
+      appState.activeProvider.cancel()
+
+      // Helper: wait for pasteboard update
+      func waitForPasteboardUpdate(
+        _ pb: NSPasteboard,
+        initialChangeCount: Int,
+        timeout: TimeInterval = 0.6
+      ) async {
+        let start = Date()
+        while pb.changeCount == initialChangeCount,
+          Date().timeIntervalSince(start) < timeout
+        {
+          try? await Task.sleep(nanoseconds: 20_000_000) // 20ms
         }
+      }
+
+      // Helper: read attributed selection (flat-RTFD, RTFD, RTF, HTML)
+      func readAttributedSelection(from pb: NSPasteboard) -> NSAttributedString? {
+        if let flatRtfd = pb.data(
+          forType: NSPasteboard.PasteboardType("com.apple.flat-rtfd")
+        ),
+          let att = try? NSAttributedString(
+            data: flatRtfd,
+            options: [.documentType: NSAttributedString.DocumentType.rtfd],
+            documentAttributes: nil
+          )
+        {
+          return att
+        }
+
+        if let rtfd = pb.data(forType: .rtfd),
+          let att = try? NSAttributedString(
+            data: rtfd,
+            options: [.documentType: NSAttributedString.DocumentType.rtfd],
+            documentAttributes: nil
+          )
+        {
+          return att
+        }
+
+        if let rtf = pb.data(forType: .rtf),
+          let att = try? NSAttributedString(
+            data: rtf,
+            options: [.documentType: NSAttributedString.DocumentType.rtf],
+            documentAttributes: nil
+          )
+        {
+          return att
+        }
+
+        if let html = pb.data(forType: .html),
+          let att = try? NSAttributedString(
+            data: html,
+            options: [.documentType: NSAttributedString.DocumentType.html],
+            documentAttributes: nil
+          )
+        {
+          return att
+        }
+
+        return nil
+      }
+
+      Task { @MainActor in
+        if let frontApp = NSWorkspace.shared.frontmostApplication {
+          self.appState.previousApplication = frontApp
+        }
+
+        self.closePopupWindow()
+
+        let pb = NSPasteboard.general
+        let oldPlain = pb.string(forType: .string)
+
+        // Clear & copy current selection
+        pb.clearContents()
+        let src = CGEventSource(stateID: .hidSystemState)
+        let kd = CGEvent(keyboardEventSource: src, virtualKey: 0x08, keyDown: true)
+        let ku = CGEvent(keyboardEventSource: src, virtualKey: 0x08, keyDown: false)
+        kd?.flags = .maskCommand
+        ku?.flags = .maskCommand
+
+        let initialChange = pb.changeCount
+        kd?.post(tap: .cghidEventTap)
+        ku?.post(tap: .cghidEventTap)
+
+        // Wait until the pasteboard actually changes (or timeout)
+        await waitForPasteboardUpdate(pb, initialChangeCount: initialChange)
+
+        var foundImages: [Data] = []
+
+        // First check for file URLs (for Finder selections)
+        let classes = [NSURL.self]
+        let options: [NSPasteboard.ReadingOptionKey: Any] = [
+          .urlReadingFileURLsOnly: true,
+          .urlReadingContentsConformToTypes: [
+            "public.image",
+            "public.png",
+            "public.jpeg",
+            "public.tiff",
+            "com.compuserve.gif",
+          ],
+        ]
+
+        if let urls = pb.readObjects(
+          forClasses: classes,
+          options: options
+        ) as? [URL] {
+          for url in urls {
+            if let imageData = try? Data(contentsOf: url),
+              NSImage(data: imageData) != nil
+            {
+              foundImages.append(imageData)
+              NSLog("Loaded image data from file: \(url.lastPathComponent)")
+            }
+          }
+        }
+
+        // If no file URLs found, check for direct image data
+        if foundImages.isEmpty {
+          let supportedImageTypes: [NSPasteboard.PasteboardType] = [
+            NSPasteboard.PasteboardType("public.png"),
+            NSPasteboard.PasteboardType("public.jpeg"),
+            NSPasteboard.PasteboardType("public.tiff"),
+            NSPasteboard.PasteboardType("com.compuserve.gif"),
+            NSPasteboard.PasteboardType("public.image"),
+          ]
+
+          for type in supportedImageTypes {
+            if let data = pb.data(forType: type) {
+              foundImages.append(data)
+              NSLog("Found direct image data of type: \(type)")
+              break
+            }
+          }
+        }
+
+        // Capture rich text with extended types
+        let rich = readAttributedSelection(from: pb)
+        let plainText = rich?.string ?? pb.string(forType: .string) ?? ""
+
+        // Restore clipboard
+        pb.clearContents()
+        if let oldPlain {
+          pb.setString(oldPlain, forType: .string)
+        }
+
+        // Store selection in app state
+        self.appState.selectedAttributedText = rich
+        self.appState.selectedText = plainText
+        self.appState.selectedImages = foundImages
+
+        // Show popup window
+        let window = PopupWindow(appState: self.appState)
+        window.delegate = self
+        self.popupWindow = window
+
+        if !plainText.isEmpty || !foundImages.isEmpty {
+          window.setContentSize(NSSize(width: 400, height: 400))
+        } else {
+          window.setContentSize(NSSize(width: 400, height: 100))
+        }
+
+        window.positionNearMouse()
+        NSApp.activate(ignoringOtherApps: true)
+        window.makeKeyAndOrderFront(nil)
+        window.orderFrontRegardless()
+      }
     }
     
     // Closes and cleans up the popup window
