@@ -1,68 +1,165 @@
-# Writing Tools for macOS
+# Writing Tools for macOS (Native Swift Port)
 
-This is a new, **native macOS port of Writing Tools**, created entirely by @Aryamirsepasi 🎉
+> System-wide AI writing superpowers for Mac — **native Swift**, **privacy-first**, and **insanely fast** on Apple Silicon.
 
-Core functionality works well, and it is still an ongoing work in progress.
+[Back to root README](../README.md)
+
+---
+
+## Table of Contents
+- [Highlights](#highlights)
+- [Quick Start (Download & Install)](#quick-start-download--install)
+- [First Launch: Permissions](#first-launch-permissions)
+- [Using Writing Tools](#using-writing-tools)
+- [Providers & Models](#providers--models)
+- [Power Features](#power-features)
+- [System Requirements](#system-requirements)
+- [Build From Source (Xcode)](#build-from-source-xcode)
+- [Troubleshooting](#troubleshooting)
+- [Privacy](#privacy)
+- [Credits](#credits)
+- [License](#license)
+
+---
+
+## Highlights
+
+- **Truly native**: Built in Swift (SwiftUI + AppKit where helpful) for a crisp Mac experience.
+- **Local LLMs with MLX**: Run models **fully on-device** on Apple Silicon. No internet required.
+- **Rich Text Proofread**: Keep **RTF formatting** (bold, italics, lists, links) while fixing grammar and tone.
+- **Your workflow, your rules**: Add/edit **custom commands** and assign your own **shortcuts**.
+- **Multilingual**: App UI in **English, German, French, Spanish**; commands work with many more languages.
+- **Themes**: Multiple themes including Dark Mode to match your desktop.
+
+---
+
+## Quick Start (Download & Install)
+
+1) **Download** the latest `.dmg` from **Releases**:  
+   https://github.com/theJayTea/WritingTools/releases
+
+2) **Install**  
+   - Open the `.dmg`, drag **Writing Tools.app** into **Applications**.
+   - On first open, if Gatekeeper warns, right-click the app → **Open**.
+
+3) **Run**  
+   - Launch the app.
+   - Open **Settings** and choose your **AI Provider** (local MLX, Ollama, or a cloud provider).
+   - Assign your preferred **keyboard shortcut**.
+
+---
+
+## First Launch: Permissions
+
+Writing Tools uses macOS accessibility to read and replace selected text.  
+On first run, grant:
+
+- **Accessibility** (required)  
+- **Screen Recording** (only needed for some apps that restrict text access)
+
+You can manage these anytime under:  
+**System Settings → Privacy & Security → Accessibility / Screen Recording**. :contentReference[oaicite:0]{index=0}
+
+> Tip: If replacement doesn’t work in a specific app, enabling **Screen Recording** usually fixes it.
+
+---
+
+## Using Writing Tools
+
+- **Invoke anywhere**: Select text in any app → press your shortcut → choose an action:
+  - **Proofread** (keeps RTF formatting)
+  - **Rewrite**, **Make Friendly**, **Make Professional**, **Concise**
+  - **Summarize**, **Key Points**, **Table**
+  - **Custom command** (your own prompt)
+- **No selection?** Your shortcut opens a quick **Chat** with the current model.
+- **Undo**: If you don’t like the result, simply undo in the target app.
+
+> Shortcut conflicts? Check **System Settings → Keyboard → Keyboard Shortcuts** (Spotlight/Input Sources) and pick an alternative combo in the app’s Settings.
+
+---
+
+## Providers & Models
+
+- **Cloud**: OpenAI, Google (Gemini), Anthropic, Mistral, OpenRouter  
+- **Local**:
+  - **MLX (Apple Silicon)** — first-class, on-device inference
+  - **Ollama** via OpenAI-compatible endpoint
+
+Bring your own API keys, switch providers anytime, and mix local + cloud based on your task.
+
+---
+
+## Power Features
+
+- **Command Editor**: Create reusable buttons for your own prompts; assign per-command shortcuts.
+- **Model Flexibility**: Choose the best model for proofreading vs. summarization vs. chat.
+- **Localization**: UI in **EN / DE / FR / ES**; commands happily accept and output many languages.
+- **Document-friendly**: **RTF-preserving Proofread** keeps the look of your document intact.
 
 ---
 
 ## System Requirements
-Due to the accessibility features the app uses (e.g., automatically selecting the window containing the text and pasting the updated version), **the minimum macOS version required is 14.0**. You also have to allow this accessibility access in System Settings. 
-> System Settings → Privacy & Security → Accessibility → Press the plus (+) button → Add *writing-tools* and enable access.
+
+- **macOS 14.0 or later** (due to Accessibility APIs used for selection/replacement). :contentReference[oaicite:1]{index=1}  
+- **Apple Silicon** recommended for MLX local models (runs on-device for privacy and speed).  
+- For development: **Xcode 15+**.
 
 ---
 
-## How to Build This Project
+## Build From Source (Xcode)
 
-Since the `.xcodeproj` file is excluded, you can still build the project manually by following these steps:
-This guide will help you properly set up the Writing Tools macOS project in Xcode.
+You can build the macOS app either by opening the project or the package:
 
-## System Requirements
-- macOS 14.0 or later
-- Xcode 15.0 or later
-- Git
+**Option A — Open project (if present)**  
+1. `git clone https://github.com/theJayTea/WritingTools.git`  
+2. Open **WritingTools/macOS/** and double-click the **.xcodeproj**.  
+3. Select target **Writing Tools** → **Signing & Capabilities** → choose your Development Team.  
+4. Set **Deployment Target** to **macOS 14.0** (or higher).  
+5. Run on **My Mac** (⌘R).
 
-## Manual Build Steps
+**Option B — Open the folder / Package.swift**  
+1. `git clone https://github.com/theJayTea/WritingTools.git`  
+2. In Xcode: **File → Open…** → choose **WritingTools/macOS** (or the repo root).  
+3. Let Xcode resolve Swift Packages, then configure **Signing** and **Deployment Target** as above.  
+4. Run on **My Mac** (⌘R).
 
-1. **Install Xcode**
-   - Download and install Xcode from the App Store
-   - Launch Xcode once installed and complete any additional component installations
+> First debug run will trigger macOS permission prompts (Accessibility / Screen Recording). Accept them and relaunch if prompted. :contentReference[oaicite:2]{index=2}
 
-2. **Clone the Repository**
-   - Open Terminal and navigate to the directory where you want to store the project:
-   ```bash
-   git clone https://github.com/theJayTea/WritingTools.git
-   ```
+---
 
-3. **Open in Xcode**
-   - Open Xcode
-   - Select "Open an existing project..." from the options.
-   - Navigate to the macOS folder within the WritingTools directory that you cloned previously, and select "writing-tools.xcodeproj"
+## Troubleshooting
 
-4. **Configure Project Settings**
-   - In Xcode, select the project in the Navigator pane.
-   - Under "Targets", select "writing-tools"
-   - Set the following:
-     - Deployment Target: macOS 14.0
-     - Signing & Capabilities: Add your development team
+- **Shortcut doesn’t trigger**  
+  - Pick another combo in Settings (avoid Spotlight/Input Sources defaults).
+- **Text not replaced in a specific app**  
+  - Ensure **Accessibility** is allowed; enable **Screen Recording** for that app scenario.
+- **Local model not responding**  
+  - For **MLX**: confirm the model is available and selected in Settings.  
+  - For **Ollama**: verify the server is running and the **Base URL / Model** fields match your local model name.
+- **Permissions got reset**  
+  - Remove and re-add the app under: **System Settings → Privacy & Security**.
 
-5. **Build and Run**
-   - In Xcode, select "My Mac" as the run destination
-   - Click the Play button or press ⌘R to build and run
+---
 
-## Additional Notes
-- The project requires macOS 14.0+ due to accessibility features
-- Make sure all required permissions are granted when first launching the app
-- For development, ensure you have the latest Xcode Command Line Tools installed
+## Privacy
+
+- Nothing is sent anywhere unless **you** invoke an action.
+- API keys are stored **locally** on your device.
+- Use **MLX** to keep all processing **on-device** (no network).
 
 ---
 
 ## Credits
 
-The macOS port is being developed by **Aryamirsepasi**. [GitHub](https://github.com/Aryamirsepasi)
+- **macOS Port**: **Arya Mirsepasi** — native Swift, SwiftUI + AppKit polish.  
+- **Image/Picture Processing**: **Joaov41**.  
+- **Keyboard Shortcuts**: Thanks to **sindresorhus/KeyboardShortcuts**.  
+- **MLX Swift** (local LLMs on Apple Silicon): https://github.com/ml-explore/mlx-swift-examples
 
-The amazing gemini picture processing functionality was created by **Joaov41**. [GitHub](https://github.com/Joaov41)
+Original macOS README noted the minimum macOS version and Accessibility permissions. :contentReference[oaicite:3]{index=3}
 
-Special Thanks to @sindresorhus for developing a great and stable keyboard shortcuts package for Swift. [GitHub](https://github.com/sindresorhus/KeyboardShortcuts)
+---
 
-Huge shoutout to MLX Swift Team, creating local LLM compatibility on Apple silicon Macs. [GitHub](https://github.com/ml-explore/mlx-swift-examples)
+## License
+
+Distributed under the **GNU GPL v3**.

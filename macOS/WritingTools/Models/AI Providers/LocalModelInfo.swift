@@ -10,8 +10,8 @@ enum LocalModelType: String, CaseIterable, Identifiable {
     case gemma3n = "gemma3n_E4B_it_lm_4bit"
     
     // VLM Models
-    case gemma3 = "qwen2_5vl_3b_instruct_4bit"
-    case qwen25VL = "gemma-3-4b-it-qat-4bit"
+    case gemma3   = "gemma-3-4b-it-qat-4bit"
+    case qwen25VL = "qwen2_5vl_3b_instruct_4bit"
     
     var id: String { self.rawValue }
     

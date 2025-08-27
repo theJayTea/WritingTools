@@ -354,15 +354,6 @@ struct OnboardingView: View {
           }
           .padding(.top, 8)
 
-          HStack {
-            Button("Open Full Settings") {
-              WindowManager.shared.transitonFromOnboardingToSettings(
-                appState: appState
-              )
-            }
-            .buttonStyle(.bordered)
-            Spacer()
-          }
         }
         .padding(.vertical, 4)
       }
@@ -660,11 +651,20 @@ struct OnboardingView: View {
     }
   }
 
-  static func requestAccessibility() {
-    let dict = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true]
-      as CFDictionary
-    _ = AXIsProcessTrustedWithOptions(dict)
-  }
+    static func requestAccessibility() {
+        // Request the system prompt (may no-op on recent macOS if already listed/denied)
+        let key = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as CFString
+        let options: CFDictionary = [key: true] as CFDictionary
+        _ = AXIsProcessTrustedWithOptions(options)
+
+        // Always open Privacy > Accessibility as a reliable fallback
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+          if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+            NSWorkspace.shared.open(url)
+          }
+        }
+      }
+    
 
   static func checkScreenRecording() -> Bool {
     if #available(macOS 10.15, *) {

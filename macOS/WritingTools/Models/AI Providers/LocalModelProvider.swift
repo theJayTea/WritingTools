@@ -5,10 +5,12 @@ import MLXLMCommon
 import MLXRandom
 import SwiftUI
 import Combine
+import Hub
 
 // Constants for UserDefaults keys
 fileprivate let kModelStatusKey = "local_llm_model_status"
 fileprivate let kModelInfoKey = "local_llm_model_info"
+
 
 @MainActor
 class LocalModelProvider: ObservableObject, AIProvider {
@@ -42,6 +44,18 @@ class LocalModelProvider: ObservableObject, AIProvider {
 #endif
     }
     
+    // Where we keep MLX models
+    private static let modelsRoot: URL = {
+        let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        return base.appendingPathComponent("WritingTools/MLXModels", isDirectory: true)
+    }()
+
+    private lazy var hub: HubApi = {
+        // ensure the folder exists
+        try? FileManager.default.createDirectory(at: Self.modelsRoot, withIntermediateDirectories: true)
+        return HubApi(downloadBase: Self.modelsRoot)
+    }()
+
     // Is the current platform supported
     var isPlatformSupported: Bool {
         LocalModelProvider.isAppleSilicon
@@ -65,6 +79,31 @@ class LocalModelProvider: ObservableObject, AIProvider {
     private var isUsingVisionModel: Bool {
         selectedModelType?.isVisionModel ?? false
     }
+    
+    private func cleanID(from config: ModelConfiguration) -> String {
+        var s = String(describing: config.id)
+        if s.hasPrefix("id(\""), s.hasSuffix("\")") {
+            s.removeFirst(4); s.removeLast(2)
+        }
+        return s
+    }
+
+    private func expectedRepoFolder(for config: ModelConfiguration) -> URL {
+        let id = cleanID(from: config)                 // e.g. "mlx-community/gemma-3-4b-it-qat-4bit"
+        let parts = id.split(separator: "/")
+        if parts.count == 2 {
+            return Self.modelsRoot
+                .appendingPathComponent("models", isDirectory: true)
+                .appendingPathComponent(String(parts[0]), isDirectory: true)
+                .appendingPathComponent(String(parts[1]), isDirectory: true)
+        } else {
+            // fallback: flatten if id is unexpected
+            return Self.modelsRoot
+                .appendingPathComponent("models", isDirectory: true)
+                .appendingPathComponent(id.replacingOccurrences(of: "/", with: "_"), isDirectory: true)
+        }
+    }
+
     
     let generateParameters = GenerateParameters(temperature: 0.6)
     let maxTokens = 10000
@@ -97,18 +136,9 @@ class LocalModelProvider: ObservableObject, AIProvider {
     
     // Model Directory Calculation
     private var modelDirectory: URL? {
-        guard let config = selectedModelConfiguration else { return nil }
-        guard let documentsPath = FileManager.default.urls(
-            for: .documentDirectory, in: .userDomainMask).first else {
-            print("Could not find Documents directory")
-            return nil
-        }
-        let idstring = String(describing: config.id)
-        let cleanId = idstring.replacingOccurrences(of: "id(\"", with: "")
-            .replacingOccurrences(of: "\")", with: "")
-        let modelPath = "huggingface/models/\(cleanId)" // Use the ID of the selected model
-        return documentsPath.appendingPathComponent(modelPath)
-    }
+         guard let config = selectedModelConfiguration else { return nil }
+         return expectedRepoFolder(for: config)
+     }
     
     init() {
         if isPlatformSupported {
@@ -314,6 +344,24 @@ class LocalModelProvider: ObservableObject, AIProvider {
         startDownload()
     }
     
+    func revealModelsFolder() {
+        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: Self.modelsRoot.path)
+    }
+
+    func cleanLegacyCacheForSelectedModel() {
+        // If you want to remove any old cached copy (previous defaultHubApi downloads)
+        guard let config = selectedModelConfiguration else { return }
+        let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+        // MLX’s default hub uses caches; structure may vary—remove any folders that contain the repo name
+        let repo = cleanID(from: config).split(separator: "/").last.map(String.init) ?? ""
+        if let contents = try? FileManager.default.contentsOfDirectory(at: caches, includingPropertiesForKeys: nil) {
+            for url in contents where url.lastPathComponent.localizedCaseInsensitiveContains(repo) {
+                try? FileManager.default.removeItem(at: url)
+            }
+        }
+    }
+
+    
     func deleteModel() throws {
         guard isPlatformSupported else {
             throw NSError(domain: "LocalLLM", code: -1, userInfo: [NSLocalizedDescriptionKey: "Platform not supported"])
@@ -398,6 +446,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
                 print("load: Calling \(modelType.isVisionModel ? "VLM" : "LLM")ModelFactory.shared.loadContainer for \(config.id)")
                 
                 let modelContainer = try await factory.loadContainer(
+                    hub: hub,
                     configuration: config
                 ) { [weak self] progress in
                     Task { @MainActor [weak self] in
@@ -472,7 +521,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
                 : LLMModelFactory.shared
                 
                 print("load: Calling \(modelType.isVisionModel ? "VLM" : "LLM")ModelFactory.shared.loadContainer for \(config.id)")
-                let modelContainer = try await factory.loadContainer(configuration: config)
+                let modelContainer = try await factory.loadContainer(hub: hub, configuration: config)
                 print("load: loadContainer completed successfully (from disk).")
                 let numParams = await modelContainer.perform { context in context.model.numParameters() }
                 modelInfo = "\(modelType.displayName) loaded. Weights: \(numParams / (1024 * 1024))M"
