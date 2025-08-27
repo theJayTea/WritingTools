@@ -2,10 +2,29 @@
   "sourceLanguage" : "en",
   "strings" : {
     "" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
     },
     "." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -28,7 +47,7 @@
       }
     },
     "(Llama 3.2 3B 4-bit)" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -80,7 +99,7 @@
       }
     },
     "(Llama3.2 3B 4-bit)" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -176,7 +195,7 @@
       }
     },
     "• Helps you write with clarity and confidence" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -848,7 +867,26 @@
       }
     },
     "Assign per‑command shortcuts for instant actions without the popup." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weisen Sie Shortcuts pro Befehl für Sofortaktionen ohne Popup zu."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asigna atajos por comando para acciones instantáneas sin la ventana emergente."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attribuez des raccourcis par commande pour des actions instantanées sans la fenêtre contextuelle."
+          }
+        }
+      }
     },
     "Assistant's response" : {
       "localizations" : {
@@ -1849,7 +1887,26 @@
       }
     },
     "Custom commands & per-command shortcuts" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benutzerdefinierte Befehle und Befehls-Shortcuts"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comandos personalizados y atajos por comando"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Commandes personnalisées et raccourcis par commande"
+          }
+        }
+      }
     },
     "Custom Model Name" : {
       "localizations" : {
@@ -2434,7 +2491,26 @@
       }
     },
     "Enable Screenshot OCR (Optional)" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Screenshot-OCR aktivieren (optional)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Habilitar OCR de captura de pantalla (opcional)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activer l'OCR de capture d'écran (facultatif)"
+          }
+        }
+      }
     },
     "Ensure the toggle switch next to 'WritingTools' is turned ON." : {
       "extractionState" : "stale",
@@ -2549,7 +2625,26 @@
       }
     },
     "Finish and Start Using WritingTools" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beenden und Starten der Verwendung von WritingTools"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finalizar y comenzar a utilizar WritingTools"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminer et commencer à utiliser WritingTools"
+          }
+        }
+      }
     },
     "Friendly" : {
       "comment" : "ID for friendly tone",
@@ -2998,7 +3093,26 @@
       }
     },
     "Granted" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gewährt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Concedido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accordé"
+          }
+        }
+      }
     },
     "Helps you write with clarity and confidence" : {
       "extractionState" : "stale",
@@ -3024,7 +3138,26 @@
       }
     },
     "How it works" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "So funktioniert es"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cómo funciona"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment ça marche"
+          }
+        }
+      }
     },
     "How to enable accessibility access:" : {
       "extractionState" : "stale",
@@ -3072,7 +3205,26 @@
       }
     },
     "If enabled, you can run OCR on screenshot snippets. This requires Screen Recording permission." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn diese Option aktiviert ist, können Sie OCR auf Screenshot-Ausschnitten ausführen. Dazu ist die Berechtigung für Bildschirmaufnahmen erforderlich."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si está habilitado, puede ejecutar OCR en fragmentos de capturas de pantalla. Esto requiere permiso para grabar la pantalla."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si cela est activé, vous pouvez exécuter OCR sur des extraits de capture d'écran. Cela nécessite une autorisation d'enregistrement d'écran."
+          }
+        }
+      }
     },
     "Image Mode" : {
       "localizations" : {
@@ -3141,7 +3293,26 @@
       }
     },
     "Improve your writing with one shortcut" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbessern Sie Ihr Schreiben mit einem Shortcut"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mejora tu escritura con un atajo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Améliorez votre écriture avec un seul raccourci"
+          }
+        }
+      }
     },
     "Improves your writing with AI" : {
       "extractionState" : "stale",
@@ -3189,7 +3360,26 @@
       }
     },
     "Input Monitoring is NOT required. WritingTools only posts copy/paste commands." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Eingabeüberwachung ist NICHT erforderlich. WritingTools sendet nur Kopier-/Einfügebefehle."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No es necesario supervisar la entrada. WritingTools solo publica comandos de copiar/pegar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La surveillance des entrées n'est PAS nécessaire. WritingTools ne publie que des commandes copier/coller."
+          }
+        }
+      }
     },
     "Keep Alive Time" : {
       "localizations" : {
@@ -3506,7 +3696,26 @@
       }
     },
     "Local LLM keeps data on‑device; cloud providers receive selected content for processing." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lokale LLM speichert Daten auf dem Gerät; Cloud-Anbieter erhalten ausgewählte Inhalte zur Verarbeitung."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LLM local almacena los datos en el dispositivo; los proveedores de servicios en la nube reciben contenido seleccionado para su procesamiento."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le LLM local conserve les données sur l'appareil ; les fournisseurs de cloud reçoivent du contenu sélectionné pour le traitement."
+          }
+        }
+      }
     },
     "Local LLM processing is only available on Apple Silicon (M1/M2/M3/M4 etc.) devices." : {
       "localizations" : {
@@ -3977,7 +4186,26 @@
       }
     },
     "Notes" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anmerkungen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes"
+          }
+        }
+      }
     },
     "OK" : {
       "localizations" : {
@@ -4225,10 +4453,48 @@
       }
     },
     "Open Commands Manager" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Befehlsmanager öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir el Administrador de comandos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestionnaire de commandes ouvertes"
+          }
+        }
+      }
     },
     "Open Privacy & Security" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datenschutz und Sicherheit öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir Privacidad y seguridad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confidentialité et sécurité ouvertes"
+          }
+        }
+      }
     },
     "Open System Settings" : {
       "extractionState" : "stale",
@@ -4569,10 +4835,48 @@
       }
     },
     "Preserves formatting for supported apps" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Behält die Formatierung für unterstützte Apps bei"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conserva el formato para las aplicaciones compatibles."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Préserve le formatage des applications prises en charge"
+          }
+        }
+      }
     },
     "Press your global shortcut to open the popup. Select text or images in any app and run a command. Built‑in commands are available and you can add your own." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drücken Sie Ihre globale Tastenkombination, um das Popup-Fenster zu öffnen. Wählen Sie Text oder Bilder in einer beliebigen App aus und führen Sie einen Befehl aus. Es stehen integrierte Befehle zur Verfügung, und Sie können eigene hinzufügen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pulsa tu atajo global para abrir la ventana emergente. Selecciona texto o imágenes en cualquier aplicación y ejecuta un comando. Hay comandos integrados disponibles y puedes añadir los tuyos propios."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appuyez sur votre raccourci global pour ouvrir la fenêtre contextuelle. Sélectionnez du texte ou des images dans n'importe quelle application et exécutez une commande. Des commandes intégrées sont disponibles et vous pouvez ajouter les vôtres."
+          }
+        }
+      }
     },
     "Professional" : {
       "comment" : "ID for professional tone",
@@ -4710,10 +5014,48 @@
       }
     },
     "Refresh Status" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status aktualisieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualizar estado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "État de l'actualisation"
+          }
+        }
+      }
     },
     "Required" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erforderlich"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obligatorio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obligatoire"
+          }
+        }
+      }
     },
     "Reset" : {
       "localizations" : {
@@ -4938,7 +5280,26 @@
       }
     },
     "Select a provider." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wählen Sie einen Anbieter aus."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccione un proveedor."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionnez un fournisseur."
+          }
+        }
+      }
     },
     "Select AI Service" : {
       "localizations" : {
@@ -5386,10 +5747,48 @@
       }
     },
     "Tips" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipps"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consejos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conseils"
+          }
+        }
+      }
     },
     "Use “Proofread” to preserve formatting while fixing grammar/spelling." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwenden Sie „Korrekturlesen“, um die Formatierung beizubehalten und gleichzeitig Grammatik- und Rechtschreibfehler zu korrigieren."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliza «Corregir» para conservar el formato mientras corriges la gramática y la ortografía."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utilisez « Relire » pour conserver la mise en forme tout en corrigeant la grammaire et l'orthographe."
+          }
+        }
+      }
     },
     "Use local OCR or Ollama's vision model for images." : {
       "localizations" : {
@@ -5529,7 +5928,26 @@
       }
     },
     "Version: 5.0 (Based on Windows Port version 7.1)" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version: 5.0 (basierend auf Windows Port Version 7.1)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versión: 5.0 (basada en la versión 7.1 para Windows)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version : 5.0 (basée sur la version Windows Port 7.1)"
+          }
+        }
+      }
     },
     "Vision-capable model" : {
       "localizations" : {
@@ -5620,7 +6038,26 @@
       }
     },
     "Works in any app that supports copy & paste" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funktioniert in jeder App, die Kopieren und Einfügen unterstützt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funciona en cualquier aplicación que admita copiar y pegar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fonctionne dans toutes les applications prenant en charge le copier-coller."
+          }
+        }
+      }
     },
     "Works in any application" : {
       "extractionState" : "stale",
@@ -5691,13 +6128,70 @@
       }
     },
     "WritingTools briefly copies your selection, sends it to your chosen AI provider (or a local model), and then pastes the result back—preserving formatting when supported." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WritingTools kopiert kurz Ihre Auswahl, sendet sie an den von Ihnen gewählten KI-Anbieter (oder ein lokales Modell) und fügt das Ergebnis wieder ein – wobei die Formatierung beibehalten wird, sofern dies unterstützt wird."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WritingTools copia brevemente tu selección, la envía al proveedor de IA que hayas elegido (o a un modelo local) y, a continuación, pega el resultado, conservando el formato cuando sea posible."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WritingTools copie brièvement votre sélection, l'envoie au fournisseur d'IA de votre choix (ou à un modèle local), puis colle le résultat en conservant la mise en forme lorsque cela est pris en charge."
+          }
+        }
+      }
     },
     "You can revoke any permission later in System Settings." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie können jede Berechtigung später in den Systemeinstellungen widerrufen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puedes revocar cualquier permiso más adelante en la configuración del sistema."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pouvez révoquer toute autorisation ultérieurement dans les paramètres système."
+          }
+        }
+      }
     },
     "You’re ready to go!" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du bist bereit!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Ya estás listo para empezar!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous êtes prêt à partir !"
+          }
+        }
+      }
     },
     "Your message" : {
       "localizations" : {
