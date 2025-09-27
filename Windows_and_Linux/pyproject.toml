@@ -1,0 +1,34 @@
+[project]
+name = "windows-and-linux"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "darkdetect>=0.8.0",
+    "dbus-next>=0.2.3",
+    "google-generativeai>=0.8.5",
+    "markdown2>=2.5.4",
+    "ollama>=0.6.0",
+    "openai>=1.109.1",
+    "pyinstaller>=6.16.0",
+    "pynput>=1.8.1",
+    "pyperclip>=1.11.0",
+    "pyside6>=6.9.2",
+]
+
+[tool.basedpyright]
+venv = ".venv"
+venvPath = "."
+reportAny = "none"
+reportUntypedFunctionDecorator= "none"
+reportCallIssue= "none"
+reportMissingParameterType = "none"
+reportUnknownArgumentType = "none"
+reportUnknownParameterType = "none"
+reportUnknownVariableType = "none"
+reportMissingImports = "error"
+reportMissingTypeStubs = false
+reportAttributeAccessIssue = "none"
+reportOptionalMemberAccess = "none"
+reportUnusedCallResult = "none"
+reportUnknownMemberType = "none"
+reportOptionalSubscript = "none"
