@@ -226,7 +226,7 @@ class ChatContentScrollArea(QScrollArea):
         text_display = MarkdownTextBrowser(is_user_message=is_user)
         
         # Enable tables extension in markdown2
-        html = markdown2.markdown(text, extras=['tables'])
+        html = markdown2.markdown(text, extras=['tables', 'strike'])
         text_display.setHtml(html)
         
         # Calculate proper text display size using full width
@@ -703,4 +703,5 @@ class ResponseWindow(QtWidgets.QWidget):
         if hasattr(self.app, 'current_response_window'):
             delattr(self.app, 'current_response_window')
         
+
         super().closeEvent(event)
