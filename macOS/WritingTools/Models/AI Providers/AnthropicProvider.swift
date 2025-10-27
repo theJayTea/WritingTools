@@ -9,16 +9,16 @@ struct AnthropicConfig: Codable {
 }
 
 enum AnthropicModel: String, CaseIterable {
-    case claude3Haiku = "claude-3-haiku-20240307"
-    case claude3Sonnet = "claude-3-5-sonnet-20240620"
-    case claude3Opus = "claude-3-opus-20240229"
+    case claude45Haiku = "claude-haiku-4-5"
+    case claude45Sonnet = "claude-sonnet-4-5"
+    case claude41Opus = "claude-opus-4-1"
     case custom
     
     var displayName: String {
         switch self {
-        case .claude3Haiku: return "Claude 3 Haiku (Fastest, Most Affordable)"
-        case .claude3Sonnet: return "Claude 3.5 Sonnet (Best for Most Users)"
-        case .claude3Opus: return "Claude 3 Opus (Most Capable, Expensive)"
+        case .claude45Haiku: return "Claude 4.5 Haiku (Fastest, Most Affordable)"
+        case .claude45Sonnet: return "Claude 4.5 Sonnet (Best Coding Model)"
+        case .claude41Opus: return "Claude 4.1 Opus (Most Capable, Expensive)"
         case .custom: return "Custom"
         }
     }

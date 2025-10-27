@@ -374,7 +374,7 @@ struct SettingsView: View {
                         .textFieldStyle(.roundedBorder)
                         .font(.caption)
                         .onChange(of: settings.anthropicModel) { _, _ in needsSaving = true }
-                    Text("E.g., \(AnthropicModel.claude3Haiku.rawValue), \(AnthropicModel.claude3Sonnet.rawValue), etc.")
+                    Text("E.g., \(AnthropicModel.claude45Haiku.rawValue), \(AnthropicModel.claude45Sonnet.rawValue), etc.")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }

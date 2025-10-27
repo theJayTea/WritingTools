@@ -131,15 +131,13 @@ struct ResponseView: View {
 }
 
 struct ChatMessageView: View {
-    
     let message: ChatMessage
     let fontSize: CGFloat
+    @State private var isHovering: Bool = false
+    @State private var showCopiedFeedback: Bool = false
     
     var body: some View {
-        // If user message is on the right, assistant on the left:
         HStack(alignment: .top, spacing: 12) {
-            
-            // If it's assistant, push bubble to the left
             if message.role == "assistant" {
                 bubbleView(role: message.role).transition(.move(edge: .leading))
                 Spacer(minLength: 15)
@@ -150,6 +148,9 @@ struct ChatMessageView: View {
         }
         .padding(.top, 4)
         .animation(.spring(), value: message.role)
+        .onHover { hovering in
+            isHovering = hovering
+        }
     }
     
     @ViewBuilder
@@ -166,14 +167,48 @@ struct ChatMessageView: View {
                 .chatBubbleStyle(isFromUser: message.role == "user")
                 .accessibilityLabel(role == "user" ? "Your message" : "Assistant's response")
                 .accessibilityValue(message.content)
+                .contextMenu {
+                    Button("Copy Selection") {
+                        NSApp.sendAction(#selector(NSText.copy(_:)), to: nil, from: nil)
+                    }
+                    Button("Copy Message") {
+                        copyEntireMessage()
+                    }
+                }
             
-            // Time stamp
-            Text(message.timestamp.formatted(.dateTime.hour().minute()))
-                .font(.caption2)
-                .foregroundColor(.secondary)
-                .padding(.bottom, 2)
+            // Timestamp and copy button
+            HStack(spacing: 8) {
+                Text(message.timestamp.formatted(.dateTime.hour().minute()))
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                
+                Button(action: copyEntireMessage) {
+                    if showCopiedFeedback {
+                        Text("Copied")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    } else {
+                        Image(systemName: "doc.on.doc")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .buttonStyle(.plain)
+                .help(showCopiedFeedback ? "" : "Copy Message")
+            }
+            .padding(.bottom, 2)
         }
         .frame(maxWidth: 500, alignment: role == "assistant" ? .leading : .trailing)
+    }
+    
+    private func copyEntireMessage() {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(message.content, forType: .string)
+        
+        showCopiedFeedback = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            showCopiedFeedback = false
+        }
     }
 }
 

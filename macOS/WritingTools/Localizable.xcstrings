@@ -1781,6 +1781,9 @@
         }
       }
     },
+    "Copied" : {
+
+    },
     "Copied!" : {
       "localizations" : {
         "de" : {
@@ -1847,6 +1850,12 @@
           }
         }
       }
+    },
+    "Copy Message" : {
+
+    },
+    "Copy Selection" : {
+
     },
     "Created with care by Jesai, a high school student." : {
       "localizations" : {
