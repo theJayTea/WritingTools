@@ -624,6 +624,9 @@
         }
       }
     },
+    "All changes saved" : {
+
+    },
     "Anthropic" : {
       "localizations" : {
         "de" : {
@@ -1111,6 +1114,12 @@
         }
       }
     },
+    "Cancel download" : {
+
+    },
+    "Cancel the current download." : {
+
+    },
     "Cannot proceed due to error." : {
       "localizations" : {
         "de" : {
@@ -1243,6 +1252,9 @@
         }
       }
     },
+    "Checking model status" : {
+
+    },
     "Checking status..." : {
       "localizations" : {
         "de" : {
@@ -1265,6 +1277,9 @@
         }
       }
     },
+    "Choose a convenient key combination to bring up Writing Tools from anywhere." : {
+
+    },
     "Choose a model to download and use for local processing." : {
       "localizations" : {
         "de" : {
@@ -1286,6 +1301,9 @@
           }
         }
       }
+    },
+    "Choose a window appearance that matches your preferences and context." : {
+
     },
     "Choose between local OCR or Ollama's built-in vision capabilities." : {
       "extractionState" : "stale",
@@ -1376,6 +1394,9 @@
           }
         }
       }
+    },
+    "Choose whether custom prompts open in a separate response window or replace text inline." : {
+
     },
     "Choose your theme:" : {
       "extractionState" : "manual",
@@ -2199,6 +2220,12 @@
         }
       }
     },
+    "Download progress" : {
+
+    },
+    "Download the selected model for offline use." : {
+
+    },
     "Download Update" : {
       "localizations" : {
         "de" : {
@@ -2560,6 +2587,9 @@
         }
       }
     },
+    "Error: %@" : {
+
+    },
     "Exit Edit Mode" : {
       "localizations" : {
         "de" : {
@@ -2603,6 +2633,9 @@
           }
         }
       }
+    },
+    "Filter between all, text-only, and vision-capable models." : {
+
     },
     "Finish" : {
       "localizations" : {
@@ -3006,6 +3039,7 @@
       }
     },
     "Global Keyboard Shortcut" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3472,6 +3506,9 @@
         }
       }
     },
+    "Keyboard Shortcuts" : {
+
+    },
     "Loading %@..." : {
       "localizations" : {
         "de" : {
@@ -3493,6 +3530,12 @@
           }
         }
       }
+    },
+    "Loading model" : {
+
+    },
+    "Loading model into memory" : {
+
     },
     "Loading model into memory..." : {
       "localizations" : {
@@ -3719,7 +3762,11 @@
         }
       }
     },
+    "Local LLM processing is only available on Apple Silicon (M-series) devices." : {
+
+    },
     "Local LLM processing is only available on Apple Silicon (M1/M2/M3/M4 etc.) devices." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3785,7 +3832,11 @@
         }
       }
     },
+    "Manage your writing tools and assign keyboard shortcuts." : {
+
+    },
     "Manage your writing tools and their keyboard shortcuts" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3918,6 +3969,9 @@
           }
         }
       }
+    },
+    "Model Filters" : {
+
     },
     "Model Information" : {
       "extractionState" : "manual",
@@ -4454,6 +4508,9 @@
         }
       }
     },
+    "Open Anthropic console to create or view your API key." : {
+
+    },
     "Open Commands Manager" : {
       "localizations" : {
         "de" : {
@@ -4477,6 +4534,21 @@
       }
     },
     "Open custom prompts in response window" : {
+
+    },
+    "Open Google AI Studio to generate an API key." : {
+
+    },
+    "Open Mistral console to create an API key." : {
+
+    },
+    "Open Ollama download and documentation page in your browser." : {
+
+    },
+    "Open OpenAI dashboard to create an API key." : {
+
+    },
+    "Open OpenRouter to retrieve your API key." : {
 
     },
     "Open Privacy & Security" : {
@@ -4523,6 +4595,9 @@
           }
         }
       }
+    },
+    "Open the Commands Manager to add, edit, or remove commands." : {
+
     },
     "Open Writing Tools" : {
       "extractionState" : "stale",
@@ -4726,7 +4801,11 @@
         }
       }
     },
+    "Please select a different AI Provider in Settings if you are on an Intel Mac." : {
+
+    },
     "Please select a different AI Provider in the settings if you are on an Intel Mac." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5040,6 +5119,9 @@
         }
       }
     },
+    "Remove the downloaded model from disk." : {
+
+    },
     "Required" : {
       "localizations" : {
         "de" : {
@@ -5284,6 +5366,12 @@
         }
       }
     },
+    "Save your changes and close settings." : {
+
+    },
+    "Select a local model. Vision-capable models can process images." : {
+
+    },
     "Select a provider." : {
       "localizations" : {
         "de" : {
@@ -5351,6 +5439,7 @@
       }
     },
     "Select Local Model" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5393,6 +5482,12 @@
           }
         }
       }
+    },
+    "Select which AI service to use for processing." : {
+
+    },
+    "Set a global shortcut to quickly activate Writing Tools." : {
+
     },
     "Set the keyboard shortcut to activate WritingTools from anywhere." : {
       "localizations" : {
@@ -5505,6 +5600,9 @@
           }
         }
       }
+    },
+    "Standard uses system backgrounds. Glass respects transparency preferences. OLED uses deep blacks." : {
+
     },
     "Status: %@" : {
       "localizations" : {
@@ -5772,6 +5870,9 @@
           }
         }
       }
+    },
+    "Try downloading again if the previous attempt failed." : {
+
     },
     "Use “Proofread” to preserve formatting while fixing grammar/spelling." : {
       "localizations" : {

@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 enum AppTheme: String {
     case standard
@@ -61,25 +62,52 @@ struct GlassmorphicBackground: View {
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
-        ZStack {
-            // Base color and Gradient overlay in light mode (Dark mode looks good)
-            if colorScheme == .light {
-                Color(.windowBackgroundColor)
-                    .opacity(0.2)
+        // Respect Reduce Transparency accessibility setting
+        let reduceTransparency = NSWorkspace.shared.accessibilityDisplayShouldReduceTransparency
 
+        ZStack {
+            if reduceTransparency {
+                // Fall back to a solid, high-contrast background
+                colorScheme == .light ? Color(.windowBackgroundColor) : Color.black
+            } else {
+                // Base subtle tint for both light and dark
+                (colorScheme == .light ? Color.white.opacity(0.06) : Color.white.opacity(0.03))
+
+                // Soft white highlight from top-left to center to enhance "glass" sheen
                 LinearGradient(
                     colors: [
-                        Color.white.opacity(0.1),
-                        Color.white.opacity(0.2),
+                        Color.white.opacity(colorScheme == .light ? 0.22 : 0.12),
+                        Color.clear
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .center
+                )
+                .blendMode(.plusLighter)
+
+                // Gentle color tint for depth (subtle and theme-agnostic)
+                LinearGradient(
+                    colors: [
+                        Color.blue.opacity(0.10),
+                        Color.purple.opacity(0.08),
+                        Color.clear
                     ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
-            }
+                .blendMode(.softLight)
 
-            // Blur effect
-            Rectangle()
-                .fill(.ultraThinMaterial)
+                // Core blur/translucency material
+                Rectangle()
+                    .fill(.ultraThinMaterial)
+
+                // Subtle inner border to define edges of the glass
+                Rectangle()
+                    .strokeBorder(
+                        Color.white.opacity(colorScheme == .light ? 0.25 : 0.12),
+                        lineWidth: 1
+                    )
+                    .blendMode(.overlay)
+            }
         }
     }
 }

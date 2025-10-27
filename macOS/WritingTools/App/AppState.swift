@@ -276,20 +276,36 @@ class AppState: ObservableObject {
       let pb = NSPasteboard.general
       pb.clearContents()
 
-      // Prefer RTF, then plain string
-      if let rtfData = try? mutable.data(
-        from: NSRange(location: 0, length: mutable.length),
+      // Prefer HTML for web editors (e.g., Gmail in browsers), then RTF, always include plain text
+      let fullRange = NSRange(location: 0, length: mutable.length)
+      let htmlData = try? mutable.data(
+        from: fullRange,
+        documentAttributes: [
+          .documentType: NSAttributedString.DocumentType.html,
+        ]
+      )
+      let rtfData = try? mutable.data(
+        from: fullRange,
         documentAttributes: [
           .documentType: NSAttributedString.DocumentType.rtf,
         ]
-      ) {
-        pb.declareTypes([.rtf, .string], owner: nil)
-        pb.setData(rtfData, forType: .rtf)
-        pb.setString(corrected, forType: .string)
-      } else {
-        // Fallback to plain text if we couldn't build RTF
-        pb.setString(corrected, forType: .string)
+      )
+
+      // Declare available types in priority order
+      var types: [NSPasteboard.PasteboardType] = []
+      if htmlData != nil { types.append(.html) }
+      if rtfData != nil { types.append(.rtf) }
+      types.append(.string)
+
+      pb.declareTypes(types, owner: nil)
+
+      if let htmlData {
+        pb.setData(htmlData, forType: .html)
       }
+      if let rtfData {
+        pb.setData(rtfData, forType: .rtf)
+      }
+      pb.setString(corrected, forType: .string)
 
       if let previous = previousApplication {
         previous.activate()

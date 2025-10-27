@@ -182,6 +182,55 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
       await waitForPasteboardUpdate(pb, initialChangeCount: initialChange)
 
+      var foundImages: [Data] = []
+
+      let classes = [NSURL.self]
+      let options: [NSPasteboard.ReadingOptionKey: Any] = [
+        .urlReadingFileURLsOnly: true,
+        .urlReadingContentsConformToTypes: [
+          "public.image",
+          "public.png",
+          "public.jpeg",
+          "public.tiff",
+          "com.compuserve.gif",
+        ],
+      ]
+
+      if
+        let urls = pb.readObjects(
+          forClasses: classes,
+          options: options
+        ) as? [URL]
+      {
+        for url in urls {
+          if
+            let imageData = try? Data(contentsOf: url),
+            NSImage(data: imageData) != nil
+          {
+            foundImages.append(imageData)
+            NSLog("Loaded image data from file: \(url.lastPathComponent)")
+          }
+        }
+      }
+
+      if foundImages.isEmpty {
+        let supportedImageTypes: [NSPasteboard.PasteboardType] = [
+          NSPasteboard.PasteboardType("public.png"),
+          NSPasteboard.PasteboardType("public.jpeg"),
+          NSPasteboard.PasteboardType("public.tiff"),
+          NSPasteboard.PasteboardType("com.compuserve.gif"),
+          NSPasteboard.PasteboardType("public.image"),
+        ]
+
+        for type in supportedImageTypes {
+          if let data = pb.data(forType: type) {
+            foundImages.append(data)
+            NSLog("Found direct image data of type: \(type)")
+            break
+          }
+        }
+      }
+
       let rich = readAttributedSelection(from: pb)
       let selectedText = rich?.string ?? pb.string(forType: .string) ?? ""
 
@@ -200,6 +249,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         self.appState.previousApplication = previousApp
       }
 
+      self.appState.selectedImages = foundImages
       self.appState.selectedAttributedText = rich
       self.appState.selectedText = selectedText
 
@@ -218,7 +268,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
       let result = try await appState.activeProvider.processText(
         systemPrompt: command.prompt,
         userPrompt: appState.selectedText,
-        images: [],
+        images: appState.selectedImages,
         streaming: false
       )
 

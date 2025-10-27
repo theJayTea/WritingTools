@@ -214,13 +214,11 @@ final class ResponseViewModel: ObservableObject, Sendable {
     }
     
     func processFollowUpQuestion(_ question: String, completion: @escaping () -> Void) {
-        // Add user message
-        DispatchQueue.main.async {
-            self.messages.append(ChatMessage(
-                role: "user",
-                content: question
-            ))
-        }
+        // Add user message (already on MainActor)
+        self.messages.append(ChatMessage(
+            role: "user",
+            content: question
+        ))
         
         Task {
             do {
@@ -252,7 +250,7 @@ final class ResponseViewModel: ObservableObject, Sendable {
                     streaming: true
                 )
                 
-                DispatchQueue.main.async {
+                await MainActor.run {
                     self.messages.append(ChatMessage(
                         role: "assistant",
                         content: result
@@ -261,7 +259,7 @@ final class ResponseViewModel: ObservableObject, Sendable {
                 }
             } catch {
                 print("Error processing follow-up: \(error)")
-                completion()
+                await MainActor.run { completion() }
             }
         }
     }
@@ -285,3 +283,4 @@ final class ResponseViewModel: ObservableObject, Sendable {
         }
     }
 }
+

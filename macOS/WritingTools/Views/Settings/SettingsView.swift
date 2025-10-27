@@ -65,6 +65,7 @@ struct SettingsView: View {
                 }
             }
             .padding(20)
+            .controlSize(.regular)
         }
         .frame(width: 540, height: showOnlyApiSetup ? 400 : 460)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -103,72 +104,74 @@ struct SettingsView: View {
     }
     
     private var generalPane: some View {
-        VStack(alignment: .leading, spacing: 24) {
+        VStack(alignment: .leading, spacing: 16) {
             Text("General Settings")
                 .font(.headline)
-            
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Global Keyboard Shortcut")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                
-                HStack(alignment: .center) {
-                    Text("Activate Writing Tools:")
-                        .frame(width: 180, alignment: .leading)
-                        .foregroundColor(.primary)
-                    KeyboardShortcuts.Recorder(
-                        for: .showPopup,
-                        onChange: { _ in
-                            needsSaving = true
+                .accessibilityAddTraits(.isHeader)
+
+            GroupBox("Keyboard Shortcuts") {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Set a global shortcut to quickly activate Writing Tools.")
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+
+                    HStack(alignment: .center, spacing: 12) {
+                        Text("Activate Writing Tools:")
+                            .frame(width: 180, alignment: .leading)
+                            .foregroundColor(.primary)
+                        KeyboardShortcuts.Recorder(
+                            for: .showPopup,
+                            onChange: { _ in
+                                needsSaving = true
+                            }
+                        )
+                        .help("Choose a convenient key combination to bring up Writing Tools from anywhere.")
+                    }
+                    .padding(.vertical, 2)
+                }
+            }
+
+            GroupBox("Commands") {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Manage your writing tools and assign keyboard shortcuts.")
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+
+                    Button(action: {
+                        showingCommandsManager = true
+                    }) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "list.bullet.rectangle")
+                            Text("Manage Commands")
                         }
-                    )
-                }
-                .padding(.vertical, 2)
-            }
-            
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Commands")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                
-                Text("Manage your writing tools and their keyboard shortcuts")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                
-                Button(action: {
-                    showingCommandsManager = true
-                }) {
-                    HStack {
-                        Image(systemName: "list.bullet.rectangle")
-                        Text("Manage Commands")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 12)
+                        .background(Color(.controlBackgroundColor))
+                        .cornerRadius(8)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, 12)
-                    .background(Color(.controlBackgroundColor))
-                    .cornerRadius(8)
-                }
-                .buttonStyle(.plain)
-                
-                // New checkbox for custom command behavior
-                Toggle(isOn: $settings.openCustomCommandsInResponseWindow) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Open custom prompts in response window")
-                            .font(.body)
-                        Text("When unchecked, custom prompts will replace selected text inline")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                    .buttonStyle(.plain)
+                    .help("Open the Commands Manager to add, edit, or remove commands.")
+
+                    Toggle(isOn: $settings.openCustomCommandsInResponseWindow) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Open custom prompts in response window")
+                            Text("When unchecked, custom prompts will replace selected text inline")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
                     }
-                }
-                .toggleStyle(.checkbox)
-                .padding(.top, 4)
-                .onChange(of: settings.openCustomCommandsInResponseWindow) { _, _ in
-                    needsSaving = true
+                    .toggleStyle(.checkbox)
+                    .padding(.top, 4)
+                    .onChange(of: settings.openCustomCommandsInResponseWindow) { _, _ in
+                        needsSaving = true
+                    }
+                    .help("Choose whether custom prompts open in a separate response window or replace text inline.")
                 }
             }
-            
+
             Spacer()
-            
+
             if !showOnlyApiSetup {
                 saveButton
             }
@@ -189,7 +192,7 @@ struct SettingsView: View {
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                 
-                Text("Choose how the popup window looks.")
+                Text("Choose a window appearance that matches your preferences and context.")
                     .font(.caption)
                     .foregroundColor(.secondary)
                 
@@ -204,6 +207,7 @@ struct SettingsView: View {
                 .onChange(of: settings.themeStyle) { oldValue, newValue in
                     needsSaving = true
                 }
+                .help("Standard uses system backgrounds. Glass respects transparency preferences. OLED uses deep blacks.")
             }
             
             Spacer()
@@ -244,6 +248,7 @@ struct SettingsView: View {
                     }
                     needsSaving = true
                 }
+                .help("Select which AI service to use for processing.")
                 
             }
             
@@ -313,6 +318,7 @@ struct SettingsView: View {
                 }
             }
             .buttonStyle(.link)
+            .help("Open OpenRouter to retrieve your API key.")
         }
     }
     
@@ -360,6 +366,7 @@ struct SettingsView: View {
                 }
             }
             .buttonStyle(.link)
+            .help("Open Anthropic console to create or view your API key.")
         }
     }
     
@@ -412,6 +419,7 @@ struct SettingsView: View {
                 }
             }
             .buttonStyle(.link)
+            .help("Open Google AI Studio to generate an API key.")
         }
     }
     
@@ -461,6 +469,7 @@ struct SettingsView: View {
                 }
             }
             .buttonStyle(.link)
+            .help("Open Mistral console to create an API key.")
         }
     }
     
@@ -510,6 +519,7 @@ struct SettingsView: View {
                 }
             }
             .buttonStyle(.link)
+            .help("Open OpenAI dashboard to create an API key.")
         }
     }
     
@@ -582,18 +592,24 @@ struct SettingsView: View {
                 }
             }
             .buttonStyle(.link)
+            .help("Open Ollama download and documentation page in your browser.")
         }
     }
     
     private var saveButton: some View {
-        HStack {
+        HStack(spacing: 8) {
+            if !needsSaving {
+                Text("All changes saved")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
             Spacer()
             Button("Save Changes") {
                 saveSettings()
             }
             .buttonStyle(.borderedProminent)
             .keyboardShortcut(.return)
-            .disabled(!needsSaving)
+            .help("Save your changes and close settings.")
         }
     }
     
@@ -671,6 +687,9 @@ struct SettingsView: View {
         if showOnlyApiSetup {
             UserDefaults.standard.set(true, forKey: "has_completed_onboarding")
         }
+        
+        // Mark changes as saved
+        needsSaving = false
         
         // Close window
         DispatchQueue.main.async {

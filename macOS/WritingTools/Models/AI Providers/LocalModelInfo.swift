@@ -12,6 +12,7 @@ enum LocalModelType: String, CaseIterable, Identifiable {
     // VLM Models
     case gemma3   = "gemma-3-4b-it-qat-4bit"
     case qwen25VL = "qwen2_5vl_3b_instruct_4bit"
+    case qwen3VL  = "qwen3vl_3b_instruct_4bit"
     
     var id: String { self.rawValue }
     
@@ -25,7 +26,10 @@ enum LocalModelType: String, CaseIterable, Identifiable {
             
             // VLM Models
         case .gemma3: return "Gemma 3 VL (4B, 4-bit) 📷 (Recommended)"
+        case .qwen3VL: return "Qwen 3 VL (4B, 4-bit) 📷"
         case .qwen25VL: return "Qwen 2.5 VL (3B, 4-bit) 📷"
+            
+        
         }
     }
     
@@ -35,6 +39,8 @@ enum LocalModelType: String, CaseIterable, Identifiable {
         case .qwen25VL:
             return true
         case .gemma3:
+            return true
+        case .qwen3VL:
             return true
         default:
             return false
@@ -52,6 +58,7 @@ enum LocalModelType: String, CaseIterable, Identifiable {
             // VLM configurations
         case .gemma3: return VLMRegistry.gemma3_4B_qat_4bit
         case .qwen25VL: return VLMRegistry.qwen2_5VL3BInstruct4Bit
+        case .qwen3VL: return VLMRegistry.qwen3VL4BInstruct4Bit
         }
     }
     
