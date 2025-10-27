@@ -75,6 +75,9 @@ struct SettingsView: View {
                                       forKey: "lastSettingsTab")
             updateWindowTitle(to: newValue)
         }
+        .onReceive(NotificationCenter.default.publisher(for: Notification.Name("CommandsChanged"))) { _ in
+            needsSaving = true
+        }
         
     }
     
@@ -109,8 +112,18 @@ struct SettingsView: View {
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                 
-                KeyboardShortcuts.Recorder("Activate Writing Tools:", name: .showPopup)
-                    .padding(.vertical, 2)
+                HStack(alignment: .center) {
+                    Text("Activate Writing Tools:")
+                        .frame(width: 180, alignment: .leading)
+                        .foregroundColor(.primary)
+                    KeyboardShortcuts.Recorder(
+                        for: .showPopup,
+                        onChange: { _ in
+                            needsSaving = true
+                        }
+                    )
+                }
+                .padding(.vertical, 2)
             }
             
             VStack(alignment: .leading, spacing: 12) {
@@ -136,6 +149,22 @@ struct SettingsView: View {
                     .cornerRadius(8)
                 }
                 .buttonStyle(.plain)
+                
+                // New checkbox for custom command behavior
+                Toggle(isOn: $settings.openCustomCommandsInResponseWindow) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Open custom prompts in response window")
+                            .font(.body)
+                        Text("When unchecked, custom prompts will replace selected text inline")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .toggleStyle(.checkbox)
+                .padding(.top, 4)
+                .onChange(of: settings.openCustomCommandsInResponseWindow) { _, _ in
+                    needsSaving = true
+                }
             }
             
             Spacer()
@@ -148,6 +177,7 @@ struct SettingsView: View {
             CommandsView(commandManager: appState.commandManager)
         }
     }
+
     
     private var appearancePane: some View {
         VStack(alignment: .leading, spacing: 24) {
@@ -562,6 +592,7 @@ struct SettingsView: View {
                 saveSettings()
             }
             .buttonStyle(.borderedProminent)
+            .keyboardShortcut(.return)
             .disabled(!needsSaving)
         }
     }

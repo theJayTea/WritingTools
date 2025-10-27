@@ -25,6 +25,7 @@
     },
     "." : {
       "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -100,6 +101,7 @@
     },
     "(Llama3.2 3B 4-bit)" : {
       "extractionState" : "manual",
+      "generatesSymbol" : false,
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4474,6 +4476,9 @@
         }
       }
     },
+    "Open custom prompts in response window" : {
+
+    },
     "Open Privacy & Security" : {
       "localizations" : {
         "de" : {
@@ -6015,6 +6020,9 @@
         }
       }
     },
+    "When unchecked, custom prompts will replace selected text inline" : {
+
+    },
     "Window Style" : {
       "localizations" : {
         "de" : {
@@ -6216,5 +6224,5 @@
       }
     }
   },
-  "version" : "1.0"
+  "version" : "1.1"
 }

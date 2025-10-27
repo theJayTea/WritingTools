@@ -260,17 +260,26 @@ struct PopupView: View {
         )
 
         await MainActor.run {
-          let window = ResponseWindow(
-            title: "AI Response",
-            content: result,
-            selectedText: appState.selectedText.isEmpty
-              ? instruction : appState.selectedText,
-            option: .proofread
-          )
+          // Use the setting to determine behavior
+          let settings = AppSettings.shared
+          
+          if settings.openCustomCommandsInResponseWindow {
+            // Open in response window
+            let window = ResponseWindow(
+              title: "AI Response",
+              content: result,
+              selectedText: appState.selectedText.isEmpty
+                ? instruction : appState.selectedText,
+              option: .proofread
+            )
 
-          WindowManager.shared.addResponseWindow(window)
-          window.makeKeyAndOrderFront(nil)
-          window.orderFrontRegardless()
+            WindowManager.shared.addResponseWindow(window)
+            window.makeKeyAndOrderFront(nil)
+            window.orderFrontRegardless()
+          } else {
+            // Replace inline
+            appState.replaceSelectedText(with: result)
+          }
 
           customText = ""
           isCustomLoading = false

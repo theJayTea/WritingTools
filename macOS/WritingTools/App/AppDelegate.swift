@@ -163,10 +163,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
 
     Task { @MainActor in
-      if let currentFrontmostApp = NSWorkspace.shared.frontmostApplication {
-        self.appState.previousApplication = currentFrontmostApp
-      }
-
+      // Store the previous app BEFORE any operations
+      let previousApp = NSWorkspace.shared.frontmostApplication
+      
       let pb = NSPasteboard.general
       let oldPlain = pb.string(forType: .string)
 
@@ -194,6 +193,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
       guard !selectedText.isEmpty else {
         NSLog("No text selected for command: \(command.name)")
         return
+      }
+
+      // Set previous app AFTER we've successfully copied
+      if let previousApp = previousApp {
+        self.appState.previousApplication = previousApp
       }
 
       self.appState.selectedAttributedText = rich

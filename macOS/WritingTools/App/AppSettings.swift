@@ -126,6 +126,11 @@ class AppSettings: ObservableObject {
         didSet { defaults.set(selectedLocalLLMId, forKey: "selected_local_llm_id") }
     }
     
+    // MARK: - Custom Commands Settings
+    @Published var openCustomCommandsInResponseWindow: Bool {
+        didSet { defaults.set(openCustomCommandsInResponseWindow, forKey: "open_custom_commands_in_response_window") }
+    }
+    
     // MARK: - Init
     private init() {
         let defaults = UserDefaults.standard
@@ -175,7 +180,9 @@ class AppSettings: ObservableObject {
         self.openRouterApiKey = defaults.string(forKey: "openrouter_api_key") ?? ""
         self.openRouterModel = defaults.string(forKey: "openrouter_model") ?? OpenRouterConfig.defaultModel
         self.openRouterCustomModel = defaults.string(forKey: "openrouter_custom_model") ?? ""
-
+        
+        // Custom commands setting - default to true (open in response window)
+        self.openCustomCommandsInResponseWindow = defaults.object(forKey: "open_custom_commands_in_response_window") as? Bool ?? true
     }
     
     // MARK: - Convenience
