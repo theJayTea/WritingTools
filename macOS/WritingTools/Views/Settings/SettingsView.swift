@@ -1,5 +1,6 @@
 import SwiftUI
 import KeyboardShortcuts
+import AppKit
 
 extension KeyboardShortcuts.Name {
     static let showPopup = Self("showPopup")
@@ -67,7 +68,7 @@ struct SettingsView: View {
             .padding(20)
             .controlSize(.regular)
         }
-        .frame(width: 540, height: showOnlyApiSetup ? 400 : 460)
+        .frame(width: 540, height: showOnlyApiSetup ? 470 : 540)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .windowBackground(useGradient: settings.useGradientTheme)
         .onAppear(perform: restoreLastTab)
@@ -169,6 +170,26 @@ struct SettingsView: View {
                     .help("Choose whether custom prompts open in a separate response window or replace text inline.")
                 }
             }
+            
+            GroupBox("Onboarding") {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("You can rerun the onboarding flow to review permissions and quickly configure the app.")
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+
+                    HStack {
+                        Button {
+                            restartOnboarding()
+                        } label: {
+                            Label("Restart Onboarding", systemImage: "arrow.counterclockwise")
+                        }
+                        .buttonStyle(.bordered)
+                        .help("Open the onboarding window to set up WritingTools again.")
+
+                        Spacer()
+                    }
+                }
+            }
 
             Spacer()
 
@@ -253,7 +274,7 @@ struct SettingsView: View {
             }
             
             Divider()
-                .padding(.vertical, 4)
+                .padding(.vertical, 2)
             
             ScrollView {
                 providerSpecificSettings
@@ -700,6 +721,37 @@ struct SettingsView: View {
             }) {
                 window.close()
             }
+        }
+    }
+    
+    private func restartOnboarding() {
+        // Mark onboarding as not completed
+        settings.hasCompletedOnboarding = false
+
+        // Create the onboarding window the same way AppDelegate does
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 640, height: 720),
+            styleMask: [.titled, .closable, .miniaturizable, .resizable],
+            backing: .buffered,
+            defer: false
+        )
+        window.title = "Onboarding"
+        window.isReleasedWhenClosed = false
+        
+        let onboardingView = OnboardingView(appState: appState)
+        let hostingView = NSHostingView(rootView: onboardingView)
+        window.contentView = hostingView
+        window.level = .floating
+
+        // Register with WindowManager properly
+        WindowManager.shared.setOnboardingWindow(window, hostingView: hostingView)
+        window.makeKeyAndOrderFront(nil)
+
+        // Optionally close Settings to reduce window clutter
+        if let settingsWindow = NSApplication.shared.windows.first(where: {
+            $0.contentView?.subviews.contains(where: { $0 is NSHostingView<SettingsView> }) ?? false
+        }) {
+            settingsWindow.close()
         }
     }
 }

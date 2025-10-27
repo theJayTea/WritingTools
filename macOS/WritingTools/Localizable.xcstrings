@@ -1004,6 +1004,9 @@
         }
       }
     },
+    "Bliss AI on Google Play" : {
+
+    },
     "Built-in" : {
       "localizations" : {
         "de" : {
@@ -1187,6 +1190,7 @@
       }
     },
     "Check out Bliss AI on Google Play" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1209,6 +1213,7 @@
       }
     },
     "Check out ProseKey AI (iOS port of WritingTools)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1865,6 +1870,9 @@
         }
       }
     },
+    "Creators" : {
+
+    },
     "Custom" : {
       "localizations" : {
         "de" : {
@@ -2453,7 +2461,14 @@
         }
       }
     },
+    "Email Arya" : {
+
+    },
+    "Email Jesai" : {
+
+    },
     "Email: developer@aryamirsepasi.com" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2476,6 +2491,7 @@
       }
     },
     "Email: jesaitarun@gmail.com" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3810,6 +3826,9 @@
         }
       }
     },
+    "macOS version by Arya Mirsepasi" : {
+
+    },
     "Manage Commands" : {
       "localizations" : {
         "de" : {
@@ -4485,6 +4504,9 @@
         }
       }
     },
+    "Onboarding" : {
+
+    },
     "Open Accessibility Settings" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4596,7 +4618,13 @@
         }
       }
     },
+    "Open System Settings to manage permissions." : {
+
+    },
     "Open the Commands Manager to add, edit, or remove commands." : {
+
+    },
+    "Open the onboarding window to set up WritingTools again." : {
 
     },
     "Open Writing Tools" : {
@@ -5053,6 +5081,9 @@
         }
       }
     },
+    "ProseKey AI (iOS port)" : {
+
+    },
     "Provider" : {
       "localizations" : {
         "de" : {
@@ -5096,6 +5127,9 @@
           }
         }
       }
+    },
+    "Recheck current permission statuses." : {
+
     },
     "Refresh Status" : {
       "localizations" : {
@@ -5253,6 +5287,9 @@
           }
         }
       }
+    },
+    "Restart Onboarding" : {
+
     },
     "Retry" : {
       "extractionState" : "stale",
@@ -5740,6 +5777,7 @@
       }
     },
     "The macOS version is created by Arya Mirsepasi" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5918,6 +5956,9 @@
         }
       }
     },
+    "Version & Updates" : {
+
+    },
     "Version: 3.0 (Based on Windows Port version 7.1)" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -6034,6 +6075,7 @@
       }
     },
     "Version: 5.0 (Based on Windows Port version 7.1)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6054,6 +6096,12 @@
           }
         }
       }
+    },
+    "Version: 5.3 (Based on Windows Port version 7.1)" : {
+
+    },
+    "View Releases" : {
+
     },
     "Vision-capable model" : {
       "localizations" : {
@@ -6215,6 +6263,7 @@
       }
     },
     "Writing Tools is a free & lightweight tool that helps you improve your writing with AI, similar to Apple's new Apple Intelligence feature." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6235,6 +6284,9 @@
           }
         }
       }
+    },
+    "Writing Tools is a free, lightweight utility that enhances your writing with AI." : {
+
     },
     "WritingTools briefly copies your selection, sends it to your chosen AI provider (or a local model), and then pastes the result back—preserving formatting when supported." : {
       "localizations" : {
@@ -6257,6 +6309,18 @@
           }
         }
       }
+    },
+    "You can always adjust these later in Settings." : {
+
+    },
+    "You can change any setting later in Settings." : {
+
+    },
+    "You can rerun the onboarding flow to review permissions and quickly configure the app." : {
+
+    },
+    "You can revisit onboarding anytime from Settings > General > Onboarding." : {
+
     },
     "You can revoke any permission later in System Settings." : {
       "localizations" : {

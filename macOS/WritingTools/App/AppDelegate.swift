@@ -397,7 +397,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     window.title = "Welcome to Writing Tools"
     window.center()
     window.isReleasedWhenClosed = false
-    window.delegate = self
+    // Removed: window.delegate = self
 
     let onboardingView = OnboardingView(appState: appState)
     let hostingView = NSHostingView(rootView: onboardingView)

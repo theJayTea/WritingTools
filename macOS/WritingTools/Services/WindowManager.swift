@@ -95,6 +95,7 @@ class WindowManager: NSObject, NSWindowDelegate {
       )
 
       settingsWindow.title = "Complete Setup"
+      settingsWindow.identifier = NSUserInterfaceItemIdentifier("SettingsWindow")
       settingsWindow.center()
       settingsWindow.isReleasedWhenClosed = false
 
@@ -124,6 +125,7 @@ class WindowManager: NSObject, NSWindowDelegate {
       self.onboardingWindow.setObject(hostingView, forKey: window)
       window.delegate = self
       window.level = .floating
+      window.identifier = NSUserInterfaceItemIdentifier("OnboardingWindow")
       window.center()
     }
   }

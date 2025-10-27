@@ -3,7 +3,7 @@ import KeyboardShortcuts
 import ApplicationServices
 import CoreGraphics
 
-struct OnboardingView: View {
+@MainActor struct OnboardingView: View {
   @ObservedObject var appState: AppState
   @ObservedObject var settings = AppSettings.shared
 
@@ -43,13 +43,13 @@ struct OnboardingView: View {
   var body: some View {
     VStack(spacing: 0) {
       // Header
-      VStack(spacing: 4) {
+      VStack(spacing: 6) {
         Text(steps[currentStep].title)
           .font(.largeTitle)
           .bold()
           .multilineTextAlignment(.center)
         Text(steps[currentStep].description)
-          .font(.title3)
+          .font(.body)
           .foregroundColor(.secondary)
           .multilineTextAlignment(.center)
           .padding(.horizontal)
@@ -90,9 +90,9 @@ struct OnboardingView: View {
               .fill(
                 currentStep >= index
                   ? Color.accentColor
-                  : Color.gray.opacity(0.25)
+                  : Color.gray.opacity(0.3)
               )
-              .frame(width: 8, height: 8)
+              .frame(width: 10, height: 10)
           }
         }
 
@@ -171,6 +171,11 @@ struct OnboardingView: View {
         }
         .padding(8)
       }
+
+      Text("You can change any setting later in Settings.")
+        .font(.footnote)
+        .foregroundColor(.secondary)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
   }
 
@@ -272,6 +277,7 @@ struct OnboardingView: View {
           refreshPermissionStatuses()
         }
         .buttonStyle(.bordered)
+        .help("Recheck current permission statuses.")
 
         Spacer()
 
@@ -281,6 +287,7 @@ struct OnboardingView: View {
           )
         }
         .buttonStyle(.link)
+        .help("Open System Settings to manage permissions.")
       }
       .padding(.top, 4)
     }
@@ -354,6 +361,9 @@ struct OnboardingView: View {
           }
           .padding(.top, 8)
 
+          Text("You can always adjust these later in Settings.")
+            .font(.footnote)
+            .foregroundColor(.secondary)
         }
         .padding(.vertical, 4)
       }
@@ -401,6 +411,10 @@ struct OnboardingView: View {
         .foregroundColor(.secondary)
         .padding(8)
       }
+
+      Text("You can revisit onboarding anytime from Settings > General > Onboarding.")
+        .font(.footnote)
+        .foregroundColor(.secondary)
 
       HStack {
         Button("Open Commands Manager") {
@@ -651,20 +665,20 @@ struct OnboardingView: View {
     }
   }
 
-    static func requestAccessibility() {
-        // Request the system prompt (may no-op on recent macOS if already listed/denied)
-        let key = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as CFString
-        let options: CFDictionary = [key: true] as CFDictionary
-        _ = AXIsProcessTrustedWithOptions(options)
+  static func requestAccessibility() {
+      // Request the system prompt (may no-op on recent macOS if already listed/denied)
+      let key = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as CFString
+      let options: CFDictionary = [key: true] as CFDictionary
+      _ = AXIsProcessTrustedWithOptions(options)
 
-        // Always open Privacy > Accessibility as a reliable fallback
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-          if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
-            NSWorkspace.shared.open(url)
-          }
+      // Always open Privacy > Accessibility as a reliable fallback
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+          NSWorkspace.shared.open(url)
         }
       }
-    
+    }
+  
 
   static func checkScreenRecording() -> Bool {
     if #available(macOS 10.15, *) {
@@ -687,7 +701,7 @@ struct OnboardingView: View {
 
   // MARK: - Save & finish
 
-  private func saveSettingsAndFinish() {
+  @MainActor private func saveSettingsAndFinish() {
     switch settings.currentProvider {
     case "gemini":
       appState.saveGeminiConfig(
@@ -737,7 +751,17 @@ struct OnboardingView: View {
     appState.setCurrentProvider(settings.currentProvider)
     settings.hasCompletedOnboarding = true
 
-    WindowManager.shared.cleanupWindows()
+    DispatchQueue.main.async {
+      if let window = NSApplication.shared.windows.first(where: { $0.identifier?.rawValue == "OnboardingWindow" }) {
+        window.close()
+      } else if let window = NSApplication.shared.windows.first(where: { w in
+        // Fallback: detect hosting view if identifier is missing
+        if let _ = w.contentView as? NSHostingView<OnboardingView> { return true }
+        return w.contentView?.subviews.contains(where: { $0 is NSHostingView<OnboardingView> }) ?? false
+      }) {
+        window.close()
+      }
+    }
   }
 }
 
