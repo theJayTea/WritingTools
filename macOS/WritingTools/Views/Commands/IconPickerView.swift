@@ -3,17 +3,15 @@ import SwiftUI
 struct IconPickerView: View {
     @Environment(\.dismiss) var dismiss
     @Binding var selectedIcon: String
+    @State private var searchText: String = ""
     
-    // Default icon set from the original implementation
     let availableIcons: [String]
     
-    // Default initialization with our pre-selected set of icons
     init(selectedIcon: Binding<String>, availableIcons: [String]? = nil) {
         self._selectedIcon = selectedIcon
         if let icons = availableIcons {
             self.availableIcons = icons
         } else {
-            // Use the original list of icons with 20 additional ones
             self.availableIcons = [
                 // Original icons
                 "star.fill", "heart.fill", "bolt.fill", "leaf.fill", "globe",
@@ -38,21 +36,35 @@ struct IconPickerView: View {
                 // Additional 20 modern SF symbols
                 "bubble.left.and.text.bubble.right.fill", "text.word.spacing", "captions.bubble.fill",
                 "text.alignleft", "text.alignright", "text.aligncenter", "text.badge.checkmark",
-                "text.badge.minus", "text.badge.plus", "text.bubble.fill", "gearshape", 
+                "text.badge.minus", "text.badge.plus", "text.bubble.fill", "gearshape",
                 "sparkle.magnifyingglass", "highlighter", "scribble.variable", "pencil.and.outline",
                 "square.and.pencil", "pencil.circle", "pencil.circle.fill", "pencil.tip",
                 "rectangle.and.paperclip", "doc.richtext", "doc.plaintext", "doc.append",
                 "doc.text.below.ecg", "doc.viewfinder", "sparkles", "wand.and.rays",
                 "dial.min", "dial.min.fill", "text.line.first.and.arrowtriangle.forward",
-                "paragraph", "list.bullet.circle", "list.number", "list.star", "list.bullet.indent", 
-                "photo.stack", "square.stack.3d.up", "square.stack.3d.down.right", "tray.full.fill", 
-                "slider.horizontal.3"
+                "paragraph", "list.bullet.circle", "list.number", "list.star", "list.bullet.indent",
+                "photo.stack", "square.stack.3d.up", "square.stack.3d.down.right", "tray.full.fill",
+                "slider.horizontal.3",
+                
+                // Additional 20 common and important SF symbols
+                "play.fill", "pause.fill", "stop.fill", "plus.circle.fill", "minus.circle.fill",
+                "sun.max.fill", "moon.fill", "cloud.fill", "camera.fill", "video.fill",
+                "mic.fill", "speaker.fill", "lock.fill", "lock.open.fill", "eye.fill",
+                "eye.slash.fill", "hand.thumbsup.fill", "creditcard.fill", "cart.fill", "gift.fill"
             ]
         }
     }
     
-    // Use a more compact grid layout with more columns
     let columns = Array(repeating: GridItem(.flexible(), spacing: 12), count: 8)
+    
+    var filteredIcons: [String] {
+        if searchText.isEmpty {
+            return availableIcons
+        }
+        return availableIcons.filter {
+            $0.localizedCaseInsensitiveContains(searchText)
+        }
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -70,28 +82,67 @@ struct IconPickerView: View {
             }
             .padding()
             
+            Divider()
+            
+            // Search bar
+            HStack(spacing: 8) {
+                Image(systemName: "magnifyingglass")
+                    .foregroundColor(.secondary)
+                TextField("Search icons...", text: $searchText)
+                    .textFieldStyle(.roundedBorder)
+                if !searchText.isEmpty {
+                    Button(action: { searchText = "" }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding()
+            
+            Divider()
+            
             // Icons grid
             ScrollView {
-                LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(availableIcons, id: \.self) { icon in
-                        Button(action: {
-                            selectedIcon = icon
-                            dismiss()
-                        }) {
-                            Image(systemName: icon)
-                                .font(.title2)
-                                .frame(width: 36, height: 36)
-                                .foregroundColor(selectedIcon == icon ? .white : .primary)
-                                .background(selectedIcon == icon ? Color.accentColor : Color.clear)
-                                .cornerRadius(8)
-                        }
-                        .buttonStyle(.plain)
+                if filteredIcons.isEmpty {
+                    VStack {
+                        Spacer()
+                        Image(systemName: "magnifyingglass")
+                            .font(.system(size: 32))
+                            .foregroundColor(.secondary)
+                        Text("No icons found")
+                            .foregroundColor(.secondary)
+                            .padding(.top, 8)
+                        Spacer()
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    LazyVGrid(columns: columns, spacing: 16) {
+                        ForEach(filteredIcons, id: \.self) { icon in
+                            Button(action: {
+                                selectedIcon = icon
+                                dismiss()
+                            }) {
+                                Image(systemName: icon)
+                                    .font(.title2)
+                                    .frame(width: 36, height: 36)
+                                    .foregroundColor(
+                                        selectedIcon == icon ? .white : .primary
+                                    )
+                                    .background(
+                                        selectedIcon == icon ?
+                                        Color.accentColor : Color.clear
+                                    )
+                                    .cornerRadius(8)
+                            }
+                            .buttonStyle(.plain)
+                            .help(icon)
+                        }
+                    }
+                    .padding()
                 }
-                .padding()
             }
-            
         }
-        .frame(width: 480, height: 480)
+        .frame(width: 480, height: 540)
     }
-} 
+}

@@ -219,167 +219,6 @@
         }
       }
     },
-    "• Improves your writing with AI" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "• Verbessert Ihr Schreiben mit KI"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "• Mejora tu escritura con IA"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "• Améliore votre écriture grâce à l'IA"
-          }
-        }
-      }
-    },
-    "• Support Custom Commands for anything you want" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "• Unterstützt benutzerdefinierte Befehle für alles, was Sie möchten"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "• Comandos personalizados para todo lo que desee"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "• Prend en charge les commandes personnalisées pour tout ce que vous voulez"
-          }
-        }
-      }
-    },
-    "• Works in any application" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "• Funktioniert in jeder Anwendung"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "• Funciona en cualquier aplicación"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "• Fonctionne dans n'importe quelle application"
-          }
-        }
-      }
-    },
-    "1. Click the button below to open System Settings" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1. Klicken Sie auf die Schaltfläche unten, um die Systemeinstellungen zu öffnen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1. Haga clic en el botón de abajo para abrir Configuración del sistema"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1. Cliquez sur le bouton ci-dessous pour ouvrir les paramètres système"
-          }
-        }
-      }
-    },
-    "2. Click the '+' button in the accessibility section" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "2. Klicken Sie auf die Schaltfläche '+' im Bereich Barrierefreiheit"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "2. Haga clic en el botón «+» de la sección de accesibilidad"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "2. Cliquez sur le bouton '+' dans la section accessibilité"
-          }
-        }
-      }
-    },
-    "3. Navigate to Applications and select writing-tools" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "3. Navigieren Sie zu Anwendungen und wählen Sie Schreibwerkzeuge aus"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "3. Navegue hasta Aplicaciones y seleccione herramientas de escritura"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "3. Naviguez vers Applications et sélectionnez les outils d'écriture"
-          }
-        }
-      }
-    },
-    "4. Enable the checkbox next to writing-tools" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "4. Aktivieren Sie das Kontrollkästchen neben Schreibwerkzeuge"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "4. Active la casilla junto a herramientas de escritura"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "4. Activez la case à cocher à côté des outils d'écriture"
-          }
-        }
-      }
-    },
     "A command with this name already exists. Please choose a different name." : {
       "localizations" : {
         "de" : {
@@ -625,7 +464,14 @@
       }
     },
     "All changes saved" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Änderungen gespeichert"
+          }
+        }
+      }
     },
     "Anthropic" : {
       "localizations" : {
@@ -715,29 +561,6 @@
         }
       }
     },
-    "Appearance" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Erscheinungsbild"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apariencia"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apparence"
-          }
-        }
-      }
-    },
     "Appearance Settings" : {
       "localizations" : {
         "de" : {
@@ -822,29 +645,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Êtes-vous sûr de vouloir supprimer le modèle téléchargé %@ ? Vous devrez le télécharger à nouveau pour l'utiliser."
-          }
-        }
-      }
-    },
-    "Are you sure you want to delete the downloaded model? You'll need to download it again to use local processing." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sind Sie sicher, dass Sie das heruntergeladene Modell löschen möchten? Sie müssen es erneut herunterladen, um die lokale Verarbeitung zu verwenden."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "¿Estás seguro de que quieres borrar el modelo descargado? Tendrás que volver a descargarlo para utilizar el procesamiento local."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Êtes-vous sûr de vouloir supprimer le modèle téléchargé ? Vous devrez le télécharger à nouveau pour utiliser le traitement local."
           }
         }
       }
@@ -1005,7 +805,14 @@
       }
     },
     "Bliss AI on Google Play" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bliss AI on Google Play"
+          }
+        }
+      }
     },
     "Built-in" : {
       "localizations" : {
@@ -1118,10 +925,24 @@
       }
     },
     "Cancel download" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download abbrechen"
+          }
+        }
+      }
     },
     "Cancel the current download." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Den aktuellen Download abbrechen."
+          }
+        }
+      }
     },
     "Cannot proceed due to error." : {
       "localizations" : {
@@ -1189,52 +1010,6 @@
         }
       }
     },
-    "Check out Bliss AI on Google Play" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Probieren Sie Bliss AI auf Google Play aus"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Echa un vistazo a Bliss AI en Google Play"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Découvrez Bliss AI sur Google Play"
-          }
-        }
-      }
-    },
-    "Check out ProseKey AI (iOS port of WritingTools)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Probieren Sie ProseKey AI aus (iOS-Portierung von WritingTools)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Echa un vistazo a ProseKey AI (adaptación para iOS de WritingTools)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Découvrez ProseKey AI (port iOS de WritingTools)"
-          }
-        }
-      }
-    },
     "Checking for updates..." : {
       "localizations" : {
         "de" : {
@@ -1258,7 +1033,14 @@
       }
     },
     "Checking model status" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überprüfung des Modellstatus"
+          }
+        }
+      }
     },
     "Checking status..." : {
       "localizations" : {
@@ -1283,7 +1065,14 @@
       }
     },
     "Choose a convenient key combination to bring up Writing Tools from anywhere." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wählen Sie eine praktische Tastenkombination, um Schreibwerkzeuge von überall her aufzubringen."
+          }
+        }
+      }
     },
     "Choose a model to download and use for local processing." : {
       "localizations" : {
@@ -1308,27 +1097,11 @@
       }
     },
     "Choose a window appearance that matches your preferences and context." : {
-
-    },
-    "Choose between local OCR or Ollama's built-in vision capabilities." : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wählen Sie zwischen lokaler OCR oder den in Ollama integrierten Bildverarbeitungsfunktionen."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Elija entre el OCR local o las funciones de visión integradas de Ollama."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choisissez entre l'OCR local ou les capacités de vision intégrées d'Ollama."
+            "value" : "Wählen Sie ein Fensterbild, das Ihren Präferenzen und Ihrem Kontext entspricht."
           }
         }
       }
@@ -1351,29 +1124,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vous pouvez choisir d'effectuer l'OCR localement ou d'utiliser un modèle de vision Ollama pour la saisie de l'image."
-          }
-        }
-      }
-    },
-    "Choose how the app windows will appear" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wählen Sie, wie die App-Fenster angezeigt werden"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Elige cómo aparecerán las ventanas de la aplicación"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choisir l'apparence des fenêtres de l'application"
           }
         }
       }
@@ -1401,7 +1151,14 @@
       }
     },
     "Choose whether custom prompts open in a separate response window or replace text inline." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wählen Sie aus, ob benutzerdefinierte Eingabeaufforderungen in einem separaten Antwortfenster geöffnet werden oder Text inline ersetzt werden sollen."
+          }
+        }
+      }
     },
     "Choose your theme:" : {
       "extractionState" : "manual",
@@ -1422,52 +1179,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Choisissez votre thème:"
-          }
-        }
-      }
-    },
-    "Click the '+' button (you may need to unlock first)." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Klicken Sie auf die Schaltfläche „+“ (eventuell müssen Sie sie erst entsperren)."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Haz clic en el botón «+» (puede que tengas que desbloquearlo primero)."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cliquez sur le bouton « + » (il se peut que vous deviez d'abord déverrouiller)."
-          }
-        }
-      }
-    },
-    "Click the button below to open System Settings > Privacy & Security > Accessibility." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Klicken Sie auf die Schaltfläche unten, um Systemeinstellungen > Datenschutz und Sicherheit > Barrierefreiheit zu öffnen."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Haga clic en el botón de abajo para abrir Configuración del sistema > Privacidad y seguridad > Accesibilidad."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cliquez sur le bouton ci-dessous pour ouvrir les Paramètres du système > Confidentialité et sécurité > Accessibilité."
           }
         }
       }
@@ -1782,7 +1493,14 @@
       }
     },
     "Copied" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopiert"
+          }
+        }
+      }
     },
     "Copied!" : {
       "localizations" : {
@@ -1852,10 +1570,24 @@
       }
     },
     "Copy Message" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nachricht kopieren"
+          }
+        }
+      }
     },
     "Copy Selection" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auswahl kopieren"
+          }
+        }
+      }
     },
     "Created with care by Jesai, a high school student." : {
       "localizations" : {
@@ -1880,7 +1612,14 @@
       }
     },
     "Creators" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entwicklern"
+          }
+        }
+      }
     },
     "Custom" : {
       "localizations" : {
@@ -1970,29 +1709,6 @@
         }
       }
     },
-    "Customize Your Experience" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Passen Sie Ihr Erlebnis an"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Personalice su experiencia"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Personnalisez votre expérience"
-          }
-        }
-      }
-    },
     "Decrease text size" : {
       "localizations" : {
         "de" : {
@@ -2033,29 +1749,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modèles par défaut : %@, gpt-4o, gpt-4o-mini, etc."
-          }
-        }
-      }
-    },
-    "Delete" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Löschen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Borrar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Supprimer"
           }
         }
       }
@@ -2214,34 +1907,25 @@
         }
       }
     },
-    "Download Model" : {
-      "extractionState" : "stale",
+    "Download progress" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Model herunterladen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Descargar modelo"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Télécharger le modèle"
+            "value" : "Download-Fortschritt"
           }
         }
       }
     },
-    "Download progress" : {
-
-    },
     "Download the selected model for offline use." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laden Sie das ausgewählte Modell für die Offline-Nutzung herunter."
+          }
+        }
+      }
     },
     "Download Update" : {
       "localizations" : {
@@ -2283,29 +1967,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Téléchargement de %@..."
-          }
-        }
-      }
-    },
-    "Downloading model..." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Model wird heruntergeladen…"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Descargar modelo..."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Téléchargement du modèle..."
           }
         }
       }
@@ -2471,53 +2132,21 @@
       }
     },
     "Email Arya" : {
-
-    },
-    "Email Jesai" : {
-
-    },
-    "Email: developer@aryamirsepasi.com" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Email: developer@aryamirsepasi.com"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Email: developer@aryamirsepasi.com"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Email: developer@aryamirsepasi.com"
+            "value" : "Email Arya"
           }
         }
       }
     },
-    "Email: jesaitarun@gmail.com" : {
-      "extractionState" : "stale",
+    "Email Jesai" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Email: jesaitarun@gmail.com"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Email: jesaitarun@gmail.com"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Email: jesaitarun@gmail.com"
+            "value" : "Email Jesai"
           }
         }
       }
@@ -2566,54 +2195,15 @@
         }
       }
     },
-    "Ensure the toggle switch next to 'WritingTools' is turned ON." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stellen Sie sicher, dass der Kippschalter neben „WritingTools“ eingeschaltet ist."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Asegúrese de que el conmutador situado junto a «Herramientas de escritura» está activado."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Assurez-vous que l'interrupteur à bascule situé à côté de « WritingTools » est activé."
-          }
-        }
-      }
-    },
-    "Error" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Error"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Error"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Erreur"
-          }
-        }
-      }
-    },
     "Error: %@" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: %@"
+          }
+        }
+      }
     },
     "Exit Edit Mode" : {
       "localizations" : {
@@ -2660,7 +2250,14 @@
       }
     },
     "Filter between all, text-only, and vision-capable models." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtern Sie zwischen allen, nur textfähigen und visionfähigen Modellen."
+          }
+        }
+      }
     },
     "Finish" : {
       "localizations" : {
@@ -2729,29 +2326,6 @@
         }
       }
     },
-    "Gemini" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gemini"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gemini"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gemini"
-          }
-        }
-      }
-    },
     "Gemini AI" : {
       "localizations" : {
         "de" : {
@@ -2792,52 +2366,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gemini AI (Google)"
-          }
-        }
-      }
-    },
-    "Gemini AI Settings" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gemini Einstellungen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Configuración de la IA Gemini"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Paramètres de Gemini"
-          }
-        }
-      }
-    },
-    "General" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Allgemeines"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "General"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Général"
           }
         }
       }
@@ -2996,29 +2524,6 @@
         }
       }
     },
-    "GitHub Page" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "GitHub-Seite"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Página de GitHub"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Page GitHub"
-          }
-        }
-      }
-    },
     "GitHub Page." : {
       "localizations" : {
         "de" : {
@@ -3063,29 +2568,6 @@
         }
       }
     },
-    "Global Keyboard Shortcut" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Globaler Tastaturkurzbefehl"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Atajo de teclado global"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Raccourci clavier global"
-          }
-        }
-      }
-    },
     "Global Shortcut" : {
       "localizations" : {
         "de" : {
@@ -3104,29 +2586,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Raccourci global"
-          }
-        }
-      }
-    },
-    "Global Shortcut:" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Globaler Shortcut:"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Atajo global:"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Raccourci global :"
           }
         }
       }
@@ -3175,29 +2634,6 @@
         }
       }
     },
-    "Helps you write with clarity and confidence" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hilft Ihnen, mit Klarheit und Selbstvertrauen zu schreiben"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le ayuda a escribir con claridad y confianza"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vous aide à écrire avec clarté et confiance"
-          }
-        }
-      }
-    },
     "How it works" : {
       "localizations" : {
         "de" : {
@@ -3216,29 +2652,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Comment ça marche"
-          }
-        }
-      }
-    },
-    "How to enable accessibility access:" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "So aktivieren Sie den Barrierefreiheitszugang:"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cómo habilitar el acceso a la accesibilidad:"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comment activer l'accès à l'accessibilité :"
           }
         }
       }
@@ -3371,29 +2784,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Améliorez votre écriture avec un seul raccourci"
-          }
-        }
-      }
-    },
-    "Improves your writing with AI" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Verbessert Ihr Schreiben mit AI"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mejora tu escritura con IA"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Améliorez votre écriture grâce à l'IA"
           }
         }
       }
@@ -3532,7 +2922,14 @@
       }
     },
     "Keyboard Shortcuts" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tastenkombinationen"
+          }
+        }
+      }
     },
     "Loading %@..." : {
       "localizations" : {
@@ -3557,10 +2954,24 @@
       }
     },
     "Loading model" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modell wird geladen"
+          }
+        }
+      }
     },
     "Loading model into memory" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modell wird in den Speicher geladen"
+          }
+        }
+      }
     },
     "Loading model into memory..." : {
       "localizations" : {
@@ -3580,29 +2991,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chargement du modèle en mémoire..."
-          }
-        }
-      }
-    },
-    "Loading model..." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modell wird geladen..."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cargando modelo..."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chargement du modèle..."
           }
         }
       }
@@ -3719,52 +3107,6 @@
         }
       }
     },
-    "Local LLM is only available on Apple Silicon devices (M1/M2/M3 Macs)." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lokale LLM ist nur auf Apple Silicon Geräten (M1/M2/M3 Macs) verfügbar."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "LLM local sólo está disponible en dispositivos Apple Silicon (Macs M1/M2/M3)."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "LLM local n'est disponible que sur les appareils Apple Silicon (Mac M1/M2/M3)."
-          }
-        }
-      }
-    },
-    "Local LLM is only available on Apple Silicon devices." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lokale LLM ist nur auf Apple Silicon Geräten verfügbar."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "LLM local sólo está disponible en dispositivos Apple Silicon."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le LLM local n'est disponible que sur les appareils Apple Silicon."
-          }
-        }
-      }
-    },
     "Local LLM keeps data on‑device; cloud providers receive selected content for processing." : {
       "localizations" : {
         "de" : {
@@ -3788,27 +3130,11 @@
       }
     },
     "Local LLM processing is only available on Apple Silicon (M-series) devices." : {
-
-    },
-    "Local LLM processing is only available on Apple Silicon (M1/M2/M3/M4 etc.) devices." : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die lokale LLM-Verarbeitung ist nur auf Apple Silicon-Geräten (M1/M2/M3/M4 usw.) verfügbar."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El procesamiento LLM local sólo está disponible en dispositivos Apple Silicon (M1/M2/M3/M4 etc.)."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le traitement LLM local n'est disponible que sur les appareils Apple Silicon (M1/M2/M3/M4 etc.)."
+            "value" : "Die lokale LLM-Verarbeitung ist nur auf Geräten der Apple Silicon (M-Serie) verfügbar."
           }
         }
       }
@@ -3836,7 +3162,14 @@
       }
     },
     "macOS version by Arya Mirsepasi" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS-Version von Arya Mirsepasi"
+          }
+        }
+      }
     },
     "Manage Commands" : {
       "localizations" : {
@@ -3861,50 +3194,11 @@
       }
     },
     "Manage your writing tools and assign keyboard shortcuts." : {
-
-    },
-    "Manage your writing tools and their keyboard shortcuts" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verwalten Sie Ihre Schreibwerkzeuge und deren Tastenkombinationen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gestiona tus herramientas de escritura y sus atajos de teclado"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gérer vos outils d'écriture et leurs raccourcis clavier"
-          }
-        }
-      }
-    },
-    "Mistral" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mistral"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mistral"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mistral"
+            "value" : "Verwalten Sie Ihre Schreibwerkzeuge und weisen Sie Tastenkombinationen zu."
           }
         }
       }
@@ -3927,29 +3221,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mistral AI"
-          }
-        }
-      }
-    },
-    "Mistral AI Settings" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mistral AI Einstellungen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mistral AI Ajustes"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Paramètres de Mistral AI"
           }
         }
       }
@@ -3999,7 +3270,14 @@
       }
     },
     "Model Filters" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model Filters"
+          }
+        }
+      }
     },
     "Model Information" : {
       "extractionState" : "manual",
@@ -4046,52 +3324,6 @@
         }
       }
     },
-    "Model needs to be downloaded before first use" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das Modell muss vor der ersten Verwendung heruntergeladen werden"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Es necesario descargar el modelo antes de utilizarlo por primera vez"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le modèle doit être téléchargé avant la première utilisation"
-          }
-        }
-      }
-    },
-    "Model ready" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Model ist bereit"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modelo listo"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modèle prêt"
-          }
-        }
-      }
-    },
     "Model Selection" : {
       "localizations" : {
         "de" : {
@@ -4132,29 +3364,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nom"
-          }
-        }
-      }
-    },
-    "Navigate to your Applications folder and select 'WritingTools'." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Navigieren Sie zu Ihrem Anwendungsordner und wählen Sie „WritingTools“."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vaya a la carpeta Aplicaciones y seleccione 'WritingTools'."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Naviguez dans votre dossier Applications et sélectionnez « WritingTools »."
           }
         }
       }
@@ -4243,6 +3452,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pas encore de commandes personnalisées"
+          }
+        }
+      }
+    },
+    "No icons found" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Symbole gefunden"
           }
         }
       }
@@ -4357,29 +3576,6 @@
         }
       }
     },
-    "Ollama (local, but requires separate installation)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ollama (lokal, erfordert aber eine separate Installation)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ollama (local, pero requiere instalación independiente)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ollama (local, mais nécessite une installation séparée)"
-          }
-        }
-      }
-    },
     "Ollama (Self-Hosted)" : {
       "localizations" : {
         "de" : {
@@ -4490,57 +3686,25 @@
         }
       }
     },
-    "Ollama Provider Settings" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ollama-Anbietereinstellungen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Configuración del proveedor de Ollama"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Paramètres du fournisseur Ollama"
-          }
-        }
-      }
-    },
     "Onboarding" : {
-
-    },
-    "Open Accessibility Settings" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zugänglichkeitseinstellungen öffnen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abrir la configuración de accesibilidad"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ouvrir les paramètres d'accessibilité"
+            "value" : "Onboarding"
           }
         }
       }
     },
     "Open Anthropic console to create or view your API key." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnen Sie die Anthropic-Konsole, um Ihren API-Schlüssel zu erstellen oder anzuzeigen."
+          }
+        }
+      }
     },
     "Open Commands Manager" : {
       "localizations" : {
@@ -4565,22 +3729,64 @@
       }
     },
     "Open custom prompts in response window" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benutzerdefinierte Eingabeaufforderungen im Antwortfenster öffnen"
+          }
+        }
+      }
     },
     "Open Google AI Studio to generate an API key." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnen Sie Google AI Studio, um einen API-Schlüssel zu generieren."
+          }
+        }
+      }
     },
     "Open Mistral console to create an API key." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnen Sie die Mistral-Konsole, um einen API-Schlüssel zu erstellen."
+          }
+        }
+      }
     },
     "Open Ollama download and documentation page in your browser." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnen Sie die Download- und Dokumentationsseite von Ollama in Ihrem Browser."
+          }
+        }
+      }
     },
     "Open OpenAI dashboard to create an API key." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnen Sie das OpenAI-Dashboard, um einen API-Schlüssel zu erstellen."
+          }
+        }
+      }
     },
     "Open OpenRouter to retrieve your API key." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnen Sie OpenRouter, um Ihren API-Schlüssel abzurufen."
+          }
+        }
+      }
     },
     "Open Privacy & Security" : {
       "localizations" : {
@@ -4604,57 +3810,32 @@
         }
       }
     },
-    "Open System Settings" : {
-      "extractionState" : "stale",
+    "Open System Settings to manage permissions." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Systemeinstellungen öffnen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abrir la configuración del sistema"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ouvrir les paramètres système"
+            "value" : "Öffnen Sie die Systemeinstellungen, um Berechtigungen zu verwalten."
           }
         }
       }
     },
-    "Open System Settings to manage permissions." : {
-
-    },
     "Open the Commands Manager to add, edit, or remove commands." : {
-
-    },
-    "Open the onboarding window to set up WritingTools again." : {
-
-    },
-    "Open Writing Tools" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "WritingTools öffnen"
+            "value" : "Öffnen Sie den Befehls-Manager, um Befehle hinzuzufügen, zu bearbeiten oder zu entfernen."
           }
-        },
-        "es" : {
+        }
+      }
+    },
+    "Open the onboarding window to set up WritingTools again." : {
+      "localizations" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Herramientas de escritura abierta"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ouvrir l'écritureOutils"
+            "value" : "Öffnen Sie das Onboarding-Fenster, um WritingTools erneut einzurichten."
           }
         }
       }
@@ -4703,29 +3884,6 @@
         }
       }
     },
-    "OpenAI (GPT-4/3.5)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OpenAI (GPT-4/3.5)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OpenAI (GPT-4/3.5)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OpenAI (GPT-4/3.5)"
-          }
-        }
-      }
-    },
     "OpenAI models include: gpt-4o, gpt-4o-mini, etc." : {
       "localizations" : {
         "de" : {
@@ -4744,29 +3902,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Les modèles OpenAI incluent : gpt-4o, gpt-4o-mini, etc."
-          }
-        }
-      }
-    },
-    "OpenAI Settings" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OpenAI-Einstellungen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Configuración de OpenAI"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Paramètres OpenAI"
           }
         }
       }
@@ -4839,50 +3974,11 @@
       }
     },
     "Please select a different AI Provider in Settings if you are on an Intel Mac." : {
-
-    },
-    "Please select a different AI Provider in the settings if you are on an Intel Mac." : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bitte wählen Sie einen anderen AI-Provider in den Einstellungen, wenn Sie einen Intel-Mac verwenden."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Por favor, seleccione un proveedor de AI diferente en la configuración si usted está en un Mac Intel."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Si vous utilisez un Mac Intel, veuillez sélectionner un autre fournisseur d'IA dans les paramètres."
-          }
-        }
-      }
-    },
-    "Please select a different AI provider." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bitte wählen Sie einen anderen KI-Anbieter."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seleccione otro proveedor de AI."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Veuillez sélectionner un autre fournisseur d'IA."
+            "value" : "Bitte wählen Sie in den Einstellungen einen anderen KI-Anbieter aus, wenn Sie einen Intel-Mac verwenden."
           }
         }
       }
@@ -4905,52 +4001,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Veuillez sélectionner un modèle dans la liste déroulante ci-dessus pour voir son statut et ses options de téléchargement."
-          }
-        }
-      }
-    },
-    "Please select a provider." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bitte wählen Sie einen Anbieter."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seleccione un proveedor."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Veuillez sélectionner un fournisseur."
-          }
-        }
-      }
-    },
-    "Please use one of the online models instead:" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bitte verwenden Sie stattdessen eines der Online-Modelle:"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "En su lugar, utilice uno de los modelos en línea:"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Veuillez plutôt utiliser l'un des modèles en ligne :"
           }
         }
       }
@@ -5091,7 +4141,14 @@
       }
     },
     "ProseKey AI (iOS port)" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ProseKey AI (iOS port)"
+          }
+        }
+      }
     },
     "Provider" : {
       "localizations" : {
@@ -5138,7 +4195,14 @@
       }
     },
     "Recheck current permission statuses." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überprüfen Sie den aktuellen Berechtigungsstatus erneut."
+          }
+        }
+      }
     },
     "Refresh Status" : {
       "localizations" : {
@@ -5163,7 +4227,14 @@
       }
     },
     "Remove the downloaded model from disk." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entfernen Sie das heruntergeladene Modell von der Festplatte."
+          }
+        }
+      }
     },
     "Required" : {
       "localizations" : {
@@ -5298,27 +4369,11 @@
       }
     },
     "Restart Onboarding" : {
-
-    },
-    "Retry" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Erneut versuchen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reintentar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Réessayer"
+            "value" : "Onboarding neu starten"
           }
         }
       }
@@ -5413,10 +4468,34 @@
       }
     },
     "Save your changes and close settings." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichern Sie Ihre Änderungen und schließen Sie die Einstellungen."
+          }
+        }
+      }
+    },
+    "Search icons..." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Icons suchen…"
+          }
+        }
+      }
     },
     "Select a local model. Vision-capable models can process images." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wählen Sie ein lokales Modell aus. Sehfähige Modelle können Bilder verarbeiten."
+          }
+        }
+      }
     },
     "Select a provider." : {
       "localizations" : {
@@ -5484,29 +4563,6 @@
         }
       }
     },
-    "Select Local Model" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lokales Modell auswählen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seleccionar modelo local"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sélectionnez le modèle local"
-          }
-        }
-      }
-    },
     "Select the AI service you want to use." : {
       "localizations" : {
         "de" : {
@@ -5530,10 +4586,24 @@
       }
     },
     "Select which AI service to use for processing." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wählen Sie aus, welcher KI-Dienst für die Verarbeitung verwendet werden soll."
+          }
+        }
+      }
     },
     "Set a global shortcut to quickly activate Writing Tools." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Legen Sie eine globale Verknüpfung fest, um die Schreibwerkzeuge schnell zu aktivieren."
+          }
+        }
+      }
     },
     "Set the keyboard shortcut to activate WritingTools from anywhere." : {
       "localizations" : {
@@ -5648,7 +4718,14 @@
       }
     },
     "Standard uses system backgrounds. Glass respects transparency preferences. OLED uses deep blacks." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard verwendet Systemhintergründe. Glas respektiert Transparenzpräferenzen. OLED verwendet tiefe Schwarztien."
+          }
+        }
+      }
     },
     "Status: %@" : {
       "localizations" : {
@@ -5691,29 +4768,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Résumé"
-          }
-        }
-      }
-    },
-    "Supports Custom Commands" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unterstützt benutzerdefinierte Befehle"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Admite comandos personalizados"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Prend en charge les commandes personnalisées"
           }
         }
       }
@@ -5781,29 +4835,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La dernière version est déjà installée !"
-          }
-        }
-      }
-    },
-    "The macOS version is created by Arya Mirsepasi" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die macOS-Version wurde von Arya Mirsepasi erstellt"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La versión para macOS ha sido creada por Arya Mirsepasi"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La version macOS a été créée par Arya Mirsepasi"
           }
         }
       }
@@ -5919,7 +4950,14 @@
       }
     },
     "Try downloading again if the previous attempt failed." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versuchen Sie den Download erneut, wenn der vorherige Versuch fehlgeschlagen ist."
+          }
+        }
+      }
     },
     "Use “Proofread” to preserve formatting while fixing grammar/spelling." : {
       "localizations" : {
@@ -5966,7 +5004,14 @@
       }
     },
     "Version & Updates" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version & Updates"
+          }
+        }
+      }
     },
     "Version: 3.0 (Based on Windows Port version 7.1)" : {
       "extractionState" : "manual",
@@ -6014,103 +5059,25 @@
         }
       }
     },
-    "Version: 4.0 (Based on Windows Port version 7.1)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Version: 4.0 (Basierend auf Windows-Port-Version 7.1)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Versión: 4.0 (Basada en Windows Port versión 7.1)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Version : 4.0 (basée sur Windows Port version 7.1)"
-          }
-        }
-      }
-    },
-    "Version: 4.1 (Based on Windows Port version 7.1)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Version: 4.1 (Basierend auf Windows-Port-Version 7.1)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Versión: 4.1 (Basada en Windows Port versión 7.1)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Version : 4.1 (basée sur Windows Port version 7.1)"
-          }
-        }
-      }
-    },
-    "Version: 4.2 (Based on Windows Port version 7.1)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Version: 4.2 (Basierend auf Windows-Port-Version 7.1)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Versión: 4.2 (Basada en Windows Port versión 7.1)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Version : 4.2 (basée sur Windows Port version 7.1)"
-          }
-        }
-      }
-    },
-    "Version: 5.0 (Based on Windows Port version 7.1)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Version: 5.0 (basierend auf Windows Port Version 7.1)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Versión: 5.0 (basada en la versión 7.1 para Windows)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Version : 5.0 (basée sur la version Windows Port 7.1)"
-          }
-        }
-      }
-    },
     "Version: 5.3 (Based on Windows Port version 7.1)" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version: 5.3 (Basierend auf Windows Port Version 7.1)"
+          }
+        }
+      }
     },
     "View Releases" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veröffentlichungen anzeigen"
+          }
+        }
+      }
     },
     "Vision-capable model" : {
       "localizations" : {
@@ -6179,7 +5146,14 @@
       }
     },
     "When unchecked, custom prompts will replace selected text inline" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn nicht aktiviert, ersetzen benutzerdefinierte Eingabeaufforderungen ausgewählte Text-Inline"
+          }
+        }
+      }
     },
     "Window Style" : {
       "localizations" : {
@@ -6225,77 +5199,15 @@
         }
       }
     },
-    "Works in any application" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Funktioniert in jeder Anwendung"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Funciona en cualquier aplicación"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fonctionne dans n'importe quelle application"
-          }
-        }
-      }
-    },
-    "Writing Tools" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Writing Tools"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Writing Tools"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Writing Tools"
-          }
-        }
-      }
-    },
-    "Writing Tools is a free & lightweight tool that helps you improve your writing with AI, similar to Apple's new Apple Intelligence feature." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "WritingTools ist ein kostenloses und leichtgewichtiges Tool, das Ihnen hilft, Ihr Schreiben mit Hilfe von KI zu verbessern, ähnlich wie Apples neue Apple Intelligence Funktion."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "WritingTools es una herramienta gratuita y ligera que te ayuda a mejorar tu escritura con IA, similar a la nueva función Apple Intelligence de Apple."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Writing Tools est un outil gratuit et léger qui vous aide à améliorer votre écriture grâce à l'IA, à l'instar de la nouvelle fonctionnalité Apple Intelligence."
-          }
-        }
-      }
-    },
     "Writing Tools is a free, lightweight utility that enhances your writing with AI." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Writing Tools ist ein kostenloses, leichtes Dienstprogramm, das Ihr Schreiben mit KI verbessert."
+          }
+        }
+      }
     },
     "WritingTools briefly copies your selection, sends it to your chosen AI provider (or a local model), and then pastes the result back—preserving formatting when supported." : {
       "localizations" : {
@@ -6320,16 +5232,44 @@
       }
     },
     "You can always adjust these later in Settings." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie können diese jederzeit später in den Einstellungen anpassen."
+          }
+        }
+      }
     },
     "You can change any setting later in Settings." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie können jede Einstellung später in den Einstellungen ändern."
+          }
+        }
+      }
     },
     "You can rerun the onboarding flow to review permissions and quickly configure the app." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie können den Onboarding-Fluss erneut ausführen, um Berechtigungen zu überprüfen und die App schnell zu konfigurieren."
+          }
+        }
+      }
     },
     "You can revisit onboarding anytime from Settings > General > Onboarding." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie können das Onboarding jederzeit unter \"Einstellungen\" > \"Allgemein\" > \"Onboarding\" erneut besuchen."
+          }
+        }
+      }
     },
     "You can revoke any permission later in System Settings." : {
       "localizations" : {

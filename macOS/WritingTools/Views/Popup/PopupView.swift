@@ -53,7 +53,6 @@ struct PopupView: View {
 
         Button(action: {
           viewModel.isEditMode.toggle()
-          // Optional: keep notification if other parts listen to it
           NotificationCenter.default.post(
             name: NSNotification.Name("EditModeChanged"),
             object: nil
@@ -110,7 +109,6 @@ struct PopupView: View {
                 },
                 onEdit: {
                   editingCommand = command
-                  showingCommandsView = true
                 },
                 onDelete: {
                   print("Deleting command: \(command.name)")
@@ -151,6 +149,28 @@ struct PopupView: View {
     )
     .clipShape(RoundedRectangle(cornerRadius: 12))
     .shadow(color: Color.black.opacity(0.2), radius: 10, y: 5)
+    // Sheet for editing individual command
+    .sheet(item: $editingCommand) { command in
+      let binding = Binding(
+        get: { command },
+        set: { updatedCommand in
+          appState.commandManager.updateCommand(updatedCommand)
+          editingCommand = nil
+        }
+      )
+      
+      CommandEditor(
+        command: binding,
+        onSave: {
+          editingCommand = nil
+        },
+        onCancel: {
+          editingCommand = nil
+        },
+        commandManager: appState.commandManager
+      )
+    }
+    // Sheet for managing all commands
     .sheet(isPresented: $showingCommandsView) {
       CommandsView(commandManager: appState.commandManager)
         .onDisappear {
@@ -260,11 +280,9 @@ struct PopupView: View {
         )
 
         await MainActor.run {
-          // Use the setting to determine behavior
           let settings = AppSettings.shared
           
           if settings.openCustomCommandsInResponseWindow {
-            // Open in response window
             let window = ResponseWindow(
               title: "AI Response",
               content: result,
@@ -277,7 +295,6 @@ struct PopupView: View {
             window.makeKeyAndOrderFront(nil)
             window.orderFrontRegardless()
           } else {
-            // Replace inline
             appState.replaceSelectedText(with: result)
           }
 

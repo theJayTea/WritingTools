@@ -52,8 +52,17 @@ final class OllamaProvider: ObservableObject, AIProvider {
         isProcessing = true
         defer { isProcessing = false }
 
-        // 1) Build prompt + image policy (OCR vs Ollama)
-        var combinedPrompt = userPrompt
+        // 1) Build combined prompt: system message + user input
+        var combinedPrompt = ""
+        
+        // Include system prompt if provided
+        if let system = systemPrompt, !system.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            combinedPrompt = system + "\n\n"
+        }
+        
+        // Add user's actual text
+        combinedPrompt += userPrompt
+        
         var imagesForOllama: [String] = []
 
         if !images.isEmpty {
@@ -61,27 +70,30 @@ final class OllamaProvider: ObservableObject, AIProvider {
             case .ocr:
                 let ocrText = await OCRManager.shared.extractText(from: images)
                 if !ocrText.isEmpty {
-                    combinedPrompt += "\nExtracted Text: \(ocrText)"
+                    combinedPrompt += "\n\nExtracted Text: \(ocrText)"
                 }
             case .ollama:
                 imagesForOllama = images.map { $0.base64EncodedString() }
             }
         }
 
-        // 2) Construct URL against normalized /api base
+        // 2) Construct URL
         guard let url = makeEndpointURL("/generate") else {
             throw makeClientError("Invalid base URL '\(config.baseURL)'. Expected like http://localhost:11434 or http://localhost:11434/api")
         }
 
-        // 3) Encode request
+        // 3) Build request body - everything in one "prompt" field
         var body: [String: Any] = [
             "model": config.model,
-            "prompt": combinedPrompt,
-            "stream": streaming  // honor caller
+            "prompt": combinedPrompt,  // ← CRITICAL: Combined system+user here
+            "stream": streaming
         ]
-        if let system = systemPrompt { body["system"] = system }
-        if let keepAlive = config.keepAlive, !keepAlive.isEmpty { body["keep_alive"] = keepAlive }
-        if !imagesForOllama.isEmpty { body["images"] = imagesForOllama }
+        if let keepAlive = config.keepAlive, !keepAlive.isEmpty {
+            body["keep_alive"] = keepAlive
+        }
+        if !imagesForOllama.isEmpty {
+            body["images"] = imagesForOllama
+        }
 
         let jsonData = try JSONSerialization.data(withJSONObject: body)
 
@@ -91,7 +103,7 @@ final class OllamaProvider: ObservableObject, AIProvider {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
 
-        // 4) Call API (streaming vs non-streaming per Ollama docs)
+        // 4) Execute request
         if streaming {
             return try await performStreaming(request)
         } else {
@@ -100,7 +112,6 @@ final class OllamaProvider: ObservableObject, AIProvider {
     }
 
     func cancel() {
-        // No in-flight task handle stored yet; keep UI flag correct.
         isProcessing = false
     }
 
@@ -112,15 +123,11 @@ final class OllamaProvider: ObservableObject, AIProvider {
             throw makeClientError("Invalid response from server.")
         }
 
-        // Surface server-side errors with payload if present
         guard http.statusCode == 200 else {
             let message = decodeServerError(from: data)
             throw makeServerError(http.statusCode, message)
         }
 
-        // Non-stream: one JSON object containing the full `response`
-        // per /api/generate "Request (No streaming)" docs.
-        // https://ollama.readthedocs.io → API → Generate (stream=false)
         let obj = try JSONDecoder().decode(GenerateChunk.self, from: data)
         if let err = obj.error, !err.isEmpty {
             throw makeServerError(http.statusCode, err)
@@ -141,8 +148,7 @@ final class OllamaProvider: ObservableObject, AIProvider {
         if http.statusCode != 200 {
             var data = Data()
             for try await byte in stream {
-                data.append(byte)              // <-- FIX: append single UInt8
-                // or: data.append(contentsOf: [byte])
+                data.append(byte)
             }
             let message = decodeServerError(from: data)
             throw makeServerError(http.statusCode, message)
@@ -161,20 +167,21 @@ final class OllamaProvider: ObservableObject, AIProvider {
         return aggregate
     }
 
-
     // MARK: - Utilities
 
-    /// Accepts either "...:11434" or "...:11434/api" and returns a URL for "/api{path}".
     private func makeEndpointURL(_ path: String) -> URL? {
         let trimmed = config.baseURL.trimmingCharacters(in: .whitespacesAndNewlines)
         let noSlash = trimmed.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
-        let root: String = noSlash.hasSuffix("api") ? String(noSlash.dropLast(3)).trimmingCharacters(in: CharacterSet(charactersIn: "/")) : noSlash
+        let root: String = noSlash.hasSuffix("api")
+            ? String(noSlash.dropLast(3)).trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+            : noSlash
         let full = root + "/api" + path
         return URL(string: full)
     }
 
     private func decodeServerError(from data: Data) -> String {
-        if let obj = try? JSONDecoder().decode(GenerateChunk.self, from: data), let err = obj.error, !err.isEmpty {
+        if let obj = try? JSONDecoder().decode(GenerateChunk.self, from: data),
+           let err = obj.error, !err.isEmpty {
             return err
         }
         return String(data: data, encoding: .utf8) ?? "Unknown server error."

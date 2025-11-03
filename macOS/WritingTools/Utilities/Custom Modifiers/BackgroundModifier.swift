@@ -34,15 +34,7 @@ struct WindowBackground: ViewModifier {
                     case .standard:
                         Color(.windowBackgroundColor)
                     case .gradient:
-                        colorScheme == .light
-                            ? LinearGradient(
-                                colors: [Color(hex: "f1c6bc"), Color(hex: "b4bbef"),
-                                         Color(hex: "e9d686"), Color(hex: "b9c7ee")],
-                                startPoint: .topLeading, endPoint: .bottomTrailing)
-                            : LinearGradient(
-                                colors: [Color(hex: "18323D"), Color(hex: "164066"),
-                                         Color(hex: "35423E"), Color(hex: "4E4246")],
-                                startPoint: .topLeading, endPoint: .bottomTrailing)
+                        MeshLikeGradientBackground()
                     case .glass:
                         GlassmorphicBackground()
                     case .oled:
@@ -55,6 +47,145 @@ struct WindowBackground: ViewModifier {
                         style: .continuous)
                 )
             )
+    }
+}
+
+struct MeshLikeGradientBackground: View {
+    @Environment(\.colorScheme) var colorScheme
+
+    var body: some View {
+        if colorScheme == .light {
+            ZStack {
+                Color(hex: "f1f5f9")
+
+                GeometryReader { proxy in
+                    let size = max(proxy.size.width, proxy.size.height)
+                    
+                    ZStack {
+                        // Top left slate blob
+                        Circle()
+                            .fill(Color(hex: "f1f5f9").opacity(0.8))
+                            .frame(width: size * 0.9, height: size * 0.9)
+                            .position(
+                                x: proxy.size.width * 0.15,
+                                y: proxy.size.height * 0.15
+                            )
+
+                        // Bottom left slate blob
+                        Circle()
+                            .fill(Color(hex: "f1f5f9").opacity(0.8))
+                            .frame(width: size * 0.9, height: size * 0.9)
+                            .position(
+                                x: proxy.size.width * 0.15,
+                                y: proxy.size.height * 0.85
+                            )
+
+                        // Top middle cyan blob
+                        Circle()
+                            .fill(Color(hex: "a5f3fc").opacity(0.8))
+                            .frame(width: size * 1.0, height: size * 1.0)
+                            .position(
+                                x: proxy.size.width * 0.5,
+                                y: proxy.size.height * 0.15
+                            )
+
+                        // Bottom middle cyan blob
+                        Circle()
+                            .fill(Color(hex: "a5f3fc").opacity(0.8))
+                            .frame(width: size * 1.0, height: size * 1.0)
+                            .position(
+                                x: proxy.size.width * 0.5,
+                                y: proxy.size.height * 0.85
+                            )
+
+                        // Top right indigo blob
+                        Circle()
+                            .fill(Color(hex: "818cf8").opacity(0.8))
+                            .frame(width: size * 0.9, height: size * 0.9)
+                            .position(
+                                x: proxy.size.width * 0.85,
+                                y: proxy.size.height * 0.15
+                            )
+
+                        // Bottom right indigo blob
+                        Circle()
+                            .fill(Color(hex: "818cf8").opacity(0.8))
+                            .frame(width: size * 0.9, height: size * 0.9)
+                            .position(
+                                x: proxy.size.width * 0.85,
+                                y: proxy.size.height * 0.85
+                            )
+                    }
+                }
+                .blur(radius: 100)
+            }
+        } else {
+            // Dark mode version
+            ZStack {
+                Color(hex: "083344")
+
+                GeometryReader { proxy in
+                    let size = max(proxy.size.width, proxy.size.height)
+                    
+                    ZStack {
+                        // Top left dark slate blob
+                        Circle()
+                            .fill(Color(hex: "083344").opacity(0.8))
+                            .frame(width: size * 0.9, height: size * 0.9)
+                            .position(
+                                x: proxy.size.width * 0.15,
+                                y: proxy.size.height * 0.15
+                            )
+
+                        // Bottom left dark slate blob
+                        Circle()
+                            .fill(Color(hex: "083344").opacity(0.8))
+                            .frame(width: size * 0.9, height: size * 0.9)
+                            .position(
+                                x: proxy.size.width * 0.15,
+                                y: proxy.size.height * 0.85
+                            )
+
+                        // Top middle indigo blob
+                        Circle()
+                            .fill(Color(hex: "6366f1").opacity(0.8))
+                            .frame(width: size * 1.0, height: size * 1.0)
+                            .position(
+                                x: proxy.size.width * 0.5,
+                                y: proxy.size.height * 0.15
+                            )
+
+                        // Bottom middle indigo blob
+                        Circle()
+                            .fill(Color(hex: "6366f1").opacity(0.8))
+                            .frame(width: size * 1.0, height: size * 1.0)
+                            .position(
+                                x: proxy.size.width * 0.5,
+                                y: proxy.size.height * 0.85
+                            )
+
+                        // Top right rose blob
+                        Circle()
+                            .fill(Color(hex: "881337").opacity(0.8))
+                            .frame(width: size * 0.9, height: size * 0.9)
+                            .position(
+                                x: proxy.size.width * 0.85,
+                                y: proxy.size.height * 0.15
+                            )
+
+                        // Bottom right rose blob
+                        Circle()
+                            .fill(Color(hex: "881337").opacity(0.8))
+                            .frame(width: size * 0.9, height: size * 0.9)
+                            .position(
+                                x: proxy.size.width * 0.85,
+                                y: proxy.size.height * 0.85
+                            )
+                    }
+                }
+                .blur(radius: 100)
+            }
+        }
     }
 }
 
@@ -142,4 +273,10 @@ extension View {
     func windowBackground(useGradient: Bool, cornerRadius: CGFloat? = nil) -> some View {
         modifier(WindowBackground(useGradient: useGradient, cornerRadius: cornerRadius))
     }
+}
+
+
+
+#Preview {
+    MeshLikeGradientBackground()
 }
