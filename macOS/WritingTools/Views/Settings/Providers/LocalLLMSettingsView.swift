@@ -1,10 +1,3 @@
-//
-//  LocalLLMSettingsView.swift
-//  WritingTools
-//
-//  Created by T3 Chat on 25.07.25.
-//
-
 import SwiftUI
 
 struct LocalLLMSettingsView: View {

@@ -5,6 +5,7 @@ class AppSettings: ObservableObject {
     static let shared = AppSettings()
     
     private let defaults = UserDefaults.standard
+    private let keychain = KeychainManager.shared
     
     // MARK: - Published Settings
     @Published var themeStyle: String {
@@ -14,8 +15,11 @@ class AppSettings: ObservableObject {
         }
     }
     
-    @Published var geminiApiKey: String {
-        didSet { defaults.set(geminiApiKey, forKey: "gemini_api_key") }
+    // API Keys now use computed properties backed by Keychain
+    @Published var geminiApiKey: String = "" {
+        didSet {
+            try? keychain.save(geminiApiKey, forKey: "gemini_api_key")
+        }
     }
     
     @Published var geminiModel: GeminiModel {
@@ -26,8 +30,10 @@ class AppSettings: ObservableObject {
         didSet { defaults.set(geminiCustomModel, forKey: "gemini_custom_model") }
     }
     
-    @Published var openAIApiKey: String {
-        didSet { defaults.set(openAIApiKey, forKey: "openai_api_key") }
+    @Published var openAIApiKey: String = "" {
+        didSet {
+            try? keychain.save(openAIApiKey, forKey: "openai_api_key")
+        }
     }
     
     @Published var openAIBaseURL: String {
@@ -73,9 +79,10 @@ class AppSettings: ObservableObject {
         didSet { defaults.set(hotkeysPaused, forKey: "hotkeys_paused") }
     }
     
-    
-    @Published var mistralApiKey: String {
-        didSet { defaults.set(mistralApiKey, forKey: "mistral_api_key") }
+    @Published var mistralApiKey: String = "" {
+        didSet {
+            try? keychain.save(mistralApiKey, forKey: "mistral_api_key")
+        }
     }
     
     @Published var mistralBaseURL: String {
@@ -103,16 +110,20 @@ class AppSettings: ObservableObject {
         didSet { defaults.set(ollamaImageMode.rawValue, forKey: "ollama_image_mode") }
     }
     
-    @Published var anthropicApiKey: String {
-        didSet { defaults.set(anthropicApiKey, forKey: "anthropic_api_key") }
+    @Published var anthropicApiKey: String = "" {
+        didSet {
+            try? keychain.save(anthropicApiKey, forKey: "anthropic_api_key")
+        }
     }
     
     @Published var anthropicModel: String {
         didSet { defaults.set(anthropicModel, forKey: "anthropic_model") }
     }
     
-    @Published var openRouterApiKey: String {
-        didSet { defaults.set(openRouterApiKey, forKey: "openrouter_api_key") }
+    @Published var openRouterApiKey: String = "" {
+        didSet {
+            try? keychain.save(openRouterApiKey, forKey: "openrouter_api_key")
+        }
     }
     @Published var openRouterModel: String {
         didSet { defaults.set(openRouterModel, forKey: "openrouter_model") }
@@ -135,23 +146,26 @@ class AppSettings: ObservableObject {
     private init() {
         let defaults = UserDefaults.standard
         
+        // MARK: - Perform Keychain Migration (One-time on first launch after update)
+        KeychainMigrationManager.shared.migrateIfNeeded()
+        
         // Initialize the theme style first
         self.themeStyle = defaults.string(forKey: "theme_style") ?? "gradient"
         
-        // Load or set defaults
-        self.geminiApiKey = defaults.string(forKey: "gemini_api_key") ?? ""
+        // Load API Keys from Keychain (post-migration)
+        self.geminiApiKey = (try? keychain.retrieve(forKey: "gemini_api_key")) ?? ""
         let geminiModelStr = defaults.string(forKey: "gemini_model") ?? GeminiModel.twoflash.rawValue
         self.geminiModel = GeminiModel(rawValue: geminiModelStr) ?? .twoflash
         
         self.geminiCustomModel = defaults.string(forKey: "gemini_custom_model") ?? ""
         
-        self.openAIApiKey = defaults.string(forKey: "openai_api_key") ?? ""
+        self.openAIApiKey = (try? keychain.retrieve(forKey: "openai_api_key")) ?? ""
         self.openAIBaseURL = defaults.string(forKey: "openai_base_url") ?? OpenAIConfig.defaultBaseURL
         self.openAIModel = defaults.string(forKey: "openai_model") ?? OpenAIConfig.defaultModel
-        self.openAIOrganization = defaults.string(forKey: "openai_organization") ?? nil
-        self.openAIProject = defaults.string(forKey: "openai_project") ?? nil
+        self.openAIOrganization = defaults.string(forKey: "openai_organization")
+        self.openAIProject = defaults.string(forKey: "openai_project")
         
-        self.mistralApiKey = defaults.string(forKey: "mistral_api_key") ?? ""
+        self.mistralApiKey = (try? keychain.retrieve(forKey: "mistral_api_key")) ?? ""
         self.mistralBaseURL = defaults.string(forKey: "mistral_base_url") ?? MistralConfig.defaultBaseURL
         self.mistralModel = defaults.string(forKey: "mistral_model") ?? MistralConfig.defaultModel
         
@@ -172,12 +186,12 @@ class AppSettings: ObservableObject {
         let ollamaImageModeRaw = defaults.string(forKey: "ollama_image_mode") ?? OllamaImageMode.ocr.rawValue
         self.ollamaImageMode = OllamaImageMode(rawValue: ollamaImageModeRaw) ?? .ocr
         
-        self.anthropicApiKey = defaults.string(forKey: "anthropic_api_key") ?? ""
+        self.anthropicApiKey = (try? keychain.retrieve(forKey: "anthropic_api_key")) ?? ""
         self.anthropicModel = defaults.string(forKey: "anthropic_model") ?? AnthropicConfig.defaultModel
         
         self.selectedLocalLLMId = defaults.string(forKey: "selected_local_llm_id")
         
-        self.openRouterApiKey = defaults.string(forKey: "openrouter_api_key") ?? ""
+        self.openRouterApiKey = (try? keychain.retrieve(forKey: "openrouter_api_key")) ?? ""
         self.openRouterModel = defaults.string(forKey: "openrouter_model") ?? OpenRouterConfig.defaultModel
         self.openRouterCustomModel = defaults.string(forKey: "openrouter_custom_model") ?? ""
         
@@ -190,5 +204,8 @@ class AppSettings: ObservableObject {
         let domain = Bundle.main.bundleIdentifier!
         UserDefaults.standard.removePersistentDomain(forName: domain)
         UserDefaults.standard.synchronize()
+        
+        // Clear Keychain API keys
+        try? keychain.clearAllApiKeys()
     }
 }

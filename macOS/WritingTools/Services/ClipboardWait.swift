@@ -16,6 +16,10 @@ func waitForPasteboardUpdate(
   while pb.changeCount == initialChangeCount && Date().timeIntervalSince(start) <
     timeout
   {
-    try? await Task.sleep(nanoseconds: 20_000_000) // 20 ms
+      do {
+          try await Task.sleep(nanoseconds: 20_000_000)
+      } catch {
+          NSLog("Task sleep interrupted: \(error)")
+      } // 20 ms
   }
 }

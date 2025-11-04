@@ -17,7 +17,7 @@ class AppState: ObservableObject {
     @Published var isPopupVisible: Bool = false
     @Published var isProcessing: Bool = false
     @Published var previousApplication: NSRunningApplication?
-    @Published var selectedImages: [Data] = []  // Store selected image data
+    @Published var selectedImages: [Data] = []
     
     // Command management
     @Published var commandManager = CommandManager()
@@ -81,7 +81,7 @@ class AppState: ObservableObject {
         
         self.localLLMProvider = LocalModelProvider()
         
-        // Iniltialize Anthropic
+        // Initialize Anthropic
         let anthropicConfig = AnthropicConfig(
             apiKey: asettings.anthropicApiKey,
             model: asettings.anthropicModel
@@ -127,10 +127,9 @@ class AppState: ObservableObject {
         AppSettings.shared.geminiApiKey = apiKey
         AppSettings.shared.geminiModel = model
         if model == .custom, let custom = customModelName {
-            AppSettings.shared.geminiCustomModel = custom   // persist custom
+            AppSettings.shared.geminiCustomModel = custom
         }
         
-        // choose actual modelName
         let modelName = (model == .custom) ? (customModelName ?? "") : model.rawValue
         let config = GeminiConfig(apiKey: apiKey, modelName: modelName)
         geminiProvider = GeminiProvider(config: config)
@@ -153,7 +152,7 @@ class AppState: ObservableObject {
     func setCurrentProvider(_ provider: String) {
         currentProvider = provider
         AppSettings.shared.currentProvider = provider
-        objectWillChange.send()  // Explicitly notify observers
+        objectWillChange.send()
     }
     
     func saveMistralConfig(apiKey: String, baseURL: String, model: String) {
@@ -181,7 +180,6 @@ class AppState: ObservableObject {
         print("AppState: Anthropic config saved and provider updated.")
     }
     
-    
     // For updating Ollama settings
     func saveOllamaConfig(baseURL: String, model: String, keepAlive: String) {
         let asettings = AppSettings.shared
@@ -208,130 +206,158 @@ class AppState: ObservableObject {
     
     // Process a command (unified method for all command types)
     func processCommand(_ command: CommandModel) {
-      guard !selectedText.isEmpty else { return }
+        guard !selectedText.isEmpty else { return }
 
-      isProcessing = true
+        isProcessing = true
 
-      Task {
-        do {
-          let prompt = command.prompt
-          let result = try await activeProvider.processText(
-            systemPrompt: prompt,
-            userPrompt: selectedText,
-            images: [],
-            streaming: false
-          )
+        Task {
+            do {
+                let prompt = command.prompt
+                let result = try await activeProvider.processText(
+                    systemPrompt: prompt,
+                    userPrompt: selectedText,
+                    images: [],
+                    streaming: false
+                )
 
-          if command.useResponseWindow {
-            let window = ResponseWindow(
-              title: "\(command.name) Result",
-              content: result,
-              selectedText: selectedText,
-              option: nil
-            )
+                if command.useResponseWindow {
+                    let window = ResponseWindow(
+                        title: "\(command.name) Result",
+                        content: result,
+                        selectedText: selectedText,
+                        option: nil
+                    )
 
-            WindowManager.shared.addResponseWindow(window)
-            window.makeKeyAndOrderFront(nil)
-            window.orderFrontRegardless()
-          } else {
-            if command.preserveFormatting, selectedAttributedText != nil {
-              replaceSelectedTextPreservingAttributes(with: result)
-            } else {
-              replaceSelectedText(with: result)
+                    WindowManager.shared.addResponseWindow(window)
+                    window.makeKeyAndOrderFront(nil)
+                    window.orderFrontRegardless()
+                } else {
+                    if command.preserveFormatting, selectedAttributedText != nil {
+                        replaceSelectedTextPreservingAttributes(with: result)
+                    } else {
+                        replaceSelectedText(with: result)
+                    }
+                }
+            } catch {
+                NSLog("Error processing command: \(error)")
             }
-          }
-        } catch {
-          print("Error processing command: \(error)")
-        }
 
-        isProcessing = false
-      }
+            isProcessing = false
+        }
     }
     
-    // Helper method to replace selected text
+    // MARK: - Fixed: Proper Window Activation Verification
+
     func replaceSelectedText(with newText: String) {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(newText, forType: .string)
         
-        // Reactivate previous application and paste
+        // Reactivate previous application
         if let previousApp = previousApplication {
             previousApp.activate()
             
-            // Wait briefly for activation then paste once
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                self.simulatePaste()
+            // Wait for window activation instead of fixed delay
+            activateWindowAndPaste(for: previousApp)
+        }
+    }
+    
+    private func activateWindowAndPaste(for app: NSRunningApplication) {
+        var attempts = 0
+        let maxAttempts = 100 // ~1 second with 10ms intervals
+
+        let timer = Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true) { [weak self] timer in
+            attempts += 1
+            
+            // Check if target app is now frontmost or max attempts reached
+            if NSWorkspace.shared.frontmostApplication?.bundleIdentifier == app.bundleIdentifier
+                || attempts >= maxAttempts {
+                timer.invalidate()
+                Task { @MainActor in
+                    self?.simulatePaste()
+                }
             }
+        }
+        
+        // Safety: invalidate timer after 2 seconds regardless
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            timer.invalidate()
         }
     }
     
     func replaceSelectedTextPreservingAttributes(with corrected: String) {
-      guard let original = selectedAttributedText else {
-        replaceSelectedText(with: corrected)
-        return
-      }
-
-      let mutable = NSMutableAttributedString(attributedString: original)
-      mutable.applyCharacterDiff(from: original.string, to: corrected)
-
-      let pb = NSPasteboard.general
-      pb.clearContents()
-
-      // Prefer HTML for web editors (e.g., Gmail in browsers), then RTF, always include plain text
-      let fullRange = NSRange(location: 0, length: mutable.length)
-      let htmlData = try? mutable.data(
-        from: fullRange,
-        documentAttributes: [
-          .documentType: NSAttributedString.DocumentType.html,
-        ]
-      )
-      let rtfData = try? mutable.data(
-        from: fullRange,
-        documentAttributes: [
-          .documentType: NSAttributedString.DocumentType.rtf,
-        ]
-      )
-
-      // Declare available types in priority order
-      var types: [NSPasteboard.PasteboardType] = []
-      if htmlData != nil { types.append(.html) }
-      if rtfData != nil { types.append(.rtf) }
-      types.append(.string)
-
-      pb.declareTypes(types, owner: nil)
-
-      if let htmlData {
-        pb.setData(htmlData, forType: .html)
-      }
-      if let rtfData {
-        pb.setData(rtfData, forType: .rtf)
-      }
-      pb.setString(corrected, forType: .string)
-
-      if let previous = previousApplication {
-        previous.activate()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-          self.simulatePaste()
+        guard let original = selectedAttributedText else {
+            replaceSelectedText(with: corrected)
+            return
         }
-      }
+
+        let mutable = NSMutableAttributedString(attributedString: original)
+        mutable.applyCharacterDiff(from: original.string, to: corrected)
+
+        let pb = NSPasteboard.general
+        pb.clearContents()
+
+        // Prefer HTML for web editors (e.g., Gmail in browsers), then RTF, always include plain text
+        let fullRange = NSRange(location: 0, length: mutable.length)
+        let htmlData = try? mutable.data(
+            from: fullRange,
+            documentAttributes: [
+                .documentType: NSAttributedString.DocumentType.html,
+            ]
+        )
+        let rtfData = try? mutable.data(
+            from: fullRange,
+            documentAttributes: [
+                .documentType: NSAttributedString.DocumentType.rtf,
+            ]
+        )
+
+        // Declare available types in priority order
+        var types: [NSPasteboard.PasteboardType] = []
+        if htmlData != nil { types.append(.html) }
+        if rtfData != nil { types.append(.rtf) }
+        types.append(.string)
+
+        pb.declareTypes(types, owner: nil)
+
+        if let htmlData {
+            pb.setData(htmlData, forType: .html)
+        }
+        if let rtfData {
+            pb.setData(rtfData, forType: .rtf)
+        }
+        pb.setString(corrected, forType: .string)
+
+        if let previous = previousApplication {
+            previous.activate()
+            activateWindowAndPaste(for: previous)
+        }
     }
 
-
+    // MARK: - Fixed: Use cgSessionEventTap for Reliable Event Ordering
     
-    // Simulate paste command
     private func simulatePaste() {
-        guard let source = CGEventSource(stateID: .hidSystemState) else { return }
+        guard let source = CGEventSource(stateID: .hidSystemState) else {
+            NSLog("Failed to create CGEventSource")
+            return
+        }
         
-        // Create a Command + V key down event
-        let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: true)
-        keyDown?.flags = .maskCommand
+        // Create Command + V key down event
+        guard let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: true) else {
+            NSLog("Failed to create key down event")
+            return
+        }
+        keyDown.flags = .maskCommand
         
-        // Create a Command + V key up event
-        let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: false)
-        keyUp?.flags = .maskCommand
+        // Create Command + V key up event
+        guard let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: false) else {
+            NSLog("Failed to create key up event")
+            return
+        }
+        keyUp.flags = .maskCommand
         
-        // Post the events to the HID event system
-        keyDown?.post(tap: .cghidEventTap)
-        keyUp?.post(tap: .cghidEventTap)
+        // Post to cgSessionEventTap for more predictable ordering
+        keyDown.post(tap: .cgSessionEventTap)
+        keyUp.post(tap: .cgSessionEventTap)
     }
 }
 
@@ -370,4 +396,3 @@ extension NSMutableAttributedString {
         }
     }
 }
-

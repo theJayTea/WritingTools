@@ -4960,6 +4960,7 @@
       }
     },
     "Use “Proofread” to preserve formatting while fixing grammar/spelling." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5002,6 +5003,9 @@
           }
         }
       }
+    },
+    "Use Proofread to preserve formatting while fixing grammar/spelling." : {
+
     },
     "Version & Updates" : {
       "localizations" : {
@@ -5293,7 +5297,11 @@
         }
       }
     },
+    "You're ready to go!" : {
+
+    },
     "You’re ready to go!" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
