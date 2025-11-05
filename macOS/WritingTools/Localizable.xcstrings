@@ -470,6 +470,12 @@
             "state" : "translated",
             "value" : "Alle Änderungen gespeichert"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toutes les modifications enregistrées"
+          }
         }
       }
     },
@@ -560,6 +566,9 @@
           }
         }
       }
+    },
+    "Appearance" : {
+
     },
     "Appearance Settings" : {
       "localizations" : {
@@ -811,6 +820,12 @@
             "state" : "translated",
             "value" : "Bliss AI on Google Play"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bliss AI sur Google Play"
+          }
         }
       }
     },
@@ -931,6 +946,12 @@
             "state" : "translated",
             "value" : "Download abbrechen"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler le téléchargement"
+          }
         }
       }
     },
@@ -940,6 +961,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Den aktuellen Download abbrechen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler le téléchargement actuel."
           }
         }
       }
@@ -1039,6 +1066,12 @@
             "state" : "translated",
             "value" : "Überprüfung des Modellstatus"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérification de l'état du modèle"
+          }
         }
       }
     },
@@ -1071,6 +1104,12 @@
             "state" : "translated",
             "value" : "Wählen Sie eine praktische Tastenkombination, um Schreibwerkzeuge von überall her aufzubringen."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez une combinaison de touches pratique pour faire ressortir les outils d'écriture de n'importe où."
+          }
         }
       }
     },
@@ -1102,6 +1141,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wählen Sie ein Fensterbild, das Ihren Präferenzen und Ihrem Kontext entspricht."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez une apparence de fenêtre qui correspond à vos préférences et à votre contexte."
           }
         }
       }
@@ -1156,6 +1201,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wählen Sie aus, ob benutzerdefinierte Eingabeaufforderungen in einem separaten Antwortfenster geöffnet werden oder Text inline ersetzt werden sollen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez si les invites personnalisées s'ouvrent dans une fenêtre de réponse distincte ou remplacent le texte en ligne."
           }
         }
       }
@@ -1499,6 +1550,12 @@
             "state" : "translated",
             "value" : "Kopiert"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copié"
+          }
         }
       }
     },
@@ -1575,6 +1632,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nachricht kopieren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier le message"
           }
         }
       }
@@ -2369,6 +2432,9 @@
           }
         }
       }
+    },
+    "General" : {
+
     },
     "General Settings" : {
       "localizations" : {
@@ -4595,6 +4661,16 @@
         }
       }
     },
+    "Send message" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nachricht senden"
+          }
+        }
+      }
+    },
     "Set a global shortcut to quickly activate Writing Tools." : {
       "localizations" : {
         "de" : {
@@ -4959,29 +5035,6 @@
         }
       }
     },
-    "Use “Proofread” to preserve formatting while fixing grammar/spelling." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Verwenden Sie „Korrekturlesen“, um die Formatierung beizubehalten und gleichzeitig Grammatik- und Rechtschreibfehler zu korrigieren."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Utiliza «Corregir» para conservar el formato mientras corriges la gramática y la ortografía."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Utilisez « Relire » pour conserver la mise en forme tout en corrigeant la grammaire et l'orthographe."
-          }
-        }
-      }
-    },
     "Use local OCR or Ollama's vision model for images." : {
       "localizations" : {
         "de" : {
@@ -5005,7 +5058,14 @@
       }
     },
     "Use Proofread to preserve formatting while fixing grammar/spelling." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwenden Sie Proofread, um die Formatierung beizubehalten und die Grammatik/Rechtschreibung zu korrigieren."
+          }
+        }
+      }
     },
     "Version & Updates" : {
       "localizations" : {
@@ -5298,27 +5358,11 @@
       }
     },
     "You're ready to go!" : {
-
-    },
-    "You’re ready to go!" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Du bist bereit!"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "¡Ya estás listo para empezar!"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vous êtes prêt à partir !"
+            "value" : "Sie sind bereit!"
           }
         }
       }

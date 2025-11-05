@@ -9,6 +9,9 @@ struct AppleStyleTextFieldModifier: ViewModifier {
     @State private var isAnimating: Bool = false
     @State private var isHovered: Bool = false
     
+    private let animationDuration = 0.3
+    private let animationNanoseconds: UInt64 = 300_000_000  // 0.3 seconds
+    
     func body(content: Content) -> some View {
         ZStack(alignment: .trailing) {
             HStack(spacing: 0) {
@@ -17,14 +20,7 @@ struct AppleStyleTextFieldModifier: ViewModifier {
                     .foregroundColor(colorScheme == .dark ? .white : .primary)
                     .padding(12)
                     .onSubmit {
-                        withAnimation {
-                            isAnimating = true
-                        }
-                        onSubmit()
-                        
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            isAnimating = false
-                        }
+                        performSubmitAnimation()
                     }
                 
                 Spacer(minLength: 0)
@@ -32,27 +28,13 @@ struct AppleStyleTextFieldModifier: ViewModifier {
             
             // Integrated send button with more subtle styling
             if !text.isEmpty {
-                Button(action: {
-                    withAnimation {
-                        isAnimating = true
-                    }
-                    onSubmit()
-                    
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        isAnimating = false
-                    }
-                }) {
+                Button(action: performSubmitAnimation) {
                     Image(systemName: isLoading ? "hourglass" : "paperplane.fill")
                         .foregroundColor(.white)
                         .font(.system(size: 12))
                         .frame(width: 24, height: 24)
-                        .background(
-                            colorScheme == .dark 
-                                ? Color.blue
-                                : Color.blue
-                        )
+                        .background(Color.blue)
                         .clipShape(Circle())
-                        //.clipShape(RoundedRectangle(cornerRadius: 8))
                         .scaleEffect(isHovered ? 1.05 : 1.0)
                         .opacity(isHovered ? 1.0 : 0.9)
                 }
@@ -62,9 +44,11 @@ struct AppleStyleTextFieldModifier: ViewModifier {
                 .onHover { hovering in
                     isHovered = hovering
                 }
+                .help("Send message")
+                .accessibilityLabel("Send message")
             }
         }
-        .frame(height: 36) // Slightly taller for better macOS alignment
+        .frame(height: 36)
         .background(
             ZStack {
                 if colorScheme == .dark {
@@ -79,22 +63,41 @@ struct AppleStyleTextFieldModifier: ViewModifier {
                 }
             }
         )
-        .cornerRadius(6) // macOS uses subtler corner radii
+        .cornerRadius(6)
         .overlay(
             RoundedRectangle(cornerRadius: 6)
                 .strokeBorder(
-                    isAnimating 
+                    isAnimating
                         ? Color.blue.opacity(0.8)
                         : Color.gray.opacity(0.2),
                     lineWidth: isAnimating ? 2 : 0.5
                 )
-                .animation(.easeInOut(duration: 0.3), value: isAnimating)
+                .animation(.easeInOut(duration: animationDuration), value: isAnimating)
         )
+    }
+    
+    private func performSubmitAnimation() {
+        withAnimation(.easeInOut(duration: animationDuration)) {
+            isAnimating = true
+        }
+        
+        onSubmit()
+        
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: animationNanoseconds)
+            withAnimation(.easeInOut(duration: animationDuration)) {
+                isAnimating = false
+            }
+        }
     }
 }
 
 extension View {
-    func appleStyleTextField(text: String, isLoading: Bool = false, onSubmit: @escaping () -> Void) -> some View {
+    func appleStyleTextField(
+        text: String,
+        isLoading: Bool = false,
+        onSubmit: @escaping () -> Void
+    ) -> some View {
         self.modifier(AppleStyleTextFieldModifier(isLoading: isLoading, text: text, onSubmit: onSubmit))
     }
 }

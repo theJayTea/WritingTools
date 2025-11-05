@@ -5,7 +5,6 @@ import AppKit
 extension KeyboardShortcuts.Name {
     static let showPopup = Self("showPopup")
     
-    // Generate a shortcut name for a specific command
     static func commandShortcut(for id: UUID) -> Self {
         return Self("command_\(id.uuidString)")
     }
@@ -26,47 +25,57 @@ struct SettingsView: View {
         case aiProvider  = "AI Provider"
         
         var id: Self { self }
+        
+        var systemImage: String {
+            switch self {
+            case .general:
+                return "gear"
+            case .appearance:
+                return "paintbrush"
+            case .aiProvider:
+                return "network"
+            }
+        }
     }
     
     var body: some View {
         VStack(spacing: 0) {
-            Picker("", selection: $selectedTab) {
-                ForEach(SettingsTab.allCases) { tab in
-                    Text(tab.rawValue).tag(tab)
+            TabView(selection: $selectedTab) {
+                GeneralSettingsPane(
+                    appState: appState,
+                    needsSaving: $needsSaving,
+                    showingCommandsManager: $showingCommandsManager,
+                    showOnlyApiSetup: showOnlyApiSetup,
+                    saveButton: AnyView(saveButton)
+                )
+                .tag(SettingsTab.general)
+                .tabItem {
+                    Label("General", systemImage: SettingsTab.general.systemImage)
                 }
-            }
-            .pickerStyle(.segmented)
-            .padding(.horizontal, 16)
-            .padding(.top, 10)
-            
-            Group {
-                switch selectedTab {
-                case .general:
-                    GeneralSettingsPane(
-                        appState: appState,
-                        needsSaving: $needsSaving,
-                        showingCommandsManager: $showingCommandsManager,
-                        showOnlyApiSetup: showOnlyApiSetup,
-                        saveButton: AnyView(saveButton)
-                    )
-                case .appearance:
-                    AppearanceSettingsPane(
-                        needsSaving: $needsSaving,
-                        showOnlyApiSetup: showOnlyApiSetup,
-                        saveButton: AnyView(saveButton)
-                    )
-                case .aiProvider:
-                    AIProviderSettingsPane(
-                        appState: appState,
-                        needsSaving: $needsSaving,
-                        showOnlyApiSetup: showOnlyApiSetup,
-                        saveButton: AnyView(saveButton),
-                        completeSetupButton: AnyView(completeSetupButton)
-                    )
+                
+                AppearanceSettingsPane(
+                    needsSaving: $needsSaving,
+                    showOnlyApiSetup: showOnlyApiSetup,
+                    saveButton: AnyView(saveButton)
+                )
+                .tag(SettingsTab.appearance)
+                .tabItem {
+                    Label("Appearance", systemImage: SettingsTab.appearance.systemImage)
+                }
+                
+                AIProviderSettingsPane(
+                    appState: appState,
+                    needsSaving: $needsSaving,
+                    showOnlyApiSetup: showOnlyApiSetup,
+                    saveButton: AnyView(saveButton),
+                    completeSetupButton: AnyView(completeSetupButton)
+                )
+                .tag(SettingsTab.aiProvider)
+                .tabItem {
+                    Label("AI Provider", systemImage: SettingsTab.aiProvider.systemImage)
                 }
             }
             .padding(20)
-            .controlSize(.regular)
         }
         .frame(width: 540, height: showOnlyApiSetup ? 470 : 540)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -135,7 +144,6 @@ struct SettingsView: View {
         
         UserDefaults.standard.set(settings.shortcutText, forKey: "shortcut")
                 
-        // Save provider-specific settings
         if settings.currentProvider == "gemini" {
             appState.saveGeminiConfig(
                 apiKey: settings.geminiApiKey,
@@ -177,26 +185,20 @@ struct SettingsView: View {
             )
         }
         
-        // Save ollama image mode
         UserDefaults.standard.set(settings.ollamaImageMode.rawValue, forKey: "ollama_image_mode")
         
-        // Set current provider
         appState.setCurrentProvider(settings.currentProvider)
         
-        // If shortcut changed, post notification
         if oldShortcut != settings.shortcutText {
             NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
         }
         
-        // If this is the onboarding API setup, mark onboarding as complete
         if showOnlyApiSetup {
             UserDefaults.standard.set(true, forKey: "has_completed_onboarding")
         }
         
-        // Mark changes as saved
         needsSaving = false
         
-        // Close window
         DispatchQueue.main.async {
             if self.showOnlyApiSetup {
                 WindowManager.shared.cleanupWindows()
@@ -209,10 +211,8 @@ struct SettingsView: View {
     }
     
     private func restartOnboarding() {
-        // Mark onboarding as not completed
         settings.hasCompletedOnboarding = false
 
-        // Create the onboarding window the same way AppDelegate does
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 640, height: 720),
             styleMask: [.titled, .closable, .miniaturizable, .resizable],
@@ -227,11 +227,9 @@ struct SettingsView: View {
         window.contentView = hostingView
         window.level = .floating
 
-        // Register with WindowManager properly
         WindowManager.shared.setOnboardingWindow(window, hostingView: hostingView)
         window.makeKeyAndOrderFront(nil)
 
-        // Optionally close Settings to reduce window clutter
         if let settingsWindow = NSApplication.shared.windows.first(where: {
             $0.contentView?.subviews.contains(where: { $0 is NSHostingView<SettingsView> }) ?? false
         }) {
@@ -239,7 +237,6 @@ struct SettingsView: View {
         }
     }
 }
-
 
 #Preview("SettingsView") {
     SettingsView(appState: AppState.shared)

@@ -229,7 +229,8 @@ struct GlassmorphicBackground: View {
 
                 // Core blur/translucency material
                 Rectangle()
-                    .fill(.ultraThinMaterial)
+                    .fill(Material.regular)
+                    .opacity(0.5)
 
                 // Subtle inner border to define edges of the glass
                 Rectangle()
