@@ -108,20 +108,31 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
             let pb = NSPasteboard.general
             let oldPlain = pb.string(forType: .string)
+            let oldChangeCount = pb.changeCount
 
-            pb.clearContents()
+            // Create and post Cmd+C event
             let src = CGEventSource(stateID: .hidSystemState)
             let kd = CGEvent(keyboardEventSource: src, virtualKey: 0x08, keyDown: true)
             let ku = CGEvent(keyboardEventSource: src, virtualKey: 0x08, keyDown: false)
             kd?.flags = .maskCommand
             ku?.flags = .maskCommand
 
-            let initialChange = pb.changeCount
             kd?.post(tap: .cgSessionEventTap)
             ku?.post(tap: .cgSessionEventTap)
 
-            await waitForPasteboardChange(pb, initialChangeCount: initialChange)
+            // Give the system a tiny moment to process the copy event
+            try? await Task.sleep(nanoseconds: 20_000_000) // 20ms
 
+            // Wait for the pasteboard to actually change
+            await waitForPasteboardChange(pb, initialChangeCount: oldChangeCount)
+
+            // Only proceed if the pasteboard actually changed (new content was copied)
+            guard pb.changeCount > oldChangeCount else {
+                NSLog("No new content was copied for command: \(command.name) - change count didn't increase (old: \(oldChangeCount), new: \(pb.changeCount))")
+                return
+            }
+
+            // Read the newly copied content
             var foundImages: [Data] = []
 
             let classes = [NSURL.self]
@@ -167,15 +178,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             let rich = pb.readAttributedSelection()
             let selectedText = rich?.string ?? pb.string(forType: .string) ?? ""
 
-            pb.clearContents()
-            if let oldPlain {
-                pb.setString(oldPlain, forType: .string)
-            }
-
             guard !selectedText.isEmpty else {
-                NSLog("No text selected for command: \(command.name)")
+                NSLog("No text selected for command: \(command.name) - pasteboard contained no text")
+                // Restore old clipboard
+                pb.clearContents()
+                if let oldPlain {
+                    pb.setString(oldPlain, forType: .string)
+                }
                 return
             }
+
+            NSLog("Successfully captured text for command \(command.name): \(selectedText.prefix(50))...")
 
             // Set previous app AFTER we've successfully copied
             if let previousApp = previousApp {
@@ -185,6 +198,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             self.appState.selectedImages = foundImages
             self.appState.selectedAttributedText = rich
             self.appState.selectedText = selectedText
+
+            // Restore old clipboard content AFTER we've stored the new selection
+            pb.clearContents()
+            if let oldPlain {
+                pb.setString(oldPlain, forType: .string)
+            }
 
             Task { await self.processCommandWithUI(command) }
         }
@@ -239,8 +258,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
     private func waitForPasteboardChange(_ pb: NSPasteboard, initialChangeCount: Int) async {
         let startTime = Date()
-        let timeout: TimeInterval = 1.0
-        let pollInterval: UInt64 = 10_000_000 // 10 milliseconds in nanoseconds
+        let timeout: TimeInterval = 2.0 // Increased timeout
+        let pollInterval: UInt64 = 5_000_000 // 5 milliseconds in nanoseconds (more responsive)
 
         while pb.changeCount == initialChangeCount && Date().timeIntervalSince(startTime) < timeout {
             do {
@@ -253,7 +272,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         }
         
         if pb.changeCount == initialChangeCount {
-            NSLog("Warning: Clipboard update timeout after \(timeout)s - proceeding anyway")
+            NSLog("Warning: Clipboard update timeout after \(timeout)s - no change detected")
+        } else {
+            let elapsed = Date().timeIntervalSince(startTime)
+            NSLog("Clipboard changed after \(String(format: "%.3f", elapsed))s")
         }
     }
 
@@ -439,19 +461,22 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
             let pb = NSPasteboard.general
             let oldPlain = pb.string(forType: .string)
+            let oldChangeCount = pb.changeCount
 
-            pb.clearContents()
+            // Create and post Cmd+C event
             let src = CGEventSource(stateID: .hidSystemState)
             let kd = CGEvent(keyboardEventSource: src, virtualKey: 0x08, keyDown: true)
             let ku = CGEvent(keyboardEventSource: src, virtualKey: 0x08, keyDown: false)
             kd?.flags = .maskCommand
             ku?.flags = .maskCommand
 
-            let initialChange = pb.changeCount
             kd?.post(tap: .cgSessionEventTap)
             ku?.post(tap: .cgSessionEventTap)
 
-            await waitForPasteboardChange(pb, initialChangeCount: initialChange)
+            // Give the system a tiny moment to process the copy event
+            try? await Task.sleep(nanoseconds: 20_000_000) // 20ms
+
+            await waitForPasteboardChange(pb, initialChangeCount: oldChangeCount)
 
             var foundImages: [Data] = []
 
@@ -498,14 +523,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             let rich = pb.readAttributedSelection()
             let plainText = rich?.string ?? pb.string(forType: .string) ?? ""
 
+            self.appState.selectedAttributedText = rich
+            self.appState.selectedText = plainText
+            self.appState.selectedImages = foundImages
+
+            // Restore old clipboard content AFTER we've stored the new selection
             pb.clearContents()
             if let oldPlain {
                 pb.setString(oldPlain, forType: .string)
             }
-
-            self.appState.selectedAttributedText = rich
-            self.appState.selectedText = plainText
-            self.appState.selectedImages = foundImages
 
             let window = PopupWindow(appState: self.appState)
             if !plainText.isEmpty || !foundImages.isEmpty {
