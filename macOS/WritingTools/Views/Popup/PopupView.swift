@@ -248,6 +248,9 @@ struct PopupView: View {
   private func processCustomInstruction(_ instruction: String) {
     guard !instruction.isEmpty else { return }
     appState.isProcessing = true
+    
+    // Capture setting value once at the start
+    let openInResponseWindow = AppSettings.shared.openCustomCommandsInResponseWindow
 
     Task {
       do {
@@ -258,7 +261,7 @@ struct PopupView: View {
         always return the best and most accurate answer and not different \
         options. 
         If it's a request for help, provide clear guidance and examples where \
-        appropriate. Make sure tu use the language used or specified by the \
+        appropriate. Make sure to use the language used or specified by the \
         user instruction.
         Use Markdown formatting to make your response more readable.
         """
@@ -280,9 +283,7 @@ struct PopupView: View {
         )
 
         await MainActor.run {
-          let settings = AppSettings.shared
-          
-          if settings.openCustomCommandsInResponseWindow {
+          if openInResponseWindow {
             let window = ResponseWindow(
               title: "AI Response",
               content: result,
