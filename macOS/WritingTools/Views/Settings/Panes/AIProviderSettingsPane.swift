@@ -52,7 +52,7 @@ struct AIProviderSettingsPane: View {
                 .padding(.vertical, 2)
 
             ScrollView {
-                Group {
+                VStack(alignment: .leading, spacing: 0) {
                     if settings.currentProvider == "gemini" {
                         GeminiSettingsView(needsSaving: $needsSaving)
                     } else if settings.currentProvider == "mistral" {
@@ -69,7 +69,7 @@ struct AIProviderSettingsPane: View {
                         LocalLLMSettingsView(provider: appState.localLLMProvider)
                     }
                 }
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
 
             if !showOnlyApiSetup {

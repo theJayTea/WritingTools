@@ -471,6 +471,12 @@
             "value" : "Alle Änderungen gespeichert"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todos los cambios guardados"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -568,7 +574,26 @@
       }
     },
     "Appearance" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aussehen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aspecto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apparence"
+          }
+        }
+      }
     },
     "Appearance Settings" : {
       "localizations" : {
@@ -821,6 +846,12 @@
             "value" : "Bliss AI on Google Play"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bliss AI en Google Play"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -947,6 +978,12 @@
             "value" : "Download abbrechen"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar descarga"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -961,6 +998,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Den aktuellen Download abbrechen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancela la descarga actual."
           }
         },
         "fr" : {
@@ -1067,6 +1110,12 @@
             "value" : "Überprüfung des Modellstatus"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verificando estado del modelo"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1105,6 +1154,12 @@
             "value" : "Wählen Sie eine praktische Tastenkombination, um Schreibwerkzeuge von überall her aufzubringen."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige una combinación de teclas conveniente para abrir Writing Tools desde cualquier lugar."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1141,6 +1196,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wählen Sie ein Fensterbild, das Ihren Präferenzen und Ihrem Kontext entspricht."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige una apariencia de ventana que se ajuste a tus preferencias y contexto."
           }
         },
         "fr" : {
@@ -1201,6 +1262,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wählen Sie aus, ob benutzerdefinierte Eingabeaufforderungen in einem separaten Antwortfenster geöffnet werden oder Text inline ersetzt werden sollen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige si los indicadores personalizados se abren en una ventana de respuesta separada o reemplazan el texto en línea."
           }
         },
         "fr" : {
@@ -1551,6 +1618,12 @@
             "value" : "Kopiert"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiado"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1634,6 +1707,12 @@
             "value" : "Nachricht kopieren"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar mensaje"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1648,6 +1727,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Auswahl kopieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar selección"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier la sélection"
           }
         }
       }
@@ -1680,6 +1771,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Entwicklern"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creadores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créateurs"
           }
         }
       }
@@ -1977,6 +2080,18 @@
             "state" : "translated",
             "value" : "Download-Fortschritt"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progreso de descarga"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progression du téléchargement"
+          }
         }
       }
     },
@@ -1986,6 +2101,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Laden Sie das ausgewählte Modell für die Offline-Nutzung herunter."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descarga el modelo seleccionado para uso sin conexión."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Téléchargez le modèle sélectionné pour une utilisation hors ligne."
           }
         }
       }
@@ -2201,6 +2328,18 @@
             "state" : "translated",
             "value" : "Email Arya"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Correo electrónico a Arya"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email à Arya"
+          }
         }
       }
     },
@@ -2210,6 +2349,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Email Jesai"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Correo electrónico a Jesai"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email à Jesai"
           }
         }
       }
@@ -2265,6 +2416,18 @@
             "state" : "translated",
             "value" : "Error: %@"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur: %@"
+          }
         }
       }
     },
@@ -2318,6 +2481,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Filtern Sie zwischen allen, nur textfähigen und visionfähigen Modellen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtra entre todos, solo texto y modelos con capacidad de visión."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtrez entre tous, texte uniquement et modèles capables de vision."
           }
         }
       }
@@ -2434,7 +2609,26 @@
       }
     },
     "General" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allgemeines"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "General"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Général"
+          }
+        }
+      }
     },
     "General Settings" : {
       "localizations" : {
@@ -2994,6 +3188,18 @@
             "state" : "translated",
             "value" : "Tastenkombinationen"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atajos de teclado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raccourcis clavier"
+          }
         }
       }
     },
@@ -3026,6 +3232,18 @@
             "state" : "translated",
             "value" : "Modell wird geladen"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cargando modelo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chargement du modèle"
+          }
         }
       }
     },
@@ -3035,6 +3253,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modell wird in den Speicher geladen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cargando modelo en la memoria"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chargement du modèle en mémoire"
           }
         }
       }
@@ -3202,6 +3432,18 @@
             "state" : "translated",
             "value" : "Die lokale LLM-Verarbeitung ist nur auf Geräten der Apple Silicon (M-Serie) verfügbar."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El procesamiento LLM local solo está disponible en dispositivos Apple Silicon (serie M)."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le traitement LLM local n'est disponible que sur les appareils Apple Silicon (série M)."
+          }
         }
       }
     },
@@ -3234,6 +3476,18 @@
             "state" : "translated",
             "value" : "macOS-Version von Arya Mirsepasi"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versión macOS de Arya Mirsepasi"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version macOS par Arya Mirsepasi"
+          }
         }
       }
     },
@@ -3265,6 +3519,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Verwalten Sie Ihre Schreibwerkzeuge und weisen Sie Tastenkombinationen zu."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestiona tus herramientas de escritura y asigna atajos de teclado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gérez vos outils d'écriture et attribuez des raccourcis clavier."
           }
         }
       }
@@ -3341,6 +3607,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Model Filters"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtros de modelo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtres de modèle"
           }
         }
       }
@@ -3528,6 +3806,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Keine Symbole gefunden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se encontraron iconos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune icône trouvée"
           }
         }
       }
@@ -3759,6 +4049,18 @@
             "state" : "translated",
             "value" : "Onboarding"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incorporación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intégration"
+          }
         }
       }
     },
@@ -3768,6 +4070,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Öffnen Sie die Anthropic-Konsole, um Ihren API-Schlüssel zu erstellen oder anzuzeigen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre la consola de Anthropic para crear o ver tu clave API."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrez la console Anthropic pour créer ou afficher votre clé API."
           }
         }
       }
@@ -3801,6 +4115,18 @@
             "state" : "translated",
             "value" : "Benutzerdefinierte Eingabeaufforderungen im Antwortfenster öffnen"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre indicadores personalizados en la ventana de respuesta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les invites personnalisées dans la fenêtre de réponse"
+          }
         }
       }
     },
@@ -3810,6 +4136,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Öffnen Sie Google AI Studio, um einen API-Schlüssel zu generieren."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre Google AI Studio para generar una clave API."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrez Google AI Studio pour générer une clé API."
           }
         }
       }
@@ -3821,6 +4159,18 @@
             "state" : "translated",
             "value" : "Öffnen Sie die Mistral-Konsole, um einen API-Schlüssel zu erstellen."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre la consola de Mistral para crear una clave API."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrez la console Mistral pour créer une clé API."
+          }
         }
       }
     },
@@ -3830,6 +4180,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Öffnen Sie die Download- und Dokumentationsseite von Ollama in Ihrem Browser."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre la página de descarga y documentación de Ollama en tu navegador."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrez la page de téléchargement et de documentation d'Ollama dans votre navigateur."
           }
         }
       }
@@ -3841,6 +4203,18 @@
             "state" : "translated",
             "value" : "Öffnen Sie das OpenAI-Dashboard, um einen API-Schlüssel zu erstellen."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre el panel de control de OpenAI para crear una clave API."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrez le tableau de bord OpenAI pour créer une clé API."
+          }
         }
       }
     },
@@ -3850,6 +4224,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Öffnen Sie OpenRouter, um Ihren API-Schlüssel abzurufen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre OpenRouter para recuperar tu clave API."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrez OpenRouter pour récupérer votre clé API."
           }
         }
       }
@@ -3883,6 +4269,18 @@
             "state" : "translated",
             "value" : "Öffnen Sie die Systemeinstellungen, um Berechtigungen zu verwalten."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre la Configuración del sistema para gestionar los permisos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrez les paramètres système pour gérer les autorisations."
+          }
         }
       }
     },
@@ -3893,6 +4291,18 @@
             "state" : "translated",
             "value" : "Öffnen Sie den Befehls-Manager, um Befehle hinzuzufügen, zu bearbeiten oder zu entfernen."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre el Administrador de comandos para agregar, editar o eliminar comandos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrez le gestionnaire de commandes pour ajouter, modifier ou supprimer des commandes."
+          }
         }
       }
     },
@@ -3902,6 +4312,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Öffnen Sie das Onboarding-Fenster, um WritingTools erneut einzurichten."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre la ventana de incorporación para configurar WritingTools de nuevo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrez la fenêtre d'intégration pour configurer WritingTools à nouveau."
           }
         }
       }
@@ -4045,6 +4467,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bitte wählen Sie in den Einstellungen einen anderen KI-Anbieter aus, wenn Sie einen Intel-Mac verwenden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Por favor, selecciona un proveedor de IA diferente en Configuración si estás en un Mac Intel."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veuillez sélectionner un autre fournisseur d'IA dans les paramètres si vous utilisez un Mac Intel."
           }
         }
       }
@@ -4213,6 +4647,18 @@
             "state" : "translated",
             "value" : "ProseKey AI (iOS port)"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ProseKey AI (puerto iOS)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ProseKey AI (port iOS)"
+          }
         }
       }
     },
@@ -4267,6 +4713,18 @@
             "state" : "translated",
             "value" : "Überprüfen Sie den aktuellen Berechtigungsstatus erneut."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vuelve a comprobar los estados de permisos actuales."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérifiez à nouveau l'état des autorisations actuelles."
+          }
         }
       }
     },
@@ -4298,6 +4756,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Entfernen Sie das heruntergeladene Modell von der Festplatte."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimina el modelo descargado del disco."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimez le modèle téléchargé du disque."
           }
         }
       }
@@ -4441,6 +4911,18 @@
             "state" : "translated",
             "value" : "Onboarding neu starten"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reiniciar la incorporación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Redémarrer l'intégration"
+          }
         }
       }
     },
@@ -4540,6 +5022,18 @@
             "state" : "translated",
             "value" : "Speichern Sie Ihre Änderungen und schließen Sie die Einstellungen."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guarda tus cambios y cierra la configuración."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrez vos modifications et fermez les paramètres."
+          }
         }
       }
     },
@@ -4550,6 +5044,18 @@
             "state" : "translated",
             "value" : "Icons suchen…"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar iconos..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher des icônes..."
+          }
         }
       }
     },
@@ -4559,6 +5065,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wählen Sie ein lokales Modell aus. Sehfähige Modelle können Bilder verarbeiten."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selecciona un modelo local. Los modelos con capacidad de visión pueden procesar imágenes."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionnez un modèle local. Les modèles capables de vision peuvent traiter les images."
           }
         }
       }
@@ -4658,6 +5176,18 @@
             "state" : "translated",
             "value" : "Wählen Sie aus, welcher KI-Dienst für die Verarbeitung verwendet werden soll."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selecciona qué servicio de IA usar para procesar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionnez quel service d'IA utiliser pour le traitement."
+          }
         }
       }
     },
@@ -4668,6 +5198,18 @@
             "state" : "translated",
             "value" : "Nachricht senden"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviar mensaje"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoyer le message"
+          }
         }
       }
     },
@@ -4677,6 +5219,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Legen Sie eine globale Verknüpfung fest, um die Schreibwerkzeuge schnell zu aktivieren."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Establece un atajo global para activar rápidamente Writing Tools."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Définissez un raccourci global pour activer rapidement Writing Tools."
           }
         }
       }
@@ -4799,6 +5353,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Standard verwendet Systemhintergründe. Glas respektiert Transparenzpräferenzen. OLED verwendet tiefe Schwarztien."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estándar utiliza fondos del sistema. Glass respeta las preferencias de transparencia. OLED utiliza negros profundos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard utilise les arrière-plans système. Glass respecte les préférences de transparence. OLED utilise des noirs profonds."
           }
         }
       }
@@ -5032,6 +5598,18 @@
             "state" : "translated",
             "value" : "Versuchen Sie den Download erneut, wenn der vorherige Versuch fehlgeschlagen ist."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intenta descargar de nuevo si el intento anterior falló."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essayez de télécharger à nouveau si la tentative précédente a échoué."
+          }
         }
       }
     },
@@ -5064,6 +5642,18 @@
             "state" : "translated",
             "value" : "Verwenden Sie Proofread, um die Formatierung beizubehalten und die Grammatik/Rechtschreibung zu korrigieren."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usa Corrección para preservar el formato mientras corriges gramática/ortografía."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utilisez Correction pour conserver la mise en forme tout en corrigeant la grammaire/l'orthographe."
+          }
         }
       }
     },
@@ -5073,6 +5663,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Version & Updates"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versión y actualizaciones"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version et mises à jour"
           }
         }
       }
@@ -5130,6 +5732,18 @@
             "state" : "translated",
             "value" : "Version: 5.3 (Basierend auf Windows Port Version 7.1)"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versión: 5.3 (Basada en la versión 7.1 de Windows Port)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version : 5.3 (Basée sur la version 7.1 du port Windows)"
+          }
         }
       }
     },
@@ -5139,6 +5753,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Veröffentlichungen anzeigen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ver lanzamientos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voir les versions"
           }
         }
       }
@@ -5216,6 +5842,18 @@
             "state" : "translated",
             "value" : "Wenn nicht aktiviert, ersetzen benutzerdefinierte Eingabeaufforderungen ausgewählte Text-Inline"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando está desactivada, los indicadores personalizados reemplazarán el texto seleccionado en línea"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lorsque non coché, les invites personnalisées remplaceront le texte sélectionné en ligne"
+          }
         }
       }
     },
@@ -5270,6 +5908,18 @@
             "state" : "translated",
             "value" : "Writing Tools ist ein kostenloses, leichtes Dienstprogramm, das Ihr Schreiben mit KI verbessert."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Writing Tools es una utilidad gratuita y ligera que mejora tu escritura con IA."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Writing Tools est un utilitaire gratuit et léger qui améliore votre écriture avec l'IA."
+          }
         }
       }
     },
@@ -5302,6 +5952,18 @@
             "state" : "translated",
             "value" : "Sie können diese jederzeit später in den Einstellungen anpassen."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siempre puedes ajustar estos valores más adelante en Configuración."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pouvez toujours ajuster ces paramètres ultérieurement dans les paramètres."
+          }
         }
       }
     },
@@ -5311,6 +5973,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sie können jede Einstellung später in den Einstellungen ändern."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puedes cambiar cualquier configuración más adelante en Configuración."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pouvez modifier n'importe quel paramètre ultérieurement dans les paramètres."
           }
         }
       }
@@ -5322,6 +5996,18 @@
             "state" : "translated",
             "value" : "Sie können den Onboarding-Fluss erneut ausführen, um Berechtigungen zu überprüfen und die App schnell zu konfigurieren."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puedes volver a ejecutar el flujo de incorporación para revisar los permisos y configurar rápidamente la aplicación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pouvez réexécuter le flux d'intégration pour vérifier les autorisations et configurer rapidement l'application."
+          }
         }
       }
     },
@@ -5331,6 +6017,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sie können das Onboarding jederzeit unter \"Einstellungen\" > \"Allgemein\" > \"Onboarding\" erneut besuchen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puedes revisar la incorporación en cualquier momento desde Configuración > General > Incorporación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pouvez revoir l'intégration à tout moment à partir de Paramètres > Général > Intégration."
           }
         }
       }
@@ -5363,6 +6061,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sie sind bereit!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Estás listo para empezar!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous êtes prêt !"
           }
         }
       }
