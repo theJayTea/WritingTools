@@ -107,8 +107,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             let previousApp = NSWorkspace.shared.frontmostApplication
 
             let pb = NSPasteboard.general
-            let oldPlain = pb.string(forType: .string)
             let oldChangeCount = pb.changeCount
+            
+            // IMPORTANT: Capture the ENTIRE clipboard state before copying
+            let clipboardSnapshot = pb.createSnapshot()
+            NSLog("Captured clipboard snapshot with \(clipboardSnapshot.itemCount) items")
 
             // Create and post Cmd+C event
             let src = CGEventSource(stateID: .hidSystemState)
@@ -121,7 +124,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             ku?.post(tap: .cgSessionEventTap)
 
             // Give the system a tiny moment to process the copy event
-            try? await Task.sleep(nanoseconds: 20_000_000) // 20ms
+            try? await Task.sleep(nanoseconds: 50_000_000) // 50ms - increased for reliability
 
             // Wait for the pasteboard to actually change
             await waitForPasteboardChange(pb, initialChangeCount: oldChangeCount)
@@ -132,7 +135,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 return
             }
 
-            // Read the newly copied content
+            // Read the newly copied content IMMEDIATELY after detecting the change
             var foundImages: [Data] = []
 
             let classes = [NSURL.self]
@@ -175,37 +178,35 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 }
             }
 
+            // Read rich text BEFORE clearing
             let rich = pb.readAttributedSelection()
             let selectedText = rich?.string ?? pb.string(forType: .string) ?? ""
 
             guard !selectedText.isEmpty else {
                 NSLog("No text selected for command: \(command.name) - pasteboard contained no text")
-                // Restore old clipboard
-                pb.clearContents()
-                if let oldPlain {
-                    pb.setString(oldPlain, forType: .string)
-                }
+                // Restore original clipboard using snapshot
+                pb.restore(snapshot: clipboardSnapshot)
                 return
             }
 
             NSLog("Successfully captured text for command \(command.name): \(selectedText.prefix(50))...")
 
+            // Store data in appState BEFORE restoring clipboard
+            self.appState.selectedImages = foundImages
+            self.appState.selectedAttributedText = rich
+            self.appState.selectedText = selectedText
+            
             // Set previous app AFTER we've successfully copied
             if let previousApp = previousApp {
                 self.appState.previousApplication = previousApp
             }
 
-            self.appState.selectedImages = foundImages
-            self.appState.selectedAttributedText = rich
-            self.appState.selectedText = selectedText
+            // NOW restore original clipboard using the snapshot
+            pb.restore(snapshot: clipboardSnapshot)
+            NSLog("Restored original clipboard after capturing selection")
 
-            // Restore old clipboard content AFTER we've stored the new selection
-            pb.clearContents()
-            if let oldPlain {
-                pb.setString(oldPlain, forType: .string)
-            }
-
-            Task { await self.processCommandWithUI(command) }
+            // Process the command with the captured data
+            await self.processCommandWithUI(command)
         }
     }
 
@@ -221,12 +222,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         }
 
         do {
-            let result = try await appState.activeProvider.processText(
+            var result = try await appState.activeProvider.processText(
                 systemPrompt: command.prompt,
                 userPrompt: appState.selectedText,
                 images: appState.selectedImages,
                 streaming: false
             )
+            
+            // Preserve trailing newlines from the original selection
+            // This is important for triple-click selections which include the trailing newline
+            let originalText = appState.selectedText
+            if originalText.hasSuffix("\n") && !result.hasSuffix("\n") {
+                result += "\n"
+                NSLog("Added trailing newline to match input")
+            }
 
             await MainActor.run {
                 if command.useResponseWindow {
@@ -460,8 +469,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             self.closePopupWindow()
 
             let pb = NSPasteboard.general
-            let oldPlain = pb.string(forType: .string)
             let oldChangeCount = pb.changeCount
+            
+            // Capture the ENTIRE clipboard state before copying
+            let clipboardSnapshot = pb.createSnapshot()
+            NSLog("Captured clipboard snapshot with \(clipboardSnapshot.itemCount) items")
 
             // Create and post Cmd+C event
             let src = CGEventSource(stateID: .hidSystemState)
@@ -474,7 +486,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             ku?.post(tap: .cgSessionEventTap)
 
             // Give the system a tiny moment to process the copy event
-            try? await Task.sleep(nanoseconds: 20_000_000) // 20ms
+            try? await Task.sleep(nanoseconds: 50_000_000) // 50ms - increased for reliability
 
             await waitForPasteboardChange(pb, initialChangeCount: oldChangeCount)
 
@@ -520,18 +532,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 }
             }
 
+            // Read rich text and plain text BEFORE restoring clipboard
             let rich = pb.readAttributedSelection()
             let plainText = rich?.string ?? pb.string(forType: .string) ?? ""
 
+            // Store data in appState BEFORE restoring clipboard
             self.appState.selectedAttributedText = rich
             self.appState.selectedText = plainText
             self.appState.selectedImages = foundImages
 
-            // Restore old clipboard content AFTER we've stored the new selection
-            pb.clearContents()
-            if let oldPlain {
-                pb.setString(oldPlain, forType: .string)
-            }
+            // Restore original clipboard using the snapshot
+            pb.restore(snapshot: clipboardSnapshot)
+            NSLog("Restored original clipboard after capturing selection")
 
             let window = PopupWindow(appState: self.appState)
             if !plainText.isEmpty || !foundImages.isEmpty {

@@ -213,12 +213,19 @@ class AppState: ObservableObject {
         Task {
             do {
                 let prompt = command.prompt
-                let result = try await activeProvider.processText(
+                var result = try await activeProvider.processText(
                     systemPrompt: prompt,
                     userPrompt: selectedText,
                     images: [],
                     streaming: false
                 )
+                
+                // Preserve trailing newlines from the original selection
+                // This is important for triple-click selections which include the trailing newline
+                if selectedText.hasSuffix("\n") && !result.hasSuffix("\n") {
+                    result += "\n"
+                    NSLog("Added trailing newline to match input")
+                }
 
                 if command.useResponseWindow {
                     let window = ResponseWindow(
@@ -249,6 +256,10 @@ class AppState: ObservableObject {
     // MARK: - Fixed: Proper Window Activation Verification
 
     func replaceSelectedText(with newText: String) {
+        // Take a snapshot of the current clipboard BEFORE we overwrite it
+        let clipboardSnapshot = NSPasteboard.general.createSnapshot()
+        
+        // Set the new text on the clipboard
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(newText, forType: .string)
         
@@ -256,12 +267,12 @@ class AppState: ObservableObject {
         if let previousApp = previousApplication {
             previousApp.activate()
             
-            // Wait for window activation instead of fixed delay
-            activateWindowAndPaste(for: previousApp)
+            // Wait for window activation, paste, then restore clipboard
+            activateWindowAndPaste(for: previousApp, clipboardSnapshot: clipboardSnapshot)
         }
     }
     
-    private func activateWindowAndPaste(for app: NSRunningApplication) {
+    private func activateWindowAndPaste(for app: NSRunningApplication, clipboardSnapshot: ClipboardSnapshot) {
         var attempts = 0
         let maxAttempts = 100 // ~1 second with 10ms intervals
 
@@ -273,7 +284,15 @@ class AppState: ObservableObject {
                 || attempts >= maxAttempts {
                 timer.invalidate()
                 Task { @MainActor in
+                    // Perform the paste
                     self?.simulatePaste()
+                    
+                    // Wait a moment for the paste to complete, then restore the clipboard
+                    try? await Task.sleep(nanoseconds: 100_000_000) // 100ms
+                    
+                    // Restore the original clipboard content
+                    NSPasteboard.general.restore(snapshot: clipboardSnapshot)
+                    NSLog("Clipboard restored after paste")
                 }
             }
         }
@@ -289,6 +308,9 @@ class AppState: ObservableObject {
             replaceSelectedText(with: corrected)
             return
         }
+
+        // Take a snapshot of the current clipboard BEFORE we overwrite it
+        let clipboardSnapshot = NSPasteboard.general.createSnapshot()
 
         let mutable = NSMutableAttributedString(attributedString: original)
         mutable.applyCharacterDiff(from: original.string, to: corrected)
@@ -329,7 +351,7 @@ class AppState: ObservableObject {
 
         if let previous = previousApplication {
             previous.activate()
-            activateWindowAndPaste(for: previous)
+            activateWindowAndPaste(for: previous, clipboardSnapshot: clipboardSnapshot)
         }
     }
 

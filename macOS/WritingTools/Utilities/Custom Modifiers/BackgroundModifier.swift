@@ -201,45 +201,81 @@ struct GlassmorphicBackground: View {
                 // Fall back to a solid, high-contrast background
                 colorScheme == .light ? Color(.windowBackgroundColor) : Color.black
             } else {
-                // Base subtle tint for both light and dark
-                (colorScheme == .light ? Color.white.opacity(0.06) : Color.white.opacity(0.03))
-
-                // Soft white highlight from top-left to center to enhance "glass" sheen
-                LinearGradient(
-                    colors: [
-                        Color.white.opacity(colorScheme == .light ? 0.22 : 0.12),
-                        Color.clear
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .center
-                )
-                .blendMode(.plusLighter)
-
-                // Gentle color tint for depth (subtle and theme-agnostic)
-                LinearGradient(
-                    colors: [
-                        Color.blue.opacity(0.10),
-                        Color.purple.opacity(0.08),
-                        Color.clear
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .blendMode(.softLight)
-
-                // Core blur/translucency material
-                Rectangle()
-                    .fill(Material.regular)
-                    .opacity(0.5)
-
-                // Subtle inner border to define edges of the glass
-                Rectangle()
-                    .strokeBorder(
-                        Color.white.opacity(colorScheme == .light ? 0.25 : 0.12),
-                        lineWidth: 1
-                    )
-                    .blendMode(.overlay)
+                // Use native Liquid Glass effect on macOS 16.0+ (internal version 26.0)
+                if #available(macOS 26.0, *) {
+                    LiquidGlassBackground()
+                } else {
+                    // Legacy glass effect for older macOS versions
+                    LegacyGlassBackground(colorScheme: colorScheme)
+                }
             }
+        }
+    }
+}
+
+/// Native Liquid Glass effect for macOS 26.0+
+@available(macOS 26.0, *)
+struct LiquidGlassBackground: View {
+    @Environment(\.colorScheme) var colorScheme
+    
+    var body: some View {
+        // Use SwiftUI's native Liquid Glass effect with rectangular shape
+        Color.clear
+            .glassEffect(
+                .regular.tint(
+                    colorScheme == .light 
+                        ? Color.blue.opacity(0.08)
+                        : Color.blue.opacity(0.05)
+                ),
+                in: .rect(cornerRadius: 0)
+            )
+    }
+}
+
+/// Legacy glass effect for macOS versions before 26.0
+struct LegacyGlassBackground: View {
+    let colorScheme: ColorScheme
+    
+    var body: some View {
+        ZStack {
+            // Base subtle tint for both light and dark (increased opacity)
+            (colorScheme == .light ? Color.white.opacity(0.15) : Color.white.opacity(0.08))
+
+            // Soft white highlight from top-left to center to enhance "glass" sheen
+            LinearGradient(
+                colors: [
+                    Color.white.opacity(colorScheme == .light ? 0.35 : 0.20),
+                    Color.clear
+                ],
+                startPoint: .topLeading,
+                endPoint: .center
+            )
+            .blendMode(.plusLighter)
+
+            // Gentle color tint for depth (subtle and theme-agnostic)
+            LinearGradient(
+                colors: [
+                    Color.blue.opacity(0.15),
+                    Color.purple.opacity(0.12),
+                    Color.clear
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .blendMode(.softLight)
+
+            // Core blur/translucency material (using thicker material)
+            Rectangle()
+                .fill(Material.thick)
+                .opacity(0.75)
+
+            // Subtle inner border to define edges of the glass
+            Rectangle()
+                .strokeBorder(
+                    Color.white.opacity(colorScheme == .light ? 0.30 : 0.15),
+                    lineWidth: 1
+                )
+                .blendMode(.overlay)
         }
     }
 }

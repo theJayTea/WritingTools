@@ -5725,24 +5725,24 @@
         }
       }
     },
-    "Version: 5.3 (Based on Windows Port version 7.1)" : {
+    "Version: 6.0 (Based on Windows Port version 7.1)" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Version: 5.3 (Basierend auf Windows Port Version 7.1)"
+            "value" : "Version: 6.0 (Basierend auf Windows Port Version 7.1)"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Versión: 5.3 (Basada en la versión 7.1 de Windows Port)"
+            "value" : "Versión: 6.0 (Basada en la versión 7.1 de Windows Port)"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Version : 5.3 (Basée sur la version 7.1 du port Windows)"
+            "value" : "Version : 6.0 (Basée sur la version 7.1 du port Windows)"
           }
         }
       }

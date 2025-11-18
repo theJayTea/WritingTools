@@ -10,13 +10,17 @@
 		420ADBB92E2D2FB400D4A564 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 420ADBB82E2D2FB400D4A564 /* MarkdownUI */; };
 		420ADBBC2E2D2FCB00D4A564 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 420ADBBB2E2D2FCB00D4A564 /* KeyboardShortcuts */; };
 		420ADBBF2E2D300F00D4A564 /* AIProxy in Frameworks */ = {isa = PBXBuildFile; productRef = 420ADBBE2E2D300F00D4A564 /* AIProxy */; };
+		420F0D022ECCB706004D7AC6 /* LiquidGlass in Frameworks */ = {isa = PBXBuildFile; productRef = 420F0D012ECCB706004D7AC6 /* LiquidGlass */; };
 		42655EE02E2D3380000EB2FE /* MLXEmbedders in Frameworks */ = {isa = PBXBuildFile; productRef = 42655EDF2E2D3380000EB2FE /* MLXEmbedders */; };
 		42655EE22E2D3380000EB2FE /* MLXLLM in Frameworks */ = {isa = PBXBuildFile; productRef = 42655EE12E2D3380000EB2FE /* MLXLLM */; };
 		42655EE42E2D3380000EB2FE /* MLXLMCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 42655EE32E2D3380000EB2FE /* MLXLMCommon */; };
 		42655EE62E2D3380000EB2FE /* MLXMNIST in Frameworks */ = {isa = PBXBuildFile; productRef = 42655EE52E2D3380000EB2FE /* MLXMNIST */; };
 		42655EE82E2D3380000EB2FE /* MLXVLM in Frameworks */ = {isa = PBXBuildFile; productRef = 42655EE72E2D3380000EB2FE /* MLXVLM */; };
 		42655EEA2E2D3380000EB2FE /* StableDiffusion in Frameworks */ = {isa = PBXBuildFile; productRef = 42655EE92E2D3380000EB2FE /* StableDiffusion */; };
-		42655EED2E2D3890000EB2FE /* LiquidGlass in Frameworks */ = {isa = PBXBuildFile; productRef = 42655EEC2E2D3890000EB2FE /* LiquidGlass */; };
+		42D870F32EC4D1C5001B0626 /* MLXEmbedders in Frameworks */ = {isa = PBXBuildFile; productRef = 42D870F22EC4D1C5001B0626 /* MLXEmbedders */; };
+		42D870F52EC4D1C5001B0626 /* MLXLLM in Frameworks */ = {isa = PBXBuildFile; productRef = 42D870F42EC4D1C5001B0626 /* MLXLLM */; };
+		42D870F72EC4D1C5001B0626 /* MLXLMCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 42D870F62EC4D1C5001B0626 /* MLXLMCommon */; };
+		42D870F92EC4D1C5001B0626 /* MLXVLM in Frameworks */ = {isa = PBXBuildFile; productRef = 42D870F82EC4D1C5001B0626 /* MLXVLM */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -49,16 +53,20 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				42D870F52EC4D1C5001B0626 /* MLXLLM in Frameworks */,
 				42655EE62E2D3380000EB2FE /* MLXMNIST in Frameworks */,
 				42655EE22E2D3380000EB2FE /* MLXLLM in Frameworks */,
+				420F0D022ECCB706004D7AC6 /* LiquidGlass in Frameworks */,
 				42655EE02E2D3380000EB2FE /* MLXEmbedders in Frameworks */,
 				420ADBBF2E2D300F00D4A564 /* AIProxy in Frameworks */,
 				420ADBB92E2D2FB400D4A564 /* MarkdownUI in Frameworks */,
 				42655EE42E2D3380000EB2FE /* MLXLMCommon in Frameworks */,
+				42D870F32EC4D1C5001B0626 /* MLXEmbedders in Frameworks */,
 				42655EE82E2D3380000EB2FE /* MLXVLM in Frameworks */,
-				42655EED2E2D3890000EB2FE /* LiquidGlass in Frameworks */,
+				42D870F92EC4D1C5001B0626 /* MLXVLM in Frameworks */,
 				42655EEA2E2D3380000EB2FE /* StableDiffusion in Frameworks */,
 				420ADBBC2E2D2FCB00D4A564 /* KeyboardShortcuts in Frameworks */,
+				42D870F72EC4D1C5001B0626 /* MLXLMCommon in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -102,7 +110,11 @@
 				42655EE52E2D3380000EB2FE /* MLXMNIST */,
 				42655EE72E2D3380000EB2FE /* MLXVLM */,
 				42655EE92E2D3380000EB2FE /* StableDiffusion */,
-				42655EEC2E2D3890000EB2FE /* LiquidGlass */,
+				42D870F22EC4D1C5001B0626 /* MLXEmbedders */,
+				42D870F42EC4D1C5001B0626 /* MLXLLM */,
+				42D870F62EC4D1C5001B0626 /* MLXLMCommon */,
+				42D870F82EC4D1C5001B0626 /* MLXVLM */,
+				420F0D012ECCB706004D7AC6 /* LiquidGlass */,
 			);
 			productName = "swift-writing-tools";
 			productReference = 4293055F2E2FD66E00685531 /* WritingTools.app */;
@@ -140,7 +152,8 @@
 				420ADBB72E2D2FB400D4A564 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 				420ADBBA2E2D2FCB00D4A564 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 				420ADBBD2E2D300F00D4A564 /* XCRemoteSwiftPackageReference "aiproxyswift" */,
-				42655EEB2E2D3890000EB2FE /* XCRemoteSwiftPackageReference "LiquidGlass" */,
+				42D870F12EC4D1C5001B0626 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */,
+				420F0D002ECCB706004D7AC6 /* XCRemoteSwiftPackageReference "LiquidGlass" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2ABCBC152CDEB606001E4B5E;
@@ -313,7 +326,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 33;
+				CURRENT_PROJECT_VERSION = 36;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"WritingTools/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
@@ -343,7 +356,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 5.3;
+				MARKETING_VERSION = 6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.aryamirsepasi.writing-tools";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -365,7 +378,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 33;
+				CURRENT_PROJECT_VERSION = 36;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"WritingTools/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
@@ -395,7 +408,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 5.3;
+				MARKETING_VERSION = 6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.aryamirsepasi.writing-tools";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -453,17 +466,25 @@
 				minimumVersion = 0.120.0;
 			};
 		};
-		42655EEB2E2D3890000EB2FE /* XCRemoteSwiftPackageReference "LiquidGlass" */ = {
+		420F0D002ECCB706004D7AC6 /* XCRemoteSwiftPackageReference "LiquidGlass" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/rebeloper/LiquidGlass";
+			repositoryURL = "https://github.com/xnxjoe/LiquidGlass.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.1.1;
+				minimumVersion = 1.1.2;
 			};
 		};
 		428BD5FA2E2D2EBC0089EED4 /* XCRemoteSwiftPackageReference "mlx-swift-examples" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ml-explore/mlx-swift-examples.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		42D870F12EC4D1C5001B0626 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ml-explore/mlx-swift-lm/";
 			requirement = {
 				branch = main;
 				kind = branch;
@@ -486,6 +507,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 420ADBBD2E2D300F00D4A564 /* XCRemoteSwiftPackageReference "aiproxyswift" */;
 			productName = AIProxy;
+		};
+		420F0D012ECCB706004D7AC6 /* LiquidGlass */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 420F0D002ECCB706004D7AC6 /* XCRemoteSwiftPackageReference "LiquidGlass" */;
+			productName = LiquidGlass;
 		};
 		42655EDF2E2D3380000EB2FE /* MLXEmbedders */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -517,10 +543,25 @@
 			package = 428BD5FA2E2D2EBC0089EED4 /* XCRemoteSwiftPackageReference "mlx-swift-examples" */;
 			productName = StableDiffusion;
 		};
-		42655EEC2E2D3890000EB2FE /* LiquidGlass */ = {
+		42D870F22EC4D1C5001B0626 /* MLXEmbedders */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 42655EEB2E2D3890000EB2FE /* XCRemoteSwiftPackageReference "LiquidGlass" */;
-			productName = LiquidGlass;
+			package = 42D870F12EC4D1C5001B0626 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */;
+			productName = MLXEmbedders;
+		};
+		42D870F42EC4D1C5001B0626 /* MLXLLM */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 42D870F12EC4D1C5001B0626 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */;
+			productName = MLXLLM;
+		};
+		42D870F62EC4D1C5001B0626 /* MLXLMCommon */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 42D870F12EC4D1C5001B0626 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */;
+			productName = MLXLMCommon;
+		};
+		42D870F82EC4D1C5001B0626 /* MLXVLM */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 42D870F12EC4D1C5001B0626 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */;
+			productName = MLXVLM;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
