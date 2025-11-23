@@ -6,6 +6,7 @@ import signal
 import sys
 import threading
 import time
+import sys
 
 import darkdetect
 import pyperclip
@@ -128,8 +129,13 @@ class WritingToolApp(QtWidgets.QApplication):
             self.update_checker.check_updates_async()
 
         self.recent_triggers = []  # Track recent hotkey triggers
-        self.TRIGGER_WINDOW = 1.5  # Time window in seconds
-        self.MAX_TRIGGERS = 3  # Max allowed triggers in window
+        self.TRIGGER_WINDOW = 3.0  # Time window in seconds
+        self.MAX_TRIGGERS = (
+            3  # Max allowed triggers in window (increased for Wayland compatibility)
+        )
+        self.last_hotkey_time = 0  # Track last hotkey press time
+        self.HOTKEY_DEBOUNCE_TIME = 0.5  # Minimum time between hotkey presses
+        self.hotkey_processing = False  # Prevent concurrent hotkey processing
 
     def setup_translations(self, lang=None):
         if not lang:
@@ -167,7 +173,7 @@ class WritingToolApp(QtWidgets.QApplication):
 
     def check_trigger_spam(self):
         """
-        Check if hotkey is being triggered too frequently (3+ times in 1.5 seconds).
+        Check if hotkey is being triggered too frequently.
         Returns True if spam is detected.
         """
         current_time = time.time()
@@ -181,6 +187,7 @@ class WritingToolApp(QtWidgets.QApplication):
         ]
 
         # Check if we have too many triggers in the window
+        # Increased threshold for better Wayland compatibility
         return len(self.recent_triggers) >= self.MAX_TRIGGERS
 
     def load_config(self):
@@ -280,9 +287,26 @@ class WritingToolApp(QtWidgets.QApplication):
         """Handle the hotkey and capture selected text."""
         logging.debug("Hotkey pressed")
 
+        # Prevent concurrent hotkey processing
+        if self.hotkey_processing:
+            logging.debug("Hotkey already being processed, ignoring")
+            return
+
+        self.hotkey_processing = True
+
+        # Check for rapid successive triggers (debouncing)
+        current_time = time.time()
+        if current_time - self.last_hotkey_time < self.HOTKEY_DEBOUNCE_TIME:
+            logging.debug("Hotkey pressed too soon, ignoring")
+            self.hotkey_processing = False
+            return
+
+        self.last_hotkey_time = current_time
+
         # Check for spam triggers
         if self.check_trigger_spam():
             logging.warning("Hotkey spam detected - quitting application")
+            self.hotkey_processing = False
             self.exit_app()
             return
 
@@ -304,10 +328,12 @@ class WritingToolApp(QtWidgets.QApplication):
             selected_text = backend.get_selected_text().strip()
         except Exception as e:
             logging.error(f"Error capturing text: {e}")
+            self.hotkey_processing = False
             self.show_message_signal.emit("Error", f"Failed to capture text: {e}")
             return
 
         if not selected_text:
+            self.hotkey_processing = False
             self.show_message_signal.emit("Error", "No text selected")
             return
 
@@ -317,6 +343,9 @@ class WritingToolApp(QtWidgets.QApplication):
         QtCore.QMetaObject.invokeMethod(
             self, "_show_popup", QtCore.Qt.ConnectionType.QueuedConnection
         )
+
+        # Reset the hotkey processing flag
+        self.hotkey_processing = False
 
     @Slot()
     def _show_popup(self):
