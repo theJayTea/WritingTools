@@ -225,7 +225,7 @@ class ChatContentScrollArea(QScrollArea):
         text_display = MarkdownTextBrowser(is_user_message=is_user)
 
         # Enable tables extension in markdown2
-        html = markdown2.markdown(text, extras=['tables', 'strike'])
+        html = markdown2.markdown(text, extras=["tables", "strike"])
         text_display.setHtml(html)
 
         # Calculate proper text display size using full width
