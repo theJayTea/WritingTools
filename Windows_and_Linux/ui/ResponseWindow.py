@@ -57,22 +57,22 @@ class MarkdownTextBrowser(QtWidgets.QTextBrowser):
                 width: 100%;
                 margin: 10px 0;
             }}
-            
+
             th, td {{
                 border: 1px solid {"#555" if colorMode == "dark" else "#ccc"};
                 padding: 8px;
                 text-align: left;
             }}
-            
+
             th {{
                 background-color: {"#444" if colorMode == "dark" else "#f5f5f5"};
                 font-weight: bold;
             }}
-            
+
             tr:nth-child(even) {{
                 background-color: {"#3a3a3a" if colorMode == "dark" else "#f9f9f9"};
             }}
-            
+
             tr:hover {{
                 background-color: {"#484848" if colorMode == "dark" else "#f0f0f0"};
             }}
@@ -225,7 +225,7 @@ class ChatContentScrollArea(QScrollArea):
         text_display = MarkdownTextBrowser(is_user_message=is_user)
 
         # Enable tables extension in markdown2
-        html = markdown2.markdown(text, extras=["tables"])
+        html = markdown2.markdown(text, extras=['tables', 'strike'])
         text_display.setHtml(html)
 
         # Calculate proper text display size using full width

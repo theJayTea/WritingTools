@@ -1,5 +1,7 @@
 # Writing Tools
 
+> **🍎 Using a Mac? Jump to the macOS (Native Swift Port) section → [macOS](#macos)**
+
 ### **Instantly proofread and optimize your writing system-wide with AI:**
 
 https://github.com/user-attachments/assets/d3ce4694-b593-45ff-ae9a-892ce94b1dc8
@@ -92,7 +94,8 @@ Writing Tools works well on x11. On Wayland, there are a few caveats:
 - [it works on XWayland apps](https://github.com/theJayTea/WritingTools/issues/34#issuecomment-2461633556)
 - [and it works if you disable Wayland for individual Flatpaks with Flatseal.](https://github.com/theJayTea/WritingTools/issues/93#issuecomment-2576511041)
 
-### **🍎 macOS**:
+<a id="macos"></a>
+### 🍎 macOS
 The macOS version is a **native Swift port**, developed by [Arya Mirsepasi](https://github.com/Aryamirsepasi). View the [README inside the macOS folder](https://github.com/theJayTea/WritingTools/tree/main/macOS) to learn more.
 
 To install it:
@@ -100,6 +103,56 @@ To install it:
 2. Open the `.dmg` file, also open a Finder Window, and drag the `writing-tools.app` into the Applications folder. That's it!
 
 **Note:** macOS 14 or later is required due to accessibility API requirements.
+
+---
+
+#### 💎 Why the macOS port is special
+
+- **Truly native**: Built in Swift (SwiftUI + AppKit where needed) for a fast, polished Mac experience.
+- **Private & on-device**: Run **local LLMs with MLX** on Apple Silicon — no internet required for on-device models.
+- **Rich-text aware**: **Proofread preserves RTF formatting** (bold, italics, lists, links) so your documents keep their look while errors disappear.
+- **Your workflows, your way**: **Edit and add your own commands** and assign custom shortcuts.
+- **Multilingual by design**: App UI supports **English, German, French, and Spanish**, and commands work in many more languages.
+- **Choice of intelligence**: Connect to top providers or go fully local — switch any time.
+- **Themes**: Multiple themes (including dark mode) to match your desktop vibe.
+
+#### 🧠 Providers & Models on macOS
+
+- Cloud: **OpenAI, Google (Gemini), Anthropic, Mistral, OpenRouter**  
+- Local: **Ollama** (via OpenAI-compatible endpoint) and **MLX on Apple Silicon** for first-class, low-latency on-device inference  
+- You can mix & match: keep sensitive work on-device with MLX, use cloud models when you need the biggest brains.
+
+#### 🖱️ System-wide magic on macOS
+
+- Works across most Mac apps — select text, invoke Writing Tools, and instantly **Proofread**, **Rewrite**, **Change tone**, or **Summarize**.
+- Start a **quick chat** with your chosen model without selecting text.
+
+> **Tip:** If your shortcut clashes with Spotlight or Input Source switching, set a custom hotkey in Writing Tools **and/or** adjust macOS settings under  
+> **System Settings → Keyboard → Keyboard Shortcuts** (Spotlight / Input Sources).
+
+#### 🔐 First-launch permissions (macOS)
+
+For full functionality, macOS will prompt you to grant:
+- **Accessibility** (to read/replace selected text)
+- **Screen Recording** (for certain apps that restrict text access)
+
+You can manage these under **System Settings → Privacy & Security**.
+
+#### ⚙️ Power features (macOS)
+
+- **Command editor**: Create reusable buttons for your own prompts and assign shortcuts.
+- **Model flexibility**: Bring your own API keys. Switch providers per task.
+- **Document-friendly**: RTF-preserving **Proofread** keeps your formatting intact.
+- **Localization**: UI in **EN/DE/FR/ES**; commands happily work with many languages.
+- **Theming**: Choose from multiple themes, including dark mode.
+
+#### 🧩 Troubleshooting (macOS)
+
+- **Hotkey not firing?** Change the shortcut in Writing Tools and make sure nothing else uses the same combo (Spotlight / Input Sources).  
+- **No text replacement in a specific app?** Ensure **Accessibility** is enabled for Writing Tools; for some apps, **Screen Recording** is also required.  
+- **Local model issues?** Confirm your Ollama/MLX model is running and the base URL/model name are correct in Settings.
+
+---
 
 ## 👀 Tips
 
