@@ -9,31 +9,33 @@ class OCRManager {
     
     // Extracts text from a single image Data object.
     func extractText(from imageData: Data) async -> String {
-        guard let nsImage = NSImage(data: imageData),
-              let cgImage = nsImage.cgImage(forProposedRect: nil, context: nil, hints: nil)
-        else { return "" }
-        
-        let request = VNRecognizeTextRequest()
-        request.recognitionLevel = .accurate
-        request.usesLanguageCorrection = true
-        
-        return await withCheckedContinuation { continuation in
-            let requestHandler = VNImageRequestHandler(cgImage: cgImage, options: [:])
-            do {
-                try requestHandler.perform([request])
-                guard let observations = request.results else {
+        await Task.detached {
+            guard let nsImage = NSImage(data: imageData),
+                  let cgImage = nsImage.cgImage(forProposedRect: nil, context: nil, hints: nil)
+            else { return "" }
+            
+            let request = VNRecognizeTextRequest()
+            request.recognitionLevel = .accurate
+            request.usesLanguageCorrection = true
+            
+            return await withCheckedContinuation { continuation in
+                let requestHandler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+                do {
+                    try requestHandler.perform([request])
+                    guard let observations = request.results else {
+                        continuation.resume(returning: "")
+                        return
+                    }
+                    let texts = observations.compactMap { observation in
+                        observation.topCandidates(1).first?.string
+                    }
+                    let fullText = texts.joined(separator: "\n")
+                    continuation.resume(returning: fullText)
+                } catch {
                     continuation.resume(returning: "")
-                    return
                 }
-                let texts = observations.compactMap { observation in
-                    observation.topCandidates(1).first?.string
-                }
-                let fullText = texts.joined(separator: "\n")
-                continuation.resume(returning: fullText)
-            } catch {
-                continuation.resume(returning: "")
             }
-        }
+        }.value
     }
     
     

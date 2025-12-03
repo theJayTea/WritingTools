@@ -184,6 +184,7 @@ struct MeshLikeGradientBackground: View {
                     }
                 }
                 .blur(radius: 100)
+                .drawingGroup()
             }
         }
     }

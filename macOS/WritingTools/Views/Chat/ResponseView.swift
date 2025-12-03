@@ -1,5 +1,6 @@
 import SwiftUI
 import MarkdownUI
+import LaTeXSwiftUI
 
 struct ChatMessage: Identifiable, Equatable, Sendable {
     let id = UUID()
@@ -156,16 +157,10 @@ struct ChatMessageView: View {
     @ViewBuilder
     private func bubbleView(role: String) -> some View {
         VStack(alignment: role == "assistant" ? .leading : .trailing, spacing: 2) {
-            Markdown(message.content)
-                .markdownTextStyle(\.text){
-                    FontSize(fontSize)
-                }
-                .markdownTextStyle(\.code){
-                    
-                }
+            RichMarkdownView(text: message.content, fontSize: fontSize)
                 .textSelection(.enabled)
                 .chatBubbleStyle(isFromUser: message.role == "user")
-                .accessibilityLabel(role == "user" ? "Your message" : "Assistant's response")
+                .accessibilityLabel(message.role == "user" ? "Your message" : "Assistant's response")
                 .accessibilityValue(message.content)
                 .contextMenu {
                     Button("Copy Selection") {
@@ -175,6 +170,7 @@ struct ChatMessageView: View {
                         copyEntireMessage()
                     }
                 }
+
             
             // Timestamp and copy button
             HStack(spacing: 8) {
@@ -319,3 +315,201 @@ final class ResponseViewModel: ObservableObject, Sendable {
     }
 }
 
+struct RichTextSegment: Identifiable {
+    enum Kind {
+        case markdown(String)
+        case inlineMath(String)
+        case blockMath(String)
+    }
+
+    let id = UUID()
+    let kind: Kind
+}
+
+enum RichTextParser {
+
+    static func parse(_ text: String) -> [RichTextSegment] {
+        var segments: [RichTextSegment] = []
+
+        var index = text.startIndex
+        var currentTextStart = index
+
+        func flushMarkdown(upTo end: String.Index) {
+            guard currentTextStart < end else { return }
+            let slice = String(text[currentTextStart..<end])
+            if !slice.isEmpty {
+                segments.append(.init(kind: .markdown(slice)))
+            }
+            currentTextStart = end
+        }
+
+        func advance(_ i: inout String.Index, by n: Int) {
+            i = text.index(i, offsetBy: n, limitedBy: text.endIndex) ?? text.endIndex
+        }
+
+        while index < text.endIndex {
+            let ch = text[index]
+
+            // MARK: - Backslash-based delimiters: \( \), \[ \], \begin{...}\end{...}
+            if ch == "\\" {
+                let remaining = text[index...]
+
+                // 1) \(
+                if remaining.hasPrefix(#"\("#) {
+                    let start = index
+                    let contentStart = text.index(start, offsetBy: 2) // after "\("
+                    if let closeRange = text.range(of: #"\\)"#, range: contentStart..<text.endIndex) {
+                        flushMarkdown(upTo: start)
+                        let content = String(text[contentStart..<closeRange.lowerBound])
+                        segments.append(.init(kind: .inlineMath(content)))
+                        index = closeRange.upperBound
+                        currentTextStart = index
+                        continue
+                    }
+                }
+
+                // 2) \[
+                if remaining.hasPrefix(#"\["#) {
+                    let start = index
+                    let contentStart = text.index(start, offsetBy: 2) // after "\["
+                    if let closeRange = text.range(of: #"\\]"#, range: contentStart..<text.endIndex) {
+                        flushMarkdown(upTo: start)
+                        let content = String(text[contentStart..<closeRange.lowerBound])
+                        segments.append(.init(kind: .blockMath(content)))
+                        index = closeRange.upperBound
+                        currentTextStart = index
+                        continue
+                    }
+                }
+
+                // 3) \begin{...} ... \end{...}
+                if remaining.hasPrefix(#"\begin{"#) {
+                    let start = index
+                    let envNameStart = text.index(start, offsetBy: 7) // after "\begin{"
+
+                    if let envNameEnd = text[envNameStart...].firstIndex(of: "}") {
+                        let envName = String(text[envNameStart..<envNameEnd])
+                        let endToken = "\\end{\(envName)}"
+                        let searchStart = text.index(after: envNameEnd)
+
+                        if let endRange = text.range(of: endToken, range: searchStart..<text.endIndex) {
+                            flushMarkdown(upTo: start)
+
+                            // Keep the full environment (begin + content + end)
+                            let blockRange = start..<endRange.upperBound
+                            let content = String(text[blockRange])
+
+                            segments.append(.init(kind: .blockMath(content)))
+                            index = endRange.upperBound
+                            currentTextStart = index
+                            continue
+                        }
+                    }
+                }
+
+                // No known LaTeX token → just move on
+                advance(&index, by: 1)
+                continue
+            }
+
+            // MARK: - Dollar-based delimiters: $...$, $$...$$
+            if ch == "$" {
+                let start = index
+                let next = text.index(after: index)
+                let hasNext = next < text.endIndex
+
+                // Block math: $$...$$
+                if hasNext, text[next] == "$" {
+                    flushMarkdown(upTo: start)
+
+                    let contentStart = text.index(start, offsetBy: 2) // after "$$"
+                    if let endRange = text.range(of: "$$", range: contentStart..<text.endIndex) {
+                        let content = String(text[contentStart..<endRange.lowerBound])
+                        segments.append(.init(kind: .blockMath(content)))
+                        index = endRange.upperBound
+                        currentTextStart = index
+                        continue
+                    } else {
+                        // No closing $$ → treat as plain text
+                        // (fall through)
+                    }
+                } else {
+                    // Inline math: $...$
+                    flushMarkdown(upTo: start)
+
+                    if let closing = findClosingDollar(in: text, start: next) {
+                        let content = String(text[next..<closing])
+                        segments.append(.init(kind: .inlineMath(content)))
+                        index = text.index(after: closing) // skip closing $
+                        currentTextStart = index
+                        continue
+                    } else {
+                        // No closing $ → treat as plain text
+                        // (fall through)
+                    }
+                }
+            }
+
+            // DEFAULT: just move forward
+            advance(&index, by: 1)
+        }
+
+        // Flush trailing markdown
+        flushMarkdown(upTo: text.endIndex)
+        return segments
+    }
+
+    /// Finds a matching `$` that is not escaped (i.e. not preceded by `\`).
+    private static func findClosingDollar(in text: String, start: String.Index) -> String.Index? {
+        var i = start
+        while i < text.endIndex {
+            let ch = text[i]
+            if ch == "$" {
+                if i == text.startIndex {
+                    return i
+                }
+                let prev = text.index(before: i)
+                if text[prev] != "\\" {
+                    return i
+                }
+                // If it *is* escaped (`\$`), just skip and continue
+            }
+            i = text.index(after: i)
+        }
+        return nil
+    }
+}
+
+
+struct RichMarkdownView: View {
+    let text: String
+    let fontSize: CGFloat
+
+    var body: some View {
+        let segments = RichTextParser.parse(text)
+
+        VStack(alignment: .leading, spacing: 4) {
+            ForEach(segments) { segment in
+                switch segment.kind {
+                case .markdown(let md):
+                    Markdown(md)
+                        .markdownTextStyle(\.text) {
+                            FontSize(fontSize)
+                        }
+
+                case .inlineMath(let latex):
+                    // Inline math: keep same size as text
+                    LaTeX(latex)
+                        .font(.system(size: fontSize))
+
+                case .blockMath(let latex):
+                    // Block math: slightly bigger and full-width
+                    LaTeX(latex)
+                        .font(.system(size: fontSize + 2))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.vertical, 4)
+                }
+            }
+        }
+    }
+}
