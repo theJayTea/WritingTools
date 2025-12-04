@@ -1,6 +1,27 @@
 import SwiftUI
-import MarkdownUI
-import LaTeXSwiftUI
+import MarkdownView
+
+// MARK: - String Extension for LaTeX Normalization
+
+extension String {
+    /// Normalizes LaTeX delimiters to markdown-friendly versions
+    /// Converts \[...\] to $$...$$ and \(...\) to $...$
+    fileprivate func normalizedLatex() -> String {
+        var result = self
+        
+        // Convert \[...\] to $$...$$
+        result = result.replacingOccurrences(of: #"\\\["#, with: "\n$$", options: .regularExpression)
+        result = result.replacingOccurrences(of: #"\\\]"#, with: "$$\n", options: .regularExpression)
+        
+        // Convert \(...\) to $...$
+        result = result.replacingOccurrences(of: #"\\\("#, with: "$", options: .regularExpression)
+        result = result.replacingOccurrences(of: #"\\\)"#, with: "$", options: .regularExpression)
+        
+        return result
+    }
+}
+
+// MARK: - Chat Message Model
 
 struct ChatMessage: Identifiable, Equatable, Sendable {
     let id = UUID()
@@ -16,6 +37,8 @@ struct ChatMessage: Identifiable, Equatable, Sendable {
     }
 }
 
+// MARK: - Response View
+
 struct ResponseView: View {
     @StateObject private var viewModel: ResponseViewModel
     @ObservedObject private var settings = AppSettings.shared
@@ -25,18 +48,21 @@ struct ResponseView: View {
     @State private var scrollProxy: ScrollViewProxy?
     @State private var latestMessageId: UUID?
     @State private var showSettings = false
+    @State private var errorMessage: String?
+    @State private var showError: Bool = false
     
-    init(content: String, selectedText: String, option: WritingOption? = nil) {
+    init(content: String, selectedText: String, option: WritingOption? = nil, provider: any AIProvider) {
         self._viewModel = StateObject(wrappedValue: ResponseViewModel(
             content: content,
             selectedText: selectedText,
-            option: option
+            option: option,
+            provider: provider
         ))
     }
     
     var body: some View {
         VStack(spacing: 0) {
-            // Enhanced toolbar with more controls
+            // Toolbar
             HStack(spacing: 16) {
                 Button(action: { viewModel.copyContent() }) {
                     Label(viewModel.showCopyConfirmation ? "Copied!" : "Copy All",
@@ -87,6 +113,26 @@ struct ResponseView: View {
                                 .id(message.id)
                                 .frame(maxWidth: .infinity, alignment: message.role == "user" ? .trailing : .leading)
                         }
+                        
+                        // Show loading indicator
+                        if viewModel.isProcessing {
+                            HStack(alignment: .top, spacing: 12) {
+                                HStack(spacing: 8) {
+                                    ProgressView()
+                                        .scaleEffect(0.8)
+                                    Text("Thinking...")
+                                        .font(.system(size: 14))
+                                        .foregroundColor(.secondary)
+                                }
+                                .padding(12)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                        .fill(Color(.controlBackgroundColor))
+                                )
+                                Spacer(minLength: 15)
+                            }
+                            .padding(.top, 4)
+                        }
                     }
                     .padding()
                 }
@@ -111,6 +157,7 @@ struct ResponseView: View {
                             isLoading: isRegenerating,
                             onSubmit: sendMessage
                         )
+                        .disabled(viewModel.isProcessing)
                 }
                 .padding(.horizontal)
                 .padding(.vertical, 8)
@@ -118,18 +165,37 @@ struct ResponseView: View {
             .background(Color(.windowBackgroundColor))
         }
         .windowBackground(useGradient: settings.useGradientTheme)
+        .alert("Error", isPresented: $showError, presenting: errorMessage) { _ in
+            Button("OK") { errorMessage = nil }
+        } message: { message in
+            Text(message)
+        }
     }
     
     private func sendMessage() {
-        guard !inputText.isEmpty else { return }
+        guard !inputText.isEmpty, !viewModel.isProcessing else { return }
         let question = inputText
         inputText = ""
         isRegenerating = true
-        viewModel.processFollowUpQuestion(question) {
-            isRegenerating = false
+        
+        Task {
+            do {
+                try await viewModel.processFollowUpQuestion(question)
+                await MainActor.run {
+                    isRegenerating = false
+                }
+            } catch {
+                await MainActor.run {
+                    errorMessage = error.localizedDescription
+                    showError = true
+                    isRegenerating = false
+                }
+            }
         }
     }
 }
+
+// MARK: - Chat Message View
 
 struct ChatMessageView: View {
     let message: ChatMessage
@@ -170,7 +236,6 @@ struct ChatMessageView: View {
                         copyEntireMessage()
                     }
                 }
-
             
             // Timestamp and copy button
             HStack(spacing: 8) {
@@ -208,102 +273,127 @@ struct ChatMessageView: View {
     }
 }
 
-// A small convenience enum for clarity (optional)
-fileprivate enum MessageRole {
-    case user, assistant
-}
+// MARK: - View Model
 
-
-extension View {
-    func maxWidth(_ width: CGFloat) -> some View {
-        frame(maxWidth: width)
-    }
-}
-
-// Update ResponseViewModel to handle chat messages
 @MainActor
-final class ResponseViewModel: ObservableObject, Sendable {
-    
+class ResponseViewModel: ObservableObject {
     @Published var messages: [ChatMessage] = []
     @Published var fontSize: CGFloat = 14
-    @Published var showCopyConfirmation: Bool = false
-    let initialContent: String
+    @Published var showCopyConfirmation = false
+    @Published var isProcessing = false
     
-    let selectedText: String
-    let option: WritingOption?
+    private let content: String
+    private let selectedText: String
+    private let option: WritingOption?
+    private let provider: any AIProvider
     
-    init(content: String, selectedText: String, option: WritingOption? = nil) {
-        self.initialContent = content
+    // Store conversation history for context
+    private var conversationHistory: [(role: String, content: String)] = []
+    
+    init(content: String, selectedText: String, option: WritingOption?, provider: any AIProvider) {
+        // 🔧 Normalize LaTeX delimiters on initialization
+        self.content = content.normalizedLatex()
         self.selectedText = selectedText
         self.option = option
+        self.provider = provider
         
-        // Initialize with the first message
-        self.messages.append(ChatMessage(
-            role: "assistant",
-            content: content
-        ))
+        // Add initial assistant message
+        messages.append(ChatMessage(role: "assistant", content: self.content))
+        
+        // Initialize conversation history
+        if !selectedText.isEmpty {
+            conversationHistory.append((role: "user", content: selectedText))
+        }
+        conversationHistory.append((role: "assistant", content: self.content))
     }
     
-    func processFollowUpQuestion(_ question: String, completion: @escaping () -> Void) {
-        // Add user message (already on MainActor)
-        self.messages.append(ChatMessage(
-            role: "user",
-            content: question
-        ))
+    func processFollowUpQuestion(_ question: String) async throws {
+        // Add user message to UI
+        messages.append(ChatMessage(role: "user", content: question))
         
-        Task {
-            do {
-                // Build conversation history
-                let conversationHistory = messages.map { message in
-                    return "\(message.role == "user" ? "User" : "Assistant"): \(message.content)"
-                }.joined(separator: "\n\n")
-                
-                // Create prompt with context
-                let contextualPrompt = """
-                Previous conversation:
-                \(conversationHistory)
-                
-                User's new question: \(question)
-                
-                Respond to the user's question while maintaining context from the previous conversation.
-                """
-                
-                let result = try await AppState.shared.activeProvider.processText(
-                    systemPrompt: """
-                    You are a writing and coding assistant. Your sole task is to respond to the user's instruction thoughtfully and comprehensively.
-                    If the instruction is a question, provide a detailed answer. But always return the best and most accurate answer and not different options. 
-                    If it's a request for help, provide clear guidance and examples where appropriate. Make sure to use the language used or specified by the user instruction.
-                    Use Markdown formatting to make your response more readable.
-                    DO NOT ANSWER OR RESPOND TO THE USER'S TEXT CONTENT.
-                    """,
-                    userPrompt: contextualPrompt,
-                    images: AppState.shared.selectedImages,
-                    streaming: true
-                )
-                
-                await MainActor.run {
-                    self.messages.append(ChatMessage(
-                        role: "assistant",
-                        content: result
-                    ))
-                    completion()
-                }
-            } catch {
-                print("Error processing follow-up: \(error)")
-                await MainActor.run { completion() }
-            }
+        // Add to conversation history
+        conversationHistory.append((role: "user", content: question))
+        
+        isProcessing = true
+        
+        do {
+            // Build context-aware system prompt
+            let systemPrompt = buildSystemPrompt()
+            
+            // Build user prompt with conversation context
+            let userPrompt = buildUserPrompt(question: question)
+            
+            // Call the actual AI provider
+            let rawResponse = try await provider.processText(
+                systemPrompt: systemPrompt,
+                userPrompt: userPrompt,
+                images: [], // Follow-up questions don't include images
+                streaming: false
+            )
+            
+            // 🔧 Normalize LaTeX delimiters before displaying
+            let normalizedResponse = rawResponse.normalizedLatex()
+            
+            // Add to UI
+            messages.append(ChatMessage(role: "assistant", content: normalizedResponse))
+            
+            // Add to conversation history
+            conversationHistory.append((role: "assistant", content: normalizedResponse))
+            
+            isProcessing = false
+        } catch {
+            isProcessing = false
+            throw error
         }
     }
     
-    func clearConversation() {
-        messages.removeAll()
+    private func buildSystemPrompt() -> String {
+        // Use the original option's system prompt if available, otherwise use a general one
+        if let option = option {
+            return """
+            You are a helpful AI assistant continuing a conversation about text modification.
+            
+            Original task: \(option.systemPrompt)
+            
+            The user may ask follow-up questions or request modifications. Provide helpful, 
+            contextual responses based on the conversation history. Use Markdown formatting 
+            where appropriate.
+            """
+        } else {
+            return """
+            You are a helpful AI assistant. Answer the user's questions thoughtfully and 
+            comprehensively. Maintain context from the conversation history. Use Markdown 
+            formatting where appropriate.
+            """
+        }
+    }
+    
+    private func buildUserPrompt(question: String) -> String {
+        // Include recent conversation history for context (last 5 exchanges)
+        let recentHistory = conversationHistory.suffix(10) // Last 5 exchanges (user + assistant)
+        
+        var prompt = ""
+        
+        // Add conversation history
+        if recentHistory.count > 2 { // More than just the initial exchange
+            prompt += "Conversation history:\n\n"
+            for (index, exchange) in recentHistory.dropLast(1).enumerated() {
+                let role = exchange.role == "user" ? "User" : "Assistant"
+                prompt += "\(role): \(exchange.content)\n\n"
+            }
+            prompt += "---\n\n"
+        }
+        
+        // Add current question
+        prompt += "User's follow-up question: \(question)"
+        
+        return prompt
     }
     
     func copyContent() {
-        // Concatenate all messages in the conversation
         let conversationText = messages.map { message in
-            return "\(message.role.capitalized): \(message.content)" // Format each message with role
-        }.joined(separator: "\n\n") // Join messages with double newlines for readability
+            return "\(message.role.capitalized): \(message.content)"
+        }.joined(separator: "\n\n")
         
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(conversationText, forType: .string)
@@ -315,201 +405,21 @@ final class ResponseViewModel: ObservableObject, Sendable {
     }
 }
 
-struct RichTextSegment: Identifiable {
-    enum Kind {
-        case markdown(String)
-        case inlineMath(String)
-        case blockMath(String)
-    }
-
-    let id = UUID()
-    let kind: Kind
-}
-
-enum RichTextParser {
-
-    static func parse(_ text: String) -> [RichTextSegment] {
-        var segments: [RichTextSegment] = []
-
-        var index = text.startIndex
-        var currentTextStart = index
-
-        func flushMarkdown(upTo end: String.Index) {
-            guard currentTextStart < end else { return }
-            let slice = String(text[currentTextStart..<end])
-            if !slice.isEmpty {
-                segments.append(.init(kind: .markdown(slice)))
-            }
-            currentTextStart = end
-        }
-
-        func advance(_ i: inout String.Index, by n: Int) {
-            i = text.index(i, offsetBy: n, limitedBy: text.endIndex) ?? text.endIndex
-        }
-
-        while index < text.endIndex {
-            let ch = text[index]
-
-            // MARK: - Backslash-based delimiters: \( \), \[ \], \begin{...}\end{...}
-            if ch == "\\" {
-                let remaining = text[index...]
-
-                // 1) \(
-                if remaining.hasPrefix(#"\("#) {
-                    let start = index
-                    let contentStart = text.index(start, offsetBy: 2) // after "\("
-                    if let closeRange = text.range(of: #"\\)"#, range: contentStart..<text.endIndex) {
-                        flushMarkdown(upTo: start)
-                        let content = String(text[contentStart..<closeRange.lowerBound])
-                        segments.append(.init(kind: .inlineMath(content)))
-                        index = closeRange.upperBound
-                        currentTextStart = index
-                        continue
-                    }
-                }
-
-                // 2) \[
-                if remaining.hasPrefix(#"\["#) {
-                    let start = index
-                    let contentStart = text.index(start, offsetBy: 2) // after "\["
-                    if let closeRange = text.range(of: #"\\]"#, range: contentStart..<text.endIndex) {
-                        flushMarkdown(upTo: start)
-                        let content = String(text[contentStart..<closeRange.lowerBound])
-                        segments.append(.init(kind: .blockMath(content)))
-                        index = closeRange.upperBound
-                        currentTextStart = index
-                        continue
-                    }
-                }
-
-                // 3) \begin{...} ... \end{...}
-                if remaining.hasPrefix(#"\begin{"#) {
-                    let start = index
-                    let envNameStart = text.index(start, offsetBy: 7) // after "\begin{"
-
-                    if let envNameEnd = text[envNameStart...].firstIndex(of: "}") {
-                        let envName = String(text[envNameStart..<envNameEnd])
-                        let endToken = "\\end{\(envName)}"
-                        let searchStart = text.index(after: envNameEnd)
-
-                        if let endRange = text.range(of: endToken, range: searchStart..<text.endIndex) {
-                            flushMarkdown(upTo: start)
-
-                            // Keep the full environment (begin + content + end)
-                            let blockRange = start..<endRange.upperBound
-                            let content = String(text[blockRange])
-
-                            segments.append(.init(kind: .blockMath(content)))
-                            index = endRange.upperBound
-                            currentTextStart = index
-                            continue
-                        }
-                    }
-                }
-
-                // No known LaTeX token → just move on
-                advance(&index, by: 1)
-                continue
-            }
-
-            // MARK: - Dollar-based delimiters: $...$, $$...$$
-            if ch == "$" {
-                let start = index
-                let next = text.index(after: index)
-                let hasNext = next < text.endIndex
-
-                // Block math: $$...$$
-                if hasNext, text[next] == "$" {
-                    flushMarkdown(upTo: start)
-
-                    let contentStart = text.index(start, offsetBy: 2) // after "$$"
-                    if let endRange = text.range(of: "$$", range: contentStart..<text.endIndex) {
-                        let content = String(text[contentStart..<endRange.lowerBound])
-                        segments.append(.init(kind: .blockMath(content)))
-                        index = endRange.upperBound
-                        currentTextStart = index
-                        continue
-                    } else {
-                        // No closing $$ → treat as plain text
-                        // (fall through)
-                    }
-                } else {
-                    // Inline math: $...$
-                    flushMarkdown(upTo: start)
-
-                    if let closing = findClosingDollar(in: text, start: next) {
-                        let content = String(text[next..<closing])
-                        segments.append(.init(kind: .inlineMath(content)))
-                        index = text.index(after: closing) // skip closing $
-                        currentTextStart = index
-                        continue
-                    } else {
-                        // No closing $ → treat as plain text
-                        // (fall through)
-                    }
-                }
-            }
-
-            // DEFAULT: just move forward
-            advance(&index, by: 1)
-        }
-
-        // Flush trailing markdown
-        flushMarkdown(upTo: text.endIndex)
-        return segments
-    }
-
-    /// Finds a matching `$` that is not escaped (i.e. not preceded by `\`).
-    private static func findClosingDollar(in text: String, start: String.Index) -> String.Index? {
-        var i = start
-        while i < text.endIndex {
-            let ch = text[i]
-            if ch == "$" {
-                if i == text.startIndex {
-                    return i
-                }
-                let prev = text.index(before: i)
-                if text[prev] != "\\" {
-                    return i
-                }
-                // If it *is* escaped (`\$`), just skip and continue
-            }
-            i = text.index(after: i)
-        }
-        return nil
-    }
-}
-
+// MARK: - Rich Markdown View
 
 struct RichMarkdownView: View {
     let text: String
     let fontSize: CGFloat
 
     var body: some View {
-        let segments = RichTextParser.parse(text)
-
-        VStack(alignment: .leading, spacing: 4) {
-            ForEach(segments) { segment in
-                switch segment.kind {
-                case .markdown(let md):
-                    Markdown(md)
-                        .markdownTextStyle(\.text) {
-                            FontSize(fontSize)
-                        }
-
-                case .inlineMath(let latex):
-                    // Inline math: keep same size as text
-                    LaTeX(latex)
-                        .font(.system(size: fontSize))
-
-                case .blockMath(let latex):
-                    // Block math: slightly bigger and full-width
-                    LaTeX(latex)
-                        .font(.system(size: fontSize + 2))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.vertical, 4)
-                }
-            }
-        }
+        MarkdownView(text)
+            .markdownMathRenderingEnabled() // Opt-in to LaTeX/MathJax rendering per MarkdownView docs
+            .font(.system(size: fontSize))
+            .font(.system(size: fontSize * 1.2, weight: .bold), for: .h1)
+            .font(.system(size: fontSize * 1.15, weight: .semibold), for: .h2)
+            .font(.system(size: fontSize * 1.1, weight: .semibold), for: .h3)
+            .font(.system(size: fontSize), for: .inlineMath)
+            .font(.system(size: fontSize + 2), for: .displayMath)
+            .tint(.primary, for: .inlineCodeBlock)
     }
 }

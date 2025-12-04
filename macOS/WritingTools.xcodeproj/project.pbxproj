@@ -18,6 +18,7 @@
 		42655EE82E2D3380000EB2FE /* MLXVLM in Frameworks */ = {isa = PBXBuildFile; productRef = 42655EE72E2D3380000EB2FE /* MLXVLM */; };
 		42655EEA2E2D3380000EB2FE /* StableDiffusion in Frameworks */ = {isa = PBXBuildFile; productRef = 42655EE92E2D3380000EB2FE /* StableDiffusion */; };
 		42D3D3392EE0DF8B00105C2F /* LaTeXSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 42D3D3382EE0DF8B00105C2F /* LaTeXSwiftUI */; };
+		42D3D33C2EE0E51300105C2F /* MarkdownView in Frameworks */ = {isa = PBXBuildFile; productRef = 42D3D33B2EE0E51300105C2F /* MarkdownView */; };
 		42D870F32EC4D1C5001B0626 /* MLXEmbedders in Frameworks */ = {isa = PBXBuildFile; productRef = 42D870F22EC4D1C5001B0626 /* MLXEmbedders */; };
 		42D870F52EC4D1C5001B0626 /* MLXLLM in Frameworks */ = {isa = PBXBuildFile; productRef = 42D870F42EC4D1C5001B0626 /* MLXLLM */; };
 		42D870F72EC4D1C5001B0626 /* MLXLMCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 42D870F62EC4D1C5001B0626 /* MLXLMCommon */; };
@@ -64,6 +65,7 @@
 				420ADBB92E2D2FB400D4A564 /* MarkdownUI in Frameworks */,
 				42655EE42E2D3380000EB2FE /* MLXLMCommon in Frameworks */,
 				42D870F32EC4D1C5001B0626 /* MLXEmbedders in Frameworks */,
+				42D3D33C2EE0E51300105C2F /* MarkdownView in Frameworks */,
 				42655EE82E2D3380000EB2FE /* MLXVLM in Frameworks */,
 				42D870F92EC4D1C5001B0626 /* MLXVLM in Frameworks */,
 				42655EEA2E2D3380000EB2FE /* StableDiffusion in Frameworks */,
@@ -118,6 +120,7 @@
 				42D870F82EC4D1C5001B0626 /* MLXVLM */,
 				420F0D012ECCB706004D7AC6 /* LiquidGlass */,
 				42D3D3382EE0DF8B00105C2F /* LaTeXSwiftUI */,
+				42D3D33B2EE0E51300105C2F /* MarkdownView */,
 			);
 			productName = "swift-writing-tools";
 			productReference = 4293055F2E2FD66E00685531 /* WritingTools.app */;
@@ -158,6 +161,7 @@
 				42D870F12EC4D1C5001B0626 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */,
 				420F0D002ECCB706004D7AC6 /* XCRemoteSwiftPackageReference "LiquidGlass" */,
 				42D3D3372EE0DF8B00105C2F /* XCRemoteSwiftPackageReference "LaTeXSwiftUI" */,
+				42D3D33A2EE0E51300105C2F /* XCRemoteSwiftPackageReference "MarkdownView" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2ABCBC152CDEB606001E4B5E;
@@ -330,7 +334,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 38;
+				CURRENT_PROJECT_VERSION = 39;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"WritingTools/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
@@ -382,7 +386,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 38;
+				CURRENT_PROJECT_VERSION = 39;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"WritingTools/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
@@ -494,6 +498,14 @@
 				kind = branch;
 			};
 		};
+		42D3D33A2EE0E51300105C2F /* XCRemoteSwiftPackageReference "MarkdownView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/LiYanan2004/MarkdownView.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.2;
+			};
+		};
 		42D870F12EC4D1C5001B0626 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ml-explore/mlx-swift-lm/";
@@ -559,6 +571,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 42D3D3372EE0DF8B00105C2F /* XCRemoteSwiftPackageReference "LaTeXSwiftUI" */;
 			productName = LaTeXSwiftUI;
+		};
+		42D3D33B2EE0E51300105C2F /* MarkdownView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 42D3D33A2EE0E51300105C2F /* XCRemoteSwiftPackageReference "MarkdownView" */;
+			productName = MarkdownView;
 		};
 		42D870F22EC4D1C5001B0626 /* MLXEmbedders */ = {
 			isa = XCSwiftPackageProductDependency;

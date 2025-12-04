@@ -232,7 +232,8 @@ class AppState: ObservableObject {
                         title: "\(command.name) Result",
                         content: result,
                         selectedText: selectedText,
-                        option: nil
+                        option: nil,
+                        provider: self.activeProvider
                     )
 
                     WindowManager.shared.addResponseWindow(window)

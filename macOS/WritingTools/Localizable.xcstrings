@@ -2409,6 +2409,9 @@
         }
       }
     },
+    "Error" : {
+
+    },
     "Error: %@" : {
       "localizations" : {
         "de" : {
@@ -5502,6 +5505,9 @@
           }
         }
       }
+    },
+    "Thinking..." : {
+
     },
     "This is a built-in command. Your changes will be saved but you can reset to the original configuration later if needed." : {
       "localizations" : {

@@ -243,7 +243,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                         title: command.name,
                         content: result,
                         selectedText: appState.selectedText,
-                        option: nil
+                        option: nil,
+                        provider: appState.activeProvider
                     )
 
                     NSApp.activate(ignoringOtherApps: true)

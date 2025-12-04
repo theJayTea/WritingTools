@@ -139,17 +139,15 @@ struct PopupView: View {
         }
         .buttonStyle(.plain)
         .padding(.horizontal, 16)
-        .transition(.opacity.combined(with: .move(edge: .bottom)))
       }
     }
     .padding(.bottom, 8)
-    .animation(.easeInOut(duration: 0.25), value: viewModel.isEditMode)
     .windowBackground(useGradient: useGradientTheme)
     .overlay(
-      RoundedRectangle(cornerRadius: 20)
+      RoundedRectangle(cornerRadius: 12)
         .strokeBorder(Color.gray.opacity(0.2), lineWidth: 1)
     )
-    .clipShape(RoundedRectangle(cornerRadius: 20))
+    .clipShape(RoundedRectangle(cornerRadius: 12))
     .shadow(color: Color.black.opacity(0.2), radius: 10, y: 5)
     // Sheet for editing individual command
     .sheet(item: $editingCommand) { command in
@@ -212,7 +210,8 @@ struct PopupView: View {
             title: command.name,
             content: result,
             selectedText: userText,
-            option: .proofread
+            option: .proofread,
+            provider: appState.activeProvider
           )
 
           WindowManager.shared.addResponseWindow(window)
@@ -291,7 +290,8 @@ struct PopupView: View {
               content: result,
               selectedText: appState.selectedText.isEmpty
                 ? instruction : appState.selectedText,
-              option: .proofread
+              option: .proofread,
+              provider: appState.activeProvider
             )
 
             WindowManager.shared.addResponseWindow(window)
@@ -314,4 +314,3 @@ struct PopupView: View {
     }
   }
 }
-
