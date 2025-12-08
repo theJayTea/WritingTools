@@ -9,18 +9,17 @@ import time
 
 import darkdetect
 import pyperclip
-from pynput import keyboard as pykeyboard
-from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtCore import QLocale, Signal, Slot
-from PySide6.QtGui import QCursor, QGuiApplication
-from PySide6.QtWidgets import QApplication, QMessageBox
-
 import ui.AboutWindow
 import ui.CustomPopupWindow
 import ui.OnboardingWindow
 import ui.ResponseWindow
 import ui.SettingsWindow
-from aiprovider import GeminiProvider, OllamaProvider, OpenAICompatibleProvider
+from aiprovider import GeminiProvider, OllamaProvider, OpenAICompatibleProvider, obfuscate_api_key
+from pynput import keyboard as pykeyboard
+from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6.QtCore import QLocale, Signal, Slot
+from PySide6.QtGui import QCursor, QGuiApplication
+from PySide6.QtWidgets import QApplication, QMessageBox
 from update_checker import UpdateChecker
 
 _ = gettext.gettext
@@ -46,6 +45,10 @@ class WritingToolApp(QtWidgets.QApplication):
         self.config = None
         self.config_path = None
         self.load_config()
+
+        # Check if config migration is needed for v8 (Gemini model update)
+        self._migrate_config_for_v8()
+
         self.options = None
         self.options_path = None
         self.load_options()
@@ -168,6 +171,67 @@ class WritingToolApp(QtWidgets.QApplication):
         else:
             logging.debug('Config file not found')
             self.config = None
+
+    def _migrate_config_for_v8(self):
+        """
+        Migrate config for v8 update:
+        1. Google removed Gemini 2.0 models from free API, so update to Gemma 3 27B
+        2. Obfuscate plaintext Gemini API keys for security (defeats Ctrl+F scanning)
+
+        This migration:
+        1. Checks if 'is_config_file_updated_for_v8' flag exists and is True
+        2. If not, updates the Gemini model and obfuscates the API key
+        3. Shows a popup telling the user to restart Writing Tools
+        """
+        # Skip if no config exists (new user going through onboarding)
+        if not self.config:
+            logging.debug('No config to migrate (new user)')
+            return
+
+        # Check if already migrated
+        if self.config.get('is_config_file_updated_for_v8', False):
+            logging.debug('Config already migrated for v8, skipping')
+            return
+
+        logging.info('Migrating config for v8 (Gemini model + API key obfuscation)...')
+
+        # Update the Gemini provider's model name and obfuscate API key
+        config_changed = False
+        if 'providers' in self.config and 'Gemini (Recommended)' in self.config['providers']:
+            gemini_config = self.config['providers']['Gemini (Recommended)']
+
+            # Update to the new Gemma model (works with unlimited usage on free API)
+            old_model = gemini_config.get('model_name', '')
+            gemini_config['model_name'] = 'gemma-3-27b-it'
+            logging.info(f'Updated Gemini model from "{old_model}" to "gemma-3-27b-it"')
+
+            # Obfuscate the API key if it exists and isn't already obfuscated
+            if 'api_key' in gemini_config and gemini_config['api_key']:
+                old_key = gemini_config['api_key']
+                gemini_config['api_key'] = obfuscate_api_key(old_key)
+                if old_key != gemini_config['api_key']:
+                    logging.info('Obfuscated Gemini API key')
+
+            config_changed = True
+
+        # Set the migration flag
+        self.config['is_config_file_updated_for_v8'] = True
+
+        # Save the updated config
+        self.save_config(self.config)
+        logging.info('Config migration for v8 complete')
+
+        # Only show restart message if we actually changed something
+        if config_changed:
+            # Show popup telling user to restart (use QMessageBox directly since signals aren't connected yet)
+            QMessageBox.information(
+                None,
+                'Writing Tools Updated',
+                'Writing Tools has just completed an internal update (your config.json has been updated).\n\n'
+                'Please restart Writing Tools.'
+            )
+            # Exit the app so user can restart
+            sys.exit(0)
 
     def load_options(self):
         """

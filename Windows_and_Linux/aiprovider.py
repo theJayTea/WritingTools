@@ -31,6 +31,7 @@ Response Flow:
 Note: Streaming has been fully removed throughout the code.
 """
 
+import base64
 import logging
 import webbrowser
 from abc import ABC, abstractmethod
@@ -44,6 +45,33 @@ from openai import OpenAI
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QVBoxLayout
 from ui.UIUtils import colorMode
+
+# Obfuscation prefix to identify encrypted API keys
+_OBFUSCATION_PREFIX = "enc:"
+_XOR_KEY = 0x5A  # Simple XOR key for obfuscation
+
+
+def obfuscate_api_key(key: str) -> str:
+    """
+    Obfuscate an API key using XOR + Base64 encoding.
+    Returns the obfuscated string with 'enc:' prefix.
+    """
+    if not key or key.startswith(_OBFUSCATION_PREFIX):
+        return key  # Already obfuscated or empty
+    xored = bytes([b ^ _XOR_KEY for b in key.encode('utf-8')])
+    return _OBFUSCATION_PREFIX + base64.b64encode(xored).decode('ascii')
+
+
+def deobfuscate_api_key(obfuscated: str) -> str:
+    """
+    Deobfuscate an API key that was obfuscated with obfuscate_api_key().
+    If the key doesn't have the 'enc:' prefix, returns it as-is (plaintext).
+    """
+    if not obfuscated or not obfuscated.startswith(_OBFUSCATION_PREFIX):
+        return obfuscated  # Not obfuscated, return as-is
+    encoded = obfuscated[len(_OBFUSCATION_PREFIX):]
+    xored = base64.b64decode(encoded)
+    return bytes([b ^ _XOR_KEY for b in xored]).decode('utf-8')
 
 
 class AIProviderSetting(ABC):
@@ -108,13 +136,25 @@ class TextSetting(AIProviderSetting):
 class DropdownSetting(AIProviderSetting):
     """
     A dropdown setting (e.g., for selecting a model).
+
+    Optionally supports a "Custom" option that reveals a text input for arbitrary values.
+    When allow_custom=True, users can select "Custom" from the dropdown and enter any value.
+    If the loaded config value doesn't match any preset option, "Custom" is auto-selected.
     """
+    # Sentinel value used internally to identify the "Custom" dropdown option
+    _CUSTOM_SENTINEL = "__custom__"
+
     def __init__(self, name: str, display_name: str = None, default_value: str = None,
-                 description: str = None, options: list = None):
+                 description: str = None, options: list = None, allow_custom: bool = False,
+                 custom_placeholder: str = "Enter custom value"):
         super().__init__(name, display_name, default_value, description)
         self.options = options if options else []
         self.internal_value = default_value
         self.dropdown = None
+        self.allow_custom = allow_custom
+        self.custom_placeholder = custom_placeholder
+        self.custom_input = None
+        self.custom_input_container = None
 
     def render_to_layout(self, layout: QVBoxLayout):
         row_layout = QtWidgets.QHBoxLayout()
@@ -129,18 +169,77 @@ class DropdownSetting(AIProviderSetting):
             color: {'#ffffff' if colorMode=='dark' else '#000000'};
             border: 1px solid {'#666' if colorMode=='dark' else '#ccc'};
         """)
+
+        # Add preset options
         for option, value in self.options:
             self.dropdown.addItem(option, value)
+
+        # Add "Custom" option if enabled
+        if self.allow_custom:
+            self.dropdown.addItem("🔧 Custom", self._CUSTOM_SENTINEL)
+
+        # Set initial selection based on internal_value
         index = self.dropdown.findData(self.internal_value)
         if index != -1:
+            # Value matches a preset option
             self.dropdown.setCurrentIndex(index)
+        elif self.allow_custom and self.internal_value:
+            # Value doesn't match any preset - it's a custom value, select "Custom"
+            custom_index = self.dropdown.findData(self._CUSTOM_SENTINEL)
+            if custom_index != -1:
+                self.dropdown.setCurrentIndex(custom_index)
+
         row_layout.addWidget(self.dropdown)
         layout.addLayout(row_layout)
+
+        # Create custom input row if allow_custom is enabled
+        if self.allow_custom:
+            self.custom_input_container = QtWidgets.QWidget()
+            custom_row_layout = QtWidgets.QHBoxLayout(self.custom_input_container)
+            custom_row_layout.setContentsMargins(0, 5, 0, 0)
+
+            self.custom_input = QtWidgets.QLineEdit()
+            self.custom_input.setPlaceholderText(self.custom_placeholder)
+            self.custom_input.setStyleSheet(f"""
+                font-size: 16px;
+                padding: 5px;
+                background-color: {'#444' if colorMode=='dark' else 'white'};
+                color: {'#ffffff' if colorMode=='dark' else '#000000'};
+                border: 1px solid {'#666' if colorMode=='dark' else '#ccc'};
+            """)
+
+            # If current value is custom (not in presets), populate the input
+            if self.dropdown.currentData() == self._CUSTOM_SENTINEL and self.internal_value:
+                self.custom_input.setText(self.internal_value)
+
+            custom_row_layout.addWidget(self.custom_input)
+            layout.addWidget(self.custom_input_container)
+
+            # Connect signal to show/hide custom input when dropdown changes
+            self.dropdown.currentIndexChanged.connect(self._on_dropdown_changed)
+            # Set initial visibility
+            self._update_custom_input_visibility()
+
+    def _on_dropdown_changed(self):
+        """Handle dropdown selection change to show/hide custom input."""
+        self._update_custom_input_visibility()
+
+    def _update_custom_input_visibility(self):
+        """Show or hide the custom input based on dropdown selection."""
+        if self.custom_input_container:
+            is_custom = self.dropdown.currentData() == self._CUSTOM_SENTINEL
+            self.custom_input_container.setVisible(is_custom)
+            # Focus the input when switching to Custom for better UX
+            if is_custom and self.custom_input:
+                self.custom_input.setFocus()
 
     def set_value(self, value):
         self.internal_value = value
 
     def get_value(self):
+        # If "Custom" is selected, return the text input value (stripped of whitespace)
+        if self.allow_custom and self.dropdown.currentData() == self._CUSTOM_SENTINEL:
+            return self.custom_input.text().strip()
         return self.dropdown.currentData()
 
 
@@ -234,14 +333,16 @@ class GeminiProvider(AIProvider):
             DropdownSetting(
                 name="model_name",
                 display_name="Model",
-                default_value="gemini-2.0-flash",
+                default_value="gemma-3-27b-it",
                 description="Select Gemini model to use",
                 options=[
-                    ("Gemini 2.0 Flash Lite (intelligent | very fast | 30 uses/min)", "gemini-2.0-flash-lite-preview-02-05"),
-                    ("Gemini 2.0 Flash (very intelligent | fast | 15 uses/min)", "gemini-2.0-flash"),
-                    ("Gemini 2.0 Flash Thinking (most intelligent | slow | 10 uses/min)", "gemini-2.0-flash-thinking-exp-01-21"),
-                    ("Gemini 2.0 Pro (most intelligent | slow | 2 uses/min)", "gemini-2.0-pro-exp-02-05"),
-                ]
+                    ("⭐ Gemma 3 27B (very intelligent | unlimited usage)", "gemma-3-27b-it"),
+                    ("Gemma 3 4B (intelligent | unlimited usage)", "gemma-3-4b-it"),
+                    ("Gemini Flash Latest (very intelligent | only 20 uses/day)", "gemini-flash-latest"),
+                    ("Gemini Flash Lite Latest (intelligent | only 20 uses/day)", "gemini-flash-lite-latest"),
+                ],
+                allow_custom=True,
+                custom_placeholder="e.g., gemini-3-pro-preview"
             )
         ]
         super().__init__(app, "Gemini (Recommended)", settings,
@@ -282,6 +383,30 @@ class GeminiProvider(AIProvider):
             self.close_requested = False
 
         return ""
+
+    def load_config(self, config: dict):
+        """
+        Load configuration, deobfuscating the API key if needed.
+        """
+        # Deobfuscate API key before loading
+        if 'api_key' in config:
+            config = config.copy()  # Don't modify the original
+            config['api_key'] = deobfuscate_api_key(config['api_key'])
+        super().load_config(config)
+
+    def save_config(self):
+        """
+        Save configuration, obfuscating the API key for storage.
+        """
+        config = {}
+        for setting in self.settings:
+            value = setting.get_value()
+            # Obfuscate API key before saving
+            if setting.name == 'api_key':
+                value = obfuscate_api_key(value)
+            config[setting.name] = value
+        self.app.config["providers"][self.provider_name] = config
+        self.app.save_config(self.app.config)
 
     def after_load(self):
         """
