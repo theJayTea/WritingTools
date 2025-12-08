@@ -6,7 +6,7 @@ struct ChatMessage: Identifiable, Equatable, Sendable {
     let role: String // "user" or "assistant"
     let content: String
     let timestamp: Date = Date()
-    
+
     static func == (lhs: ChatMessage, rhs: ChatMessage) -> Bool {
         lhs.id == rhs.id &&
         lhs.role == rhs.role &&
@@ -24,7 +24,7 @@ struct ResponseView: View {
     @State private var scrollProxy: ScrollViewProxy?
     @State private var latestMessageId: UUID?
     @State private var showSettings = false
-    
+
     init(content: String, selectedText: String, option: WritingOption? = nil) {
         self._viewModel = StateObject(wrappedValue: ResponseViewModel(
             content: content,
@@ -32,7 +32,7 @@ struct ResponseView: View {
             option: option
         ))
     }
-    
+
     var body: some View {
         VStack(spacing: 0) {
             // Enhanced toolbar with more controls
@@ -44,9 +44,9 @@ struct ResponseView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .animation(.easeInOut, value: viewModel.showCopyConfirmation)
-                
+
                 Spacer()
-                
+
                 HStack(spacing: 12) {
                     Button(action: { viewModel.fontSize -= 1 }) {
                         Label("Decrease text size", systemImage: "textformat.size.smaller")
@@ -55,7 +55,7 @@ struct ResponseView: View {
                     .buttonStyle(.borderless)
                     .disabled(viewModel.fontSize <= 10)
                     .keyboardShortcut("-", modifiers: .command)
-                    
+
                     Button(action: { viewModel.fontSize += 1 }) {
                         Label("Increase text size", systemImage: "textformat.size.larger")
                             .labelStyle(.iconOnly)
@@ -63,7 +63,7 @@ struct ResponseView: View {
                     .buttonStyle(.borderless)
                     .disabled(viewModel.fontSize >= 20)
                     .keyboardShortcut("+", modifiers: .command)
-                    
+
                     Button(action: {
                         viewModel.fontSize = 14
                     }) {
@@ -76,7 +76,7 @@ struct ResponseView: View {
             }
             .padding()
             .background(Color.clear)
-            
+
             // Chat messages area
             ScrollViewReader { proxy in
                 ScrollView {
@@ -97,11 +97,11 @@ struct ResponseView: View {
                     }
                 }
             }
-            
+
             // Input area
             VStack(spacing: 8) {
                 Divider()
-                
+
                 HStack(spacing: 8) {
                     TextField("Ask a follow-up question...", text: $inputText)
                         .textFieldStyle(.plain)
@@ -118,7 +118,7 @@ struct ResponseView: View {
         }
         .windowBackground(useGradient: settings.useGradientTheme)
     }
-    
+
     private func sendMessage() {
         guard !inputText.isEmpty else { return }
         let question = inputText
@@ -135,7 +135,7 @@ struct ChatMessageView: View {
     let fontSize: CGFloat
     @State private var isHovering: Bool = false
     @State private var showCopiedFeedback: Bool = false
-    
+
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             if message.role == "assistant" {
@@ -152,7 +152,7 @@ struct ChatMessageView: View {
             isHovering = hovering
         }
     }
-    
+
     @ViewBuilder
     private func bubbleView(role: String) -> some View {
         VStack(alignment: role == "assistant" ? .leading : .trailing, spacing: 2) {
@@ -161,7 +161,7 @@ struct ChatMessageView: View {
                     FontSize(fontSize)
                 }
                 .markdownTextStyle(\.code){
-                    
+
                 }
                 .textSelection(.enabled)
                 .chatBubbleStyle(isFromUser: message.role == "user")
@@ -175,13 +175,13 @@ struct ChatMessageView: View {
                         copyEntireMessage()
                     }
                 }
-            
+
             // Timestamp and copy button
             HStack(spacing: 8) {
                 Text(message.timestamp.formatted(.dateTime.hour().minute()))
                     .font(.caption2)
                     .foregroundColor(.secondary)
-                
+
                 Button(action: copyEntireMessage) {
                     if showCopiedFeedback {
                         Text("Copied")
@@ -200,11 +200,11 @@ struct ChatMessageView: View {
         }
         .frame(maxWidth: 500, alignment: role == "assistant" ? .leading : .trailing)
     }
-    
+
     private func copyEntireMessage() {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(message.content, forType: .string)
-        
+
         showCopiedFeedback = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             showCopiedFeedback = false
@@ -227,55 +227,68 @@ extension View {
 // Update ResponseViewModel to handle chat messages
 @MainActor
 final class ResponseViewModel: ObservableObject, Sendable {
-    
+
+    // UserDefaults key for persistent font size storage
+    private static let fontSizeKey = "ResponseView.fontSize"
+    private static let defaultFontSize: CGFloat = 14
+
     @Published var messages: [ChatMessage] = []
-    @Published var fontSize: CGFloat = 14
+    @Published var fontSize: CGFloat = 14 {
+        didSet {
+            // Save font size to UserDefaults whenever it changes
+            UserDefaults.standard.set(fontSize, forKey: Self.fontSizeKey)
+        }
+    }
     @Published var showCopyConfirmation: Bool = false
     let initialContent: String
-    
+
     let selectedText: String
     let option: WritingOption?
-    
+
     init(content: String, selectedText: String, option: WritingOption? = nil) {
         self.initialContent = content
         self.selectedText = selectedText
         self.option = option
-        
+
+        // Load saved font size from UserDefaults, or use default
+        let savedFontSize = UserDefaults.standard.object(forKey: Self.fontSizeKey) as? CGFloat
+        self.fontSize = savedFontSize ?? Self.defaultFontSize
+
         // Initialize with the first message
         self.messages.append(ChatMessage(
             role: "assistant",
             content: content
         ))
     }
-    
+
     func processFollowUpQuestion(_ question: String, completion: @escaping () -> Void) {
         // Add user message (already on MainActor)
         self.messages.append(ChatMessage(
             role: "user",
             content: question
         ))
-        
+
         Task {
             do {
                 // Build conversation history
                 let conversationHistory = messages.map { message in
                     return "\(message.role == "user" ? "User" : "Assistant"): \(message.content)"
                 }.joined(separator: "\n\n")
-                
+
                 // Create prompt with context
                 let contextualPrompt = """
                 Previous conversation:
                 \(conversationHistory)
-                
+
                 User's new question: \(question)
-                
+
                 Respond to the user's question while maintaining context from the previous conversation.
                 """
-                
+
                 let result = try await AppState.shared.activeProvider.processText(
                     systemPrompt: """
                     You are a writing and coding assistant. Your sole task is to respond to the user's instruction thoughtfully and comprehensively.
-                    If the instruction is a question, provide a detailed answer. But always return the best and most accurate answer and not different options. 
+                    If the instruction is a question, provide a detailed answer. But always return the best and most accurate answer and not different options.
                     If it's a request for help, provide clear guidance and examples where appropriate. Make sure to use the language used or specified by the user instruction.
                     Use Markdown formatting to make your response more readable.
                     DO NOT ANSWER OR RESPOND TO THE USER'S TEXT CONTENT.
@@ -284,7 +297,7 @@ final class ResponseViewModel: ObservableObject, Sendable {
                     images: AppState.shared.selectedImages,
                     streaming: true
                 )
-                
+
                 await MainActor.run {
                     self.messages.append(ChatMessage(
                         role: "assistant",
@@ -298,24 +311,23 @@ final class ResponseViewModel: ObservableObject, Sendable {
             }
         }
     }
-    
+
     func clearConversation() {
         messages.removeAll()
     }
-    
+
     func copyContent() {
         // Concatenate all messages in the conversation
         let conversationText = messages.map { message in
             return "\(message.role.capitalized): \(message.content)" // Format each message with role
         }.joined(separator: "\n\n") // Join messages with double newlines for readability
-        
+
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(conversationText, forType: .string)
-        
+
         showCopyConfirmation = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             self.showCopyConfirmation = false
         }
     }
 }
-
