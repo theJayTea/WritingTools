@@ -1,7 +1,7 @@
 import SwiftUI
 import MarkdownView
 
-// MARK: - String Extension for LaTeX Normalization
+// MARK: - String Extension for Markdown Processing
 
 extension String {
     /// Normalizes LaTeX delimiters to markdown-friendly versions
@@ -18,6 +18,34 @@ extension String {
         result = result.replacingOccurrences(of: #"\\\)"#, with: "$", options: .regularExpression)
         
         return result
+    }
+    
+    /// Strips outer code block wrapper if the entire response is wrapped in one.
+    /// Some AI models wrap their entire response in ```markdown or ``` fences.
+    fileprivate func strippingOuterCodeBlock() -> String {
+        let trimmed = self.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Pattern to match content wrapped in a single outer code block
+        // Matches: ```<optional language>\n<content>\n```
+        // The (?s) flag makes . match newlines
+        let pattern = #"^```(?:\w+)?\s*\n([\s\S]*?)\n```$"#
+        
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: []),
+              let match = regex.firstMatch(in: trimmed, options: [], range: NSRange(trimmed.startIndex..., in: trimmed)),
+              let contentRange = Range(match.range(at: 1), in: trimmed) else {
+            return self
+        }
+        
+        // Only strip if this is truly a single outer wrapper (no other content outside)
+        let content = String(trimmed[contentRange])
+        return content
+    }
+    
+    /// Applies all markdown normalizations for AI responses
+    fileprivate func normalizedForMarkdown() -> String {
+        return self
+            .strippingOuterCodeBlock()
+            .normalizedLatex()
     }
 }
 
@@ -301,8 +329,8 @@ class ResponseViewModel: ObservableObject {
     private var conversationHistory: [(role: String, content: String)] = []
     
     init(content: String, selectedText: String, option: WritingOption?, provider: any AIProvider) {
-        // 🔧 Normalize LaTeX delimiters on initialization
-        self.content = content.normalizedLatex()
+        // 🔧 Normalize markdown content (strip outer code blocks + normalize LaTeX)
+        self.content = content.normalizedForMarkdown()
         self.selectedText = selectedText
         self.option = option
         self.provider = provider
@@ -345,8 +373,8 @@ class ResponseViewModel: ObservableObject {
                 streaming: false
             )
             
-            // 🔧 Normalize LaTeX delimiters before displaying
-            let normalizedResponse = rawResponse.normalizedLatex()
+            // 🔧 Normalize markdown content (strip outer code blocks + normalize LaTeX)
+            let normalizedResponse = rawResponse.normalizedForMarkdown()
             
             // Add to UI
             messages.append(ChatMessage(role: "assistant", content: normalizedResponse))
@@ -427,13 +455,27 @@ struct RichMarkdownView: View {
 
     var body: some View {
         MarkdownView(text)
-            .markdownMathRenderingEnabled() // Opt-in to LaTeX/MathJax rendering per MarkdownView docs
-            .font(.system(size: fontSize))
-            .font(.system(size: fontSize * 1.2, weight: .bold), for: .h1)
-            .font(.system(size: fontSize * 1.15, weight: .semibold), for: .h2)
-            .font(.system(size: fontSize * 1.1, weight: .semibold), for: .h3)
+            .markdownMathRenderingEnabled()
+            // Body text (paragraphs, list items, etc.)
+            .font(.system(size: fontSize), for: .body)
+            // Headings - scaled relative to base font size
+            .font(.system(size: fontSize * 1.4, weight: .bold), for: .h1)
+            .font(.system(size: fontSize * 1.25, weight: .bold), for: .h2)
+            .font(.system(size: fontSize * 1.15, weight: .semibold), for: .h3)
+            .font(.system(size: fontSize * 1.1, weight: .semibold), for: .h4)
+            .font(.system(size: fontSize * 1.05, weight: .medium), for: .h5)
+            .font(.system(size: fontSize, weight: .medium), for: .h6)
+            // Code blocks
+            .font(.system(size: fontSize, design: .monospaced), for: .codeBlock)
+            // Block quotes
+            .font(.system(size: fontSize), for: .blockQuote)
+            // Tables
+            .font(.system(size: fontSize, weight: .semibold), for: .tableHeader)
+            .font(.system(size: fontSize), for: .tableBody)
+            // Math
             .font(.system(size: fontSize), for: .inlineMath)
             .font(.system(size: fontSize + 2), for: .displayMath)
+            // Tint for inline code
             .tint(.primary, for: .inlineCodeBlock)
     }
 }
