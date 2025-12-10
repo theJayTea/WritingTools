@@ -2420,7 +2420,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fallo"
+            "value" : "Error"
           }
         },
         "fr" : {
