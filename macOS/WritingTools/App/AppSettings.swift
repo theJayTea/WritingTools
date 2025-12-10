@@ -154,8 +154,8 @@ class AppSettings: ObservableObject {
         
         // Load API Keys from Keychain (post-migration)
         self.geminiApiKey = (try? keychain.retrieve(forKey: "gemini_api_key")) ?? ""
-        let geminiModelStr = defaults.string(forKey: "gemini_model") ?? GeminiModel.twofiveflash.rawValue
-        self.geminiModel = GeminiModel(rawValue: geminiModelStr) ?? .twofiveflash
+        let geminiModelStr = defaults.string(forKey: "gemini_model") ?? GeminiModel.gemmabig.rawValue
+        self.geminiModel = GeminiModel(rawValue: geminiModelStr) ?? .gemmabig
         
         self.geminiCustomModel = defaults.string(forKey: "gemini_custom_model") ?? ""
         
