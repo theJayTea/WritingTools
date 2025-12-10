@@ -277,8 +277,18 @@ struct ChatMessageView: View {
 
 @MainActor
 class ResponseViewModel: ObservableObject {
+    
+    // UserDefaults key for persistent font size storage
+    private static let fontSizeKey = "ResponseView.fontSize"
+    private static let defaultFontSize: CGFloat = 14
+    
     @Published var messages: [ChatMessage] = []
-    @Published var fontSize: CGFloat = 14
+    @Published var fontSize: CGFloat = 14 {
+            didSet {
+                // Save font size to UserDefaults whenever it changes
+                UserDefaults.standard.set(fontSize, forKey: Self.fontSizeKey)
+            }
+    }
     @Published var showCopyConfirmation = false
     @Published var isProcessing = false
     
@@ -296,6 +306,10 @@ class ResponseViewModel: ObservableObject {
         self.selectedText = selectedText
         self.option = option
         self.provider = provider
+        
+        // Load saved font size from UserDefaults, or use default
+        let savedFontSize = UserDefaults.standard.object(forKey: Self.fontSizeKey) as? CGFloat
+        self.fontSize = savedFontSize ?? Self.defaultFontSize
         
         // Add initial assistant message
         messages.append(ChatMessage(role: "assistant", content: self.content))
