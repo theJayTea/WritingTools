@@ -264,7 +264,7 @@ Over so many emails, @Aryamirsepasi has been someone I truly look up to, and it'
 
 **1. [Joaov41](https://github.com/Joaov41):**
 
-Developed the amazing picture processing functionalit in Gemini for WritingTools, allowing the app to now work with images in addition to text!
+Developed the amazing picture processing functionality in Gemini for WritingTools, allowing the app to now work with images in addition to text!
 
 **2. [drankush](https://github.com/drankush):**
 
