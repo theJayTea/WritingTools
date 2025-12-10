@@ -264,7 +264,15 @@ Over so many emails, @Aryamirsepasi has been someone I truly look up to, and it'
 
 **1. [Joaov41](https://github.com/Joaov41):**
 
-Developed the amazing picture processing functionality for WritingTools, allowing the app to now work with images in addition to text!
+Developed the amazing picture processing functionalit in Gemini for WritingTools, allowing the app to now work with images in addition to text!
+
+**2. [drankush](https://github.com/drankush):**
+
+Fixed an issue that caused the app to fail in completing requests when the OpenAI provider was configured with a custom Base URL (e.g., for Groq or other compatible services).
+
+**3. [gdmka](https://github.com/gdmka):**
+
+Added the change that makes the ResponseView remember the user’s preferred text size across app launches.
 
 ## 🤝 Contributing
 
