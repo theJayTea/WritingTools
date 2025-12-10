@@ -38,8 +38,17 @@ struct CommandButton: View {
                 }
                 .frame(maxWidth: 140)
                 .padding()
-                .background(Color(.controlBackgroundColor))
-                .cornerRadius(8)
+                .background {
+                    if #available(macOS 26, *) {
+                        // Use Liquid Glass effect on macOS 26+
+                        Color.clear
+                            .glassEffect(.regular, in: .rect(cornerRadius: 8))
+                    } else {
+                        // Fallback for older macOS versions
+                        Color(.controlBackgroundColor)
+                            .cornerRadius(8)
+                    }
+                }
             }
             .buttonStyle(LoadingButtonStyle(isLoading: isLoading))
             .disabled(isLoading || isEditing)

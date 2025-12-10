@@ -27,6 +27,9 @@ class LocalModelProvider: ObservableObject, AIProvider {
     @Published var stat = ""
     @Published var lastError: String?
     @Published var retryCount: Int = 0
+
+    // Keep already loaded models alive so we don't pay the load cost after a model switch.
+    private let modelCache = NSCache<NSString, ModelContainer>()
     
     var running = false
     private var isCancelled = false
@@ -88,6 +91,10 @@ class LocalModelProvider: ObservableObject, AIProvider {
         return s
     }
 
+    private func cacheKey(for config: ModelConfiguration) -> NSString {
+        NSString(string: cleanID(from: config))
+    }
+
     private func expectedRepoFolder(for config: ModelConfiguration) -> URL {
         let id = cleanID(from: config)                 // e.g. "mlx-community/gemma-3-4b-it-qat-4bit"
         let parts = id.split(separator: "/")
@@ -105,7 +112,12 @@ class LocalModelProvider: ObservableObject, AIProvider {
     }
 
     
-    let generateParameters = GenerateParameters(temperature: 0.6)
+    private var generationParameters: GenerateParameters {
+        GenerateParameters(
+            maxTokens: maxTokens,
+            temperature: 0.6
+        )
+    }
     let maxTokens = 10000
     let displayEveryNTokens = 4
     
@@ -141,6 +153,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
      }
     
     init() {
+        modelCache.countLimit = 2
         if isPlatformSupported {
             MLX.GPU.set(cacheLimit: 20 * 1024 * 1024)
             
@@ -369,6 +382,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
         guard let modelDir = modelDirectory, let modelType = selectedModelType else {
             throw NSError(domain: "LocalLLM", code: -1, userInfo: [NSLocalizedDescriptionKey: "No model selected to delete."])
         }
+        let cacheKey = cacheKey(for: modelType.configuration)
         guard !isDownloading && !running && loadState != .loading else { // Also check loading state
             throw NSError(domain: "LocalLLM", code: -1, userInfo: [NSLocalizedDescriptionKey: "Cannot delete while model is busy (downloading, running, or loading)"])
         }
@@ -393,6 +407,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
             
             // Reset state *after* successful deletion or if not found
             resetModelState() // Reset everything
+            modelCache.removeObject(forKey: cacheKey)
             checkModelStatus() // Re-check, should now be .needsDownload
             modelInfo = "\(modelType.displayName) deleted." // Update info *after* check
             
@@ -412,11 +427,19 @@ class LocalModelProvider: ObservableObject, AIProvider {
         guard let config = selectedModelConfiguration, let modelType = selectedModelType else {
             throw NSError(domain: "LocalLLM", code: -1, userInfo: [NSLocalizedDescriptionKey: "No model selected to load."])
         }
+        let cacheKey = cacheKey(for: config)
         
         print("load: Function called. Current state: \(loadState)")
-        
+
+        if let cached = modelCache.object(forKey: cacheKey) {
+            loadState = .loaded(cached)
+            modelInfo = "\(modelType.displayName) is ready (cached)."
+            return cached
+        }
+
         if case .loaded(let container) = loadState {
             print("load: Model already loaded.")
+            modelCache.setObject(container, forKey: cacheKey)
             return container
         }
         if case .loading = loadState {
@@ -467,6 +490,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
                 downloadTask = nil // Clear task reference
                 let numParams = await modelContainer.perform { context in context.model.numParameters() }
                 modelInfo = "\(modelType.displayName) loaded. Weights: \(numParams / (1024 * 1024))M"
+                modelCache.setObject(modelContainer, forKey: cacheKey)
                 loadState = .loaded(modelContainer)
                 print("load: State set to .loaded")
                 return modelContainer
@@ -525,6 +549,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
                 print("load: loadContainer completed successfully (from disk).")
                 let numParams = await modelContainer.perform { context in context.model.numParameters() }
                 modelInfo = "\(modelType.displayName) loaded. Weights: \(numParams / (1024 * 1024))M"
+                modelCache.setObject(modelContainer, forKey: cacheKey)
                 loadState = .loaded(modelContainer)
                 print("load: State set to .loaded")
                 return modelContainer
@@ -586,7 +611,8 @@ class LocalModelProvider: ObservableObject, AIProvider {
                     modelContainer: modelContainer,
                     systemPrompt: systemPrompt,
                     userPrompt: userPrompt,
-                    images: images
+                    images: images,
+                    streaming: streaming
                 )
             } else {
                 // Regular LLM or VLM without images
@@ -604,7 +630,8 @@ class LocalModelProvider: ObservableObject, AIProvider {
                 return try await processWithLLM(
                     modelContainer: modelContainer,
                     systemPrompt: systemPrompt,
-                    userPrompt: combinedPrompt
+                    userPrompt: combinedPrompt,
+                    streaming: streaming
                 )
             }
         } catch {
@@ -618,48 +645,114 @@ class LocalModelProvider: ObservableObject, AIProvider {
         }
     }
     
+    private struct GenerationResult {
+        let text: String
+        let info: GenerateCompletionInfo?
+        let timeToFirstToken: TimeInterval?
+        let trailingFlush: String
+    }
+
+    private func generateResponse(
+        userInput: UserInput,
+        modelContainer: ModelContainer,
+        streaming: Bool
+    ) async throws -> String {
+        let parameters = generationParameters
+        let flushEvery = displayEveryNTokens
+        let start = Date()
+
+        let result = try await modelContainer.perform { context in
+            var output = ""
+            var completion: GenerateCompletionInfo?
+            var timeToFirstToken: TimeInterval?
+            var pendingFlush = ""
+            var tokensSinceFlush = 0
+
+            let input = try await context.processor.prepare(input: userInput)
+            let stream = try MLXLMCommon.generate(
+                input: input,
+                parameters: parameters,
+                context: context
+            )
+
+            for try await item in stream {
+                switch item {
+                case .chunk(let string):
+                    output += string
+                    if timeToFirstToken == nil {
+                        timeToFirstToken = Date().timeIntervalSince(start)
+                    }
+
+                    if streaming {
+                        pendingFlush += string
+                        tokensSinceFlush += 1
+
+                        let shouldFlush = tokensSinceFlush == 1 || tokensSinceFlush >= flushEvery
+                        if shouldFlush {
+                            let flush = pendingFlush
+                            pendingFlush.removeAll()
+                            tokensSinceFlush = 0
+                            await MainActor.run { [weak self] in
+                                self?.output += flush
+                            }
+                        }
+                    }
+                case .info(let info):
+                    completion = info
+                case .toolCall:
+                    break
+                }
+            }
+
+            return GenerationResult(
+                text: output,
+                info: completion,
+                timeToFirstToken: timeToFirstToken,
+                trailingFlush: pendingFlush
+            )
+        }
+
+        if streaming {
+            if !result.trailingFlush.isEmpty {
+                await MainActor.run { [weak self] in
+                    self?.output += result.trailingFlush
+                }
+            }
+        } else {
+            await MainActor.run { [weak self] in
+                self?.output = result.text
+            }
+        }
+
+        let ttft = result.timeToFirstToken ?? 0
+        let tps = result.info?.tokensPerSecond ?? 0
+        await MainActor.run { [weak self] in
+            self?.stat = "TTFT: \(String(format: "%.2f", ttft))s | TPS: \(String(format: "%.2f", tps))"
+        }
+
+        return result.text
+    }
+    
     // New method to process with LLM
     private func processWithLLM(
         modelContainer: ModelContainer,
         systemPrompt: String?,
-        userPrompt: String
+        userPrompt: String,
+        streaming: Bool
     ) async throws -> String {
         MLXRandom.seed(UInt64(Date.timeIntervalSinceReferenceDate * 1000))
-        
-        let result = try await modelContainer.perform { [weak self] context in
-            guard let self = self else {
-                throw NSError(domain: "LocalModelProvider", code: -2, userInfo: [NSLocalizedDescriptionKey: "Provider deallocated"])
-            }
-            
-            // Create final prompt with system prompt if available
-            let finalPrompt = systemPrompt.map { "\($0)\n\nUser:\n\(userPrompt)" } ?? "User:\n\(userPrompt)"
-            
-            // Prepare input for the model
-            let userInput = await UserInput(
-                prompt: finalPrompt,
-                additionalContext: ["enable_thinking": self.enableThinking]
-            )
-            let input = try await context.processor.prepare(input: userInput)
-            
-            // Generate text
-            return try MLXLMCommon.generate(
-                input: input,
-                parameters: self.generateParameters,
-                context: context
-            ) { [weak self] tokens in
-                guard let self = self else { return .stop }
-                if tokens.count >= self.maxTokens { return .stop }
-                else { return .more }
-            }
-        }
-        
-        // Update published properties
-        await MainActor.run { [weak self] in
-            self?.output = result.output
-            self?.stat = "Tokens/second: \(String(format: "%.3f", result.tokensPerSecond))"
-        }
-        
-        return result.output
+
+        let finalPrompt = systemPrompt.map { "\($0)\n\nUser:\n\(userPrompt)" } ?? "User:\n\(userPrompt)"
+        let userInput = await UserInput(
+            prompt: finalPrompt,
+            additionalContext: ["enable_thinking": self.enableThinking]
+        )
+
+        return try await generateResponse(
+            userInput: userInput,
+            modelContainer: modelContainer,
+            streaming: streaming
+        )
     }
     
     // New method to process with VLM
@@ -667,7 +760,8 @@ class LocalModelProvider: ObservableObject, AIProvider {
         modelContainer: ModelContainer,
         systemPrompt: String?,
         userPrompt: String,
-        images: [Data]
+        images: [Data],
+        streaming: Bool
     ) async throws -> String {
         MLXRandom.seed(UInt64(Date.timeIntervalSinceReferenceDate * 1000))
         
@@ -710,60 +804,39 @@ class LocalModelProvider: ObservableObject, AIProvider {
                 try? FileManager.default.removeItem(at: url)
             }
         }
-        
         // Increase GPU memory limit for VLM models
         MLX.GPU.set(cacheLimit: 4 * 1024 * 1024 * 1024) // 4GB cache limit
         
         do {
-            let result = try await modelContainer.perform { [weak self] context in
-                guard let self = self else {
-                    throw NSError(domain: "LocalModelProvider", code: -2, userInfo: [NSLocalizedDescriptionKey: "Provider deallocated"])
-                }
-                
-                // Create a chat-style input with images
-                var messages: [Chat.Message] = []
-                
-                // Add system message if provided
-                if let systemPrompt = systemPrompt, !systemPrompt.isEmpty {
-                    messages.append(Chat.Message(role: .system, content: systemPrompt))
-                }
-                
-                // Convert image URLs to the format expected by MLX
-                let imageAttachments: [UserInput.Image] = imageURLs.map { .url($0) }
-                
-                // Add user message with text and images
-                messages.append(Chat.Message(
-                    role: .user,
-                    content: userPrompt,
-                    images: imageAttachments
-                ))
-                
-                // Create chat input
-                let userInput = await UserInput(
-                    chat: messages,
-                    additionalContext: ["enable_thinking": self.enableThinking]
-                )
-                let input = try await context.processor.prepare(input: userInput)
-                
-                // Generate text
-                return try MLXLMCommon.generate(
-                    input: input,
-                    parameters: self.generateParameters,
-                    context: context
-                ) { [weak self] tokens in
-                    guard let self = self else { return .stop }
-                    if tokens.count >= self.maxTokens { return .stop }
-                    else { return .more }
-                }
+            // Create a chat-style input with images
+            var messages: [Chat.Message] = []
+            
+            // Add system message if provided
+            if let systemPrompt = systemPrompt, !systemPrompt.isEmpty {
+                messages.append(Chat.Message(role: .system, content: systemPrompt))
             }
             
-            // Update published properties
-            await MainActor.run { [weak self] in
-                self?.output = result.output
-                self?.stat = "Tokens/second: \(String(format: "%.3f", result.tokensPerSecond))"
-            }
+            // Convert image URLs to the format expected by MLX
+            let imageAttachments: [UserInput.Image] = imageURLs.map { .url($0) }
             
-            return result.output
+            // Add user message with text and images
+            messages.append(Chat.Message(
+                role: .user,
+                content: userPrompt,
+                images: imageAttachments
+            ))
+            
+            // Create chat input
+            let userInput = await UserInput(
+                chat: messages,
+                additionalContext: ["enable_thinking": self.enableThinking]
+            )
+
+            return try await generateResponse(
+                userInput: userInput,
+                modelContainer: modelContainer,
+                streaming: streaming
+            )
         } catch {
             // Reset GPU cache on error
             MLX.GPU.set(cacheLimit: 20 * 1024 * 1024)

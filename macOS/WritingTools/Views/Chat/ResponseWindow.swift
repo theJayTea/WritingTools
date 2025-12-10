@@ -7,13 +7,15 @@ class ResponseWindow: NSWindow {
     title: String,
     content: String,
     selectedText: String,
-    option: WritingOption? = nil
+    option: WritingOption? = nil,
+    provider: any AIProvider
   ) {
     let controller = NSHostingController(
       rootView: ResponseView(
         content: content,
         selectedText: selectedText,
-        option: option
+        option: option,
+        provider: provider
       )
     )
     self.hostingController = controller

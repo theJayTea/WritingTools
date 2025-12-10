@@ -210,7 +210,8 @@ struct PopupView: View {
             title: command.name,
             content: result,
             selectedText: userText,
-            option: .proofread
+            option: .proofread,
+            provider: appState.activeProvider
           )
 
           WindowManager.shared.addResponseWindow(window)
@@ -289,7 +290,8 @@ struct PopupView: View {
               content: result,
               selectedText: appState.selectedText.isEmpty
                 ? instruction : appState.selectedText,
-              option: .proofread
+              option: .proofread,
+              provider: appState.activeProvider
             )
 
             WindowManager.shared.addResponseWindow(window)

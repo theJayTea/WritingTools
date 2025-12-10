@@ -2409,6 +2409,28 @@
         }
       }
     },
+    "Error" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehler"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur"
+          }
+        }
+      }
+    },
     "Error: %@" : {
       "localizations" : {
         "de" : {
@@ -5503,6 +5525,28 @@
         }
       }
     },
+    "Thinking..." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Denken..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pensando..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réflexion..."
+          }
+        }
+      }
+    },
     "This is a built-in command. Your changes will be saved but you can reset to the original configuration later if needed." : {
       "localizations" : {
         "de" : {
@@ -5725,24 +5769,24 @@
         }
       }
     },
-    "Version: 5.3 (Based on Windows Port version 7.1)" : {
+    "Version: 5.5 (Based on Windows Port version 8.0)" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Version: 5.3 (Basierend auf Windows Port Version 7.1)"
+            "value" : "Version: 5.5 (Basierend auf Windows Port Version 8.0)"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Versión: 5.3 (Basada en la versión 7.1 de Windows Port)"
+            "value" : "Versión: 5.5 (Basado en la versión 8.0 del puerto de Windows)"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Version : 5.3 (Basée sur la version 7.1 du port Windows)"
+            "value" : "Version : 5.5 (Basée sur Windows Port version 8.0)"
           }
         }
       }

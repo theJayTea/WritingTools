@@ -151,14 +151,14 @@ You can build the macOS app either by opening the project or the package:
 
 ## Credits
 
-- **macOS Port**: **Arya Mirsepasi** — native Swift, SwiftUI + AppKit polish.  
-- **Image/Picture Processing**: **Joaov41**.  
+- **macOS Port**: **Arya Mirsepasi** 
+- **Gemini Image/Picture Processing**: **Joaov41**. 
+- **OpenAI Compatible API Fix**: **drankush**
+- **Text size fix**: **gdmka**
 - **Keyboard Shortcuts**: Thanks to **sindresorhus/KeyboardShortcuts**.  
 - **MLX Swift** (local LLMs on Apple Silicon): https://github.com/ml-explore/mlx-swift-examples
 
-Original macOS README noted the minimum macOS version and Accessibility permissions. :contentReference[oaicite:3]{index=3}
 
----
 
 ## License
 

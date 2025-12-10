@@ -9,31 +9,30 @@ class OCRManager {
     
     // Extracts text from a single image Data object.
     func extractText(from imageData: Data) async -> String {
-        guard let nsImage = NSImage(data: imageData),
-              let cgImage = nsImage.cgImage(forProposedRect: nil, context: nil, hints: nil)
-        else { return "" }
-        
-        let request = VNRecognizeTextRequest()
-        request.recognitionLevel = .accurate
-        request.usesLanguageCorrection = true
-        
-        return await withCheckedContinuation { continuation in
+        await Task.detached(priority: .userInitiated) {
+            guard let nsImage = NSImage(data: imageData),
+                  let cgImage = nsImage.cgImage(forProposedRect: nil, context: nil, hints: nil)
+            else { return "" }
+            
+            let request = VNRecognizeTextRequest()
+            request.recognitionLevel = .accurate
+            request.usesLanguageCorrection = true
+            
+            // Perform the synchronous Vision work on this detached task
             let requestHandler = VNImageRequestHandler(cgImage: cgImage, options: [:])
             do {
                 try requestHandler.perform([request])
                 guard let observations = request.results else {
-                    continuation.resume(returning: "")
-                    return
+                    return ""
                 }
                 let texts = observations.compactMap { observation in
                     observation.topCandidates(1).first?.string
                 }
-                let fullText = texts.joined(separator: "\n")
-                continuation.resume(returning: fullText)
+                return texts.joined(separator: "\n")
             } catch {
-                continuation.resume(returning: "")
+                return ""
             }
-        }
+        }.value
     }
     
     

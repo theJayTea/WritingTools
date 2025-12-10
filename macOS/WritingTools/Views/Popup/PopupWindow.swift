@@ -74,7 +74,7 @@ class PopupWindow: NSWindow {
 
     let hostingView = FirstResponderHostingView(rootView: popupView)
     hostingView.wantsLayer = true
-    hostingView.layer?.cornerRadius = 12
+    hostingView.layer?.cornerRadius = 20
     hostingView.layer?.maskedCorners = [
       .layerMinXMinYCorner,
       .layerMaxXMinYCorner,
@@ -97,7 +97,11 @@ class PopupWindow: NSWindow {
   }
 
   @objc private func updateWindowSize() {
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+    // Use a shorter delay only when needed for layout stabilization
+    // For edit mode changes, we want immediate response
+    let delay = self.viewModel.isEditMode ? 0.05 : 0.1
+    
+    DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
       guard let self = self else { return }
 
       let baseHeight: CGFloat = 100
@@ -118,7 +122,7 @@ class PopupWindow: NSWindow {
       if hasContent {
         contentHeight += (buttonHeight * CGFloat(numRows)) + spacing
         if isEditMode {
-          contentHeight += editButtonHeight + 10
+          contentHeight += editButtonHeight
         }
       }
 
