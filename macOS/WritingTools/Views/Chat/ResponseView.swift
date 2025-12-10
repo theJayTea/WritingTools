@@ -304,7 +304,7 @@ struct ChatMessageView: View {
 // MARK: - View Model
 
 @MainActor
-class ResponseViewModel: ObservableObject {
+final class ResponseViewModel: ObservableObject {
     
     // UserDefaults key for persistent font size storage
     private static let fontSizeKey = "ResponseView.fontSize"
