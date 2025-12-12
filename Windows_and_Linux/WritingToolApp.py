@@ -609,21 +609,14 @@ class WritingToolApp(QtWidgets.QApplication):
                         )
                 else:
                     # For other options, use the original clipboard-based replacement
-                    clipboard_backup = pyperclip.paste()
                     cleaned_text = self.output_queue.rstrip("\n")
-                    pyperclip.copy(cleaned_text)
 
-                    kbrd = pykeyboard.Controller()
-
-                    def press_ctrl_v():
-                        kbrd.press(pykeyboard.Key.ctrl.value)
-                        kbrd.press("v")
-                        kbrd.release("v")
-                        kbrd.release(pykeyboard.Key.ctrl.value)
-
-                    press_ctrl_v()
-                    time.sleep(0.2)
-                    pyperclip.copy(clipboard_backup)
+                    if SESSION_TYPE == "wayland":
+                        # Wayland-specific handling with robust fallback
+                        self._handle_wayland_paste(cleaned_text)
+                    else:
+                        # Use X11 method
+                        self._handle_x11_paste(cleaned_text)
 
                 if not hasattr(self, "current_response_window"):
                     self.output_queue = ""
@@ -632,6 +625,1094 @@ class WritingToolApp(QtWidgets.QApplication):
                 logging.error(f"Error processing output: {e}")
         else:
             logging.debug("No new text to process")
+
+    def _handle_wayland_paste(self, text: str):
+        """
+        Handle paste operation on Wayland with robust error handling.
+        Focuses on setting clipboard and attempting automatic paste.
+        Uses comprehensive approach with window management and input simulation.
+        """
+        import threading
+        import time
+        import subprocess
+        import os
+
+        logging.debug("Handling Wayland paste operation")
+
+        # Backup current clipboard (with timeout protection)
+        clipboard_backup = ""
+        try:
+
+            def get_clipboard():
+                nonlocal clipboard_backup
+                try:
+                    clipboard_backup = pyperclip.paste()
+                except Exception:
+                    pass
+
+            # Try to get clipboard with timeout
+            thread = threading.Thread(target=get_clipboard)
+            thread.daemon = True
+            thread.start()
+            thread.join(timeout=2)
+
+        except Exception as e:
+            logging.debug(f"Clipboard backup failed: {e}")
+
+        # Set the new text to clipboard using most reliable method
+        clipboard_success = False
+        try:
+            # Method 1: Try wl-copy first (Wayland native)
+            try:
+                result = subprocess.run(
+                    ["wl-copy"], input=text, text=True, capture_output=True, timeout=3
+                )
+                if result.returncode == 0:
+                    clipboard_success = True
+                    logging.debug("Clipboard set using wl-copy")
+            except (subprocess.TimeoutExpired, FileNotFoundError):
+                pass
+
+            # Method 2: Fallback to pyperclip
+            if not clipboard_success:
+                pyperclip.copy(text)
+                clipboard_success = True
+                logging.debug("Clipboard set using pyperclip")
+
+        except Exception as e:
+            logging.error(f"Failed to set clipboard: {e}")
+
+        if clipboard_success:
+            time.sleep(0.5)  # Extra delay for Wayland clipboard sync
+            logging.debug("Clipboard set successfully on Wayland")
+
+            # Try comprehensive replacement with window management
+            try:
+                # Store original window information before showing popup
+                if not hasattr(self, "_original_window"):
+                    self._store_original_window()
+
+                # Try comprehensive replacement
+                replacement_success = self._try_comprehensive_replacement()
+
+                if replacement_success:
+                    logging.debug("Comprehensive text replacement succeeded!")
+                    # Show success message
+                    self.show_message_signal.emit(
+                        "Success", "Text replaced automatically!"
+                    )
+                    return  # Success - we're done
+            except Exception as e:
+                logging.debug(f"Comprehensive replacement failed: {e}")
+
+            # Fallback to regular paste simulation
+            paste_success = self._try_comprehensive_paste()
+
+            if paste_success:
+                logging.debug("Automatic paste succeeded!")
+                # Show success message
+                self.show_message_signal.emit("Success", "Text replaced automatically!")
+            else:
+                logging.debug("Automatic paste failed, showing manual instruction")
+                # Show manual instruction
+                self.show_message_signal.emit(
+                    "Info", "Text copied to clipboard! Press Ctrl+V to paste manually."
+                )
+        else:
+            logging.error("Failed to set clipboard on Wayland")
+            self.show_message_signal.emit(
+                "Error", "Failed to copy text to clipboard. Please try again."
+            )
+
+        # Restore original clipboard content (best effort)
+        try:
+            if clipboard_backup:
+
+                def restore_clipboard():
+                    try:
+                        pyperclip.copy(clipboard_backup)
+                    except Exception:
+                        pass
+
+                thread = threading.Thread(target=restore_clipboard)
+                thread.daemon = True
+                thread.start()
+                # Don't wait - this is best effort
+
+        except Exception as e:
+            logging.debug(f"Clipboard restore failed: {e}")
+
+    def _store_original_window(self):
+        """Store original window information before processing"""
+        import subprocess
+
+        try:
+            # Get active window
+            result = subprocess.run(
+                ["kdotool", "getactivewindow"], capture_output=True, timeout=2
+            )
+
+            if result.returncode == 0:
+                self._original_window = result.stdout.decode().strip()
+                logging.debug(f"Stored original window: {self._original_window}")
+
+                # Get window title for reference
+                title_result = subprocess.run(
+                    ["kdotool", "getwindowname", self._original_window],
+                    capture_output=True,
+                    timeout=2,
+                    text=True,
+                )
+                if title_result.returncode == 0:
+                    window_title = title_result.stdout.strip()
+                    logging.debug(f"Original window title: {window_title}")
+
+                return True
+            else:
+                logging.debug("No active window found")
+                return False
+
+        except Exception as e:
+            logging.debug(f"Failed to store original window: {e}")
+            return False
+
+    def _try_comprehensive_replacement(self):
+        """
+        Comprehensive text replacement using kdotool for window management
+        and ydotool for input simulation with proper focus handling.
+        """
+        import subprocess
+        import time
+
+        logging.debug("Attempting comprehensive text replacement")
+
+        # Check if we have original window information
+        if not hasattr(self, "_original_window") or not self._original_window:
+            logging.debug("No original window stored, cannot proceed with replacement")
+            return False
+
+        # Get the text to replace (from the output queue)
+        text_to_replace = (
+            self.output_queue.strip() if hasattr(self, "output_queue") else ""
+        )
+        if not text_to_replace:
+            logging.debug("No text to replace")
+            return False
+
+        try:
+            # Step 1: Restore focus to original window
+            logging.debug(f"Restoring focus to window: {self._original_window}")
+            focus_result = subprocess.run(
+                ["kdotool", "windowactivate", self._original_window],
+                capture_output=True,
+                timeout=3,
+            )
+
+            if focus_result.returncode != 0:
+                logging.debug("Failed to restore window focus")
+                return False
+
+            # Add delay to ensure window is ready
+            time.sleep(0.8)
+
+            # Step 2: Try replacement methods
+            replacement_methods = [
+                # Method 1: Direct typing (most reliable for some apps)
+                lambda: self._try_type_directly(text_to_replace),
+                # Method 2: Select all (Ctrl+A) then paste (Ctrl+V)
+                lambda: self._try_key_sequence(["ctrl+a", "ctrl+v"]),
+                # Method 3: Just paste (Ctrl+V)
+                lambda: self._try_key_sequence(["ctrl+v"]),
+                # Method 4: Backspace then paste (for single line)
+                lambda: self._try_key_sequence(["backspace", "ctrl+v"]),
+                # Method 5: Delete then paste (more aggressive)
+                lambda: self._try_key_sequence(["delete", "ctrl+v"]),
+            ]
+
+            for i, method in enumerate(replacement_methods):
+                logging.debug(f"Trying replacement method {i + 1}")
+                if method():
+                    logging.debug(f"Replacement method {i + 1} succeeded!")
+                    return True
+                logging.debug(f"Replacement method {i + 1} failed")
+                time.sleep(0.2)  # Small delay between attempts
+
+            return False
+
+        except Exception as e:
+            logging.debug(f"Comprehensive replacement failed: {e}")
+            return False
+
+    def _try_type_directly(self, text):
+        """Try typing text directly using ydotool type with chunking for long text"""
+        import subprocess
+        import time
+
+        logging.debug("Trying direct typing with ydotool type")
+
+        # Check if text is too long for single command
+        max_length = 500  # Conservative limit for ydotool
+        if len(text) > max_length:
+            logging.debug(f"Text too long ({len(text)} chars), using chunked typing")
+            return self._try_chunked_typing(text)
+
+        try:
+            # First try ydotool key command as it's more reliable than ydotool type
+            # This avoids the 10-second timeout issue that causes partial text replacement
+            # The key command uses raw keycodes for better control and consistency
+            if self._try_ydotool_key_typing(text):
+                logging.debug("ydotool key typing succeeded!")
+                return True
+
+            # Fallback to ydotool type if key method fails
+            # This maintains backward compatibility
+            result = subprocess.run(
+                ["ydotool", "type", "--file", "-"],
+                input=text,
+                text=True,
+                capture_output=True,
+                timeout=10,  # Longer timeout for typing
+            )
+
+            if result.returncode == 0:
+                logging.debug("Direct typing succeeded!")
+                # Add delay based on text length
+                time.sleep(0.1 * (len(text) / 50))  # Scale delay with length
+                return True
+            else:
+                error_msg = (
+                    result.stderr.decode().strip() if result.stderr else "unknown"
+                )
+                logging.debug(f"Direct typing failed: {error_msg}")
+                return False
+
+        except Exception as e:
+            logging.debug(f"Direct typing failed: {e}")
+            return False
+
+    def _try_chunked_typing(self, text):
+        """Try typing long text in chunks to avoid buffer limits"""
+        import subprocess
+        import time
+
+        logging.debug("Trying chunked typing for long text")
+
+        # Split text into chunks
+        chunk_size = 200  # Conservative chunk size
+        chunks = [text[i : i + chunk_size] for i in range(0, len(text), chunk_size)]
+
+        try:
+            for i, chunk in enumerate(chunks):
+                logging.debug(f"Typing chunk {i + 1}/{len(chunks)}")
+
+                result = subprocess.run(
+                    ["ydotool", "type", "--file", "-"],
+                    input=chunk,
+                    text=True,
+                    capture_output=True,
+                    timeout=5,
+                )
+
+                if result.returncode != 0:
+                    logging.debug(f"Chunk {i + 1} failed")
+                    return False
+
+                # Small delay between chunks
+                time.sleep(0.2)
+
+            logging.debug("Chunked typing succeeded!")
+            time.sleep(0.5)  # Final delay
+            return True
+
+        except Exception as e:
+            logging.debug(f"Chunked typing failed: {e}")
+            return False
+
+    def _try_key_sequence(self, keys):
+        """Try a sequence of key presses with proper timing"""
+        import subprocess
+        import time
+
+        try:
+            for key in keys:
+                cmd = ["ydotool", "key", key]
+                logging.debug(f"Sending key: {key}")
+
+                result = subprocess.run(cmd, capture_output=True, timeout=3)
+
+                if result.returncode != 0:
+                    logging.debug(f"Key {key} failed: {result.stderr.decode()[:100]}")
+                    return False
+
+                # Add small delay between keys
+                time.sleep(0.15)
+
+            # Add final delay after sequence
+            time.sleep(0.4)
+            return True
+
+        except Exception as e:
+            logging.debug(f"Key sequence failed: {e}")
+            return False
+
+    def _try_comprehensive_paste(self):
+        """
+        Comprehensive paste attempt with enhanced reliability.
+        Uses all available methods with improved error handling.
+        """
+        import subprocess
+        import time
+        import os
+
+        logging.debug("Attempting comprehensive paste with enhanced methods")
+
+        # Determine if we're running on KDE
+        is_kde = os.environ.get("XDG_CURRENT_DESKTOP", "").lower() == "kde"
+
+        # Enhanced method list with better ordering
+        methods = []
+
+        if is_kde:
+            methods = [
+                lambda: self._try_ydotool_paste_enhanced(),  # Most reliable
+                lambda: self._try_dotool_paste(),  # Alternative
+                lambda: self._try_wtype_paste(),  # Virtual keyboard
+                lambda: self._try_pykeyboard_paste(),  # Fallback
+            ]
+        else:
+            methods = [
+                lambda: self._try_ydotool_paste_enhanced(),  # Most reliable
+                lambda: self._try_dotool_paste(),  # Alternative
+                lambda: self._try_wtype_paste(),  # Virtual keyboard
+                lambda: self._try_pykeyboard_paste(),  # Fallback
+            ]
+
+        # Try each method with enhanced error handling
+        for i, method in enumerate(methods):
+            try:
+                logging.debug(f"Trying enhanced paste method {i + 1}")
+
+                # Use threading with longer timeout for reliability
+                import threading
+
+                result_container = {"success": False}
+
+                def run_method():
+                    try:
+                        result_container["success"] = method()
+                    except Exception as e:
+                        logging.debug(f"Method {i + 1} failed with exception: {e}")
+                        result_container["success"] = False
+
+                thread = threading.Thread(target=run_method)
+                thread.daemon = True
+                thread.start()
+                thread.join(timeout=8)  # Longer timeout for reliability
+
+                if result_container["success"]:
+                    logging.debug(f"Enhanced paste method {i + 1} succeeded!")
+                    time.sleep(0.5)  # Extra delay for reliability
+                    return True
+                else:
+                    logging.debug(f"Enhanced paste method {i + 1} completed but failed")
+
+            except Exception as e:
+                logging.debug(f"Enhanced paste method {i + 1} failed: {e}")
+
+        logging.debug("All enhanced paste methods completed")
+        return False
+
+    def _try_ydotool_paste_enhanced(self):
+        """
+        Enhanced ydotool paste with better error handling and reliability.
+        """
+        import subprocess
+        import time
+        import os
+
+        logging.debug("Trying enhanced ydotool paste")
+
+        # Check if ydotool is available
+        try:
+            result = subprocess.run(["ydotool", "help"], capture_output=True, timeout=2)
+            if result.returncode != 0:
+                logging.debug("ydotool not found")
+                return False
+        except Exception as e:
+            logging.debug(f"ydotool check failed: {e}")
+            return False
+
+        # Ensure ydotool daemon is running
+        socket_path = f"/run/user/{os.getuid()}/.ydotool_socket"
+        daemon_running = False
+
+        try:
+            if os.path.exists(socket_path):
+                test_result = subprocess.run(
+                    ["ydotool", "debug"], capture_output=True, timeout=1
+                )
+                if test_result.returncode == 0:
+                    daemon_running = True
+        except Exception:
+            pass
+
+        if not daemon_running:
+            try:
+                subprocess.Popen(
+                    ["ydotoold"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+                )
+                time.sleep(1)  # Give daemon time to start
+            except Exception as e:
+                logging.debug(f"Failed to start ydotool daemon: {e}")
+                return False
+
+        # Enhanced ydotool methods with better parameters
+        enhanced_methods = [
+            # Method 1: Simple with delay
+            ["ydotool", "key", "--delay", "100", "ctrl+v"],
+            # Method 2: Individual keys with proper timing
+            ["ydotool", "key", "ctrl:1", "v:1", "ctrl:0", "v:0"],
+            # Method 3: Alternative syntax
+            ["ydotool", "key", "ctrl+v"],
+            # Method 4: With longer delay
+            ["ydotool", "key", "--delay", "200", "ctrl+v"],
+        ]
+
+        for i, cmd in enumerate(enhanced_methods):
+            try:
+                logging.debug(
+                    f"Trying enhanced ydotool method {i + 1}: {' '.join(cmd)}"
+                )
+
+                # Add focus verification
+                try:
+                    # Try to get active window to ensure focus
+                    active_result = subprocess.run(
+                        ["ydotool", "getactivewindow"], capture_output=True, timeout=1
+                    )
+                    if active_result.returncode != 0:
+                        logging.debug("No active window, trying to focus")
+                        # Try to focus the last active window
+                        subprocess.run(
+                            ["ydotool", "windowactivate", "%1"],
+                            capture_output=True,
+                            timeout=1,
+                        )
+                        time.sleep(0.2)
+                except Exception:
+                    pass
+
+                # Execute the paste command
+                result = subprocess.run(cmd, capture_output=True, timeout=5)
+
+                if result.returncode == 0:
+                    logging.debug(f"Enhanced ydotool method {i + 1} succeeded")
+                    time.sleep(0.3)  # Extra delay for reliability
+                    return True
+                else:
+                    error_msg = (
+                        result.stderr.decode().strip() if result.stderr else "unknown"
+                    )
+                    logging.debug(
+                        f"Enhanced ydotool method {i + 1} failed: {error_msg}"
+                    )
+
+                    # Handle daemon issues
+                    if "failed to connect socket" in error_msg:
+                        try:
+                            subprocess.run(
+                                ["pkill", "-f", "ydotoold"], capture_output=True
+                            )
+                            time.sleep(0.2)
+                            subprocess.Popen(
+                                ["ydotoold"],
+                                stdout=subprocess.DEVNULL,
+                                stderr=subprocess.DEVNULL,
+                            )
+                            time.sleep(1)
+                        except Exception:
+                            pass
+
+            except subprocess.TimeoutExpired:
+                logging.debug(f"Enhanced ydotool method {i + 1} timed out")
+            except Exception as e:
+                logging.debug(f"Enhanced ydotool method {i + 1} failed: {e}")
+
+        return False
+
+    def _handle_x11_paste(self, text: str):
+        """
+        Handle paste operation on X11 (traditional method).
+        """
+        try:
+            clipboard_backup = pyperclip.paste()
+            pyperclip.copy(text)
+
+            kbrd = pykeyboard.Controller()
+
+            def press_ctrl_v():
+                kbrd.press(pykeyboard.Key.ctrl.value)
+                kbrd.press("v")
+                kbrd.release("v")
+                kbrd.release(pykeyboard.Key.ctrl.value)
+
+            press_ctrl_v()
+            time.sleep(0.2)
+            pyperclip.copy(clipboard_backup)
+
+            logging.debug("X11 paste completed successfully")
+
+        except Exception as e:
+            logging.error(f"X11 paste failed: {e}")
+            self.show_message_signal.emit("Error", f"Failed to paste text: {e}")
+
+    def _try_paste_simulation(self):
+        """
+        Attempt to simulate paste using various Wayland-compatible methods.
+        Uses kdotool, ydotool, dotool, wtype, and other Wayland input tools.
+        Prioritizes KDE-specific tools on KDE Wayland.
+        """
+        import subprocess
+        import threading
+        import time
+        import os
+
+        logging.debug("Attempting paste simulation with Wayland tools")
+
+        # Determine if we're running on KDE
+        is_kde = os.environ.get("XDG_CURRENT_DESKTOP", "").lower() == "kde"
+
+        # Define methods based on environment
+        if is_kde:
+            logging.debug("Running on KDE Wayland - using KDE-optimized method order")
+            methods = [
+                # Method 1: Try kdotool first (KDE-specific, most reliable on KDE)
+                lambda: self._try_kdotool_paste(),
+                # Method 2: Try ydotool (comprehensive Wayland tool)
+                lambda: self._try_ydotool_paste(),
+                # Method 3: Try dotool (alternative Wayland tool)
+                lambda: self._try_dotool_paste(),
+                # Method 4: Try wtype (may work on some KDE setups)
+                lambda: self._try_wtype_paste(),
+                # Method 5: Try ydot (another alternative)
+                lambda: self._try_ydot_paste(),
+                # Method 6: Try pykeyboard as final fallback
+                lambda: self._try_pykeyboard_paste(),
+            ]
+        else:
+            # Non-KDE Wayland compositors
+            methods = [
+                # Method 1: Try ydotool first (most comprehensive)
+                lambda: self._try_ydotool_paste(),
+                # Method 2: Try dotool (alternative)
+                lambda: self._try_dotool_paste(),
+                # Method 3: Try wtype (Wayland virtual keyboard)
+                lambda: self._try_wtype_paste(),
+                # Method 4: Try kdotool (just in case)
+                lambda: self._try_kdotool_paste(),
+                # Method 5: Try ydot (another alternative)
+                lambda: self._try_ydot_paste(),
+                # Method 6: Try pykeyboard as final fallback
+                lambda: self._try_pykeyboard_paste(),
+            ]
+
+        # Try each method with timeout
+        for i, method in enumerate(methods):
+            try:
+                thread = threading.Thread(target=method)
+                thread.daemon = True
+                thread.start()
+                thread.join(timeout=5)  # Max 5 seconds per method
+
+                if not thread.is_alive():
+                    logging.debug(f"Paste method {i + 1} completed successfully")
+                    time.sleep(0.4)  # Extra delay after successful attempt
+                    return
+                else:
+                    logging.debug(f"Paste method {i + 1} timed out")
+
+            except Exception as e:
+                logging.debug(f"Paste method {i + 1} failed: {e}")
+
+        logging.debug("All Wayland paste simulation methods completed")
+
+    def _try_kdotool_paste(self):
+        """
+        Try kdotool for paste simulation - KDE-specific Wayland input tool.
+        kdotool is designed specifically for KDE Wayland and may work better.
+        """
+        import subprocess
+        import time
+
+        logging.debug("Trying kdotool paste simulation (KDE-specific)")
+
+        # Check if kdotool is available
+        try:
+            result = subprocess.run(
+                ["kdotool", "--help"], capture_output=True, timeout=2
+            )
+            if result.returncode != 0:
+                logging.debug("kdotool not found or not working")
+                return False
+        except Exception as e:
+            logging.debug(f"kdotool check failed: {e}")
+            return False
+
+        # kdotool doesn't support keyboard simulation commands
+        # It's primarily a window management tool for KDE
+        logging.debug("kdotool is available but doesn't support keyboard simulation")
+        logging.debug("kdotool is for window management (move, resize, focus, etc.)")
+        logging.debug("Skipping kdotool for paste simulation")
+
+        return False  # kdotool cannot be used for paste simulation
+
+    def _try_ydotool_key_typing(self, text: str) -> bool:
+        """
+        Try typing text using ydotool key command with raw keycodes.
+
+        This method is more reliable than ydotool type for some Wayland compositors
+        because it avoids the 10-second timeout issue that can cause partial text replacement.
+
+        The ydotool key command uses raw Linux input event codes (KEY_*) with the format:
+        <keycode>:1 for key press and <keycode>:0 for key release.
+
+        This approach provides:
+        - Better control over individual key events
+        - No timeout issues for long text
+        - More consistent performance across different Wayland compositors
+        - Fallback capability (still tries ydotool type if this fails)
+
+        Note: This implementation uses US keyboard layout keycodes. For international
+        layouts, additional mapping may be needed.
+        """
+        import subprocess
+        import time
+
+        logging.debug(f"Trying ydotool key typing for text length: {len(text)}")
+
+        # Character to keycode mapping (US layout) - expanded for better coverage
+        char_to_keycode = {
+            # Lowercase letters
+            "a": "30",
+            "b": "48",
+            "c": "46",
+            "d": "32",
+            "e": "18",
+            "f": "33",
+            "g": "34",
+            "h": "35",
+            "i": "23",
+            "j": "36",
+            "k": "37",
+            "l": "38",
+            "m": "50",
+            "n": "49",
+            "o": "24",
+            "p": "25",
+            "q": "16",
+            "r": "19",
+            "s": "31",
+            "t": "20",
+            "u": "22",
+            "v": "47",
+            "w": "17",
+            "x": "45",
+            "y": "21",
+            "z": "44",
+            # Uppercase letters (same keycodes as lowercase, but with shift)
+            "A": "30",
+            "B": "48",
+            "C": "46",
+            "D": "32",
+            "E": "18",
+            "F": "33",
+            "G": "34",
+            "H": "35",
+            "I": "23",
+            "J": "36",
+            "K": "37",
+            "L": "38",
+            "M": "50",
+            "N": "49",
+            "O": "24",
+            "P": "25",
+            "Q": "16",
+            "R": "19",
+            "S": "31",
+            "T": "20",
+            "U": "22",
+            "V": "47",
+            "W": "17",
+            "X": "45",
+            "Y": "21",
+            "Z": "44",
+            # Numbers
+            "0": "11",
+            "1": "2",
+            "2": "3",
+            "3": "4",
+            "4": "5",
+            "5": "6",
+            "6": "7",
+            "7": "8",
+            "8": "9",
+            "9": "10",
+            # Special characters
+            " ": "57",  # space
+            "\n": "28",  # enter
+            "\t": "15",  # tab
+            ".": "52",
+            ",": "51",
+            "/": "53",
+            ";": "39",
+            "'": "40",
+            "[": "26",
+            "]": "27",
+            "\\": "43",
+            "-": "12",
+            "=": "13",
+            "`": "41",
+            # Common punctuation and symbols
+            "!": "2",
+            "@": "3",
+            "#": "4",
+            "$": "5",
+            "%": "6",
+            "^": "7",
+            "&": "8",
+            "*": "9",
+            "(": "10",
+            ")": "11",
+            "_": "12",
+            "+": "13",
+            "{": "26",
+            "}": "27",
+            "|": "43",
+            ":": "39",
+            '"': "40",
+            "<": "51",
+            ">": "52",
+            "?": "53",
+            # Additional common characters
+            "\r": "28",  # carriage return (same as enter)
+        }
+
+        # Build key sequence
+        key_sequence = []
+        for char in text:
+            if char in char_to_keycode:
+                keycode = char_to_keycode[char]
+                # Format: keycode:1 keycode:0 (press and release)
+                key_sequence.extend([f"{keycode}:1", f"{keycode}:0"])
+            else:
+                # Skip unsupported characters
+                logging.debug(f"Skipping unsupported character: {char}")
+
+        if not key_sequence:
+            logging.debug("No valid key sequence generated")
+            return False
+
+        # Add small delays between characters to avoid overwhelming the system
+        delayed_sequence = []
+        for i, key_action in enumerate(key_sequence):
+            delayed_sequence.append(key_action)
+            # Add delay every few characters
+            if i > 0 and i % 10 == 0:
+                delayed_sequence.append("5")  # 5ms delay
+
+        try:
+            # Execute ydotool key command
+            result = subprocess.run(
+                ["ydotool", "key"] + delayed_sequence,
+                capture_output=True,
+                timeout=15,  # Slightly longer timeout for key sequences
+            )
+
+            if result.returncode == 0:
+                # Add delay based on text length
+                time.sleep(0.05 * (len(text) / 10))  # Scale delay with length
+                return True
+            else:
+                error_msg = (
+                    result.stderr.decode().strip() if result.stderr else "unknown"
+                )
+                logging.debug(f"ydotool key typing failed: {error_msg}")
+                return False
+
+        except subprocess.TimeoutExpired:
+            logging.debug("ydotool key typing timed out")
+            return False
+        except Exception as e:
+            logging.debug(f"ydotool key typing error: {e}")
+            return False
+
+    def _try_ydotool_paste(self):
+        """
+        Try ydotool for paste simulation - most comprehensive Wayland input tool.
+        ydotool supports both keyboard and mouse input on Wayland.
+        """
+        import subprocess
+        import time
+        import os
+
+        logging.debug("Trying ydotool paste simulation")
+
+        # Check if ydotool is available
+        try:
+            result = subprocess.run(["ydotool", "help"], capture_output=True, timeout=2)
+            if result.returncode != 0:
+                logging.debug("ydotool not found or not working")
+                return False
+        except Exception as e:
+            logging.debug(f"ydotool check failed: {e}")
+            return False
+
+        # Check if ydotool daemon is running, start it if not
+        socket_path = "/run/user/{}/.ydotool_socket".format(os.getuid())
+        daemon_running = False
+
+        try:
+            # Check if socket exists
+            if os.path.exists(socket_path):
+                # Test if daemon is responsive
+                test_result = subprocess.run(
+                    ["ydotool", "debug"], capture_output=True, timeout=1
+                )
+                if test_result.returncode == 0:
+                    daemon_running = True
+                    logging.debug("ydotool daemon is already running")
+            else:
+                logging.debug("ydotool daemon not running, attempting to start it")
+        except Exception as e:
+            logging.debug(f"ydotool daemon check failed: {e}")
+
+        # Start ydotool daemon if not running
+        if not daemon_running:
+            try:
+                # Start daemon in background
+                daemon_process = subprocess.Popen(
+                    ["ydotoold"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+                )
+                # Give daemon time to start
+                time.sleep(0.5)
+                logging.debug("ydotool daemon started")
+                daemon_running = True
+            except Exception as e:
+                logging.debug(f"Failed to start ydotool daemon: {e}")
+                return False
+
+        # Multiple ydotool approaches
+        ydotool_methods = [
+            # Method 1: Simple key sequence
+            ["ydotool", "key", "ctrl+v"],
+            # Method 2: Individual key presses with delays
+            ["ydotool", "key", "ctrl:1", "v:1", "ctrl:0", "v:0"],
+            # Method 3: With explicit delays
+            ["ydotool", "key", "--delay", "50", "ctrl+v"],
+            # Method 4: Alternative syntax using type
+            ["ydotool", "type", "--key", "ctrl+v"],
+            # Method 5: Direct key sequence
+            ["ydotool", "key", "--key", "ctrl+v"],
+        ]
+
+        for i, cmd in enumerate(ydotool_methods):
+            try:
+                logging.debug(f"Trying ydotool method {i + 1}: {' '.join(cmd)}")
+                result = subprocess.run(cmd, capture_output=True, timeout=3)
+
+                if result.returncode == 0:
+                    logging.debug(f"ydotool method {i + 1} succeeded")
+                    time.sleep(0.3)  # Extra delay for the paste to complete
+                    return True
+                else:
+                    error_msg = (
+                        result.stderr.decode().strip()
+                        if result.stderr
+                        else "unknown error"
+                    )
+                    logging.debug(f"ydotool method {i + 1} failed: {error_msg}")
+
+                    # If daemon died, try to restart it once
+                    if "failed to connect socket" in error_msg and i == 0:
+                        logging.debug(
+                            "ydotool daemon connection lost, attempting to restart"
+                        )
+                        try:
+                            # Kill any existing daemon
+                            subprocess.run(
+                                ["pkill", "-f", "ydotoold"], capture_output=True
+                            )
+                            time.sleep(0.2)
+
+                            # Start new daemon
+                            subprocess.Popen(
+                                ["ydotoold"],
+                                stdout=subprocess.DEVNULL,
+                                stderr=subprocess.DEVNULL,
+                            )
+                            time.sleep(0.5)
+                            logging.debug("ydotool daemon restarted")
+                        except Exception as e:
+                            logging.debug(f"Failed to restart ydotool daemon: {e}")
+
+            except subprocess.TimeoutExpired:
+                logging.debug(f"ydotool method {i + 1} timed out")
+            except Exception as e:
+                logging.debug(f"ydotool method {i + 1} failed: {e}")
+
+        return False
+
+    def _try_dotool_paste(self):
+        """
+        Try dotool for paste simulation - alternative Wayland input tool.
+        """
+        import subprocess
+        import time
+
+        logging.debug("Trying dotool paste simulation")
+
+        # Check if dotool is available
+        try:
+            result = subprocess.run(
+                ["dotool", "--help"], capture_output=True, timeout=2
+            )
+            if result.returncode != 0:
+                logging.debug("dotool not found")
+                return False
+        except Exception as e:
+            logging.debug(f"dotool check failed: {e}")
+            return False
+
+        # Multiple dotool approaches
+        dotool_methods = [
+            # Method 1: Simple key sequence
+            ["dotool", "key", "ctrl+v"],
+            # Method 2: Individual keys
+            ["dotool", "key", "ctrl", "v"],
+            # Method 3: With delays
+            ["dotool", "key", "--delay", "50", "ctrl+v"],
+        ]
+
+        for i, cmd in enumerate(dotool_methods):
+            try:
+                logging.debug(f"Trying dotool method {i + 1}: {' '.join(cmd)}")
+                result = subprocess.run(cmd, capture_output=True, timeout=3)
+
+                if result.returncode == 0:
+                    logging.debug(f"dotool method {i + 1} succeeded")
+                    time.sleep(0.2)
+                    return True
+                else:
+                    logging.debug(
+                        f"dotool method {i + 1} failed: {result.stderr.decode()[:100]}"
+                    )
+
+            except subprocess.TimeoutExpired:
+                logging.debug(f"dotool method {i + 1} timed out")
+            except Exception as e:
+                logging.debug(f"dotool method {i + 1} failed: {e}")
+
+        return False
+
+    def _try_ydot_paste(self):
+        """
+        Try ydot for paste simulation.
+        """
+        import subprocess
+        import time
+
+        logging.debug("Trying ydot paste simulation")
+
+        try:
+            result = subprocess.run(["ydot", "paste"], capture_output=True, timeout=3)
+            if result.returncode == 0:
+                logging.debug("ydot paste succeeded")
+                time.sleep(0.2)
+                return True
+            else:
+                logging.debug(f"ydot paste failed: {result.stderr.decode()[:100]}")
+        except Exception as e:
+            logging.debug(f"ydot paste failed: {e}")
+
+        return False
+
+    def _try_wtype_paste(self):
+        """
+        Try to use wtype for paste simulation with multiple approaches.
+        wtype is a Wayland-native virtual keyboard tool that should work better.
+        """
+        import subprocess
+        import time
+
+        logging.debug("Trying wtype paste simulation")
+
+        # First check if compositor supports virtual keyboard protocol
+        try:
+            result = subprocess.run(["wtype", "--help"], capture_output=True, timeout=2)
+            # If wtype runs without error, compositor might support it
+        except Exception as e:
+            logging.debug(
+                f"wtype not available or compositor doesn't support virtual keyboard: {e}"
+            )
+            return False
+
+        # Multiple wtype approaches
+        wtype_methods = [
+            # Method 1: Simple ctrl+v
+            ["wtype", "-P", "ctrl+v"],
+            # Method 2: More explicit key sequence
+            ["wtype", "-P", "ctrl", "v"],
+            # Method 3: With delays between keys
+            ["wtype", "-d", "50", "-P", "ctrl+v"],
+            # Method 4: Individual key presses with delays
+            ["wtype", "-d", "100", "ctrl_l", "v"],
+        ]
+
+        for i, cmd in enumerate(wtype_methods):
+            try:
+                logging.debug(f"Trying wtype method {i + 1}: {' '.join(cmd)}")
+                result = subprocess.run(cmd, capture_output=True, timeout=3)
+
+                if result.returncode == 0:
+                    logging.debug(f"wtype method {i + 1} succeeded")
+                    time.sleep(0.2)  # Give time for the paste to complete
+                    return True
+                else:
+                    logging.debug(
+                        f"wtype method {i + 1} failed with return code {result.returncode}"
+                    )
+                    if result.stderr:
+                        error_msg = result.stderr.decode().strip()
+                        if "virtual keyboard protocol" in error_msg:
+                            logging.debug(
+                                "Compositor doesn't support virtual keyboard protocol"
+                            )
+                            return False
+
+            except FileNotFoundError:
+                logging.debug("wtype not found, skipping")
+                break
+            except subprocess.TimeoutExpired:
+                logging.debug(f"wtype method {i + 1} timed out")
+            except Exception as e:
+                logging.debug(f"wtype method {i + 1} failed: {e}")
+
+        return False
+
+    def _try_pykeyboard_paste(self):
+        """Try keyboard paste with minimal delays (best effort)."""
+        try:
+            kbrd = pykeyboard.Controller()
+
+            # Quick paste sequence
+            kbrd.press(pykeyboard.Key.ctrl.value)
+            kbrd.press("v")
+            time.sleep(0.05)
+            kbrd.release("v")
+            kbrd.release(pykeyboard.Key.ctrl.value)
+
+        except Exception:
+            pass  # Silently fail - this is best effort
 
     def create_tray_icon(self):
         """
