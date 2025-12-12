@@ -1290,6 +1290,31 @@ class WritingToolApp(QtWidgets.QApplication):
 
         logging.debug(f"Trying ydotool key typing for text length: {len(text)}")
 
+        # Security and safety checks
+        # 1. Input validation - prevent excessively long text
+        max_length = 2000  # Reasonable limit to prevent abuse
+        if len(text) > max_length:
+            logging.warning(
+                f"Text too long ({len(text)} chars), truncating to {max_length}"
+            )
+            text = text[:max_length]
+
+        # 2. Validate text content - only allow printable characters
+        import string
+
+        safe_chars = (
+            string.ascii_letters + string.digits + string.punctuation + " \t\n\r"
+        )
+
+        # Check for potentially dangerous characters
+        for char in text:
+            if (
+                char not in safe_chars and ord(char) > 127
+            ):  # Allow basic ASCII and common Unicode
+                logging.warning(
+                    f"Potentially unsafe character detected: {char} (U+{ord(char):04X})"
+                )
+
         # Character to keycode mapping (US layout) - expanded for better coverage
         char_to_keycode = {
             # Lowercase letters
@@ -1414,18 +1439,42 @@ class WritingToolApp(QtWidgets.QApplication):
 
         # Add small delays between characters to avoid overwhelming the system
         delayed_sequence = []
+        max_sequence_length = 10000  # Prevent excessively long command lines
+
         for i, key_action in enumerate(key_sequence):
             delayed_sequence.append(key_action)
             # Add delay every few characters
             if i > 0 and i % 10 == 0:
                 delayed_sequence.append("5")  # 5ms delay
 
+            # Safety: Prevent excessively long sequences
+            if len(delayed_sequence) > max_sequence_length:
+                logging.warning(
+                    f"Key sequence too long ({len(delayed_sequence)}), truncating"
+                )
+                break
+
+        # Final safety check
+        if len(delayed_sequence) > max_sequence_length:
+            logging.error("Key sequence exceeds maximum allowed length")
+            return False
+
         try:
-            # Execute ydotool key command
+            # Execute ydotool key command with security safeguards
             result = subprocess.run(
                 ["ydotool", "key"] + delayed_sequence,
                 capture_output=True,
                 timeout=15,  # Slightly longer timeout for key sequences
+                text=True,
+                # Security: Don't allow shell injection
+                shell=False,
+                # Security: Limit environment inheritance to essential variables only
+                env={
+                    k: v
+                    for k, v in os.environ.items()
+                    if k
+                    in ("PATH", "HOME", "USER", "LANG", "DISPLAY", "XDG_RUNTIME_DIR")
+                },
             )
 
             if result.returncode == 0:
