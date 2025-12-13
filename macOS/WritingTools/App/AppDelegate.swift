@@ -108,7 +108,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
             let pb = NSPasteboard.general
             let oldChangeCount = pb.changeCount
-            
+
             // IMPORTANT: Capture the ENTIRE clipboard state before copying
             let clipboardSnapshot = pb.createSnapshot()
             NSLog("Captured clipboard snapshot with \(clipboardSnapshot.itemCount) items")
@@ -195,7 +195,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             self.appState.selectedImages = foundImages
             self.appState.selectedAttributedText = rich
             self.appState.selectedText = selectedText
-            
+
             // Set previous app AFTER we've successfully copied
             if let previousApp = previousApp {
                 self.appState.previousApplication = previousApp
@@ -222,13 +222,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         }
 
         do {
-            var result = try await appState.activeProvider.processText(
+            // Get the appropriate provider for this command (respects per-command overrides)
+            let provider = appState.getProvider(for: command)
+
+            var result = try await provider.processText(
                 systemPrompt: command.prompt,
                 userPrompt: appState.selectedText,
                 images: appState.selectedImages,
                 streaming: false
             )
-            
+
             // Preserve trailing newlines from the original selection
             // This is important for triple-click selections which include the trailing newline
             let originalText = appState.selectedText
@@ -244,7 +247,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                         content: result,
                         selectedText: appState.selectedText,
                         option: nil,
-                        provider: appState.activeProvider
+                        provider: provider
                     )
 
                     NSApp.activate(ignoringOtherApps: true)
@@ -261,6 +264,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             }
         } catch {
             NSLog("Error processing command \(command.name): \(error.localizedDescription)")
+
+            // Show error alert
+            await MainActor.run {
+                let alert = NSAlert()
+                alert.messageText = "Command Error"
+                alert.informativeText = "Failed to process '\(command.name)': \(error.localizedDescription)"
+                alert.alertStyle = .warning
+                alert.addButton(withTitle: "OK")
+                alert.runModal()
+            }
         }
     }
 
@@ -280,7 +293,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 return
             }
         }
-        
+
         if pb.changeCount == initialChangeCount {
             NSLog("Warning: Clipboard update timeout after \(timeout)s - no change detected")
         } else {
@@ -443,7 +456,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         )
         window.title = "Welcome to Writing Tools"
         window.isReleasedWhenClosed = false
-        
+
         window.center()
 
         let onboardingView = OnboardingView(appState: appState)
@@ -471,7 +484,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
             let pb = NSPasteboard.general
             let oldChangeCount = pb.changeCount
-            
+
             // Capture the ENTIRE clipboard state before copying
             let clipboardSnapshot = pb.createSnapshot()
             NSLog("Captured clipboard snapshot with \(clipboardSnapshot.itemCount) items")

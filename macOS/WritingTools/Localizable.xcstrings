@@ -573,6 +573,9 @@
         }
       }
     },
+    "API Key:" : {
+
+    },
     "Appearance" : {
       "localizations" : {
         "de" : {
@@ -814,6 +817,9 @@
           }
         }
       }
+    },
+    "Base URL:" : {
+
     },
     "Basic Settings" : {
       "extractionState" : "manual",
@@ -1875,6 +1881,9 @@
         }
       }
     },
+    "Custom Provider" : {
+
+    },
     "Decrease text size" : {
       "localizations" : {
         "de" : {
@@ -2232,6 +2241,15 @@
           }
         }
       }
+    },
+    "e.g., gpt-4o-mini" : {
+
+    },
+    "e.g., gpt-4o-mini, claude-3-5-sonnet" : {
+
+    },
+    "e.g., https://api.example.com/v1" : {
+
     },
     "Edit Built-In Command" : {
       "localizations" : {
@@ -3225,6 +3243,9 @@
         }
       }
     },
+    "Leave empty to use the default model for the selected provider. Examples: gpt-4o-mini (OpenAI), claude-3-5-sonnet-20240620 (Anthropic), gemini-flash-latest (Gemini)" : {
+
+    },
     "Loading %@..." : {
       "localizations" : {
         "de" : {
@@ -3601,6 +3622,9 @@
         }
       }
     },
+    "Model (optional):" : {
+
+    },
     "Model Configuration" : {
       "localizations" : {
         "de" : {
@@ -3711,6 +3735,9 @@
           }
         }
       }
+    },
+    "Model:" : {
+
     },
     "Name" : {
       "localizations" : {
@@ -4483,6 +4510,9 @@
         }
       }
     },
+    "Override the default AI provider for this specific command" : {
+
+    },
     "Please select a different AI Provider in Settings if you are on an Intel Mac." : {
       "localizations" : {
         "de" : {
@@ -4727,6 +4757,9 @@
           }
         }
       }
+    },
+    "Provider:" : {
+
     },
     "Recheck current permission statuses." : {
       "localizations" : {
@@ -5481,6 +5514,9 @@
         }
       }
     },
+    "The base URL of your API endpoint (e.g., https://api.openai.com/v1)" : {
+
+    },
     "The latest version is already installed!" : {
       "localizations" : {
         "de" : {
@@ -5502,6 +5538,9 @@
           }
         }
       }
+    },
+    "The model identifier to use" : {
+
     },
     "Theme" : {
       "localizations" : {
@@ -5656,6 +5695,9 @@
           }
         }
       }
+    },
+    "Use custom AI provider for this command" : {
+
     },
     "Use local OCR or Ollama's vision model for images." : {
       "localizations" : {
@@ -6120,6 +6162,12 @@
           }
         }
       }
+    },
+    "Your API authentication key" : {
+
+    },
+    "Your API key" : {
+
     },
     "Your message" : {
       "localizations" : {
