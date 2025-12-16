@@ -11,6 +11,21 @@ struct CommandModel: Codable, Identifiable, Equatable {
     var hasShortcut: Bool
     var preserveFormatting: Bool
 
+    // MARK: - Per-Command AI Provider Configuration
+
+    /// Optional provider override (e.g., "openai", "gemini", "anthropic", "ollama", "mistral", "openrouter", "local", "custom")
+    /// If nil, uses the default provider from AppSettings
+    var providerOverride: String?
+
+    /// Optional model override for the specified provider
+    /// If nil, uses the default model for the provider
+    var modelOverride: String?
+
+    /// Custom provider configuration (only used when providerOverride == "custom")
+    var customProviderBaseURL: String?
+    var customProviderApiKey: String?
+    var customProviderModel: String?
+
     // MARK: – CodingKeys
 
     private enum CodingKeys: String, CodingKey {
@@ -19,6 +34,11 @@ struct CommandModel: Codable, Identifiable, Equatable {
         case isBuiltIn
         case hasShortcut
         case preserveFormatting
+        case providerOverride
+        case modelOverride
+        case customProviderBaseURL
+        case customProviderApiKey
+        case customProviderModel
     }
 
     // MARK: – Decoding (old data OK)
@@ -34,6 +54,11 @@ struct CommandModel: Codable, Identifiable, Equatable {
         hasShortcut = try c.decodeIfPresent(Bool.self, forKey: .hasShortcut) ?? false
         preserveFormatting = try c.decodeIfPresent(Bool.self,
                                                    forKey: .preserveFormatting) ?? false
+        providerOverride = try c.decodeIfPresent(String.self, forKey: .providerOverride)
+        modelOverride = try c.decodeIfPresent(String.self, forKey: .modelOverride)
+        customProviderBaseURL = try c.decodeIfPresent(String.self, forKey: .customProviderBaseURL)
+        customProviderApiKey = try c.decodeIfPresent(String.self, forKey: .customProviderApiKey)
+        customProviderModel = try c.decodeIfPresent(String.self, forKey: .customProviderModel)
     }
 
     // MARK: – Encoding (store compactly)
@@ -50,6 +75,21 @@ struct CommandModel: Codable, Identifiable, Equatable {
         if preserveFormatting {
             try c.encode(preserveFormatting, forKey: .preserveFormatting)
         }
+        if let providerOverride = providerOverride {
+            try c.encode(providerOverride, forKey: .providerOverride)
+        }
+        if let modelOverride = modelOverride {
+            try c.encode(modelOverride, forKey: .modelOverride)
+        }
+        if let customProviderBaseURL = customProviderBaseURL {
+            try c.encode(customProviderBaseURL, forKey: .customProviderBaseURL)
+        }
+        if let customProviderApiKey = customProviderApiKey {
+            try c.encode(customProviderApiKey, forKey: .customProviderApiKey)
+        }
+        if let customProviderModel = customProviderModel {
+            try c.encode(customProviderModel, forKey: .customProviderModel)
+        }
     }
 
     // MARK: – Convenience initialiser (unchanged)
@@ -61,7 +101,12 @@ struct CommandModel: Codable, Identifiable, Equatable {
          useResponseWindow: Bool = false,
          isBuiltIn: Bool = false,
          hasShortcut: Bool = false,
-         preserveFormatting: Bool = false) {
+         preserveFormatting: Bool = false,
+         providerOverride: String? = nil,
+         modelOverride: String? = nil,
+         customProviderBaseURL: String? = nil,
+         customProviderApiKey: String? = nil,
+         customProviderModel: String? = nil) {
         self.id = id
         self.name = name
         self.prompt = prompt
@@ -70,6 +115,11 @@ struct CommandModel: Codable, Identifiable, Equatable {
         self.isBuiltIn = isBuiltIn
         self.hasShortcut = hasShortcut
         self.preserveFormatting = preserveFormatting
+        self.providerOverride = providerOverride
+        self.modelOverride = modelOverride
+        self.customProviderBaseURL = customProviderBaseURL
+        self.customProviderApiKey = customProviderApiKey
+        self.customProviderModel = customProviderModel
     }
 
     // Helper to create from WritingOption for migration

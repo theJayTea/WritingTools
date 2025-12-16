@@ -18,6 +18,10 @@ struct PopupView: View {
   @State private var showingCommandsView = false
   @State private var editingCommand: CommandModel? = nil
 
+  // Error handling
+  @State private var showingErrorAlert = false
+  @State private var errorMessage = ""
+
   let closeAction: () -> Void
 
   // Grid layout for two columns
@@ -158,7 +162,7 @@ struct PopupView: View {
           editingCommand = nil
         }
       )
-      
+
       CommandEditor(
         command: binding,
         onSave: {
@@ -180,6 +184,11 @@ struct PopupView: View {
           )
         }
     }
+    .alert("Error", isPresented: $showingErrorAlert) {
+      Button("OK", role: .cancel) {}
+    } message: {
+      Text(errorMessage)
+    }
   }
 
   // Process a command asynchronously and only close the popup when done
@@ -197,7 +206,10 @@ struct PopupView: View {
       let systemPrompt = command.prompt
       let userText = appState.selectedText
 
-      let result = try await appState.activeProvider.processText(
+      // Get the appropriate provider for this command (respects per-command overrides)
+      let provider = appState.getProvider(for: command)
+
+      let result = try await provider.processText(
         systemPrompt: systemPrompt,
         userPrompt: userText,
         images: appState.selectedImages,
@@ -211,7 +223,7 @@ struct PopupView: View {
             content: result,
             selectedText: userText,
             option: .proofread,
-            provider: appState.activeProvider
+            provider: provider
           )
 
           WindowManager.shared.addResponseWindow(window)
@@ -231,6 +243,8 @@ struct PopupView: View {
     } catch {
       print("Error processing command: \(error.localizedDescription)")
       await MainActor.run {
+        errorMessage = error.localizedDescription
+        showingErrorAlert = true
         processingCommandId = nil
       }
     }
@@ -249,7 +263,7 @@ struct PopupView: View {
   private func processCustomInstruction(_ instruction: String) {
     guard !instruction.isEmpty else { return }
     appState.isProcessing = true
-    
+
     // Capture setting value once at the start
     let openInResponseWindow = AppSettings.shared.openCustomCommandsInResponseWindow
 
@@ -260,7 +274,7 @@ struct PopupView: View {
         to the user's instruction thoughtfully and comprehensively.
         If the instruction is a question, provide a detailed answer. But \
         always return the best and most accurate answer and not different \
-        options. 
+        options.
         If it's a request for help, provide clear guidance and examples where \
         appropriate. Make sure to use the language used or specified by the \
         user instruction.
@@ -271,7 +285,7 @@ struct PopupView: View {
           ? instruction
           : """
             User's instruction: \(instruction)
-            
+
             Text:
             \(appState.selectedText)
             """
@@ -307,7 +321,11 @@ struct PopupView: View {
         }
       } catch {
         print("Error processing text: \(error.localizedDescription)")
-        isCustomLoading = false
+        await MainActor.run {
+          errorMessage = error.localizedDescription
+          showingErrorAlert = true
+          isCustomLoading = false
+        }
       }
 
       appState.isProcessing = false
