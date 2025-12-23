@@ -18,12 +18,12 @@ struct CommandsView: View {
             HStack {
                 Text("Manage Commands")
                     .font(.headline)
-                    .foregroundColor(.primary)
+                    .foregroundStyle(.primary)
                 Spacer()
                 Button(action: { dismiss() }) {
                     Image(systemName: "xmark.circle.fill")
                         .font(.title2)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
@@ -44,7 +44,7 @@ struct CommandsView: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text(selectedTab == 0 ? "Built-in Commands" : "Custom Commands")
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                     .padding(.horizontal)
                     .padding(.top, 8)
                 
@@ -147,9 +147,9 @@ struct CommandsView: View {
                     VStack {
                         Image(systemName: "questionmark.circle")
                             .font(.largeTitle)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                         Text("No built-in commands")
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                 }
             }
@@ -187,12 +187,12 @@ struct CommandsView: View {
                     VStack {
                         Image(systemName: "plus.circle")
                             .font(.largeTitle)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                         Text("No custom commands yet")
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                         Text("Add one to get started")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                 }
             }
@@ -212,7 +212,7 @@ struct CommandRow: View {
             // Icon with consistent size and styling
             Image(systemName: command.icon)
                 .font(.title3)
-                .foregroundColor(.accentColor)
+                .foregroundStyle(Color.accentColor)
                 .frame(width: 30, height: 30)
                 .background(
                     RoundedRectangle(cornerRadius: 6)
@@ -225,7 +225,7 @@ struct CommandRow: View {
                 
                 Text(command.isBuiltIn ? "Built-in" : "Custom")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                     .padding(.vertical, 2)
                     .padding(.horizontal, 6)
                     .background(
@@ -242,10 +242,10 @@ struct CommandRow: View {
                 Button(action: { onEdit(command) }) {
                     Image(systemName: "pencil")
                         .font(.body)
-                        .foregroundColor(.blue)
+                        .foregroundStyle(.blue)
                         .frame(width: 28, height: 28)
                         .background(Color.blue.opacity(0.1))
-                        .clipShape(Circle())
+                        .clipShape(.circle)
                 }
                 .buttonStyle(.plain)
                 .help("Edit command")
@@ -253,10 +253,10 @@ struct CommandRow: View {
                 Button(action: { onDelete(command) }) {
                     Image(systemName: "trash")
                         .font(.body)
-                        .foregroundColor(.red)
+                        .foregroundStyle(.red)
                         .frame(width: 28, height: 28)
                         .background(Color.red.opacity(0.1))
-                        .clipShape(Circle())
+                        .clipShape(.circle)
                 }
                 .buttonStyle(.plain)
                 .help("Delete command")

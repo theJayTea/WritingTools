@@ -70,7 +70,7 @@ struct LocalLLMSettingsView: View {
         VStack(alignment: .center, spacing: 16) {
             Image(systemName: "xmark.octagon.fill")
                 .font(.system(size: 44))
-                .foregroundColor(.red)
+                .foregroundStyle(.red)
                 .accessibilityHidden(true)
             
             Text("Apple Silicon Required")
@@ -80,7 +80,7 @@ struct LocalLLMSettingsView: View {
             
             Text("Local LLM processing is only available on Apple Silicon (M-series) devices.")
                 .multilineTextAlignment(.center)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
             
             Text("Please select a different AI Provider in Settings if you are on an Intel Mac.")
                 .font(.headline)
@@ -120,7 +120,7 @@ struct LocalLLMSettingsView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Choose a model to download and use for local processing.")
                         .font(.footnote)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
 
                     Picker("Model", selection: $settings.selectedLocalLLMId) {
                         Text("None Selected").tag(String?.none)
@@ -129,7 +129,7 @@ struct LocalLLMSettingsView: View {
                                 Text(modelType.displayName)
                                 if modelType.isVisionModel {
                                     Image(systemName: "camera.fill")
-                                        .foregroundColor(.blue)
+                                        .foregroundStyle(.blue)
                                 }
                             }
                             .tag(String?.some(modelType.id))
@@ -142,15 +142,15 @@ struct LocalLLMSettingsView: View {
                         HStack(spacing: 6) {
                             if selectedModel.isVisionModel {
                                 Label("Vision-capable model", systemImage: "camera.fill")
-                                    .foregroundColor(.blue)
+                                    .foregroundStyle(.blue)
                                     .font(.caption)
                                 Text("Can process images directly")
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                             } else {
                                 Label("Text-only model", systemImage: "text.justifyleft")
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                             }
                         }
                         .padding(.top, 4)
@@ -164,7 +164,7 @@ struct LocalLLMSettingsView: View {
                         if !llmProvider.modelInfo.isEmpty {
                             Text(llmProvider.modelInfo)
                                 .font(.callout)
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                                 .lineLimit(nil)
                                 .fixedSize(horizontal: false, vertical: true)
                         }
@@ -174,9 +174,9 @@ struct LocalLLMSettingsView: View {
                         if let error = llmProvider.lastError {
                             HStack(alignment: .top, spacing: 6) {
                                 Image(systemName: "exclamationmark.triangle.fill")
-                                    .foregroundColor(.red)
+                                    .foregroundStyle(.red)
                                 Text(error)
-                                    .foregroundColor(.red)
+                                    .foregroundStyle(.red)
                                     .font(.caption)
                                     .lineLimit(nil)
                                     .fixedSize(horizontal: false, vertical: true)
@@ -189,7 +189,7 @@ struct LocalLLMSettingsView: View {
                 }
             } else {
                 Text("Please select a model from the dropdown above to see its status and download options.")
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding()
             }
@@ -203,7 +203,7 @@ struct LocalLLMSettingsView: View {
             HStack(spacing: 8) {
                 ProgressView().controlSize(.small)
                 Text("Checking status...")
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             }
             .accessibilityLabel("Checking model status")
 
@@ -230,9 +230,9 @@ struct LocalLLMSettingsView: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.green)
+                        .foregroundStyle(.green)
                     Text("\(modelType.displayName) Ready")
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     Spacer()
                     Button("Delete Model") {
                         showingDeleteAlert = true
@@ -247,7 +247,7 @@ struct LocalLLMSettingsView: View {
                     HStack(spacing: 8) {
                         ProgressView().controlSize(.small)
                         Text("Loading model into memory...")
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     .accessibilityLabel("Loading model into memory")
                 }
@@ -257,7 +257,7 @@ struct LocalLLMSettingsView: View {
             HStack(spacing: 8) {
                 ProgressView().controlSize(.small)
                 Text("Loading \(modelType.displayName)...")
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             }
             .accessibilityLabel("Loading model")
 
@@ -271,7 +271,7 @@ struct LocalLLMSettingsView: View {
                 .help("Try downloading again if the previous attempt failed.")
             } else {
                 Text("Cannot proceed due to error.")
-                    .foregroundColor(.red)
+                    .foregroundStyle(.red)
             }
         }
 
@@ -280,11 +280,11 @@ struct LocalLLMSettingsView: View {
                 HStack(spacing: 8) {
                     ProgressView().controlSize(.small)
                     Text("Downloading \(modelType.displayName)...")
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     Spacer()
                     Button(action: { llmProvider.cancelDownload() }) {
                         Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.gray)
+                            .foregroundStyle(.gray)
                             .accessibilityLabel("Cancel download")
                     }
                     .buttonStyle(.plain)
@@ -293,7 +293,7 @@ struct LocalLLMSettingsView: View {
                 ProgressView(value: llmProvider.downloadProgress) {
                     Text("\(Int(llmProvider.downloadProgress * 100))%")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
                 .animation(.linear, value: llmProvider.downloadProgress)
                 .accessibilityLabel("Download progress")

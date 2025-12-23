@@ -26,7 +26,7 @@ struct PermissionRow: View {
     HStack(alignment: .top, spacing: 14) {
       Image(systemName: icon)
         .font(.system(size: 28))
-        .foregroundColor(status == .granted ? .green : .blue)
+        .foregroundStyle(status == .granted ? .green : .blue)
         .frame(width: 36)
 
       VStack(alignment: .leading, spacing: 6) {
@@ -37,7 +37,7 @@ struct PermissionRow: View {
         }
 
         Text(explanation)
-          .foregroundColor(.secondary)
+          .foregroundStyle(.secondary)
           .fixedSize(horizontal: false, vertical: true)
 
         HStack {
@@ -55,7 +55,7 @@ struct PermissionRow: View {
     }
     .padding(12)
     .background(Color(.controlBackgroundColor))
-    .cornerRadius(10)
+    .clipShape(.rect(cornerRadius: 10))
   }
 
   @ViewBuilder
@@ -65,10 +65,10 @@ struct PermissionRow: View {
         systemName: status == .granted
           ? "checkmark.circle.fill" : "exclamationmark.circle.fill"
       )
-      .foregroundColor(status == .granted ? .green : .orange)
+      .foregroundStyle(status == .granted ? .green : .orange)
       Text(status == .granted ? "Granted" : "Required")
         .font(.caption)
-        .foregroundColor(.secondary)
+        .foregroundStyle(.secondary)
     }
   }
 }

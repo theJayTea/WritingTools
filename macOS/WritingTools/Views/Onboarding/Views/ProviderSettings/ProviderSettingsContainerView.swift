@@ -30,7 +30,7 @@ struct ProviderSettingsContainerView: View {
       LocalLLMSettingsView(provider: appState.localLLMProvider)
     default:
       Text("Select a provider.")
-        .foregroundColor(.secondary)
+        .foregroundStyle(.secondary)
     }
   }
 }

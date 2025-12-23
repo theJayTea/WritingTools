@@ -41,11 +41,7 @@ struct WindowBackground: ViewModifier {
                         Color.black
                     }
                 }
-                .clipShape(
-                    RoundedRectangle(
-                        cornerRadius: cornerRadius ?? 0,
-                        style: .continuous)
-                )
+                .clipShape(.rect(cornerRadius: cornerRadius ?? 0))
             )
     }
 }

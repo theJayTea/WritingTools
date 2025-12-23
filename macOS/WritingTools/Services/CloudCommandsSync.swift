@@ -8,6 +8,8 @@
 import Foundation
 import Combine
 
+private let logger = AppLogger.logger("CloudCommandsSync")
+
 @MainActor
 final class CloudCommandsSync {
   static let shared = CloudCommandsSync()
@@ -28,18 +30,15 @@ final class CloudCommandsSync {
 
   private init() {
     // Start shortly after init to ensure AppState is ready
-    DispatchQueue.main.async { [weak self] in
-      Task { @MainActor in
-        self?.start()
-      }
+    Task { @MainActor [weak self] in
+      await Task.yield()
+      self?.start()
     }
   }
 
   func start() {
     guard !started else { return }
     started = true
-
-    store.synchronize()
 
     // Initial pull from iCloud if remote is newer
     pullFromICloudIfNewer()
@@ -102,11 +101,10 @@ final class CloudCommandsSync {
 
       store.set(data, forKey: dataKey)
       store.set(now, forKey: mtimeKey)
-      store.synchronize()
 
       UserDefaults.standard.set(now, forKey: localMTimeKey)
     } catch {
-      print("CloudCommandsSync: encode error: \(error)")
+      logger.error("CloudCommandsSync: encode error: \(error.localizedDescription)")
     }
   }
 
@@ -139,7 +137,7 @@ final class CloudCommandsSync {
         object: nil
       )
     } catch {
-      print("CloudCommandsSync: decode error: \(error)")
+      logger.error("CloudCommandsSync: decode error: \(error.localizedDescription)")
     }
   }
 

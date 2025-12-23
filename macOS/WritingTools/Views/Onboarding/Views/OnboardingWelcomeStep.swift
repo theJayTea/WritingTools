@@ -14,7 +14,7 @@ struct OnboardingWelcomeStep: View {
         .resizable()
         .scaledToFit()
         .frame(width: 60, height: 60)
-        .foregroundColor(.accentColor)
+        .foregroundStyle(.primary)
         .padding(.bottom, 4)
 
       VStack(alignment: .leading, spacing: 10) {
@@ -50,7 +50,7 @@ struct OnboardingWelcomeStep: View {
             result back—preserving formatting when supported.
             """
           )
-          .foregroundColor(.secondary)
+          .foregroundStyle(.secondary)
           .fixedSize(horizontal: false, vertical: true)
         }
         .padding(8)
@@ -58,7 +58,7 @@ struct OnboardingWelcomeStep: View {
 
       Text("You can change any setting later in Settings.")
         .font(.footnote)
-        .foregroundColor(.secondary)
+        .foregroundStyle(.secondary)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
   }

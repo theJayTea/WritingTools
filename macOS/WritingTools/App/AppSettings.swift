@@ -206,7 +206,6 @@ final class AppSettings {
     func resetAll() {
         let domain = Bundle.main.bundleIdentifier!
         UserDefaults.standard.removePersistentDomain(forName: domain)
-        UserDefaults.standard.synchronize()
         
         // Clear Keychain API keys
         try? keychain.clearAllApiKeys()

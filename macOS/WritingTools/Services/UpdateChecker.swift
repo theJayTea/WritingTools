@@ -2,6 +2,8 @@ import Foundation
 import AppKit
 import Observation
 
+private let logger = AppLogger.logger("UpdateChecker")
+
 @Observable
 @MainActor
 final class UpdateChecker {
@@ -35,7 +37,7 @@ final class UpdateChecker {
             
             // Print raw data for debugging
             if let rawString = String(data: data, encoding: .utf8) {
-                print("Raw version data: '\(rawString)'")
+                logger.debug("Raw version data: '\(rawString)'")
             }
             
             // Clean up the version string more aggressively
@@ -49,12 +51,12 @@ final class UpdateChecker {
             if let versionString = cleanedString,
                !versionString.isEmpty,
                let latestVersion = Double(versionString) {  // Changed to Double
-                print("Parsed version: \(latestVersion)")
+                logger.debug("Parsed version: \(latestVersion)")
                 updateAvailable = latestVersion > currentVersion
             } else {
                 checkError = "Invalid version format"
                 if let cleanedString = cleanedString {
-                    print("Failed to parse version from: '\(cleanedString)'")
+                    logger.warning("Failed to parse version from: '\(cleanedString)'")
                 }
             }
         } catch {

@@ -46,7 +46,7 @@ struct SettingsView: View {
                     needsSaving: $needsSaving,
                     showingCommandsManager: $showingCommandsManager,
                     showOnlyApiSetup: showOnlyApiSetup,
-                    saveButton: AnyView(saveButton)
+                    saveButton: saveButton
                 )
                 .tag(SettingsTab.general)
                 .tabItem {
@@ -56,7 +56,7 @@ struct SettingsView: View {
                 AppearanceSettingsPane(
                     needsSaving: $needsSaving,
                     showOnlyApiSetup: showOnlyApiSetup,
-                    saveButton: AnyView(saveButton)
+                    saveButton: saveButton
                 )
                 .tag(SettingsTab.appearance)
                 .tabItem {
@@ -67,8 +67,8 @@ struct SettingsView: View {
                     appState: appState,
                     needsSaving: $needsSaving,
                     showOnlyApiSetup: showOnlyApiSetup,
-                    saveButton: AnyView(saveButton),
-                    completeSetupButton: AnyView(completeSetupButton)
+                    saveButton: saveButton,
+                    completeSetupButton: completeSetupButton
                 )
                 .tag(SettingsTab.aiProvider)
                 .tabItem {
@@ -100,7 +100,7 @@ struct SettingsView: View {
     }
     
     private func updateWindowTitle(to tab: SettingsTab) {
-        DispatchQueue.main.async {
+        Task { @MainActor in
             if let window = NSApp.windows.first(where: {
                 $0.contentView?
                     .subviews
@@ -117,7 +117,7 @@ struct SettingsView: View {
             if !needsSaving {
                 Text("All changes saved")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             }
             Spacer()
             Button("Save Changes") {
@@ -199,7 +199,7 @@ struct SettingsView: View {
         
         needsSaving = false
         
-        DispatchQueue.main.async {
+        Task { @MainActor in
             if self.showOnlyApiSetup {
                 WindowManager.shared.cleanupWindows()
             } else if let window = NSApplication.shared.windows.first(where: {

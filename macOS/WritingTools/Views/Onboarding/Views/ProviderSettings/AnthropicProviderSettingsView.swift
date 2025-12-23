@@ -33,7 +33,7 @@ struct AnthropicProviderSettingsView: View {
         "E.g., \(AnthropicModel.allCases.map { $0.rawValue }.joined(separator: ", "))"
       )
       .font(.caption)
-      .foregroundColor(.secondary)
+      .foregroundStyle(.secondary)
 
       Button("Get Anthropic API Key") {
         if let url = URL(string: "https://console.anthropic.com/settings/keys")

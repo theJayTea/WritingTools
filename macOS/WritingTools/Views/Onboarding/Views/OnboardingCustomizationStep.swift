@@ -20,7 +20,7 @@ struct OnboardingCustomizationStep: View {
             "Set the keyboard shortcut to activate WritingTools from anywhere."
           )
           .font(.caption)
-          .foregroundColor(.secondary)
+          .foregroundStyle(.secondary)
 
           KeyboardShortcuts.Recorder(
             "Activate WritingTools:",
@@ -34,7 +34,7 @@ struct OnboardingCustomizationStep: View {
         VStack(alignment: .leading, spacing: 8) {
           Text("Choose how the popup window looks.")
             .font(.caption)
-            .foregroundColor(.secondary)
+            .foregroundStyle(.secondary)
 
           Picker("Theme", selection: $settings.themeStyle) {
             Text("Standard").tag("standard")
@@ -51,7 +51,7 @@ struct OnboardingCustomizationStep: View {
         VStack(alignment: .leading, spacing: 8) {
           Text("Select the AI service you want to use.")
             .font(.caption)
-            .foregroundColor(.secondary)
+            .foregroundStyle(.secondary)
 
           Picker("Provider", selection: $settings.currentProvider) {
             if LocalModelProvider.isAppleSilicon {
@@ -79,7 +79,7 @@ struct OnboardingCustomizationStep: View {
 
           Text("You can always adjust these later in Settings.")
             .font(.footnote)
-            .foregroundColor(.secondary)
+            .foregroundStyle(.secondary)
         }
         .padding(.vertical, 4)
       }

@@ -17,7 +17,7 @@ struct GeminiSettingsView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("API Configuration")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     
                     TextField("API Key", text: $settings.geminiApiKey)
                         .textFieldStyle(.roundedBorder)
@@ -29,7 +29,7 @@ struct GeminiSettingsView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Model Selection")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     
                     Picker("Model", selection: $settings.geminiModel) {
                         ForEach(GeminiModel.allCases, id: \.self) { model in

@@ -1,6 +1,8 @@
 import Foundation
 import AIProxy
 
+private let logger = AppLogger.logger("AnthropicProvider")
+
 struct AnthropicConfig: Codable {
     var apiKey: String
     var model: String
@@ -99,7 +101,7 @@ class AnthropicProvider: ObservableObject, AIProvider {
                 case .text(let message):
                     return message
                 case .toolUse(id: _, name: let toolName, input: let toolInput):
-                    print("Anthropic tool use: \(toolName) input: \(toolInput)")
+                    logger.debug("Anthropic tool use: \(toolName) input: \(toolInput)")
                 }
             }
             throw NSError(
@@ -108,14 +110,14 @@ class AnthropicProvider: ObservableObject, AIProvider {
                 userInfo: [NSLocalizedDescriptionKey: "No text content in response."]
             )
         } catch AIProxyError.unsuccessfulRequest(let statusCode, let responseBody) {
-            print("Anthropic error (\(statusCode)): \(responseBody)")
+            logger.error("Anthropic error (\(statusCode)): \(responseBody)")
             throw NSError(
                 domain: "AnthropicAPI",
                 code: statusCode,
                 userInfo: [NSLocalizedDescriptionKey: "API error: \(responseBody)"]
             )
         } catch {
-            print("Anthropic request failed: \(error.localizedDescription)")
+            logger.error("Anthropic request failed: \(error.localizedDescription)")
             throw error
         }
     }

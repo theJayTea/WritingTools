@@ -7,6 +7,8 @@
 
 import AppKit
 
+private let logger = AppLogger.logger("ClipboardSnapshot")
+
 /// A comprehensive snapshot of the clipboard state that captures all items and all types
 struct ClipboardSnapshot {
     /// All pasteboard items with their data
@@ -43,16 +45,16 @@ struct ClipboardSnapshot {
         
         self.items = capturedItems
         
-        NSLog("ClipboardSnapshot: Captured \(capturedItems.count) items with total types: \(capturedItems.flatMap { $0.keys }.count)")
+        logger.debug("ClipboardSnapshot: Captured \(capturedItems.count) items with total types: \(capturedItems.flatMap { $0.keys }.count)")
     }
     
     /// Restores this snapshot to the clipboard
     func restore() {
         let pb = NSPasteboard.general
-        pb.clearContents()
+        pb.prepareForNewContents(with: [])
         
         guard !items.isEmpty else {
-            NSLog("ClipboardSnapshot: No items to restore")
+            logger.info("ClipboardSnapshot: No items to restore")
             return
         }
         
@@ -74,9 +76,9 @@ struct ClipboardSnapshot {
         let success = pb.writeObjects(pasteboardItems)
         
         if success {
-            NSLog("ClipboardSnapshot: Successfully restored \(pasteboardItems.count) items")
+            logger.debug("ClipboardSnapshot: Successfully restored \(pasteboardItems.count) items")
         } else {
-            NSLog("ClipboardSnapshot: Failed to restore clipboard items")
+            logger.error("ClipboardSnapshot: Failed to restore clipboard items")
         }
     }
     

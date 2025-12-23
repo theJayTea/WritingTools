@@ -16,7 +16,7 @@ struct AboutView: View {
 
                 Text("Writing Tools is a free, lightweight utility that enhances your writing with AI.")
                     .multilineTextAlignment(.center)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                     .font(.title3)
                     .padding(.horizontal)
             }
@@ -62,17 +62,17 @@ struct AboutView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                     } else if let error = updateChecker.checkError {
                         Text(error)
-                            .foregroundColor(.red)
+                            .foregroundStyle(.red)
                             .font(.caption)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     } else if updateChecker.updateAvailable {
                         Text("A new version is available!")
-                            .foregroundColor(.green)
+                            .foregroundStyle(.green)
                             .font(.caption)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     } else {
                         Text("The latest version is already installed!")
-                            .foregroundColor(.green)
+                            .foregroundStyle(.green)
                             .font(.caption)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }

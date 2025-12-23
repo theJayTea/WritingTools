@@ -1,11 +1,10 @@
 import SwiftUI
 import AppKit
 
+private let logger = AppLogger.logger("WindowManager")
+
 class WindowManager: NSObject, NSWindowDelegate {
     static let shared = WindowManager()
-
-    private let windowQueue =
-        DispatchQueue(label: "com.writingtools.windowmanager", qos: .userInitiated)
 
     private var onboardingWindow =
         NSMapTable<NSWindow, NSHostingView<OnboardingView>>.strongToWeakObjects()
@@ -24,13 +23,15 @@ class WindowManager: NSObject, NSWindowDelegate {
         if Thread.isMainThread {
             operation()
         } else {
-            DispatchQueue.main.async(execute: operation)
+            Task { @MainActor in
+                operation()
+            }
         }
     }
 
     // Execute operation on window queue
     private func performOnWindowQueue(_ operation: @escaping () -> Void) {
-        windowQueue.async { [weak self] in
+        Task.detached(priority: .userInitiated) { [weak self] in
             guard self != nil else { return }
             operation()
         }
@@ -41,7 +42,7 @@ class WindowManager: NSObject, NSWindowDelegate {
     func addResponseWindow(_ window: ResponseWindow) {
         performOnMainThread { [weak self] in
             guard let self = self, !window.isReleasedWhenClosed else {
-                print("Error: Attempted to add a released window.")
+                logger.error("Attempted to add a released window.")
                 return
             }
             if !self.responseWindows.contains(window) {

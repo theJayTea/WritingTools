@@ -150,7 +150,7 @@ struct ResponseView: View {
                                         .scaleEffect(0.8)
                                     Text("Thinking...")
                                         .font(.system(size: 14))
-                                        .foregroundColor(.secondary)
+                                        .foregroundStyle(.secondary)
                                 }
                                 .padding(12)
                                 .background(
@@ -269,17 +269,17 @@ struct ChatMessageView: View {
             HStack(spacing: 8) {
                 Text(message.timestamp.formatted(.dateTime.hour().minute()))
                     .font(.caption2)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                 
                 Button(action: copyEntireMessage) {
                     if showCopiedFeedback {
                         Text("Copied")
                             .font(.caption2)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     } else {
                         Image(systemName: "doc.on.doc")
                             .font(.caption2)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                 }
                 .buttonStyle(.plain)
@@ -291,11 +291,13 @@ struct ChatMessageView: View {
     }
     
     private func copyEntireMessage() {
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(message.content, forType: .string)
+        let pasteboard = NSPasteboard.general
+        pasteboard.prepareForNewContents(with: [])
+        pasteboard.writeObjects([message.content as NSString])
         
         showCopiedFeedback = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(2))
             showCopiedFeedback = false
         }
     }
@@ -437,11 +439,13 @@ final class ResponseViewModel: ObservableObject {
             return "\(message.role.capitalized): \(message.content)"
         }.joined(separator: "\n\n")
         
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(conversationText, forType: .string)
+        let pasteboard = NSPasteboard.general
+        pasteboard.prepareForNewContents(with: [])
+        pasteboard.writeObjects([conversationText as NSString])
         
         showCopyConfirmation = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(2))
             self.showCopyConfirmation = false
         }
     }

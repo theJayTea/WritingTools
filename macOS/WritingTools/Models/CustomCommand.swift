@@ -1,6 +1,8 @@
 import Foundation
 import Combine
 
+private let logger = AppLogger.logger("CustomCommandsManager")
+
 struct CustomCommand: Codable, Identifiable, Equatable {
   let id: UUID
   var name: String
@@ -44,7 +46,6 @@ class CustomCommandsManager: ObservableObject {
     loadLocalCommands()
 
     // Start iCloud sync
-    iCloudStore.synchronize()
     // Pull from iCloud if newer than local
     pullFromICloudIfNewer()
 
@@ -118,11 +119,10 @@ class CustomCommandsManager: ObservableObject {
 
       iCloudStore.set(data, forKey: iCloudDataKey)
       iCloudStore.set(now, forKey: iCloudMTimeKey)
-      iCloudStore.synchronize()
 
       UserDefaults.standard.set(now, forKey: localMTimeDefaultsKey)
     } catch {
-      print("CustomCommandsManager: Failed to encode for iCloud: \(error)")
+      logger.error("CustomCommandsManager: Failed to encode for iCloud: \(error.localizedDescription)")
     }
   }
 
@@ -155,7 +155,7 @@ class CustomCommandsManager: ObservableObject {
       // Notify UI if needed
       objectWillChange.send()
     } catch {
-      print("CustomCommandsManager: Failed to decode from iCloud: \(error)")
+      logger.error("CustomCommandsManager: Failed to decode from iCloud: \(error.localizedDescription)")
     }
   }
 

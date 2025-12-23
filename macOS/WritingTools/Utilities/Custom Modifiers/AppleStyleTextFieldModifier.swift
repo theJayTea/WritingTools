@@ -10,14 +10,14 @@ struct AppleStyleTextFieldModifier: ViewModifier {
     @State private var isHovered: Bool = false
     
     private let animationDuration = 0.3
-    private let animationNanoseconds: UInt64 = 300_000_000  // 0.3 seconds
+    private let animationDelay: Duration = .milliseconds(300)
     
     func body(content: Content) -> some View {
         ZStack(alignment: .trailing) {
             HStack(spacing: 0) {
                 content
                     .font(.system(size: 14))
-                    .foregroundColor(colorScheme == .dark ? .white : .primary)
+                    .foregroundStyle(colorScheme == .dark ? .white : .primary)
                     .padding(12)
                     .onSubmit {
                         performSubmitAnimation()
@@ -30,11 +30,11 @@ struct AppleStyleTextFieldModifier: ViewModifier {
             if !text.isEmpty {
                 Button(action: performSubmitAnimation) {
                     Image(systemName: isLoading ? "hourglass" : "paperplane.fill")
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                         .font(.system(size: 12))
                         .frame(width: 24, height: 24)
                         .background(Color.blue)
-                        .clipShape(Circle())
+                        .clipShape(.circle)
                         .scaleEffect(isHovered ? 1.05 : 1.0)
                         .opacity(isHovered ? 1.0 : 0.9)
                 }
@@ -63,7 +63,7 @@ struct AppleStyleTextFieldModifier: ViewModifier {
                 }
             }
         )
-        .cornerRadius(6)
+        .clipShape(.rect(cornerRadius: 6))
         .overlay(
             RoundedRectangle(cornerRadius: 6)
                 .strokeBorder(
@@ -84,7 +84,7 @@ struct AppleStyleTextFieldModifier: ViewModifier {
         onSubmit()
         
         Task { @MainActor in
-            try? await Task.sleep(nanoseconds: animationNanoseconds)
+            try? await Task.sleep(for: animationDelay)
             withAnimation(.easeInOut(duration: animationDuration)) {
                 isAnimating = false
             }

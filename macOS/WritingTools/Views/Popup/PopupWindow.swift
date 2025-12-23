@@ -27,7 +27,7 @@ class PopupWindow: NSWindow {
     configureWindow()
     setupTrackingArea()
 
-    DispatchQueue.main.async { [weak self] in
+    Task { @MainActor [weak self] in
       self?.updateWindowSize()
     }
 
@@ -99,10 +99,11 @@ class PopupWindow: NSWindow {
   @objc private func updateWindowSize() {
     // Use a shorter delay only when needed for layout stabilization
     // For edit mode changes, we want immediate response
-    let delay = self.viewModel.isEditMode ? 0.05 : 0.1
-    
-    DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
-      guard let self = self else { return }
+    let delay: Duration = self.viewModel.isEditMode ? .milliseconds(50) : .milliseconds(100)
+
+    Task { @MainActor [weak self] in
+      try? await Task.sleep(for: delay)
+      guard let self else { return }
 
       let baseHeight: CGFloat = 100
       let buttonHeight: CGFloat = 55
@@ -126,7 +127,7 @@ class PopupWindow: NSWindow {
         }
       }
 
-      NSAnimationContext.runAnimationGroup { context in
+        await NSAnimationContext.runAnimationGroup { context in
         context.duration = 0.25
         context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
 

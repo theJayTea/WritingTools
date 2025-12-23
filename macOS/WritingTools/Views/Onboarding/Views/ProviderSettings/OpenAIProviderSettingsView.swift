@@ -27,7 +27,7 @@ struct OpenAIProviderSettingsView: View {
         "Default models: \(OpenAIConfig.defaultModel), gpt-4o, gpt-4o-mini, etc."
       )
       .font(.caption)
-      .foregroundColor(.secondary)
+      .foregroundStyle(.secondary)
 
       Button("Get OpenAI API Key") {
         if let url = URL(

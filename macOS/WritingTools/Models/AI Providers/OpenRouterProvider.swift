@@ -2,6 +2,8 @@ import Foundation
 import AppKit
 import AIProxy
 
+private let logger = AppLogger.logger("OpenRouterProvider")
+
 struct OpenRouterConfig: Codable {
     var apiKey: String
     var model: String
@@ -116,14 +118,14 @@ class OpenRouterProvider: ObservableObject, AIProvider {
                 return response.choices.first?.message.content ?? ""
             }
         } catch AIProxyError.unsuccessfulRequest(let statusCode, let responseBody) {
-            print("OpenRouter error (\(statusCode)): \(responseBody)")
+            logger.error("OpenRouter error (\(statusCode)): \(responseBody)")
             throw NSError(
                 domain: "OpenRouterAPI",
                 code: statusCode,
                 userInfo: [NSLocalizedDescriptionKey: "API error: \(responseBody)"]
             )
         } catch {
-            print("OpenRouter request failed: \(error.localizedDescription)")
+            logger.error("OpenRouter request failed: \(error.localizedDescription)")
             throw error
         }
     }

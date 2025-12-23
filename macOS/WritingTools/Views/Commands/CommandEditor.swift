@@ -1,6 +1,8 @@
 import SwiftUI
 import KeyboardShortcuts
 
+private let logger = AppLogger.logger("CommandEditor")
+
 struct CommandEditor: View {
     @Binding var command: CommandModel
     @Bindable private var settings = AppSettings.shared
@@ -58,12 +60,12 @@ struct CommandEditor: View {
             HStack {
                 Text(isBuiltIn ? "Edit Built-In Command" : "Edit Command")
                     .font(.headline)
-                    .foregroundColor(.primary)
+                    .foregroundStyle(.primary)
                 Spacer()
                 Button(action: { onCancel() }) {
                     Image(systemName: "xmark.circle.fill")
                         .font(.title2)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
@@ -79,7 +81,7 @@ struct CommandEditor: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("Name")
                             .font(.headline)
-                            .foregroundColor(.primary)
+                            .foregroundStyle(.primary)
                         TextField("Command Name", text: $name)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .frame(maxWidth: .infinity)
@@ -87,7 +89,7 @@ struct CommandEditor: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("Icon")
                             .font(.headline)
-                            .foregroundColor(.primary)
+                            .foregroundStyle(.primary)
                         Button(action: { showingIconPicker = true }) {
                             HStack {
                                 Image(systemName: selectedIcon)
@@ -98,7 +100,7 @@ struct CommandEditor: View {
                             }
                             .padding(6)
                             .background(Color(.controlBackgroundColor))
-                            .cornerRadius(6)
+                            .clipShape(.rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
                     }
@@ -115,7 +117,7 @@ struct CommandEditor: View {
                         VStack(alignment: .leading, spacing: 8) {
                             HStack {
                                 Text("Provider:")
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                                 Picker("", selection: $selectedProvider) {
                                     if LocalModelProvider.isAppleSilicon {
                                         Text("Local LLM").tag("local")
@@ -137,42 +139,42 @@ struct CommandEditor: View {
                                     VStack(alignment: .leading, spacing: 4) {
                                         HStack {
                                             Text("Base URL:")
-                                                .foregroundColor(.secondary)
+                                                .foregroundStyle(.secondary)
                                                 .frame(width: 80, alignment: .leading)
                                             TextField("e.g., https://api.example.com/v1", text: $customProviderBaseURL)
                                                 .textFieldStyle(.roundedBorder)
                                         }
                                         Text("The base URL of your API endpoint (e.g., https://api.openai.com/v1)")
                                             .font(.caption)
-                                            .foregroundColor(.secondary)
+                                            .foregroundStyle(.secondary)
                                             .padding(.leading, 84)
                                     }
 
                                     VStack(alignment: .leading, spacing: 4) {
                                         HStack {
                                             Text("API Key:")
-                                                .foregroundColor(.secondary)
+                                                .foregroundStyle(.secondary)
                                                 .frame(width: 80, alignment: .leading)
                                             SecureField("Your API key", text: $customProviderApiKey)
                                                 .textFieldStyle(.roundedBorder)
                                         }
                                         Text("Your API authentication key")
                                             .font(.caption)
-                                            .foregroundColor(.secondary)
+                                            .foregroundStyle(.secondary)
                                             .padding(.leading, 84)
                                     }
 
                                     VStack(alignment: .leading, spacing: 4) {
                                         HStack {
                                             Text("Model:")
-                                                .foregroundColor(.secondary)
+                                                .foregroundStyle(.secondary)
                                                 .frame(width: 80, alignment: .leading)
                                             TextField("e.g., gpt-4o-mini", text: $customProviderModel)
                                                 .textFieldStyle(.roundedBorder)
                                         }
                                         Text("The model identifier to use")
                                             .font(.caption)
-                                            .foregroundColor(.secondary)
+                                            .foregroundStyle(.secondary)
                                             .padding(.leading, 84)
                                     }
                                 }
@@ -181,13 +183,13 @@ struct CommandEditor: View {
                                 VStack(alignment: .leading, spacing: 4) {
                                     HStack {
                                         Text("Model (optional):")
-                                            .foregroundColor(.secondary)
+                                            .foregroundStyle(.secondary)
                                         TextField("e.g., gpt-4o-mini, claude-3-5-sonnet", text: $customModel)
                                             .textFieldStyle(.roundedBorder)
                                     }
                                     Text("Leave empty to use the default model for the selected provider. Examples: gpt-4o-mini (OpenAI), claude-3-5-sonnet-20240620 (Anthropic), gemini-flash-latest (Gemini)")
                                         .font(.caption)
-                                        .foregroundColor(.secondary)
+                                        .foregroundStyle(.secondary)
                                 }
                             }
                         }
@@ -199,12 +201,12 @@ struct CommandEditor: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Keyboard Shortcut")
                         .font(.headline)
-                        .foregroundColor(.primary)
+                        .foregroundStyle(.primary)
                     Toggle("Enable keyboard shortcut for this command", isOn: $hasShortcut)
                     if hasShortcut {
                         HStack {
                             Text("Command shortcut:")
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                             KeyboardShortcuts.Recorder(
                                 for: .commandShortcut(for: command.id),
                                 onChange: { shortcut in
@@ -216,14 +218,14 @@ struct CommandEditor: View {
                         }
                         Text("Tip: This shortcut will execute the command directly without opening the popup window.")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                 }
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Prompt")
                         .font(.headline)
-                        .foregroundColor(.primary)
+                        .foregroundStyle(.primary)
                     ZStack {
                         RoundedRectangle(cornerRadius: 8)
                             .fill(Color(.textBackgroundColor))
@@ -244,7 +246,7 @@ struct CommandEditor: View {
                 if isBuiltIn {
                     Text("This is a built-in command. Your changes will be saved but you can reset to the original configuration later if needed.")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
                 }
             }
@@ -277,7 +279,7 @@ struct CommandEditor: View {
                     if useCustomProvider {
                         updatedCommand.providerOverride = selectedProvider
 
-                        NSLog("CommandEditor: Saving with useCustomProvider=true, selectedProvider=\(selectedProvider)")
+                        logger.debug("CommandEditor: Saving with useCustomProvider=true, selectedProvider=\(selectedProvider)")
 
                         if selectedProvider == "custom" {
                             // Save custom provider configuration
@@ -290,7 +292,7 @@ struct CommandEditor: View {
                             updatedCommand.customProviderModel = trimmedModel.isEmpty ? nil : trimmedModel
                             updatedCommand.modelOverride = nil
 
-                            NSLog("CommandEditor: Saving custom provider - baseURL=\(trimmedBaseURL), apiKey=\(trimmedApiKey.isEmpty ? "empty" : "set"), model=\(trimmedModel)")
+                            logger.debug("CommandEditor: Saving custom provider - baseURL=\(trimmedBaseURL), apiKey=\(trimmedApiKey.isEmpty ? "empty" : "set"), model=\(trimmedModel)")
                         } else {
                             // Save model override for standard providers
                             updatedCommand.modelOverride = customModel.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : customModel.trimmingCharacters(in: .whitespacesAndNewlines)

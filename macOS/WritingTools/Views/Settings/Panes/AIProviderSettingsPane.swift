@@ -8,13 +8,13 @@
 import SwiftUI
 import AppKit
 
-struct AIProviderSettingsPane: View {
+struct AIProviderSettingsPane<SaveButton: View, CompleteSetupButton: View>: View {
     @Bindable var appState: AppState
     @Bindable var settings = AppSettings.shared
     @Binding var needsSaving: Bool
     var showOnlyApiSetup: Bool
-    var saveButton: AnyView
-    var completeSetupButton: AnyView
+    let saveButton: SaveButton
+    let completeSetupButton: CompleteSetupButton
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -24,7 +24,7 @@ struct AIProviderSettingsPane: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Select AI Service")
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
 
                 Picker("Provider", selection: $settings.currentProvider) {
                     if LocalModelProvider.isAppleSilicon {

@@ -1,6 +1,8 @@
 import Foundation
 import AIProxy
 
+private let logger = AppLogger.logger("OpenAIProvider")
+
 struct OpenAIConfig: Codable {
     var apiKey: String
     var baseURL: String
@@ -117,12 +119,12 @@ class OpenAIProvider: ObservableObject, AIProvider {
                 }
                 
             } catch AIProxyError.unsuccessfulRequest(let statusCode, let responseBody) {
-                print("Received non-200 status code: \(statusCode) with response body: \(responseBody)")
+                logger.error("Received non-200 status code: \(statusCode) with response body: \(responseBody)")
                 throw NSError(domain: "OpenAIAPI",
                               code: statusCode,
                               userInfo: [NSLocalizedDescriptionKey: "API error: \(responseBody)"])
             } catch {
-                print("Could not create OpenAI chat completion: \(error.localizedDescription)")
+                logger.error("Could not create OpenAI chat completion: \(error.localizedDescription)")
                 throw error
             }
         }
@@ -191,7 +193,7 @@ class OpenAIProvider: ObservableObject, AIProvider {
         
         guard (200...299).contains(httpResponse.statusCode) else {
             let errorBody = String(data: data, encoding: .utf8) ?? "Unknown error"
-            print("Custom OpenAI Request Failed: \(httpResponse.statusCode) - \(errorBody)")
+            logger.error("Custom OpenAI Request Failed: \(httpResponse.statusCode) - \(errorBody)")
             throw NSError(domain: "OpenAIAPI", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: "API Error: \(errorBody)"])
         }
         
@@ -210,7 +212,7 @@ class OpenAIProvider: ObservableObject, AIProvider {
             let decoded = try JSONDecoder().decode(ChatCompletionResponse.self, from: data)
             return decoded.choices.first?.message.content ?? ""
         } catch {
-            print("Failed to decode response: \(error)")
+            logger.error("Failed to decode response: \(error.localizedDescription)")
              throw NSError(domain: "OpenAIAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to parse API response."])
         }
     }

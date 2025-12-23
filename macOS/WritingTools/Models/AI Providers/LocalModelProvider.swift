@@ -8,6 +8,8 @@ import Combine
 import Observation
 import Hub
 
+private let logger = AppLogger.logger("LocalModelProvider")
+
 // Constants for UserDefaults keys
 fileprivate let kModelStatusKey = "local_llm_model_status"
 fileprivate let kModelInfoKey = "local_llm_model_info"
@@ -208,7 +210,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
         }
         
         guard !isDownloading, loadState != .loading else {
-            print("checkModelStatus: Skipping check, currently downloading or loading.")
+            logger.debug("checkModelStatus: Skipping check, currently downloading or loading.")
             return
         }
         
@@ -229,7 +231,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
                     let contents = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
                     isEmpty = contents.isEmpty
                 } catch {
-                    print("Error reading directory contents: \(error)")
+                    logger.error("Error reading directory contents: \(error.localizedDescription)")
                     isEmpty = true
                 }
             }
@@ -246,7 +248,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
             if exists && isDirectory.boolValue && isEmpty {
                 // Attempt to remove empty directory
                 try? FileManager.default.removeItem(at: modelDir)
-                print("checkModelStatus: Removed empty directory at \(modelDir.path)")
+                logger.debug("checkModelStatus: Removed empty directory at \(modelDir.path)")
             }
             loadState = .needsDownload
             modelInfo = "\(modelType.displayName) needs to be downloaded."
@@ -268,12 +270,12 @@ class LocalModelProvider: ObservableObject, AIProvider {
         }
         // Prevent starting if already downloading or task exists
         guard !isDownloading, downloadTask == nil else {
-            print("startDownload: Download already in progress or task exists.")
+            logger.info("startDownload: Download already in progress or task exists.")
             return
         }
         // Prevent starting if already downloaded/loading/loaded
         guard loadState == .needsDownload || loadState == .error("Download failed") || loadState == .idle || loadState == .checking else {
-            print("startDownload: Cannot start download from state \(loadState).")
+            logger.warning("startDownload: Cannot start download from state \(String(describing: self.loadState)).")
             // Update info based on state
             switch loadState {
             case .downloaded, .loaded: modelInfo = "\(selectedModelType?.displayName ?? "Model") is already available."
@@ -284,7 +286,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
         }
         
         
-        print("startDownload: Proceeding to initiate download for \(selectedModelType?.displayName ?? "Unknown").")
+        logger.debug("startDownload: Proceeding to initiate download for \(self.selectedModelType?.displayName ?? "Unknown").")
         
         isCancelled = false
         retryCount = 0
@@ -295,19 +297,19 @@ class LocalModelProvider: ObservableObject, AIProvider {
         loadState = .needsDownload
         
         downloadTask = Task {
-            print("startDownload: Task created, calling load()")
+            logger.debug("startDownload: Task created, calling load()")
             do {
                 let container = try await load()
                 // Success is handled within load() by setting state to .loaded
-                print("startDownload: Task finished successfully.")
+                logger.debug("startDownload: Task finished successfully.")
                 return container
             } catch {
                 // Errors (including cancellation) are handled within load()
-                print("startDownload: Task finished with error: \(error)")
+                logger.error("startDownload: Task finished with error: \(error.localizedDescription)")
                 throw error
             }
         }
-        print("startDownload: downloadTask assigned.")
+        logger.debug("startDownload: downloadTask assigned.")
     }
     
     // --- cancelDownload ---
@@ -316,14 +318,14 @@ class LocalModelProvider: ObservableObject, AIProvider {
         
         // Only proceed if a download is actually in progress
         guard isDownloading, let task = downloadTask else {
-            print("cancelDownload: No active download task to cancel.")
+            logger.info("cancelDownload: No active download task to cancel.")
             isDownloading = false
             downloadTask = nil
             isCancelled = false
             return
         }
         
-        print("cancelDownload: Initiating cancellation...")
+        logger.debug("cancelDownload: Initiating cancellation...")
         
         isCancelled = true
         task.cancel()
@@ -351,7 +353,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
             return
         }
         guard !isDownloading, downloadTask == nil else {
-            print("retryDownload: Cannot retry while another download is active.")
+            logger.warning("retryDownload: Cannot retry while another download is active.")
             modelInfo = "Cannot retry: another download is active."
             return
         }
@@ -360,7 +362,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
         loadState = .needsDownload
         lastError = nil
         modelInfo = "Retrying download (\(retryCount)/\(maxRetries)) for \(selectedModelType?.displayName ?? "model")..."
-        print("retryDownload: Attempting retry \(retryCount)/\(maxRetries)")
+        logger.debug("retryDownload: Attempting retry \(self.retryCount)/\(self.maxRetries)")
         startDownload()
     }
     
@@ -404,12 +406,12 @@ class LocalModelProvider: ObservableObject, AIProvider {
             
             if exists && isDirectory.boolValue {
                 try FileManager.default.removeItem(at: modelDir)
-                print("Model directory deleted: \(modelDir.path)")
+                logger.debug("Model directory deleted: \(modelDir.path)")
             } else if exists { // It's a file? Try deleting anyway.
                 try FileManager.default.removeItem(at: modelDir)
-                print("Warning: Expected directory but found file at \(modelDir.path), removed.")
+                logger.warning("Expected directory but found file at \(modelDir.path), removed.")
             } else {
-                print("Model directory not found, nothing to delete: \(modelDir.path)")
+                logger.debug("Model directory not found, nothing to delete: \(modelDir.path)")
             }
             
             // Reset state *after* successful deletion or if not found
@@ -419,7 +421,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
             modelInfo = "\(modelType.displayName) deleted." // Update info *after* check
             
         } catch {
-            print("Failed to delete model \(modelType.displayName): \(error)")
+            logger.error("Failed to delete model \(modelType.displayName): \(error.localizedDescription)")
             lastError = "Failed to delete \(modelType.displayName): \(error.localizedDescription)"
             modelInfo = lastError!
             loadState = .error(lastError!)
@@ -436,7 +438,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
         }
         let cacheKey = cacheKey(for: config)
         
-        print("load: Function called. Current state: \(loadState)")
+        logger.debug("load: Function called. Current state: \(String(describing: self.loadState))")
 
         if let cached = modelCache.object(forKey: cacheKey) {
             loadState = .loaded(cached)
@@ -445,12 +447,12 @@ class LocalModelProvider: ObservableObject, AIProvider {
         }
 
         if case .loaded(let container) = loadState {
-            print("load: Model already loaded.")
+            logger.debug("load: Model already loaded.")
             modelCache.setObject(container, forKey: cacheKey)
             return container
         }
         if case .loading = loadState {
-            print("load: Model is already loading (called directly?).")
+            logger.debug("load: Model is already loading (called directly?).")
             // Wait for existing load? For now, throw error.
             throw NSError(domain: "LocalLLM", code: -3, userInfo: [NSLocalizedDescriptionKey: "Model is already loading."])
         }
@@ -461,7 +463,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
         
         // --- Download Block ---
         if case .needsDownload = loadState {
-            print("load: State is .needsDownload. Preparing to download \(modelType.displayName).")
+            logger.debug("load: State is .needsDownload. Preparing to download \(modelType.displayName).")
             // Ensure flags are accurate, though startDownload should have set them
             isDownloading = true
             // downloadProgress = 0 // Keep existing progress if resuming? No, start fresh.
@@ -473,7 +475,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
                 ? VLMModelFactory.shared
                 : LLMModelFactory.shared
                 
-                print("load: Calling \(modelType.isVisionModel ? "VLM" : "LLM")ModelFactory.shared.loadContainer for \(config.id)")
+                logger.debug("load: Calling \(modelType.isVisionModel ? "VLM" : "LLM")ModelFactory.shared.loadContainer for \(String(describing: config.id))")
                 
                 let modelContainer = try await factory.loadContainer(
                     hub: hub,
@@ -491,7 +493,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
                     }
                 }
                 // --- Download Success ---
-                print("load: loadContainer completed successfully for download.")
+                logger.debug("load: loadContainer completed successfully for download.")
                 isDownloading = false
                 downloadProgress = 1.0
                 downloadTask = nil // Clear task reference
@@ -499,12 +501,12 @@ class LocalModelProvider: ObservableObject, AIProvider {
                 modelInfo = "\(modelType.displayName) loaded. Weights: \(numParams / (1024 * 1024))M"
                 modelCache.setObject(modelContainer, forKey: cacheKey)
                 loadState = .loaded(modelContainer)
-                print("load: State set to .loaded")
+                logger.debug("load: State set to .loaded")
                 return modelContainer
                 
             } catch { // Catch ALL errors here
                 // --- Download Error/Cancellation ---
-                print("load: Error during loadContainer (download): \(error), isCancelled flag: \(isCancelled)")
+                logger.error("load: Error during loadContainer (download): \(error.localizedDescription), isCancelled flag: \(self.isCancelled)")
                 
                 // Determine if it was a user cancellation
                 let wasExplicitlyCancelled = isCancelled // Check our flag first
@@ -516,7 +518,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
                 downloadTask = nil // Clear task reference
                 
                 if wasExplicitlyCancelled || isCancellationError {
-                    print("load: Download cancelled.")
+                    logger.debug("load: Download cancelled.")
                     lastError = "Download cancelled." // Set user-facing error
                     modelInfo = lastError!
                     // State should revert correctly after checkModelStatus
@@ -528,7 +530,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
                     : "Error downloading \(modelType.displayName): \(nsError.localizedDescription)"
                     modelInfo = lastError ?? "Unknown download error"
                     loadState = .error(lastError!) // Set error state immediately
-                    print("load: State set to .error")
+                    logger.error("load: State set to .error")
                 }
                 
                 // Always re-check status after failure/cancellation to update UI correctly
@@ -543,7 +545,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
             }
             // --- Load from Disk Block ---
         } else if case .downloaded = loadState {
-            print("load: State is .downloaded. Loading \(modelType.displayName) from disk.")
+            logger.debug("load: State is .downloaded. Loading \(modelType.displayName) from disk.")
             loadState = .loading
             modelInfo = "Loading \(modelType.displayName)..."
             do {
@@ -551,28 +553,28 @@ class LocalModelProvider: ObservableObject, AIProvider {
                 ? VLMModelFactory.shared
                 : LLMModelFactory.shared
                 
-                print("load: Calling \(modelType.isVisionModel ? "VLM" : "LLM")ModelFactory.shared.loadContainer for \(config.id)")
+                logger.debug("load: Calling \(modelType.isVisionModel ? "VLM" : "LLM")ModelFactory.shared.loadContainer for \(String(describing: config.id))")
                 let modelContainer = try await factory.loadContainer(hub: hub, configuration: config)
-                print("load: loadContainer completed successfully (from disk).")
+                logger.debug("load: loadContainer completed successfully (from disk).")
                 let numParams = await modelContainer.perform { context in context.model.numParameters() }
                 modelInfo = "\(modelType.displayName) loaded. Weights: \(numParams / (1024 * 1024))M"
                 modelCache.setObject(modelContainer, forKey: cacheKey)
                 loadState = .loaded(modelContainer)
-                print("load: State set to .loaded")
+                logger.debug("load: State set to .loaded")
                 return modelContainer
             } catch let error as NSError {
-                print("load: Error during loadContainer (from disk): \(error)")
+                logger.error("load: Error during loadContainer (from disk): \(error.localizedDescription)")
                 lastError = "Error loading \(modelType.displayName): \(error.localizedDescription)"
                 modelInfo = lastError!
                 loadState = .error(lastError!)
-                print("load: State set to .error")
+                logger.error("load: State set to .error")
                 // Optionally call checkModelStatus here too if loading error might change things
                 // checkModelStatus()
                 throw error
             }
             // --- Other States ---
         } else {
-            print("load: Cannot load model from current state: \(loadState)")
+            logger.warning("load: Cannot load model from current state: \(String(describing: self.loadState))")
             throw NSError(domain: "LocalLLM", code: -5, userInfo: [NSLocalizedDescriptionKey: "Cannot load model from current state: \(loadState)"])
         }
     }
@@ -586,7 +588,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
         }
         
         if running {
-            print("Generation already in progress, waiting...")
+            logger.debug("Generation already in progress, waiting...")
             while running { try await Task.sleep(for: .milliseconds(100)) }
         }
         
@@ -606,7 +608,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
         do {
             modelContainer = try await load()
         } catch {
-            print("Failed to load model for processing: \(error)")
+            logger.error("Failed to load model for processing: \(error.localizedDescription)")
             throw error
         }
         
@@ -643,7 +645,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
             }
         } catch {
             // Handle generation errors
-            print("Error during text generation: \(error)")
+            logger.error("Error during text generation: \(error.localizedDescription)")
             await MainActor.run { [weak self] in
                 self?.lastError = "Generation failed: \(error.localizedDescription)"
                 self?.stat = "Error"
@@ -776,7 +778,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
         let imageURLs = try images.compactMap { imageData -> URL? in
             // First try to create an NSImage from the data
             guard let nsImage = NSImage(data: imageData) else {
-                print("Warning: Could not create NSImage from image data")
+                logger.warning("Could not create NSImage from image data")
                 return nil
             }
             
@@ -784,7 +786,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
             guard let tiffData = nsImage.tiffRepresentation,
                   let bitmap = NSBitmapImageRep(data: tiffData),
                   let pngData = bitmap.representation(using: .png, properties: [:]) else {
-                print("Warning: Could not convert image to PNG format")
+                logger.warning("Could not convert image to PNG format")
                 return nil
             }
             
@@ -800,7 +802,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
         
         // Early return if no valid images
         if imageURLs.isEmpty && !images.isEmpty {
-            print("Warning: Failed to process all images for VLM")
+            logger.warning("Failed to process all images for VLM")
             throw NSError(domain: "LocalModelProvider", code: -3,
                           userInfo: [NSLocalizedDescriptionKey: "Failed to process images for vision model"])
         }
@@ -857,7 +859,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
         // but setting running = false prevents new ones and stops the wait loop)
         Task { @MainActor in
             if running {
-                print("Attempting to cancel generation...")
+                logger.debug("Attempting to cancel generation...")
                 // You might need more sophisticated cancellation if MLXLLM adds support
             }
             running = false
