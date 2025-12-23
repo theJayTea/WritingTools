@@ -9,8 +9,8 @@ import SwiftUI
 import AppKit
 
 struct AIProviderSettingsPane: View {
-    @ObservedObject var appState: AppState
-    @ObservedObject var settings = AppSettings.shared
+    @Bindable var appState: AppState
+    @Bindable var settings = AppSettings.shared
     @Binding var needsSaving: Bool
     var showOnlyApiSetup: Bool
     var saveButton: AnyView

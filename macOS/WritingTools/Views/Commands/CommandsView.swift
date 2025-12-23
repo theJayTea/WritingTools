@@ -2,7 +2,7 @@ import SwiftUI
 
 struct CommandsView: View {
     @ObservedObject var commandManager: CommandManager
-    @ObservedObject private var settings = AppSettings.shared
+    @Bindable private var settings = AppSettings.shared
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
     

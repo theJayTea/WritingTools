@@ -2,7 +2,7 @@ import SwiftUI
 
 struct CustomCommandsView: View {
     @ObservedObject var commandsManager: CustomCommandsManager
-    @ObservedObject private var settings = AppSettings.shared
+    @Bindable private var settings = AppSettings.shared
     @Environment(\.dismiss) var dismiss
     @State private var isAddingNew = false
     @State private var selectedCommand: CustomCommand?
@@ -113,7 +113,7 @@ struct CustomCommandRow: View {
 
 struct CustomCommandEditor: View {
     @ObservedObject var commandsManager: CustomCommandsManager
-    @ObservedObject private var settings = AppSettings.shared
+    @Bindable private var settings = AppSettings.shared
     @Binding var isPresented: Bool
     @Environment(\.dismiss) var dismiss
     

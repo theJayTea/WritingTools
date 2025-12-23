@@ -1,32 +1,34 @@
 import SwiftUI
+import Observation
 
+@Observable
 @MainActor
-class AppState: ObservableObject {
+final class AppState {
     static let shared = AppState()
 
-    @Published var geminiProvider: GeminiProvider
-    @Published var openAIProvider: OpenAIProvider
-    @Published var mistralProvider: MistralProvider
-    @Published var anthropicProvider: AnthropicProvider
-    @Published var ollamaProvider: OllamaProvider
-    @Published var localLLMProvider: LocalModelProvider
-    @Published var openRouterProvider: OpenRouterProvider
+    var geminiProvider: GeminiProvider
+    var openAIProvider: OpenAIProvider
+    var mistralProvider: MistralProvider
+    var anthropicProvider: AnthropicProvider
+    var ollamaProvider: OllamaProvider
+    var localLLMProvider: LocalModelProvider
+    var openRouterProvider: OpenRouterProvider
 
-    @Published var customInstruction: String = ""
-    @Published var selectedText: String = ""
-    @Published var isPopupVisible: Bool = false
-    @Published var isProcessing: Bool = false
-    @Published var previousApplication: NSRunningApplication?
-    @Published var selectedImages: [Data] = []
+    var customInstruction: String = ""
+    var selectedText: String = ""
+    var isPopupVisible: Bool = false
+    var isProcessing: Bool = false
+    var previousApplication: NSRunningApplication?
+    var selectedImages: [Data] = []
 
     // Command management
-    @Published var commandManager = CommandManager()
-    @Published var customCommandsManager = CustomCommandsManager()
+    var commandManager = CommandManager()
+    var customCommandsManager = CustomCommandsManager()
 
     // Current provider with UI binding support
-    @Published private(set) var currentProvider: String
+    private(set) var currentProvider: String
 
-    @Published var selectedAttributedText: NSAttributedString? = nil
+    var selectedAttributedText: NSAttributedString? = nil
 
     var activeProvider: any AIProvider {
         switch currentProvider {
@@ -264,7 +266,6 @@ class AppState: ObservableObject {
     func setCurrentProvider(_ provider: String) {
         currentProvider = provider
         AppSettings.shared.currentProvider = provider
-        objectWillChange.send()
     }
 
     func saveMistralConfig(apiKey: String, baseURL: String, model: String) {

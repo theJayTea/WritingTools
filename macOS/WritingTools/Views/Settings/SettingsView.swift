@@ -11,8 +11,8 @@ extension KeyboardShortcuts.Name {
 }
 
 struct SettingsView: View {
-    @ObservedObject var appState: AppState
-    @ObservedObject var settings = AppSettings.shared
+    @Bindable var appState: AppState
+    @Bindable var settings = AppSettings.shared
     @State private var selectedTab: SettingsTab = .general
     @State private var needsSaving: Bool = false
     @State private var showingCommandsManager = false

@@ -2,8 +2,8 @@ import SwiftUI
 import ApplicationServices
 
 @MainActor struct OnboardingView: View {
-  @ObservedObject var appState: AppState
-  @ObservedObject var settings = AppSettings.shared
+  @Bindable var appState: AppState
+  @Bindable var settings = AppSettings.shared
 
   @State private var currentStep = 0
   @State private var isAccessibilityGranted = AXIsProcessTrusted()

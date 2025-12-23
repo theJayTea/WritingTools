@@ -3,7 +3,7 @@ import KeyboardShortcuts
 
 struct CommandEditor: View {
     @Binding var command: CommandModel
-    @ObservedObject private var settings = AppSettings.shared
+    @Bindable private var settings = AppSettings.shared
     @Environment(\.colorScheme) var colorScheme
 
     var onSave: () -> Void

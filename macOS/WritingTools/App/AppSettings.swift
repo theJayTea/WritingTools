@@ -1,14 +1,17 @@
 import Foundation
+import Observation
 
 // A singleton for app-wide settings that wraps UserDefaults access
-class AppSettings: ObservableObject {
+@Observable
+@MainActor
+final class AppSettings {
     static let shared = AppSettings()
     
-    private let defaults = UserDefaults.standard
-    private let keychain = KeychainManager.shared
+    @ObservationIgnored private let defaults = UserDefaults.standard
+    @ObservationIgnored private let keychain = KeychainManager.shared
     
     // MARK: - Published Settings
-    @Published var themeStyle: String {
+    var themeStyle: String {
         didSet {
             defaults.set(themeStyle, forKey: "theme_style")
             useGradientTheme = (themeStyle != "standard")
@@ -16,129 +19,129 @@ class AppSettings: ObservableObject {
     }
     
     // API Keys now use computed properties backed by Keychain
-    @Published var geminiApiKey: String = "" {
+    var geminiApiKey: String = "" {
         didSet {
             try? keychain.save(geminiApiKey, forKey: "gemini_api_key")
         }
     }
     
-    @Published var geminiModel: GeminiModel {
+    var geminiModel: GeminiModel {
         didSet { defaults.set(geminiModel.rawValue, forKey: "gemini_model") }
     }
     
-    @Published var geminiCustomModel: String {
+    var geminiCustomModel: String {
         didSet { defaults.set(geminiCustomModel, forKey: "gemini_custom_model") }
     }
     
-    @Published var openAIApiKey: String = "" {
+    var openAIApiKey: String = "" {
         didSet {
             try? keychain.save(openAIApiKey, forKey: "openai_api_key")
         }
     }
     
-    @Published var openAIBaseURL: String {
+    var openAIBaseURL: String {
         didSet { defaults.set(openAIBaseURL, forKey: "openai_base_url") }
     }
     
-    @Published var openAIModel: String {
+    var openAIModel: String {
         didSet { defaults.set(openAIModel, forKey: "openai_model") }
     }
     
-    @Published var openAIOrganization: String? {
+    var openAIOrganization: String? {
         didSet { defaults.set(openAIOrganization, forKey: "openai_organization") }
     }
     
-    @Published var openAIProject: String? {
+    var openAIProject: String? {
         didSet { defaults.set(openAIProject, forKey: "openai_project") }
     }
     
-    @Published var currentProvider: String {
+    var currentProvider: String {
         didSet { defaults.set(currentProvider, forKey: "current_provider") }
     }
     
-    @Published var shortcutText: String {
+    var shortcutText: String {
         didSet { defaults.set(shortcutText, forKey: "shortcut") }
     }
     
-    @Published var hasCompletedOnboarding: Bool {
+    var hasCompletedOnboarding: Bool {
         didSet { defaults.set(hasCompletedOnboarding, forKey: "has_completed_onboarding") }
     }
     
-    @Published var useGradientTheme: Bool {
+    var useGradientTheme: Bool {
         didSet { defaults.set(useGradientTheme, forKey: "use_gradient_theme") }
     }
     
     // MARK: - HotKey data
-    @Published var hotKeyCode: Int {
+    var hotKeyCode: Int {
         didSet { defaults.set(hotKeyCode, forKey: "hotKey_keyCode") }
     }
-    @Published var hotKeyModifiers: Int {
+    var hotKeyModifiers: Int {
         didSet { defaults.set(hotKeyModifiers, forKey: "hotKey_modifiers") }
     }
-    @Published var hotkeysPaused: Bool {
+    var hotkeysPaused: Bool {
         didSet { defaults.set(hotkeysPaused, forKey: "hotkeys_paused") }
     }
     
-    @Published var mistralApiKey: String = "" {
+    var mistralApiKey: String = "" {
         didSet {
             try? keychain.save(mistralApiKey, forKey: "mistral_api_key")
         }
     }
     
-    @Published var mistralBaseURL: String {
+    var mistralBaseURL: String {
         didSet { defaults.set(mistralBaseURL, forKey: "mistral_base_url") }
     }
     
-    @Published var mistralModel: String {
+    var mistralModel: String {
         didSet { defaults.set(mistralModel, forKey: "mistral_model") }
     }
     
     // Ollama settings:
-    @Published var ollamaBaseURL: String {
+    var ollamaBaseURL: String {
         didSet { defaults.set(ollamaBaseURL, forKey: "ollama_base_url") }
     }
     
-    @Published var ollamaModel: String {
+    var ollamaModel: String {
         didSet { defaults.set(ollamaModel, forKey: "ollama_model") }
     }
     
-    @Published var ollamaKeepAlive: String {
+    var ollamaKeepAlive: String {
         didSet { defaults.set(ollamaKeepAlive, forKey: "ollama_keep_alive") }
     }
     
-    @Published var ollamaImageMode: OllamaImageMode {
+    var ollamaImageMode: OllamaImageMode {
         didSet { defaults.set(ollamaImageMode.rawValue, forKey: "ollama_image_mode") }
     }
     
-    @Published var anthropicApiKey: String = "" {
+    var anthropicApiKey: String = "" {
         didSet {
             try? keychain.save(anthropicApiKey, forKey: "anthropic_api_key")
         }
     }
     
-    @Published var anthropicModel: String {
+    var anthropicModel: String {
         didSet { defaults.set(anthropicModel, forKey: "anthropic_model") }
     }
     
-    @Published var openRouterApiKey: String = "" {
+    var openRouterApiKey: String = "" {
         didSet {
             try? keychain.save(openRouterApiKey, forKey: "openrouter_api_key")
         }
     }
-    @Published var openRouterModel: String {
+    var openRouterModel: String {
         didSet { defaults.set(openRouterModel, forKey: "openrouter_model") }
     }
-    @Published var openRouterCustomModel: String {
+    var openRouterCustomModel: String {
         didSet { defaults.set(openRouterCustomModel, forKey: "openrouter_custom_model") }
     }
     
     // Store the ID (rawValue) of the selected local LLM model type
-    @Published var selectedLocalLLMId: String? {
+    var selectedLocalLLMId: String? {
         didSet { defaults.set(selectedLocalLLMId, forKey: "selected_local_llm_id") }
     }
     
     // MARK: - Custom Commands Settings
-    @Published var openCustomCommandsInResponseWindow: Bool {
+    var openCustomCommandsInResponseWindow: Bool {
         didSet { defaults.set(openCustomCommandsInResponseWindow, forKey: "open_custom_commands_in_response_window") }
     }
     

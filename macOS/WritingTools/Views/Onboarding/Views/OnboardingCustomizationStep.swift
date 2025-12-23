@@ -9,8 +9,8 @@ import SwiftUI
 import KeyboardShortcuts
 
 struct OnboardingCustomizationStep: View {
-  @ObservedObject var appState: AppState
-  @ObservedObject var settings: AppSettings
+  @Bindable var appState: AppState
+  @Bindable var settings: AppSettings
 
   var body: some View {
     VStack(alignment: .leading, spacing: 20) {

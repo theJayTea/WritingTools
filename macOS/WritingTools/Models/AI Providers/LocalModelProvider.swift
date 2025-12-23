@@ -5,6 +5,7 @@ import MLXLMCommon
 import MLXRandom
 import SwiftUI
 import Combine
+import Observation
 import Hub
 
 // Constants for UserDefaults keys
@@ -15,8 +16,7 @@ fileprivate let kModelInfoKey = "local_llm_model_info"
 @MainActor
 class LocalModelProvider: ObservableObject, AIProvider {
     
-    @ObservedObject private var settings = AppSettings.shared
-    private var settingsCancellable: AnyCancellable?
+    private let settings = AppSettings.shared
     
     @Published var isProcessing = false
     @Published var isDownloading = false
@@ -157,18 +157,25 @@ class LocalModelProvider: ObservableObject, AIProvider {
         if isPlatformSupported {
             MLX.GPU.set(cacheLimit: 20 * 1024 * 1024)
             
-            settingsCancellable = settings.$selectedLocalLLMId.sink { [weak self] _ in
-                Task { @MainActor [weak self] in
-                    // When the selection changes, reset state and check the new model
-                    self?.resetModelState()
-                    self?.checkModelStatus()
-                }
-            }
+            observeSettings()
             checkModelStatus()
             
         } else {
             modelInfo = "Local LLM is only available on Apple Silicon devices"
             loadState = .error("Platform not supported")
+        }
+    }
+
+    private func observeSettings() {
+        withObservationTracking {
+            _ = settings.selectedLocalLLMId
+        } onChange: { [weak self] in
+            Task { @MainActor [weak self] in
+                // When the selection changes, reset state and check the new model.
+                self?.resetModelState()
+                self?.checkModelStatus()
+                self?.observeSettings()
+            }
         }
     }
     

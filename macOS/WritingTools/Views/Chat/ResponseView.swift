@@ -69,7 +69,7 @@ struct ChatMessage: Identifiable, Equatable, Sendable {
 
 struct ResponseView: View {
     @StateObject private var viewModel: ResponseViewModel
-    @ObservedObject private var settings = AppSettings.shared
+    @Bindable private var settings = AppSettings.shared
     @Environment(\.colorScheme) var colorScheme
     @State private var inputText: String = ""
     @State private var isRegenerating: Bool = false

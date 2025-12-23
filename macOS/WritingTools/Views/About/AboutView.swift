@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AboutView: View {
-    @ObservedObject private var settings = AppSettings.shared
+    @Bindable private var settings = AppSettings.shared
     @State private var updateChecker = UpdateChecker.shared
     
     var body: some View {

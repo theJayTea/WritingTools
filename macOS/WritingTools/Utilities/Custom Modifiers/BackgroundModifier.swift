@@ -10,7 +10,7 @@ enum AppTheme: String {
 
 struct WindowBackground: ViewModifier {
     @Environment(\.colorScheme) var colorScheme
-    @ObservedObject private var settings = AppSettings.shared
+    @Bindable private var settings = AppSettings.shared
     let useGradient: Bool
     let cornerRadius: CGFloat?
 

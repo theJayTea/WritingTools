@@ -10,8 +10,8 @@ import KeyboardShortcuts
 import AppKit
 
 struct GeneralSettingsPane: View {
-    @ObservedObject var appState: AppState
-    @ObservedObject var settings = AppSettings.shared
+    @Bindable var appState: AppState
+    @Bindable var settings = AppSettings.shared
     @Binding var needsSaving: Bool
     @Binding var showingCommandsManager: Bool
     var showOnlyApiSetup: Bool

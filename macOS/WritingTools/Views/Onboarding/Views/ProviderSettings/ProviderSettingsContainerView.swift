@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct ProviderSettingsContainerView: View {
-  @ObservedObject var settings: AppSettings
-  @ObservedObject var appState: AppState
+  @Bindable var settings: AppSettings
+  @Bindable var appState: AppState
 
   @ViewBuilder
   var body: some View {

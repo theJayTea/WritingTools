@@ -1,7 +1,9 @@
 import Foundation
 import AppKit
+import Observation
 
 @Observable
+@MainActor
 final class UpdateChecker {
     static let shared = UpdateChecker()
     private let currentVersion = 4.2 // Current app version

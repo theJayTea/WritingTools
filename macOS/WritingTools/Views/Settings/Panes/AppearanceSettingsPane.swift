@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AppearanceSettingsPane: View {
-    @ObservedObject var settings = AppSettings.shared
+    @Bindable var settings = AppSettings.shared
     @Binding var needsSaving: Bool
     var showOnlyApiSetup: Bool
     var saveButton: AnyView

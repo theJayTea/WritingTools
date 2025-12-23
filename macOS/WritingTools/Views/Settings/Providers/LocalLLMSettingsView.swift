@@ -2,7 +2,7 @@ import SwiftUI
 
 struct LocalLLMSettingsView: View {
     @ObservedObject private var llmProvider: LocalModelProvider
-    @ObservedObject private var settings = AppSettings.shared
+    @Bindable private var settings = AppSettings.shared
     
     @State private var showingDeleteAlert = false
     @State private var showingErrorAlert = false

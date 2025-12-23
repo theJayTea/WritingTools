@@ -9,7 +9,7 @@ import SwiftUI
 import AppKit
 
 struct OpenRouterSettingsView: View {
-    @ObservedObject var settings = AppSettings.shared
+    @Bindable var settings = AppSettings.shared
     @Binding var needsSaving: Bool
 
     var body: some View {

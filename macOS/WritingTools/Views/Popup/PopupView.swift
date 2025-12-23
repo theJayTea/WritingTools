@@ -6,7 +6,7 @@ final class PopupViewModel: ObservableObject {
 }
 
 struct PopupView: View {
-  @ObservedObject var appState: AppState
+  @Bindable var appState: AppState
   @ObservedObject var viewModel: PopupViewModel
   @Environment(\.colorScheme) var colorScheme
   @AppStorage("use_gradient_theme") private var useGradientTheme = false
