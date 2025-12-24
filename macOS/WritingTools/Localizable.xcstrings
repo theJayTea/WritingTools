@@ -285,6 +285,9 @@
         }
       }
     },
+    "Acknowledge content beyond primary task" : {
+
+    },
     "Activate Writing Tools:" : {
       "localizations" : {
         "de" : {
@@ -350,6 +353,9 @@
           }
         }
       }
+    },
+    "Add explanations or commentary" : {
+
     },
     "Add New Button" : {
       "extractionState" : "manual",
@@ -484,6 +490,15 @@
           }
         }
       }
+    },
+    "Allow the assistant to acknowledge or comment on content outside the main task" : {
+
+    },
+    "Allow the assistant to provide explanations alongside the output" : {
+
+    },
+    "Allow the assistant to respond to questions or requests found in the input text" : {
+
     },
     "Anthropic" : {
       "localizations" : {
@@ -1389,28 +1404,6 @@
         }
       }
     },
-    "Command shortcut:" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Befehlskurzbefehl:"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Atajo de comandos:"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Raccourci de commande :"
-          }
-        }
-      }
-    },
     "Command Type" : {
       "localizations" : {
         "de" : {
@@ -1631,6 +1624,9 @@
           }
         }
       }
+    },
+    "Configure your prompt using structured fields" : {
+
     },
     "Connection Settings" : {
       "localizations" : {
@@ -1985,6 +1981,9 @@
         }
       }
     },
+    "Define the assistant's role or persona" : {
+
+    },
     "Delete %@" : {
       "localizations" : {
         "de" : {
@@ -2050,6 +2049,9 @@
           }
         }
       }
+    },
+    "Describe what the assistant should do" : {
+
     },
     "Describe your change..." : {
       "localizations" : {
@@ -2299,6 +2301,12 @@
         }
       }
     },
+    "e.g., correct grammar and spelling errors" : {
+
+    },
+    "e.g., ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST" : {
+
+    },
     "e.g., gpt-4o-mini" : {
       "localizations" : {
         "de" : {
@@ -2364,6 +2372,15 @@
           }
         }
       }
+    },
+    "e.g., input, English, auto" : {
+
+    },
+    "e.g., only corrected text, Markdown table" : {
+
+    },
+    "e.g., proofreading assistant, summarization expert" : {
+
     },
     "Edit Built-In Command" : {
       "localizations" : {
@@ -2453,6 +2470,12 @@
         }
       }
     },
+    "Editor" : {
+
+    },
+    "Editor Mode" : {
+
+    },
     "Email Arya" : {
       "localizations" : {
         "de" : {
@@ -2541,6 +2564,12 @@
         }
       }
     },
+    "Engage with user requests in text" : {
+
+    },
+    "Enter your prompt as plain text" : {
+
+    },
     "Error" : {
       "localizations" : {
         "de" : {
@@ -2562,6 +2591,9 @@
           }
         }
       }
+    },
+    "Error Handling" : {
+
     },
     "Error: %@" : {
       "localizations" : {
@@ -3313,28 +3345,6 @@
         }
       }
     },
-    "Keyboard Shortcut" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tastaturkurzbefehl"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Atajo de teclado"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Raccourci clavier"
-          }
-        }
-      }
-    },
     "Keyboard Shortcuts" : {
       "localizations" : {
         "de" : {
@@ -3356,6 +3366,9 @@
           }
         }
       }
+    },
+    "Language Preservation" : {
+
     },
     "Leave empty to use the default model for the selected provider. Examples: gpt-4o-mini (OpenAI), claude-3-5-sonnet-20240620 (Anthropic), gemini-flash-latest (Gemini)" : {
       "localizations" : {
@@ -3667,6 +3680,12 @@
         }
       }
     },
+    "Main" : {
+
+    },
+    "Maintain the original text formatting (line breaks, spacing, etc.)" : {
+
+    },
     "Manage Commands" : {
       "localizations" : {
         "de" : {
@@ -3711,6 +3730,9 @@
         }
       }
     },
+    "Message to return when text is incompatible with request" : {
+
+    },
     "Mistral AI" : {
       "localizations" : {
         "de" : {
@@ -3751,28 +3773,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modèle"
-          }
-        }
-      }
-    },
-    "Model (optional):" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modell (optional):"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modelo (opcional):"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modèle (optionnel) :"
           }
         }
       }
@@ -4636,6 +4636,9 @@
         }
       }
     },
+    "Options" : {
+
+    },
     "Or Custom Model Name" : {
       "localizations" : {
         "de" : {
@@ -4680,6 +4683,9 @@
           }
         }
       }
+    },
+    "Output Format" : {
+
     },
     "Override the default AI provider for this specific command" : {
       "localizations" : {
@@ -4747,6 +4753,27 @@
         }
       }
     },
+    "Preserve core message/meaning" : {
+
+    },
+    "Preserve essential information" : {
+
+    },
+    "Preserve format" : {
+
+    },
+    "Preserve formatting" : {
+
+    },
+    "Preserve Options" : {
+
+    },
+    "Preserve style" : {
+
+    },
+    "Preserve tone" : {
+
+    },
     "Preserves formatting for supported apps" : {
       "localizations" : {
         "de" : {
@@ -4790,6 +4817,9 @@
           }
         }
       }
+    },
+    "Preview" : {
+
     },
     "Professional" : {
       "comment" : "ID for professional tone",
@@ -4837,27 +4867,8 @@
         }
       }
     },
-    "Prompt" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Prompt"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pregunte a"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Invite"
-          }
-        }
-      }
+    "Prompt Preview" : {
+
     },
     "Proofread" : {
       "comment" : "ID for proofreading",
@@ -5235,6 +5246,12 @@
         }
       }
     },
+    "Role" : {
+
+    },
+    "Rules" : {
+
+    },
     "Save" : {
       "localizations" : {
         "de" : {
@@ -5567,6 +5584,9 @@
         }
       }
     },
+    "Show Preview" : {
+
+    },
     "Show Response in Chat Window" : {
       "localizations" : {
         "de" : {
@@ -5700,6 +5720,9 @@
           }
         }
       }
+    },
+    "Task" : {
+
     },
     "Text-only model" : {
       "localizations" : {
@@ -5921,6 +5944,9 @@
         }
       }
     },
+    "Treat input as content (not instructions)" : {
+
+    },
     "Try downloading again if the previous attempt failed." : {
       "localizations" : {
         "de" : {
@@ -5942,6 +5968,9 @@
           }
         }
       }
+    },
+    "Use 'input' to preserve the original language" : {
+
     },
     "Use custom AI provider for this command" : {
       "localizations" : {
@@ -6186,6 +6215,9 @@
           }
         }
       }
+    },
+    "When enabled, the selected text is treated as content to process, not as instructions" : {
+
     },
     "When unchecked, custom prompts will replace selected text inline" : {
       "localizations" : {

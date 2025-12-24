@@ -53,7 +53,7 @@ struct AboutView: View {
             // Version and updates
             GroupBox("Version & Updates") {
                 VStack(spacing: 8) {
-                    Text("Version: 5.5 (Based on Windows Port version 8.0)")
+                    Text("Version: 6.0 (Based on Windows Port version 8.0)")
                         .font(.caption)
                         .frame(maxWidth: .infinity, alignment: .leading)
 
