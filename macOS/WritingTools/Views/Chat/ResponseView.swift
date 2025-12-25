@@ -421,7 +421,7 @@ final class ResponseViewModel: ObservableObject {
         // Add conversation history
         if recentHistory.count > 2 { // More than just the initial exchange
             prompt += "Conversation history:\n\n"
-            for (index, exchange) in recentHistory.dropLast(1).enumerated() {
+            for (_, exchange) in recentHistory.dropLast(1).enumerated() {
                 let role = exchange.role == "user" ? "User" : "Assistant"
                 prompt += "\(role): \(exchange.content)\n\n"
             }

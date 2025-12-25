@@ -4,11 +4,25 @@ import MLXLLM
 import MLXLMCommon
 import MLXRandom
 import SwiftUI
-import Combine
 import Observation
 import Hub
+import UniformTypeIdentifiers
 
 private let logger = AppLogger.logger("LocalModelProvider")
+
+// MARK: - Memory Monitoring Helper
+
+/// Logs GPU memory usage for debugging and performance optimization.
+/// Uses MLX.GPU.snapshot() to get current memory state.
+private func logGPUMemoryUsage(at checkpoint: String) {
+    #if DEBUG
+    let snapshot = MLX.GPU.snapshot()
+    let activeMB = Double(snapshot.activeMemory) / (1024 * 1024)
+    let cacheMB = Double(snapshot.cacheMemory) / (1024 * 1024)
+    let peakMB = Double(snapshot.peakMemory) / (1024 * 1024)
+    logger.debug("[\(checkpoint)] GPU Memory - Active: \(activeMB, privacy: .public)MB, Cache: \(cacheMB, privacy: .public)MB, Peak: \(peakMB, privacy: .public)MB")
+    #endif
+}
 
 // Constants for UserDefaults keys
 fileprivate let kModelStatusKey = "local_llm_model_status"
@@ -16,25 +30,37 @@ fileprivate let kModelInfoKey = "local_llm_model_info"
 
 
 @MainActor
-class LocalModelProvider: ObservableObject, AIProvider {
-    
-    private let settings = AppSettings.shared
-    
-    @Published var isProcessing = false
-    @Published var isDownloading = false
-    @Published var downloadProgress: Double = 0
-    @Published var downloadTask: Task<ModelContainer, Error>?
-    @Published var output = ""
-    @Published var modelInfo = ""
-    @Published var stat = ""
-    @Published var lastError: String?
-    @Published var retryCount: Int = 0
+@Observable
+class LocalModelProvider: AIProvider {
 
-    // Keep already loaded models alive so we don't pay the load cost after a model switch.
+    // Settings are observed manually via withObservationTracking, so ignore here
+    @ObservationIgnored
+    private let settings = AppSettings.shared
+
+    // UI-facing properties that should trigger view updates
+    var isProcessing = false
+    var isDownloading = false
+    var downloadProgress: Double = 0
+    var output = ""
+    var modelInfo = ""
+    var stat = ""
+    var lastError: String?
+    var retryCount: Int = 0
+
+    // Internal state - should NOT trigger observation
+    @ObservationIgnored
+    var downloadTask: Task<ModelContainer, Error>?
+
+    @ObservationIgnored
     private let modelCache = NSCache<NSString, ModelContainer>()
-    
+
+    @ObservationIgnored
     var running = false
+
+    @ObservationIgnored
     private var isCancelled = false
+
+    @ObservationIgnored
     private let maxRetries = 3
     
     // Controls whether the model uses its "thinking" mode (if supported).
@@ -55,6 +81,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
         return base.appendingPathComponent("WritingTools/MLXModels", isDirectory: true)
     }()
 
+    @ObservationIgnored
     private lazy var hub: HubApi = {
         // ensure the folder exists
         try? FileManager.default.createDirectory(at: Self.modelsRoot, withIntermediateDirectories: true)
@@ -118,10 +145,11 @@ class LocalModelProvider: ObservableObject, AIProvider {
         GenerateParameters(
             maxTokens: maxTokens,
             temperature: 0.6
+            // Note: KV cache quantization (kvBits: 4) is available but adds overhead.
+            // Only enable for memory-constrained devices or very long generations.
         )
     }
     let maxTokens = 10000
-    let displayEveryNTokens = 4
     
     enum LoadState: Equatable {
         case idle
@@ -146,7 +174,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
         }
     }
     
-    @Published var loadState = LoadState.idle
+    var loadState = LoadState.idle
     
     // Model Directory Calculation
     private var modelDirectory: URL? {
@@ -158,10 +186,10 @@ class LocalModelProvider: ObservableObject, AIProvider {
         modelCache.countLimit = 2
         if isPlatformSupported {
             MLX.GPU.set(cacheLimit: 20 * 1024 * 1024)
-            
+
             observeSettings()
             checkModelStatus()
-            
+
         } else {
             modelInfo = "Local LLM is only available on Apple Silicon devices"
             loadState = .error("Platform not supported")
@@ -181,7 +209,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
         }
     }
     
-    // --- Reset state when model selection changes ---
+    // Reset state when model selection changes
     private func resetModelState() {
         cancelDownload()
         cancel()
@@ -312,7 +340,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
         logger.debug("startDownload: downloadTask assigned.")
     }
     
-    // --- cancelDownload ---
+    // cancelDownload
     func cancelDownload() {
         guard isPlatformSupported else { return }
         
@@ -330,7 +358,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
         isCancelled = true
         task.cancel()
         
-        // --- Immediate UI Update ---
+        // Immediate UI Update
         isDownloading = false
         downloadProgress = 0 // Reset progress visually
         modelInfo = "Cancelling download..." // Update status immediately
@@ -556,6 +584,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
                 logger.debug("load: Calling \(modelType.isVisionModel ? "VLM" : "LLM")ModelFactory.shared.loadContainer for \(String(describing: config.id))")
                 let modelContainer = try await factory.loadContainer(hub: hub, configuration: config)
                 logger.debug("load: loadContainer completed successfully (from disk).")
+                logGPUMemoryUsage(at: "Model Loaded")
                 let numParams = await modelContainer.perform { context in context.model.numParameters() }
                 modelInfo = "\(modelType.displayName) loaded. Weights: \(numParams / (1024 * 1024))M"
                 modelCache.setObject(modelContainer, forKey: cacheKey)
@@ -654,11 +683,11 @@ class LocalModelProvider: ObservableObject, AIProvider {
         }
     }
     
-    private struct GenerationResult {
+    /// Stores generation result to pass out of perform block
+    private struct GenerationResult: Sendable {
         let text: String
-        let info: GenerateCompletionInfo?
-        let timeToFirstToken: TimeInterval?
-        let trailingFlush: String
+        let tokensPerSecond: Double
+        let timeToFirstToken: TimeInterval
     }
 
     private func generateResponse(
@@ -666,16 +695,16 @@ class LocalModelProvider: ObservableObject, AIProvider {
         modelContainer: ModelContainer,
         streaming: Bool
     ) async throws -> String {
+        logGPUMemoryUsage(at: "Generation Start")
         let parameters = generationParameters
-        let flushEvery = displayEveryNTokens
         let start = Date()
 
-        let result = try await modelContainer.perform { context in
-            var output = ""
-            var completion: GenerateCompletionInfo?
-            var timeToFirstToken: TimeInterval?
-            var pendingFlush = ""
-            var tokensSinceFlush = 0
+        // All generation must happen inside perform block because ModelContext is not Sendable.
+        // We replicate that pattern: batch tokens over time intervals for fewer UI updates.
+        let result: GenerationResult = try await modelContainer.perform { context in
+            var fullOutput = ""
+            var timeToFirstToken: TimeInterval = 0
+            var completionInfo: GenerateCompletionInfo?
 
             let input = try await context.processor.prepare(input: userInput)
             let stream = try MLXLMCommon.generate(
@@ -684,65 +713,88 @@ class LocalModelProvider: ObservableObject, AIProvider {
                 context: context
             )
 
-            for try await item in stream {
-                switch item {
-                case .chunk(let string):
-                    output += string
-                    if timeToFirstToken == nil {
-                        timeToFirstToken = Date().timeIntervalSince(start)
-                    }
+            if streaming {
+                // Batched streaming: accumulate tokens and flush periodically
+                // This mimics the official _throttle pattern but works within perform block
+                var pendingText = ""
+                var lastFlushTime = Date()
+                let flushInterval: TimeInterval = 0.1
 
-                    if streaming {
-                        pendingFlush += string
-                        tokensSinceFlush += 1
+                for try await item in stream {
+                    switch item {
+                    case .chunk(let text):
+                        fullOutput += text
+                        pendingText += text
+                        if timeToFirstToken == 0 {
+                            timeToFirstToken = Date().timeIntervalSince(start)
+                        }
 
-                        let shouldFlush = tokensSinceFlush == 1 || tokensSinceFlush >= flushEvery
-                        if shouldFlush {
-                            let flush = pendingFlush
-                            pendingFlush.removeAll()
-                            tokensSinceFlush = 0
-                            await MainActor.run { [weak self] in
-                                self?.output += flush
+                        // Flush to UI at most every 100ms (reduces main actor contention)
+                        let now = Date()
+                        if now.timeIntervalSince(lastFlushTime) >= flushInterval {
+                            let textToFlush = pendingText
+                            pendingText = ""
+                            lastFlushTime = now
+                            // Fire-and-forget: don't await to avoid blocking generation
+                            Task { @MainActor [weak self] in
+                                self?.output += textToFlush
                             }
                         }
+                    case .info(let info):
+                        completionInfo = info
+                    case .toolCall:
+                        break
                     }
-                case .info(let info):
-                    completion = info
-                case .toolCall:
-                    break
+                }
+
+                // Flush any remaining text
+                if !pendingText.isEmpty {
+                    let finalText = pendingText
+                    Task { @MainActor [weak self] in
+                        self?.output += finalText
+                    }
+                }
+            } else {
+                // Non-streaming: collect everything then update once
+                for try await item in stream {
+                    switch item {
+                    case .chunk(let text):
+                        fullOutput += text
+                        if timeToFirstToken == 0 {
+                            timeToFirstToken = Date().timeIntervalSince(start)
+                        }
+                    case .info(let info):
+                        completionInfo = info
+                    case .toolCall:
+                        break
+                    }
+                }
+
+                let finalOutput = fullOutput
+                Task { @MainActor [weak self] in
+                    self?.output = finalOutput
                 }
             }
 
             return GenerationResult(
-                text: output,
-                info: completion,
-                timeToFirstToken: timeToFirstToken,
-                trailingFlush: pendingFlush
+                text: fullOutput,
+                tokensPerSecond: completionInfo?.tokensPerSecond ?? 0,
+                timeToFirstToken: timeToFirstToken
             )
         }
 
-        if streaming {
-            if !result.trailingFlush.isEmpty {
-                await MainActor.run { [weak self] in
-                    self?.output += result.trailingFlush
-                }
-            }
-        } else {
-            await MainActor.run { [weak self] in
-                self?.output = result.text
-            }
-        }
-
-        let ttft = result.timeToFirstToken ?? 0
-        let tps = result.info?.tokensPerSecond ?? 0
+        // Update stats on main actor
         await MainActor.run { [weak self] in
-            self?.stat = "TTFT: \(String(format: "%.2f", ttft))s | TPS: \(String(format: "%.2f", tps))"
+            let ttftFormatted = String(format: "%.2f", result.timeToFirstToken)
+            let tpsFormatted = String(format: "%.2f", result.tokensPerSecond)
+            self?.stat = "TTFT: \(ttftFormatted)s | TPS: \(tpsFormatted)"
         }
+        logGPUMemoryUsage(at: "Generation Complete")
 
         return result.text
     }
     
-    // New method to process with LLM
+    // Process with LLM using proper Chat.Message format
     private func processWithLLM(
         modelContainer: ModelContainer,
         systemPrompt: String?,
@@ -751,9 +803,17 @@ class LocalModelProvider: ObservableObject, AIProvider {
     ) async throws -> String {
         MLXRandom.seed(UInt64(Date.timeIntervalSinceReferenceDate * 1000))
 
-        let finalPrompt = systemPrompt.map { "\($0)\n\nUser:\n\(userPrompt)" } ?? "User:\n\(userPrompt)"
-        let userInput = await UserInput(
-            prompt: finalPrompt,
+        // Use Chat.Message format for proper chat template application
+        var messages: [Chat.Message] = []
+
+        if let systemPrompt = systemPrompt, !systemPrompt.isEmpty {
+            messages.append(Chat.Message(role: .system, content: systemPrompt))
+        }
+
+        messages.append(Chat.Message(role: .user, content: userPrompt))
+
+        let userInput = UserInput(
+            chat: messages,
             additionalContext: ["enable_thinking": self.enableThinking]
         )
 
@@ -764,7 +824,6 @@ class LocalModelProvider: ObservableObject, AIProvider {
         )
     }
     
-    // New method to process with VLM
     private func processWithVLM(
         modelContainer: ModelContainer,
         systemPrompt: String?,
@@ -774,29 +833,50 @@ class LocalModelProvider: ObservableObject, AIProvider {
     ) async throws -> String {
         MLXRandom.seed(UInt64(Date.timeIntervalSinceReferenceDate * 1000))
         
-        // Create temporary URLs for images with better format handling
+        // Create temporary URLs for images with optimized format handling
         let imageURLs = try images.compactMap { imageData -> URL? in
-            // First try to create an NSImage from the data
-            guard let nsImage = NSImage(data: imageData) else {
-                logger.warning("Could not create NSImage from image data")
-                return nil
-            }
-            
-            // Convert to PNG format for better compatibility with VLMs
-            guard let tiffData = nsImage.tiffRepresentation,
-                  let bitmap = NSBitmapImageRep(data: tiffData),
-                  let pngData = bitmap.representation(using: .png, properties: [:]) else {
-                logger.warning("Could not convert image to PNG format")
-                return nil
-            }
-            
-            // Create temp file with PNG extension
             let tempDir = FileManager.default.temporaryDirectory
+
+            // Check if image data is already in a VLM-compatible format (PNG or JPEG)
+            // by checking magic bytes to avoid unnecessary conversion
+            let isPNG = imageData.count >= 8 && imageData.prefix(8).elementsEqual([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A])
+            let isJPEG = imageData.count >= 3 && imageData.prefix(3).elementsEqual([0xFF, 0xD8, 0xFF])
+
+            if isPNG {
+                // Already PNG - use directly without conversion
+                let fileName = UUID().uuidString + ".png"
+                let fileURL = tempDir.appendingPathComponent(fileName)
+                try imageData.write(to: fileURL)
+                return fileURL
+            } else if isJPEG {
+                // Already JPEG - use directly without conversion
+                let fileName = UUID().uuidString + ".jpg"
+                let fileURL = tempDir.appendingPathComponent(fileName)
+                try imageData.write(to: fileURL)
+                return fileURL
+            }
+
+            // For other formats, use CGImage directly (more efficient than TIFF intermediate)
+            guard let source = CGImageSourceCreateWithData(imageData as CFData, nil),
+                  let cgImage = CGImageSourceCreateImageAtIndex(source, 0, nil) else {
+                logger.warning("Could not create CGImage from image data")
+                return nil
+            }
+
             let fileName = UUID().uuidString + ".png"
             let fileURL = tempDir.appendingPathComponent(fileName)
-            
-            // Write PNG data to file
-            try pngData.write(to: fileURL)
+
+            // Write directly using CGImageDestination (avoids NSImage/TIFF overhead)
+            guard let destination = CGImageDestinationCreateWithURL(fileURL as CFURL, UTType.png.identifier as CFString, 1, nil) else {
+                logger.warning("Could not create image destination")
+                return nil
+            }
+            CGImageDestinationAddImage(destination, cgImage, nil)
+            guard CGImageDestinationFinalize(destination) else {
+                logger.warning("Could not finalize image destination")
+                return nil
+            }
+
             return fileURL
         }
         
@@ -813,44 +893,36 @@ class LocalModelProvider: ObservableObject, AIProvider {
                 try? FileManager.default.removeItem(at: url)
             }
         }
-        // Increase GPU memory limit for VLM models
-        MLX.GPU.set(cacheLimit: 4 * 1024 * 1024 * 1024) // 4GB cache limit
-        
-        do {
-            // Create a chat-style input with images
-            var messages: [Chat.Message] = []
-            
-            // Add system message if provided
-            if let systemPrompt = systemPrompt, !systemPrompt.isEmpty {
-                messages.append(Chat.Message(role: .system, content: systemPrompt))
-            }
-            
-            // Convert image URLs to the format expected by MLX
-            let imageAttachments: [UserInput.Image] = imageURLs.map { .url($0) }
-            
-            // Add user message with text and images
-            messages.append(Chat.Message(
-                role: .user,
-                content: userPrompt,
-                images: imageAttachments
-            ))
-            
-            // Create chat input
-            let userInput = await UserInput(
-                chat: messages,
-                additionalContext: ["enable_thinking": self.enableThinking]
-            )
 
-            return try await generateResponse(
-                userInput: userInput,
-                modelContainer: modelContainer,
-                streaming: streaming
-            )
-        } catch {
-            // Reset GPU cache on error
-            MLX.GPU.set(cacheLimit: 20 * 1024 * 1024)
-            throw error
+        // Create a chat-style input with images
+        var messages: [Chat.Message] = []
+
+        // Add system message if provided
+        if let systemPrompt = systemPrompt, !systemPrompt.isEmpty {
+            messages.append(Chat.Message(role: .system, content: systemPrompt))
         }
+
+        // Convert image URLs to the format expected by MLX
+        let imageAttachments: [UserInput.Image] = imageURLs.map { .url($0) }
+
+        // Add user message with text and images
+        messages.append(Chat.Message(
+            role: .user,
+            content: userPrompt,
+            images: imageAttachments
+        ))
+
+        // Create chat input
+        let userInput = UserInput(
+            chat: messages,
+            additionalContext: ["enable_thinking": self.enableThinking]
+        )
+
+        return try await generateResponse(
+            userInput: userInput,
+            modelContainer: modelContainer,
+            streaming: streaming
+        )
     }
     
     

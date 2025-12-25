@@ -1,21 +1,21 @@
 import SwiftUI
 
 struct LocalLLMSettingsView: View {
-    @ObservedObject private var llmProvider: LocalModelProvider
+    private var llmProvider: LocalModelProvider 
     @Bindable private var settings = AppSettings.shared
-    
+
     @State private var showingDeleteAlert = false
     @State private var showingErrorAlert = false
     @State private var selectedModelCategory: ModelCategory = .all
-    
+
     enum ModelCategory: String, CaseIterable, Identifiable {
         case all = "All Models"
         case text = "Text Models"
         case vision = "Vision Models"
-        
+
         var id: String { self.rawValue }
     }
-    
+
     init(provider: LocalModelProvider) {
         self.llmProvider = provider
     }
