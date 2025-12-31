@@ -506,49 +506,55 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             await waitForPasteboardChange(pb, initialChangeCount: oldChangeCount)
 
             var foundImages: [Data] = []
+            var rich: NSAttributedString? = nil
+            var plainText = ""
 
-            let classes = [NSURL.self]
-            let imageTypeIdentifiers = [
-                UTType.image,
-                UTType.png,
-                UTType.jpeg,
-                UTType.tiff,
-                UTType.gif,
-            ].map(\.identifier)
+            if pb.changeCount > oldChangeCount {
+                let classes = [NSURL.self]
+                let imageTypeIdentifiers = [
+                    UTType.image,
+                    UTType.png,
+                    UTType.jpeg,
+                    UTType.tiff,
+                    UTType.gif,
+                ].map(\.identifier)
 
-            let options: [NSPasteboard.ReadingOptionKey: Any] = [
-                .urlReadingFileURLsOnly: true,
-                .urlReadingContentsConformToTypes: imageTypeIdentifiers,
-            ]
-
-            if let urls = pb.readObjects(forClasses: classes, options: options) as? [URL] {
-                let loadedImages = await loadImageData(from: urls)
-                if !loadedImages.isEmpty {
-                    foundImages.append(contentsOf: loadedImages)
-                }
-            }
-
-            if foundImages.isEmpty {
-                let supportedImageTypes: [NSPasteboard.PasteboardType] = [
-                    NSPasteboard.PasteboardType(UTType.png.identifier),
-                    NSPasteboard.PasteboardType(UTType.jpeg.identifier),
-                    NSPasteboard.PasteboardType(UTType.tiff.identifier),
-                    NSPasteboard.PasteboardType(UTType.gif.identifier),
-                    NSPasteboard.PasteboardType(UTType.image.identifier),
+                let options: [NSPasteboard.ReadingOptionKey: Any] = [
+                    .urlReadingFileURLsOnly: true,
+                    .urlReadingContentsConformToTypes: imageTypeIdentifiers,
                 ]
 
-                for type in supportedImageTypes {
-                    if let data = pb.data(forType: type) {
-                        foundImages.append(data)
-                        logger.debug("Found direct image data of type: \(type.rawValue)")
-                        break
+                if let urls = pb.readObjects(forClasses: classes, options: options) as? [URL] {
+                    let loadedImages = await loadImageData(from: urls)
+                    if !loadedImages.isEmpty {
+                        foundImages.append(contentsOf: loadedImages)
                     }
                 }
-            }
 
-            // Read rich text and plain text BEFORE restoring clipboard
-            let rich = pb.readAttributedSelection()
-            let plainText = rich?.string ?? pb.string(forType: .string) ?? ""
+                if foundImages.isEmpty {
+                    let supportedImageTypes: [NSPasteboard.PasteboardType] = [
+                        NSPasteboard.PasteboardType(UTType.png.identifier),
+                        NSPasteboard.PasteboardType(UTType.jpeg.identifier),
+                        NSPasteboard.PasteboardType(UTType.tiff.identifier),
+                        NSPasteboard.PasteboardType(UTType.gif.identifier),
+                        NSPasteboard.PasteboardType(UTType.image.identifier),
+                    ]
+
+                    for type in supportedImageTypes {
+                        if let data = pb.data(forType: type) {
+                            foundImages.append(data)
+                            logger.debug("Found direct image data of type: \(type.rawValue)")
+                            break
+                        }
+                    }
+                }
+
+                // Read rich text and plain text BEFORE restoring clipboard
+                rich = pb.readAttributedSelection()
+                plainText = rich?.string ?? pb.string(forType: .string) ?? ""
+            } else {
+                logger.warning("Pasteboard did not change after copy; clearing selection to avoid stale context")
+            }
 
             // Store data in appState BEFORE restoring clipboard
             self.appState.selectedAttributedText = rich
