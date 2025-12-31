@@ -38,6 +38,7 @@ struct CommandButton: View {
                 }
                 .frame(maxWidth: 140)
                 .padding()
+                .contentShape(Rectangle())
                 .background {
                     if #available(macOS 26, *) {
                         // Use Liquid Glass effect on macOS 26+
