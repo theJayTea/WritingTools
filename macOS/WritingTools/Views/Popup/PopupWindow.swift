@@ -1,5 +1,5 @@
 import SwiftUI
-import Combine
+import Observation
 
 class PopupWindow: NSWindow {
   private var initialLocation: NSPoint?
@@ -9,9 +9,6 @@ class PopupWindow: NSWindow {
   private let windowWidth: CGFloat = 305
 
   private let viewModel = PopupViewModel()
-  private var commandCountCancellable: AnyCancellable?
-  private var isEditModeCancellable: AnyCancellable?
-
   init(appState: AppState) {
     self.appState = appState
 
@@ -31,27 +28,8 @@ class PopupWindow: NSWindow {
       self?.updateWindowSize()
     }
 
-    // Observe command changes to resize
-    commandCountCancellable = appState.commandManager.objectWillChange
-      .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
-      .sink { [weak self] _ in
-        self?.updateWindowSize()
-      }
-
-    // Observe edit mode to resize
-    isEditModeCancellable = viewModel.$isEditMode
-      .removeDuplicates()
-      .sink { [weak self] _ in
-        self?.updateWindowSize()
-      }
-
-    // Keep resize on external notifications if needed
-    NotificationCenter.default.addObserver(
-      self,
-      selector: #selector(updateWindowSize),
-      name: NSNotification.Name("CommandsChanged"),
-      object: nil
-    )
+    observeCommandChanges()
+    observeEditModeChanges()
   }
 
   private func configureWindow() {
@@ -151,9 +129,6 @@ class PopupWindow: NSWindow {
   }
 
   deinit {
-    commandCountCancellable?.cancel()
-    isEditModeCancellable?.cancel()
-    NotificationCenter.default.removeObserver(self)
   }
 
   private func setupTrackingArea() {
@@ -189,9 +164,6 @@ class PopupWindow: NSWindow {
     self.delegate = nil
 
     self.contentView = nil
-    commandCountCancellable?.cancel()
-    isEditModeCancellable?.cancel()
-    NotificationCenter.default.removeObserver(self)
   }
 
   override func close() {
@@ -287,6 +259,32 @@ class PopupWindow: NSWindow {
       self.close()
     } else {
       super.keyDown(with: event)
+    }
+  }
+}
+
+// MARK: - Observation
+
+extension PopupWindow {
+  private func observeCommandChanges() {
+    withObservationTracking { [weak self] in
+      _ = self?.appState.commandManager.commands
+    } onChange: { [weak self] in
+      Task { @MainActor in
+        self?.updateWindowSize()
+        self?.observeCommandChanges()
+      }
+    }
+  }
+
+  private func observeEditModeChanges() {
+    withObservationTracking { [weak self] in
+      _ = self?.viewModel.isEditMode
+    } onChange: { [weak self] in
+      Task { @MainActor in
+        self?.updateWindowSize()
+        self?.observeEditModeChanges()
+      }
     }
   }
 }

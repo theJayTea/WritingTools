@@ -2,6 +2,7 @@ import SwiftUI
 import KeyboardShortcuts
 import Carbon.HIToolbox
 import UniformTypeIdentifiers
+import ImageIO
 
 private let logger = AppLogger.logger("AppDelegate")
 
@@ -154,12 +155,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             ]
 
             if let urls = pb.readObjects(forClasses: classes, options: options) as? [URL] {
-                for url in urls {
-                    if let imageData = try? Data(contentsOf: url),
-                       NSImage(data: imageData) != nil {
-                        foundImages.append(imageData)
-                        logger.debug("Loaded image data from file: \(url.lastPathComponent)")
-                    }
+                let loadedImages = await loadImageData(from: urls)
+                if !loadedImages.isEmpty {
+                    foundImages.append(contentsOf: loadedImages)
                 }
             }
 
@@ -524,12 +522,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             ]
 
             if let urls = pb.readObjects(forClasses: classes, options: options) as? [URL] {
-                for url in urls {
-                    if let imageData = try? Data(contentsOf: url),
-                       NSImage(data: imageData) != nil {
-                        foundImages.append(imageData)
-                        logger.debug("Loaded image data from file: \(url.lastPathComponent)")
-                    }
+                let loadedImages = await loadImageData(from: urls)
+                if !loadedImages.isEmpty {
+                    foundImages.append(contentsOf: loadedImages)
                 }
             }
 
@@ -595,6 +590,33 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 self?.aboutWindow = nil
             }
         }
+    }
+}
+
+// MARK: - Image Loading
+
+private extension AppDelegate {
+    func loadImageData(from urls: [URL]) async -> [Data] {
+        await Task.detached(priority: .userInitiated) {
+            var images: [Data] = []
+            images.reserveCapacity(urls.count)
+
+            for url in urls {
+                if let imageData = try? Data(contentsOf: url),
+                   await Self.isValidImageData(imageData) {
+                    images.append(imageData)
+                    logger.debug("Loaded image data from file: \(url.lastPathComponent)")
+                }
+            }
+            return images
+        }.value
+    }
+
+    static func isValidImageData(_ data: Data) -> Bool {
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil) else {
+            return false
+        }
+        return CGImageSourceGetCount(source) > 0
     }
 }
 

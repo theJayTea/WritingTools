@@ -1,7 +1,8 @@
 import SwiftUI
+import Observation
 
 struct CustomCommandsView: View {
-    @ObservedObject var commandsManager: CustomCommandsManager
+    @Bindable var commandsManager: CustomCommandsManager
     @Bindable private var settings = AppSettings.shared
     @Environment(\.dismiss) var dismiss
     @State private var isAddingNew = false
@@ -112,7 +113,7 @@ struct CustomCommandRow: View {
 }
 
 struct CustomCommandEditor: View {
-    @ObservedObject var commandsManager: CustomCommandsManager
+    @Bindable var commandsManager: CustomCommandsManager
     @Bindable private var settings = AppSettings.shared
     @Binding var isPresented: Bool
     @Environment(\.dismiss) var dismiss
@@ -126,7 +127,7 @@ struct CustomCommandEditor: View {
     @State private var showingIconPicker = false
     
     init(commandsManager: CustomCommandsManager, isPresented: Binding<Bool>, editingCommand: CustomCommand? = nil) {
-        self.commandsManager = commandsManager
+        _commandsManager = Bindable(wrappedValue: commandsManager)
         self._isPresented = isPresented
         self.editingCommand = editingCommand
         

@@ -10,6 +10,7 @@ struct PromptEditorView: View {
     @State private var promptStructure: PromptStructure
     @State private var simplePromptText: String
     @State private var showPreview: Bool = true
+    @State private var advancedPreviewText: String
 
     enum EditorMode: String, CaseIterable {
         case simple = "Simple"
@@ -28,12 +29,9 @@ struct PromptEditorView: View {
         _selectedMode = State(initialValue: initialMode)
         _simplePromptText = State(initialValue: prompt.wrappedValue)
 
-        // Try to parse as structured prompt, or use default
-        if let parsed = PromptStructure.from(jsonString: prompt.wrappedValue) {
-            _promptStructure = State(initialValue: parsed)
-        } else {
-            _promptStructure = State(initialValue: .default)
-        }
+        let parsed = PromptStructure.from(jsonString: prompt.wrappedValue) ?? .default
+        _promptStructure = State(initialValue: parsed)
+        _advancedPreviewText = State(initialValue: parsed.toJSONString(pretty: true))
     }
 
     var body: some View {
@@ -95,7 +93,7 @@ struct PromptEditorView: View {
                             RoundedRectangle(cornerRadius: 8)
                                 .fill(Color(.textBackgroundColor))
                             
-                            Text(selectedMode == .simple ? simplePromptText : promptStructure.toJSONString(pretty: true))
+                            Text(selectedMode == .simple ? simplePromptText : advancedPreviewText)
                                 .font(.system(.caption, design: .monospaced))
                                 .foregroundStyle(.primary)
                                 .textSelection(.enabled)
@@ -212,8 +210,10 @@ struct PromptEditorView: View {
         VStack(alignment: .leading, spacing: 8) {
             AdvancedPromptEditor(promptStructure: $promptStructure)
                 .onChange(of: promptStructure) { _, newValue in
+                    let updated = newValue.toJSONString(pretty: true)
                     // Update the binding when structure changes
-                    prompt = newValue.toJSONString(pretty: true)
+                    prompt = updated
+                    advancedPreviewText = updated
                 }
 
             Text("Configure your prompt using structured fields")
@@ -240,7 +240,7 @@ struct PromptEditorView: View {
                     RoundedRectangle(cornerRadius: 8)
                         .fill(Color(.textBackgroundColor))
 
-                    Text(selectedMode == .simple ? simplePromptText : promptStructure.toJSONString(pretty: true))
+                    Text(selectedMode == .simple ? simplePromptText : advancedPreviewText)
                         .font(.system(.caption, design: .monospaced))
                         .foregroundStyle(.primary)
                         .textSelection(.enabled)
@@ -269,7 +269,9 @@ struct PromptEditorView: View {
                 // If not valid JSON, keep current structure or use default
                 // User can start building from scratch
             }
-            prompt = promptStructure.toJSONString(pretty: true)
+            let updated = promptStructure.toJSONString(pretty: true)
+            prompt = updated
+            advancedPreviewText = updated
         } else {
             // Switching to simple: use current prompt value
             simplePromptText = prompt

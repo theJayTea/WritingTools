@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Combine
 
 private let logger = AppLogger.logger("CloudCommandsSync")
 
@@ -26,7 +25,8 @@ final class CloudCommandsSync {
 
   private var commandsChangedObserver: NSObjectProtocol?
   private var kvsObserver: NSObjectProtocol?
-  private var objectWillChangeCancellable: AnyCancellable?
+  private var pushDebounceTask: Task<Void, Never>?
+  private let pushDebounceDelay: Duration = .milliseconds(300)
 
   private init() {
     // Start shortly after init to ensure AppState is ready
@@ -51,19 +51,9 @@ final class CloudCommandsSync {
     ) { [weak self] _ in
       // Ensure we run on the MainActor
       Task { @MainActor in
-        self?.pushLocalToICloud()
+        self?.schedulePush()
       }
     }
-
-    // Also observe objectWillChange to catch reorders, etc.
-    objectWillChangeCancellable =
-      AppState.shared.commandManager.objectWillChange
-      .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
-      .sink { [weak self] _ in
-        Task { @MainActor in
-          self?.pushLocalToICloud()
-        }
-      }
 
     // Listen for iCloud server changes
     kvsObserver = NotificationCenter.default.addObserver(
@@ -85,10 +75,22 @@ final class CloudCommandsSync {
     if let kvsObserver {
       NotificationCenter.default.removeObserver(kvsObserver)
     }
-    objectWillChangeCancellable?.cancel()
+    pushDebounceTask?.cancel()
   }
 
   // MARK: - Push local -> iCloud
+
+  private func schedulePush() {
+    guard !isApplyingCloudChange else { return }
+
+    pushDebounceTask?.cancel()
+    pushDebounceTask = Task { [weak self] in
+      guard let self else { return }
+      try? await Task.sleep(for: self.pushDebounceDelay)
+      guard !Task.isCancelled else { return }
+      self.pushLocalToICloud()
+    }
+  }
 
   private func pushLocalToICloud() {
     guard !isApplyingCloudChange else { return }
@@ -131,11 +133,6 @@ final class CloudCommandsSync {
       UserDefaults.standard.set(remoteMTime, forKey: localMTimeKey)
       isApplyingCloudChange = false
 
-      // Notify any listeners if necessary
-      NotificationCenter.default.post(
-        name: NSNotification.Name("CommandsChanged"),
-        object: nil
-      )
     } catch {
       logger.error("CloudCommandsSync: decode error: \(error.localizedDescription)")
     }

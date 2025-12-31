@@ -1,4 +1,5 @@
 import Foundation
+import Observation
 
 private let logger = AppLogger.logger("CustomProvider")
 
@@ -8,9 +9,9 @@ struct CustomProviderConfig {
     let model: String
 }
 
-@MainActor
-class CustomProvider: ObservableObject, AIProvider {
-    @Published var isProcessing: Bool = false
+@Observable
+final class CustomProvider: AIProvider {
+    var isProcessing: Bool = false
 
     private let config: CustomProviderConfig
     private var currentTask: Task<Void, Never>?

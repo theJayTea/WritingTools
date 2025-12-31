@@ -1,5 +1,6 @@
 import Foundation
 import AIProxy
+import Observation
 
 private let logger = AppLogger.logger("MistralProvider")
 
@@ -25,9 +26,9 @@ enum MistralModel: String, CaseIterable {
     }
 }
 
-@MainActor
-class MistralProvider: ObservableObject, AIProvider {
-    @Published var isProcessing = false
+@Observable
+final class MistralProvider: AIProvider {
+    var isProcessing = false
     private var config: MistralConfig
     private var aiProxyService: MistralService?
     private var currentTask: Task<Void, Never>?

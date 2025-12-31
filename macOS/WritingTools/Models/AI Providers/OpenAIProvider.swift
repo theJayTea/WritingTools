@@ -1,5 +1,6 @@
 import Foundation
 import AIProxy
+import Observation
 
 private let logger = AppLogger.logger("OpenAIProvider")
 
@@ -9,26 +10,26 @@ struct OpenAIConfig: Codable {
     var model: String
     
     static let defaultBaseURL = "https://api.openai.com"
-    static let defaultModel = "gpt-4o"
+    static let defaultModel = "gpt-5"
 }
 
 enum OpenAIModel: String, CaseIterable {
-    case gpt4 = "gpt-4.1"
-    case gpt4o = "gpt-4o"
-    case gpt4oMini = "gpt-4o-mini"
+    case gpt4_1 = "gpt-4.1"
+    case gpt5 = "gpt-5.2"
+    case gpt5Mini = "gpt-5-mini"
     
     var displayName: String {
         switch self {
-        case .gpt4: return "GPT-4.1 (Most Capable)"
-        case .gpt4o: return "GPT-4o (Optimized)"
-        case .gpt4oMini: return "GPT-4o Mini (Lightweight)"
+        case .gpt4_1: return "GPT-4.1 (Older Model)"
+        case .gpt5: return "GPT-5.2 (Most Capable)"
+        case .gpt5Mini: return "GPT-5 Mini (Lightweight)"
         }
     }
 }
 
-@MainActor
-class OpenAIProvider: ObservableObject, AIProvider {
-    @Published var isProcessing = false
+@Observable
+final class OpenAIProvider: AIProvider {
+    var isProcessing = false
         private var config: OpenAIConfig
         private var aiProxyService: OpenAIService?
         private var currentTask: Task<Void, Never>?

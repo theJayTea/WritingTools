@@ -1,7 +1,8 @@
 import SwiftUI
+import Observation
 
 struct CommandsView: View {
-    @ObservedObject var commandManager: CommandManager
+    @Bindable var commandManager: CommandManager
     @Bindable private var settings = AppSettings.shared
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme

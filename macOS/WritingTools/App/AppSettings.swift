@@ -9,6 +9,8 @@ final class AppSettings {
     
     @ObservationIgnored private let defaults = UserDefaults.standard
     @ObservationIgnored private let keychain = KeychainManager.shared
+    @ObservationIgnored private var keychainWriteTasks: [String: Task<Void, Never>] = [:]
+    @ObservationIgnored private let keychainWriteDelay: Duration = .milliseconds(350)
     
     // MARK: - Published Settings
     var themeStyle: String {
@@ -21,7 +23,7 @@ final class AppSettings {
     // API Keys now use computed properties backed by Keychain
     var geminiApiKey: String = "" {
         didSet {
-            try? keychain.save(geminiApiKey, forKey: "gemini_api_key")
+            scheduleKeychainWrite(geminiApiKey, forKey: "gemini_api_key")
         }
     }
     
@@ -35,7 +37,7 @@ final class AppSettings {
     
     var openAIApiKey: String = "" {
         didSet {
-            try? keychain.save(openAIApiKey, forKey: "openai_api_key")
+            scheduleKeychainWrite(openAIApiKey, forKey: "openai_api_key")
         }
     }
     
@@ -84,7 +86,7 @@ final class AppSettings {
     
     var mistralApiKey: String = "" {
         didSet {
-            try? keychain.save(mistralApiKey, forKey: "mistral_api_key")
+            scheduleKeychainWrite(mistralApiKey, forKey: "mistral_api_key")
         }
     }
     
@@ -115,7 +117,7 @@ final class AppSettings {
     
     var anthropicApiKey: String = "" {
         didSet {
-            try? keychain.save(anthropicApiKey, forKey: "anthropic_api_key")
+            scheduleKeychainWrite(anthropicApiKey, forKey: "anthropic_api_key")
         }
     }
     
@@ -125,7 +127,7 @@ final class AppSettings {
     
     var openRouterApiKey: String = "" {
         didSet {
-            try? keychain.save(openRouterApiKey, forKey: "openrouter_api_key")
+            scheduleKeychainWrite(openRouterApiKey, forKey: "openrouter_api_key")
         }
     }
     var openRouterModel: String {
@@ -200,6 +202,21 @@ final class AppSettings {
         
         // Custom commands setting - default to true (open in response window)
         self.openCustomCommandsInResponseWindow = defaults.object(forKey: "open_custom_commands_in_response_window") as? Bool ?? true
+    }
+
+    private func scheduleKeychainWrite(_ value: String, forKey key: String) {
+        keychainWriteTasks[key]?.cancel()
+
+        let keychain = keychain
+        keychainWriteTasks[key] = Task { [weak self] in
+            guard let self else { return }
+            defer { self.keychainWriteTasks[key] = nil }
+            try? await Task.sleep(for: self.keychainWriteDelay)
+            guard !Task.isCancelled else { return }
+            Task.detached(priority: .utility) {
+                try? keychain.save(value, forKey: key)
+            }
+        }
     }
     
     // MARK: - Convenience

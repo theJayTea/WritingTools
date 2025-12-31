@@ -114,6 +114,7 @@ struct MeshLikeGradientBackground: View {
                     }
                 }
                 .blur(radius: 100)
+                .drawingGroup()
             }
         } else {
             // Dark mode version

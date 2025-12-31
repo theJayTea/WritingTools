@@ -1,5 +1,6 @@
 import Foundation
 import AIProxy
+import Observation
 
 private let logger = AppLogger.logger("AnthropicProvider")
 
@@ -26,9 +27,9 @@ enum AnthropicModel: String, CaseIterable {
     }
 }
 
-@MainActor
-class AnthropicProvider: ObservableObject, AIProvider {
-    @Published var isProcessing = false
+@Observable
+final class AnthropicProvider: AIProvider {
+    var isProcessing = false
     
     private var config: AnthropicConfig
     private var aiProxyService: AnthropicService?
@@ -73,37 +74,84 @@ class AnthropicProvider: ObservableObject, AIProvider {
             )
         }
         
-        // Compose messages array
-        var messages: [AnthropicInputMessage] = []
+        let selectedModel = config.model.isEmpty ? AnthropicConfig.defaultModel : config.model
         
-        var userContent: [AnthropicInputContent] = [.text(userPrompt)]
+        var contentBlocks: [AnthropicContentBlockParam] = [
+            .textBlock(.init(text: userPrompt))
+        ]
+        
         for imageData in images {
-            userContent.append(
-                .image(mediaType: AnthropicImageMediaType.jpeg, data: imageData.base64EncodedString())
+            let source = AnthropicImageBlockParamSource.base64(
+                data: imageData.base64EncodedString(),
+                mediaType: .jpeg
             )
+            contentBlocks.append(.imageBlock(.init(source: source)))
         }
-        messages.append(
-            AnthropicInputMessage(content: userContent, role: .user)
-        )
+        
+        let messages: [AnthropicMessageParam] = [
+            AnthropicMessageParam(
+                content: .blocks(contentBlocks),
+                role: .user
+            )
+        ]
         
         let requestBody = AnthropicMessageRequestBody(
-            maxTokens: 1024,
+            maxTokens: 10000,
             messages: messages,
-            model: config.model.isEmpty ? AnthropicConfig.defaultModel : config.model,
-            system: systemPrompt
+            model: selectedModel,
+            system: systemPrompt.map(AnthropicSystemPrompt.text)
         )
         
         do {
-            let response = try await anthropicService.messageRequest(body: requestBody)
-            
-            for content in response.content {
-                switch content {
-                case .text(let message):
-                    return message
-                case .toolUse(id: _, name: let toolName, input: let toolInput):
-                    logger.debug("Anthropic tool use: \(toolName) input: \(toolInput)")
+            if streaming {
+                var compiledResponse = ""
+                let stream = try await anthropicService.streamingMessageRequest(
+                    body: requestBody,
+                    secondsToWait: 60
+                )
+                
+                for try await event in stream {
+                    if Task.isCancelled { break }
+                    guard case let .contentBlockDelta(contentBlockDelta) = event else {
+                        continue
+                    }
+                    
+                    switch contentBlockDelta.delta {
+                    case .textDelta(let textDelta):
+                        compiledResponse += textDelta.text
+                    case .inputJSONDelta, .citationsDelta, .thinkingDelta, .signatureDelta, .futureProof:
+                        continue
+                    }
+                }
+                
+                if !compiledResponse.isEmpty {
+                    return compiledResponse
+                }
+            } else {
+                let response = try await anthropicService.messageRequest(
+                    body: requestBody,
+                    secondsToWait: 60
+                )
+                var compiledResponse = ""
+                
+                for content in response.content {
+                    switch content {
+                    case .textBlock(let textBlock):
+                        compiledResponse += textBlock.text
+                    case .toolUseBlock(let toolUseBlock):
+                        logger.debug("Anthropic tool use: \(toolUseBlock.name) input: \(toolUseBlock.input)")
+                    case .serverToolUseBlock(let serverToolUseBlock):
+                        logger.debug("Anthropic server tool use: \(serverToolUseBlock.name) input: \(serverToolUseBlock.input)")
+                    case .thinkingBlock, .redactedThinkingBlock, .webSearchToolResultBlock, .futureProof:
+                        continue
+                    }
+                }
+                
+                if !compiledResponse.isEmpty {
+                    return compiledResponse
                 }
             }
+            
             throw NSError(
                 domain: "AnthropicAPI",
                 code: -1,

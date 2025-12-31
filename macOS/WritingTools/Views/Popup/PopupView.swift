@@ -1,15 +1,17 @@
 import SwiftUI
 import ApplicationServices
+import Observation
 
 private let logger = AppLogger.logger("PopupView")
 
-final class PopupViewModel: ObservableObject {
-  @Published var isEditMode: Bool = false
+@Observable
+final class PopupViewModel {
+  var isEditMode: Bool = false
 }
 
 struct PopupView: View {
   @Bindable var appState: AppState
-  @ObservedObject var viewModel: PopupViewModel
+  @Bindable var viewModel: PopupViewModel
   @Environment(\.colorScheme) var colorScheme
   @AppStorage("use_gradient_theme") private var useGradientTheme = false
 
@@ -119,10 +121,6 @@ struct PopupView: View {
                 onDelete: {
                   logger.debug("Deleting command: \(command.name)")
                   appState.commandManager.deleteCommand(command)
-                  NotificationCenter.default.post(
-                    name: NSNotification.Name("CommandsChanged"),
-                    object: nil
-                  )
                 }
               )
             }

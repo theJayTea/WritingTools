@@ -1,5 +1,5 @@
 import Foundation
-import Combine
+import Observation
 
 private let logger = AppLogger.logger("CustomCommandsManager")
 
@@ -25,8 +25,9 @@ struct CustomCommand: Codable, Identifiable, Equatable {
   }
 }
 
-class CustomCommandsManager: ObservableObject {
-  @Published private(set) var commands: [CustomCommand] = []
+@Observable
+final class CustomCommandsManager {
+  private(set) var commands: [CustomCommand] = []
 
   private let saveKey = "custom_commands"
 
@@ -152,8 +153,6 @@ class CustomCommandsManager: ObservableObject {
       UserDefaults.standard.set(remoteMTime, forKey: localMTimeDefaultsKey)
       isApplyingCloudChange = false
 
-      // Notify UI if needed
-      objectWillChange.send()
     } catch {
       logger.error("CustomCommandsManager: Failed to decode from iCloud: \(error.localizedDescription)")
     }

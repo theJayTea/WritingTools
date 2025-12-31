@@ -7417,6 +7417,28 @@
         }
       }
     },
+    "Version: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version: %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version: %@"
+          }
+        }
+      }
+    },
     "Version: 3.0 (Based on Windows Port version 7.1)" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -7459,28 +7481,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Version : 3.1 (Basé sur la version 7.1 du port Windows)"
-          }
-        }
-      }
-    },
-    "Version: 6.0 (Based on Windows Port version 8.0)" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Version: 6.0 (basierend auf Windows Port Version 8.0)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Versión: 6.0 (basada en la versión 8.0 para Windows)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Version : 6.0 (basée sur la version Windows Port 8.0)"
           }
         }
       }

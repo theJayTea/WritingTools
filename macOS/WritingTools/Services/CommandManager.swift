@@ -1,8 +1,10 @@
 import Foundation
+import Observation
 import SwiftUI
 
-class CommandManager: ObservableObject {
-    @Published private(set) var commands: [CommandModel] = []
+@Observable
+final class CommandManager {
+    private(set) var commands: [CommandModel] = []
     
     private let saveKey = "unified_commands"
     private let hasInitializedKey = "has_initialized_commands"
@@ -21,6 +23,7 @@ class CommandManager: ObservableObject {
     func addCommand(_ command: CommandModel) {
         commands.append(command)
         saveCommands()
+        notifyCommandsChanged()
     }
     
     func updateCommand(_ command: CommandModel) {
@@ -28,8 +31,7 @@ class CommandManager: ObservableObject {
             commands[index] = command
             saveCommands()
             
-            // Notify that commands have changed to update shortcuts
-            NotificationCenter.default.post(name: NSNotification.Name("CommandsChanged"), object: nil)
+            notifyCommandsChanged()
         }
     }
     
@@ -43,17 +45,20 @@ class CommandManager: ObservableObject {
         }
         
         saveCommands()
+        notifyCommandsChanged()
     }
     
     func moveCommand(fromOffsets source: IndexSet, toOffset destination: Int) {
         commands.move(fromOffsets: source, toOffset: destination)
         saveCommands()
+        notifyCommandsChanged()
     }
     
     // Public method to replace all commands
     func replaceAllCommands(with newCommands: [CommandModel]) {
         commands = newCommands
         saveCommands()
+        notifyCommandsChanged()
     }
     
     // MARK: - Getters with filtering
@@ -117,6 +122,7 @@ class CommandManager: ObservableObject {
         // Set up commands (if any custom commands, they will be added later)
         self.commands = defaultCmds
         saveCommands()
+        notifyCommandsChanged()
         
         // Mark as initialized
         UserDefaults.standard.set(true, forKey: hasInitializedKey)
@@ -140,6 +146,7 @@ class CommandManager: ObservableObject {
         
         // Save the changes
         saveCommands()
+        notifyCommandsChanged()
     }
     
     // MARK: - Migration Helpers
@@ -167,5 +174,13 @@ class CommandManager: ObservableObject {
         
         self.commands = uniqueCommands
         saveCommands()
+        notifyCommandsChanged()
     }
-} 
+
+    private func notifyCommandsChanged() {
+        NotificationCenter.default.post(
+            name: NSNotification.Name("CommandsChanged"),
+            object: nil
+        )
+    }
+}

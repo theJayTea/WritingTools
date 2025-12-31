@@ -339,7 +339,6 @@ struct CommandEditor: View {
         }
 
         command = updatedCommand
-        NotificationCenter.default.post(name: NSNotification.Name("CommandsChanged"), object: nil)
         onSave()
     }
 }

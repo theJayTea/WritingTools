@@ -3,6 +3,17 @@ import SwiftUI
 struct AboutView: View {
     @Bindable private var settings = AppSettings.shared
     @State private var updateChecker = UpdateChecker.shared
+
+    private var appVersion: String {
+        let shortVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
+        let buildVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String
+
+        if let shortVersion, let buildVersion, shortVersion != buildVersion {
+            return "\(shortVersion) (\(buildVersion))"
+        }
+
+        return shortVersion ?? buildVersion ?? "Unknown"
+    }
     
     var body: some View {
         VStack(spacing: 12) {
@@ -53,7 +64,7 @@ struct AboutView: View {
             // Version and updates
             GroupBox("Version & Updates") {
                 VStack(spacing: 8) {
-                    Text("Version: 6.0 (Based on Windows Port version 8.0)")
+                    Text("Version: \(appVersion)")
                         .font(.caption)
                         .frame(maxWidth: .infinity, alignment: .leading)
 

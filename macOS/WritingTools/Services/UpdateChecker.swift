@@ -8,15 +8,54 @@ private let logger = AppLogger.logger("UpdateChecker")
 @MainActor
 final class UpdateChecker {
     static let shared = UpdateChecker()
-    private let currentVersion = 4.2 // Current app version
     private let updateCheckURL = "https://raw.githubusercontent.com/theJayTea/WritingTools/main/macOS/Latest_Version_for_Update_Check.txt"
     private let updateDownloadURL = "https://github.com/theJayTea/WritingTools/releases"
     
     var isCheckingForUpdates = false
     var updateAvailable = false
     var checkError: String?
-    
+
     private init() {}
+
+    private var currentVersionString: String? {
+        let shortVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
+        let buildVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String
+        return shortVersion ?? buildVersion
+    }
+
+    private func versionComponents(from version: String) -> [Int]? {
+        let trimmed = version.trimmingCharacters(in: .whitespacesAndNewlines)
+        let allowed = CharacterSet(charactersIn: "0123456789.")
+        let numericVersion = trimmed
+            .components(separatedBy: allowed.inverted)
+            .first(where: { !$0.isEmpty })
+
+        guard let numericVersion, !numericVersion.isEmpty else {
+            return nil
+        }
+
+        return numericVersion
+            .split(separator: ".")
+            .compactMap { Int($0) }
+    }
+
+    private func isUpdateAvailable(current: String, latest: String) -> Bool? {
+        guard let currentComponents = versionComponents(from: current),
+              let latestComponents = versionComponents(from: latest) else {
+            return nil
+        }
+
+        let maxCount = max(currentComponents.count, latestComponents.count)
+        for index in 0..<maxCount {
+            let currentValue = index < currentComponents.count ? currentComponents[index] : 0
+            let latestValue = index < latestComponents.count ? latestComponents[index] : 0
+            if latestValue != currentValue {
+                return latestValue > currentValue
+            }
+        }
+
+        return false
+    }
     
     @MainActor
     func checkForUpdates() async {
@@ -31,7 +70,7 @@ final class UpdateChecker {
             checkError = "Invalid update check URL"
             return
         }
-        
+
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
             
@@ -40,19 +79,21 @@ final class UpdateChecker {
                 logger.debug("Raw version data: '\(rawString)'")
             }
             
-            // Clean up the version string more aggressively
             let cleanedString = String(data: data, encoding: .utf8)?
                 .components(separatedBy: .newlines)
                 .first?
                 .trimmingCharacters(in: .whitespacesAndNewlines)
-                .replacingOccurrences(of: "\n", with: "")
-                .replacingOccurrences(of: "\r", with: "")
-            
+
+            guard let currentVersionString else {
+                checkError = "Current version unavailable"
+                return
+            }
+
             if let versionString = cleanedString,
                !versionString.isEmpty,
-               let latestVersion = Double(versionString) {  // Changed to Double
-                logger.debug("Parsed version: \(latestVersion)")
-                updateAvailable = latestVersion > currentVersion
+               let hasUpdate = isUpdateAvailable(current: currentVersionString, latest: versionString) {
+                logger.debug("Parsed version: \(versionString)")
+                updateAvailable = hasUpdate
             } else {
                 checkError = "Invalid version format"
                 if let cleanedString = cleanedString {

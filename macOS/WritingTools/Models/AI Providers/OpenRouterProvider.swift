@@ -1,6 +1,7 @@
 import Foundation
 import AppKit
 import AIProxy
+import Observation
 
 private let logger = AppLogger.logger("OpenRouterProvider")
 
@@ -28,9 +29,9 @@ enum OpenRouterModel: String, CaseIterable {
     }
 }
 
-@MainActor
-class OpenRouterProvider: ObservableObject, AIProvider {
-    @Published var isProcessing = false
+@Observable
+final class OpenRouterProvider: AIProvider {
+    var isProcessing = false
     
     private var config: OpenRouterConfig
     private var aiProxyService: OpenRouterService?

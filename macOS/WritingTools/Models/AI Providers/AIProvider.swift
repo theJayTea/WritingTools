@@ -1,7 +1,6 @@
 import Foundation
 
-@MainActor
-protocol AIProvider: ObservableObject {
+protocol AIProvider {
     
     // Indicates if provider is processing a request
     var isProcessing: Bool { get set }

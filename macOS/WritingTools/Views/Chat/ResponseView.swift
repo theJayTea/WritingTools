@@ -1,5 +1,6 @@
 import SwiftUI
 import MarkdownView
+import Observation
 
 // MARK: - String Extension for Markdown Processing
 
@@ -68,7 +69,7 @@ struct ChatMessage: Identifiable, Equatable, Sendable {
 // MARK: - Response View
 
 struct ResponseView: View {
-    @StateObject private var viewModel: ResponseViewModel
+    @State private var viewModel: ResponseViewModel
     @Bindable private var settings = AppSettings.shared
     @Environment(\.colorScheme) var colorScheme
     @State private var inputText: String = ""
@@ -80,7 +81,7 @@ struct ResponseView: View {
     @State private var showError: Bool = false
     
     init(content: String, selectedText: String, option: WritingOption? = nil, provider: any AIProvider) {
-        self._viewModel = StateObject(wrappedValue: ResponseViewModel(
+        self._viewModel = State(initialValue: ResponseViewModel(
             content: content,
             selectedText: selectedText,
             option: option,
@@ -306,21 +307,22 @@ struct ChatMessageView: View {
 // MARK: - View Model
 
 @MainActor
-final class ResponseViewModel: ObservableObject {
+@Observable
+final class ResponseViewModel {
     
     // UserDefaults key for persistent font size storage
     private static let fontSizeKey = "ResponseView.fontSize"
     private static let defaultFontSize: CGFloat = 14
     
-    @Published var messages: [ChatMessage] = []
-    @Published var fontSize: CGFloat = 14 {
+    var messages: [ChatMessage] = []
+    var fontSize: CGFloat = 14 {
             didSet {
                 // Save font size to UserDefaults whenever it changes
                 UserDefaults.standard.set(fontSize, forKey: Self.fontSizeKey)
             }
     }
-    @Published var showCopyConfirmation = false
-    @Published var isProcessing = false
+    var showCopyConfirmation = false
+    var isProcessing = false
     
     private let content: String
     private let selectedText: String

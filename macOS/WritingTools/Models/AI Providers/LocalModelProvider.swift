@@ -31,7 +31,7 @@ fileprivate let kModelInfoKey = "local_llm_model_info"
 
 @MainActor
 @Observable
-class LocalModelProvider: AIProvider {
+class LocalModelProvider {
 
     // Settings are observed manually via withObservationTracking, so ignore here
     @ObservationIgnored
@@ -940,3 +940,5 @@ class LocalModelProvider: AIProvider {
         }
     }
 }
+
+extension LocalModelProvider: @MainActor AIProvider {}

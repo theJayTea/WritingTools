@@ -1,7 +1,8 @@
 import SwiftUI
+import Observation
 
 struct LocalLLMSettingsView: View {
-    private var llmProvider: LocalModelProvider 
+    @Bindable var llmProvider: LocalModelProvider
     @Bindable private var settings = AppSettings.shared
 
     @State private var showingDeleteAlert = false
@@ -17,7 +18,7 @@ struct LocalLLMSettingsView: View {
     }
 
     init(provider: LocalModelProvider) {
-        self.llmProvider = provider
+        _llmProvider = Bindable(wrappedValue: provider)
     }
     
     var body: some View {
