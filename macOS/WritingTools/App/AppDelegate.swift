@@ -190,7 +190,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 return
             }
 
-            logger.debug("Successfully captured text for command \(command.name): \(selectedText.prefix(50))...")
+            logger.debug("Successfully captured text for command \(command.name) (length: \(selectedText.count) characters)")
 
             // Store data in appState BEFORE restoring clipboard
             self.appState.selectedImages = foundImages

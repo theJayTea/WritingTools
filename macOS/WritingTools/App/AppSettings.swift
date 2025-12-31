@@ -204,6 +204,11 @@ final class AppSettings {
         self.openCustomCommandsInResponseWindow = defaults.object(forKey: "open_custom_commands_in_response_window") as? Bool ?? true
     }
 
+    deinit {
+        keychainWriteTasks.values.forEach { $0.cancel() }
+        keychainWriteTasks.removeAll()
+    }
+
     private func scheduleKeychainWrite(_ value: String, forKey key: String) {
         keychainWriteTasks[key]?.cancel()
 

@@ -297,4 +297,8 @@ extension PopupWindow: NSWindowDelegate {
 
 class FirstResponderHostingView<Content: View>: NSHostingView<Content> {
   override var acceptsFirstResponder: Bool { true }
+
+  override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
+    true
+  }
 }

@@ -31,7 +31,7 @@ class WindowManager: NSObject, NSWindowDelegate {
 
     // Execute operation on window queue
     private func performOnWindowQueue(_ operation: @escaping () -> Void) {
-        Task.detached(priority: .userInitiated) { [weak self] in
+        Task(priority: .userInitiated) { @MainActor [weak self] in
             guard self != nil else { return }
             operation()
         }
