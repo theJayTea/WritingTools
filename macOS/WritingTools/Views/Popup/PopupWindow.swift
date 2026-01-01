@@ -1,5 +1,5 @@
 import SwiftUI
-import Combine
+import Observation
 
 class PopupWindow: NSWindow {
   private var initialLocation: NSPoint?
@@ -9,9 +9,6 @@ class PopupWindow: NSWindow {
   private let windowWidth: CGFloat = 305
 
   private let viewModel = PopupViewModel()
-  private var commandCountCancellable: AnyCancellable?
-  private var isEditModeCancellable: AnyCancellable?
-
   init(appState: AppState) {
     self.appState = appState
 
@@ -27,31 +24,12 @@ class PopupWindow: NSWindow {
     configureWindow()
     setupTrackingArea()
 
-    DispatchQueue.main.async { [weak self] in
+    Task { @MainActor [weak self] in
       self?.updateWindowSize()
     }
 
-    // Observe command changes to resize
-    commandCountCancellable = appState.commandManager.objectWillChange
-      .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
-      .sink { [weak self] _ in
-        self?.updateWindowSize()
-      }
-
-    // Observe edit mode to resize
-    isEditModeCancellable = viewModel.$isEditMode
-      .removeDuplicates()
-      .sink { [weak self] _ in
-        self?.updateWindowSize()
-      }
-
-    // Keep resize on external notifications if needed
-    NotificationCenter.default.addObserver(
-      self,
-      selector: #selector(updateWindowSize),
-      name: NSNotification.Name("CommandsChanged"),
-      object: nil
-    )
+    observeCommandChanges()
+    observeEditModeChanges()
   }
 
   private func configureWindow() {
@@ -99,10 +77,11 @@ class PopupWindow: NSWindow {
   @objc private func updateWindowSize() {
     // Use a shorter delay only when needed for layout stabilization
     // For edit mode changes, we want immediate response
-    let delay = self.viewModel.isEditMode ? 0.05 : 0.1
-    
-    DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
-      guard let self = self else { return }
+    let delay: Duration = self.viewModel.isEditMode ? .milliseconds(50) : .milliseconds(100)
+
+    Task { @MainActor [weak self] in
+      try? await Task.sleep(for: delay)
+      guard let self else { return }
 
       let baseHeight: CGFloat = 100
       let buttonHeight: CGFloat = 55
@@ -126,7 +105,7 @@ class PopupWindow: NSWindow {
         }
       }
 
-      NSAnimationContext.runAnimationGroup { context in
+        await NSAnimationContext.runAnimationGroup { context in
         context.duration = 0.25
         context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
 
@@ -150,9 +129,6 @@ class PopupWindow: NSWindow {
   }
 
   deinit {
-    commandCountCancellable?.cancel()
-    isEditModeCancellable?.cancel()
-    NotificationCenter.default.removeObserver(self)
   }
 
   private func setupTrackingArea() {
@@ -188,9 +164,6 @@ class PopupWindow: NSWindow {
     self.delegate = nil
 
     self.contentView = nil
-    commandCountCancellable?.cancel()
-    isEditModeCancellable?.cancel()
-    NotificationCenter.default.removeObserver(self)
   }
 
   override func close() {
@@ -290,6 +263,32 @@ class PopupWindow: NSWindow {
   }
 }
 
+// MARK: - Observation
+
+extension PopupWindow {
+  private func observeCommandChanges() {
+    withObservationTracking { [weak self] in
+      _ = self?.appState.commandManager.commands
+    } onChange: { [weak self] in
+      Task { @MainActor in
+        self?.updateWindowSize()
+        self?.observeCommandChanges()
+      }
+    }
+  }
+
+  private func observeEditModeChanges() {
+    withObservationTracking { [weak self] in
+      _ = self?.viewModel.isEditMode
+    } onChange: { [weak self] in
+      Task { @MainActor in
+        self?.updateWindowSize()
+        self?.observeEditModeChanges()
+      }
+    }
+  }
+}
+
 extension PopupWindow: NSWindowDelegate {
   func windowDidBecomeKey(_ notification: Notification) {
     level = .popUpMenu
@@ -298,4 +297,8 @@ extension PopupWindow: NSWindowDelegate {
 
 class FirstResponderHostingView<Content: View>: NSHostingView<Content> {
   override var acceptsFirstResponder: Bool { true }
+
+  override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
+    true
+  }
 }

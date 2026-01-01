@@ -13,10 +13,10 @@ struct LinkText: View {
         HStack(spacing: 4) {
             Text("Local LLMs: use the instructions on")
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
             Text("GitHub Page.")
                 .font(.caption)
-                .foregroundColor(.blue)
+                .foregroundStyle(.blue)
                 .underline()
                 .onTapGesture {
                     if let url = URL(string: "https://github.com/theJayTea/WritingTools?tab=readme-ov-file#-optional-ollama-local-llm-instructions") {

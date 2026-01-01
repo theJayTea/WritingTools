@@ -1,13 +1,17 @@
 import SwiftUI
 import ApplicationServices
+import Observation
 
-final class PopupViewModel: ObservableObject {
-  @Published var isEditMode: Bool = false
+private let logger = AppLogger.logger("PopupView")
+
+@Observable
+final class PopupViewModel {
+  var isEditMode: Bool = false
 }
 
 struct PopupView: View {
-  @ObservedObject var appState: AppState
-  @ObservedObject var viewModel: PopupViewModel
+  @Bindable var appState: AppState
+  @Bindable var viewModel: PopupViewModel
   @Environment(\.colorScheme) var colorScheme
   @AppStorage("use_gradient_theme") private var useGradientTheme = false
 
@@ -43,10 +47,10 @@ struct PopupView: View {
         }) {
           Image(systemName: "xmark")
             .font(.body)
-            .foregroundColor(.secondary)
+            .foregroundStyle(.secondary)
             .frame(width: 28, height: 28)
             .background(Color(.controlBackgroundColor))
-            .clipShape(Circle())
+            .clipShape(.circle)
         }
         .buttonStyle(.plain)
         .help(viewModel.isEditMode ? "Exit Edit Mode" : "Close")
@@ -66,10 +70,10 @@ struct PopupView: View {
             systemName: viewModel.isEditMode ? "checkmark" : "square.and.pencil"
           )
           .font(.body)
-          .foregroundColor(.secondary)
+          .foregroundStyle(.secondary)
           .frame(width: 28, height: 28)
           .background(Color(.controlBackgroundColor))
-          .clipShape(Circle())
+          .clipShape(.circle)
         }
         .buttonStyle(.plain)
         .help(viewModel.isEditMode ? "Save Changes" : "Edit Commands")
@@ -115,12 +119,8 @@ struct PopupView: View {
                   editingCommand = command
                 },
                 onDelete: {
-                  print("Deleting command: \(command.name)")
+                  logger.debug("Deleting command: \(command.name)")
                   appState.commandManager.deleteCommand(command)
-                  NotificationCenter.default.post(
-                    name: NSNotification.Name("CommandsChanged"),
-                    object: nil
-                  )
                 }
               )
             }
@@ -139,7 +139,7 @@ struct PopupView: View {
           .frame(maxWidth: .infinity)
           .padding()
           .background(Color(.controlBackgroundColor))
-          .cornerRadius(8)
+          .clipShape(.rect(cornerRadius: 8))
         }
         .buttonStyle(.plain)
         .padding(.horizontal, 16)
@@ -151,7 +151,7 @@ struct PopupView: View {
       RoundedRectangle(cornerRadius: 12)
         .strokeBorder(Color.gray.opacity(0.2), lineWidth: 1)
     )
-    .clipShape(RoundedRectangle(cornerRadius: 12))
+    .clipShape(.rect(cornerRadius: 12))
     .shadow(color: Color.black.opacity(0.2), radius: 10, y: 5)
     // Sheet for editing individual command
     .sheet(item: $editingCommand) { command in
@@ -241,7 +241,7 @@ struct PopupView: View {
         processingCommandId = nil
       }
     } catch {
-      print("Error processing command: \(error.localizedDescription)")
+      logger.error("Error processing command: \(error.localizedDescription)")
       await MainActor.run {
         errorMessage = error.localizedDescription
         showingErrorAlert = true
@@ -320,7 +320,7 @@ struct PopupView: View {
           closeAction()
         }
       } catch {
-        print("Error processing text: \(error.localizedDescription)")
+        logger.error("Error processing text: \(error.localizedDescription)")
         await MainActor.run {
           errorMessage = error.localizedDescription
           showingErrorAlert = true

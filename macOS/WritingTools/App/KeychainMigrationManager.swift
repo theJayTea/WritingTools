@@ -8,6 +8,8 @@
 import Foundation
 import Security
 
+private let logger = AppLogger.logger("KeychainMigrationManager")
+
 class KeychainMigrationManager {
     static let shared = KeychainMigrationManager()
     
@@ -25,11 +27,11 @@ class KeychainMigrationManager {
     func migrateIfNeeded() {
         // Skip if already migrated
         guard !hasMigrationCompleted() else {
-            NSLog("Keychain migration already completed")
+            logger.info("Keychain migration already completed")
             return
         }
         
-        NSLog("Starting Keychain migration for API keys...")
+        logger.info("Starting Keychain migration for API keys...")
         
         let keysToMigrate = [
             ("gemini_api_key", "gemini_api_key"),
@@ -47,13 +49,13 @@ class KeychainMigrationManager {
                 do {
                     try keychain.save(value, forKey: newKey)
                     migratedKeys.append(oldKey)
-                    NSLog("✓ Migrated: \(oldKey)")
+                    logger.debug("Migrated: \(oldKey)")
                     
                     // Remove from UserDefaults after successful migration
                     userDefaults.removeObject(forKey: oldKey)
                 } catch {
                     failedKeys.append(oldKey)
-                    NSLog("✗ Failed to migrate \(oldKey): \(error.localizedDescription)")
+                    logger.error("Failed to migrate \(oldKey): \(error.localizedDescription)")
                 }
             }
         }
@@ -64,7 +66,7 @@ class KeychainMigrationManager {
         // Mark migration as complete
         markMigrationComplete()
         
-        NSLog("Keychain migration complete. Migrated: \(migratedKeys.count), Failed: \(failedKeys.count)")
+        logger.info("Keychain migration complete. Migrated: \(migratedKeys.count), Failed: \(failedKeys.count)")
     }
     
     // MARK: - Private Methods
@@ -75,7 +77,6 @@ class KeychainMigrationManager {
     
     private func markMigrationComplete() {
         userDefaults.set(true, forKey: migrationCompleteKey)
-        userDefaults.synchronize()
     }
     
     private func logMigration(migratedKeys: [String], failedKeys: [String]) {
@@ -100,8 +101,7 @@ class KeychainMigrationManager {
     func resetMigration() {
         userDefaults.removeObject(forKey: migrationCompleteKey)
         userDefaults.removeObject(forKey: migrationLogKey)
-        userDefaults.synchronize()
-        NSLog("Migration reset flag cleared")
+        logger.info("Migration reset flag cleared")
     }
     
     func forceMigration() {

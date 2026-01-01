@@ -38,6 +38,7 @@ struct CommandButton: View {
                 }
                 .frame(maxWidth: 140)
                 .padding()
+                .contentShape(Rectangle())
                 .background {
                     if #available(macOS 26, *) {
                         // Use Liquid Glass effect on macOS 26+
@@ -46,7 +47,7 @@ struct CommandButton: View {
                     } else {
                         // Fallback for older macOS versions
                         Color(.controlBackgroundColor)
-                            .cornerRadius(8)
+                            .clipShape(.rect(cornerRadius: 8))
                     }
                 }
             }
@@ -58,7 +59,7 @@ struct CommandButton: View {
                 HStack {
                     Button(action: onDelete) {
                         Image(systemName: "minus.circle")
-                            .foregroundColor(.red)
+                            .foregroundStyle(.red)
                             .padding(8)
                             .contentShape(Rectangle())
                     }
@@ -68,7 +69,7 @@ struct CommandButton: View {
                     
                     Button(action: onEdit) {
                         Image(systemName: "pencil.circle")
-                            .foregroundColor(.blue)
+                            .foregroundStyle(.blue)
                             .padding(8)
                             .contentShape(Rectangle())
                     }

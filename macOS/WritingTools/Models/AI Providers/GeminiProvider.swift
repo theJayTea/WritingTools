@@ -1,5 +1,8 @@
 import Foundation
 import AIProxy
+import Observation
+
+private let logger = AppLogger.logger("GeminiProvider")
 
 struct GeminiConfig: Codable {
     var apiKey: String
@@ -26,9 +29,9 @@ enum GeminiModel: String, CaseIterable {
     }
 }
 
-@MainActor
-class GeminiProvider: ObservableObject, AIProvider {
-    @Published var isProcessing = false
+@Observable
+final class GeminiProvider: AIProvider {
+    var isProcessing = false
     private var config: GeminiConfig
     private var aiProxyService: GeminiService?
     private var currentTask: Task<Void, Never>?
@@ -82,7 +85,7 @@ class GeminiProvider: ObservableObject, AIProvider {
             let response = try await geminiService.generateContentRequest(body: requestBody, model: config.modelName, secondsToWait: 60)
             
             /*if let usage = response.usageMetadata {
-                print("""
+                logger.debug("""
                      Gemini API Usage:
                      
                       \(usage.promptTokenCount ?? 0) prompt tokens
@@ -96,19 +99,19 @@ class GeminiProvider: ObservableObject, AIProvider {
                 case .text(let text):
                     return text
                 case .functionCall(name: let functionName, args: let arguments):
-                    print("Function call received: \(functionName) with args: \(arguments ?? [:])")
+                    logger.debug("Function call received: \(functionName) with args: \(arguments ?? [:])")
                 case .inlineData(mimeType: _, base64Data: _):
-                    print("Image generation?")
+                    logger.debug("Image generation response part received")
                 }
             }
             
             throw NSError(domain: "GeminiAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "No text content in response."])
             
         } catch AIProxyError.unsuccessfulRequest(let statusCode, let responseBody) {
-            print("AIProxy error (\(statusCode)): \(responseBody)")
+            logger.error("AIProxy error (\(statusCode)): \(responseBody)")
             throw NSError(domain: "GeminiAPI", code: statusCode, userInfo: [NSLocalizedDescriptionKey: "API error: \(responseBody)"])
         } catch {
-            print("Gemini request failed: \(error.localizedDescription)")
+            logger.error("Gemini request failed: \(error.localizedDescription)")
             throw error
         }
     }

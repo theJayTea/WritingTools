@@ -272,7 +272,9 @@ Fixed an issue that caused the app to fail in completing requests when the OpenA
 
 **3. [gdmka](https://github.com/gdmka):**
 
-Added the change that makes the ResponseView remember the user’s preferred text size across app launches.
+- Added the change that makes the ResponseView remember the user’s preferred text size across app launches. 
+- Implemented ability to set custom provider per each command. 
+
 
 ## 🤝 Contributing
 

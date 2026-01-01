@@ -9,7 +9,7 @@ import SwiftUI
 import AppKit
 
 struct OpenAISettingsView: View {
-    @ObservedObject var settings = AppSettings.shared
+    @Bindable var settings = AppSettings.shared
     @Binding var needsSaving: Bool
 
     var body: some View {
@@ -18,7 +18,7 @@ struct OpenAISettingsView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("API Configuration")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     
                     TextField("API Key", text: $settings.openAIApiKey)
                         .textFieldStyle(.roundedBorder)
@@ -36,7 +36,7 @@ struct OpenAISettingsView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Model Configuration")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     
                     TextField("Model Name", text: $settings.openAIModel)
                         .textFieldStyle(.roundedBorder)
@@ -46,7 +46,7 @@ struct OpenAISettingsView: View {
                     
                     Text("OpenAI models include: gpt-4o, gpt-4o-mini, etc.")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
                 
             }

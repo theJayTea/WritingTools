@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct OpenAIProviderSettingsView: View {
-  @ObservedObject var settings: AppSettings
+  @Bindable var settings: AppSettings
 
   var body: some View {
     VStack(alignment: .leading, spacing: 12) {
@@ -27,7 +27,7 @@ struct OpenAIProviderSettingsView: View {
         "Default models: \(OpenAIConfig.defaultModel), gpt-4o, gpt-4o-mini, etc."
       )
       .font(.caption)
-      .foregroundColor(.secondary)
+      .foregroundStyle(.secondary)
 
       Button("Get OpenAI API Key") {
         if let url = URL(

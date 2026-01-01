@@ -7,11 +7,11 @@
 
 import SwiftUI
 
-struct AppearanceSettingsPane: View {
-    @ObservedObject var settings = AppSettings.shared
+struct AppearanceSettingsPane<SaveButton: View>: View {
+    @Bindable var settings = AppSettings.shared
     @Binding var needsSaving: Bool
     var showOnlyApiSetup: Bool
-    var saveButton: AnyView
+    let saveButton: SaveButton
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
@@ -21,11 +21,11 @@ struct AppearanceSettingsPane: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Window Style")
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                 
                 Text("Choose a window appearance that matches your preferences and context.")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                 
                 Picker("Theme", selection: $settings.themeStyle) {
                     Text("Standard").tag("standard")

@@ -76,7 +76,7 @@ struct IconPickerView: View {
                 Button(action: { dismiss() }) {
                     Image(systemName: "xmark.circle.fill")
                         .font(.title2)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
                 .buttonStyle(.plain)
             }
@@ -87,13 +87,13 @@ struct IconPickerView: View {
             // Search bar
             HStack(spacing: 8) {
                 Image(systemName: "magnifyingglass")
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                 TextField("Search icons...", text: $searchText)
                     .textFieldStyle(.roundedBorder)
                 if !searchText.isEmpty {
                     Button(action: { searchText = "" }) {
                         Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     .buttonStyle(.plain)
                 }
@@ -109,9 +109,9 @@ struct IconPickerView: View {
                         Spacer()
                         Image(systemName: "magnifyingglass")
                             .font(.system(size: 32))
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                         Text("No icons found")
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                             .padding(.top, 8)
                         Spacer()
                     }
@@ -126,14 +126,14 @@ struct IconPickerView: View {
                                 Image(systemName: icon)
                                     .font(.title2)
                                     .frame(width: 36, height: 36)
-                                    .foregroundColor(
+                                    .foregroundStyle(
                                         selectedIcon == icon ? .white : .primary
                                     )
                                     .background(
                                         selectedIcon == icon ?
                                         Color.accentColor : Color.clear
                                     )
-                                    .cornerRadius(8)
+                                    .clipShape(.rect(cornerRadius: 8))
                             }
                             .buttonStyle(.plain)
                             .help(icon)

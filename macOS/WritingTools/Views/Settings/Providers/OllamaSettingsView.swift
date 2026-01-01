@@ -9,7 +9,7 @@ import SwiftUI
 import AppKit
 
 struct OllamaSettingsView: View {
-    @ObservedObject var settings = AppSettings.shared
+    @Bindable var settings = AppSettings.shared
     @Binding var needsSaving: Bool
 
     var body: some View {
@@ -18,7 +18,7 @@ struct OllamaSettingsView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Connection Settings")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     
                     TextField("Ollama Base URL", text: $settings.ollamaBaseURL)
                         .textFieldStyle(.roundedBorder)
@@ -30,7 +30,7 @@ struct OllamaSettingsView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Model Configuration")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     
                     TextField("Ollama Model", text: $settings.ollamaModel)
                         .textFieldStyle(.roundedBorder)
@@ -48,7 +48,7 @@ struct OllamaSettingsView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Image Recognition")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     
                     Picker("Image Mode", selection: $settings.ollamaImageMode) {
                         ForEach(OllamaImageMode.allCases) { mode in
@@ -62,13 +62,13 @@ struct OllamaSettingsView: View {
                     
                     Text("Choose between performing OCR locally or using an Ollama vision-enabled model for image input.")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Documentation")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     
                     LinkText()
                 }

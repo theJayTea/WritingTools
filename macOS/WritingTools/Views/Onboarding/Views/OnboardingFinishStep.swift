@@ -18,7 +18,7 @@ struct OnboardingFinishStep: View {
         VStack(alignment: .leading, spacing: 8) {
           Label("You're ready to go!", systemImage: "checkmark.seal.fill")
             .font(.title2)
-            .foregroundColor(.green)
+            .foregroundStyle(.green)
 
           Text(
             """
@@ -27,7 +27,7 @@ struct OnboardingFinishStep: View {
             available and you can add your own.
             """
           )
-          .foregroundColor(.secondary)
+          .foregroundStyle(.secondary)
           .fixedSize(horizontal: false, vertical: true)
         }
         .padding(8)
@@ -48,7 +48,7 @@ struct OnboardingFinishStep: View {
             systemImage: "lock.shield"
           )
         }
-        .foregroundColor(.secondary)
+        .foregroundStyle(.secondary)
         .padding(8)
       }
 
@@ -56,7 +56,7 @@ struct OnboardingFinishStep: View {
         "You can revisit onboarding anytime from Settings > General > Onboarding."
       )
       .font(.footnote)
-      .foregroundColor(.secondary)
+      .foregroundStyle(.secondary)
 
       HStack {
         Button("Open Commands Manager") {

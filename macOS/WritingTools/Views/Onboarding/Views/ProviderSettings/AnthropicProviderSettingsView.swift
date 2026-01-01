@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AnthropicProviderSettingsView: View {
-  @ObservedObject var settings: AppSettings
+  @Bindable var settings: AppSettings
 
   var body: some View {
     VStack(alignment: .leading, spacing: 12) {
@@ -33,7 +33,7 @@ struct AnthropicProviderSettingsView: View {
         "E.g., \(AnthropicModel.allCases.map { $0.rawValue }.joined(separator: ", "))"
       )
       .font(.caption)
-      .foregroundColor(.secondary)
+      .foregroundStyle(.secondary)
 
       Button("Get Anthropic API Key") {
         if let url = URL(string: "https://console.anthropic.com/settings/keys")

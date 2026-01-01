@@ -154,7 +154,7 @@ You can build the macOS app either by opening the project or the package:
 - **macOS Port**: **Arya Mirsepasi** 
 - **Gemini Image/Picture Processing**: **Joaov41**. 
 - **OpenAI Compatible API Fix**: **drankush**
-- **Text size fix**: **gdmka**
+- **Text size fix and per command provider**: **gdmka**
 - **Keyboard Shortcuts**: Thanks to **sindresorhus/KeyboardShortcuts**.  
 - **MLX Swift** (local LLMs on Apple Silicon): https://github.com/ml-explore/mlx-swift-examples
 

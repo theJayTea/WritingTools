@@ -1,6 +1,10 @@
 import SwiftUI
 import KeyboardShortcuts
 import Carbon.HIToolbox
+import UniformTypeIdentifiers
+import ImageIO
+
+private let logger = AppLogger.logger("AppDelegate")
 
 @MainActor
 class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
@@ -33,8 +37,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
     // Pasteboard monitoring
     private var pasteboardObserver: NSObjectProtocol?
-    private let pasteboardQueue = DispatchQueue(label: "com.writingtools.pasteboard", qos: .userInitiated)
-
     @objc private func toggleHotkeys() {
         AppSettings.shared.hotkeysPaused.toggle()
         setupMenuBar()
@@ -44,13 +46,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         NSApp.servicesProvider = self
 
         if CommandLine.arguments.contains("--reset") {
-            DispatchQueue.main.async { [weak self] in
+            Task { @MainActor [weak self] in
                 self?.performRecoveryReset()
             }
             return
         }
 
-        DispatchQueue.main.async { [weak self] in
+        Task { @MainActor [weak self] in
             self?.setupMenuBar()
 
             if self?.statusBarItem == nil {
@@ -67,7 +69,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             if !AppSettings.shared.hotkeysPaused {
                 self?.showPopup()
             } else {
-                NSLog("Hotkeys are paused")
+                logger.info("Hotkeys are paused")
             }
         }
 
@@ -111,7 +113,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
             // IMPORTANT: Capture the ENTIRE clipboard state before copying
             let clipboardSnapshot = pb.createSnapshot()
-            NSLog("Captured clipboard snapshot with \(clipboardSnapshot.itemCount) items")
+            logger.debug("Captured clipboard snapshot with \(clipboardSnapshot.itemCount) items")
 
             // Create and post Cmd+C event
             let src = CGEventSource(stateID: .hidSystemState)
@@ -124,14 +126,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             ku?.post(tap: .cgSessionEventTap)
 
             // Give the system a tiny moment to process the copy event
-            try? await Task.sleep(nanoseconds: 50_000_000) // 50ms - increased for reliability
+            try? await Task.sleep(for: .milliseconds(50)) // 50ms - increased for reliability
 
             // Wait for the pasteboard to actually change
             await waitForPasteboardChange(pb, initialChangeCount: oldChangeCount)
 
             // Only proceed if the pasteboard actually changed (new content was copied)
             guard pb.changeCount > oldChangeCount else {
-                NSLog("No new content was copied for command: \(command.name) - change count didn't increase (old: \(oldChangeCount), new: \(pb.changeCount))")
+                logger.warning("No new content was copied for command: \(command.name) - change count didn't increase (old: \(oldChangeCount), new: \(pb.changeCount))")
                 return
             }
 
@@ -139,40 +141,39 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             var foundImages: [Data] = []
 
             let classes = [NSURL.self]
+            let imageTypeIdentifiers = [
+                UTType.image,
+                UTType.png,
+                UTType.jpeg,
+                UTType.tiff,
+                UTType.gif,
+            ].map(\.identifier)
+
             let options: [NSPasteboard.ReadingOptionKey: Any] = [
                 .urlReadingFileURLsOnly: true,
-                .urlReadingContentsConformToTypes: [
-                    "public.image",
-                    "public.png",
-                    "public.jpeg",
-                    "public.tiff",
-                    "com.compuserve.gif",
-                ],
+                .urlReadingContentsConformToTypes: imageTypeIdentifiers,
             ]
 
             if let urls = pb.readObjects(forClasses: classes, options: options) as? [URL] {
-                for url in urls {
-                    if let imageData = try? Data(contentsOf: url),
-                       NSImage(data: imageData) != nil {
-                        foundImages.append(imageData)
-                        NSLog("Loaded image data from file: \(url.lastPathComponent)")
-                    }
+                let loadedImages = await loadImageData(from: urls)
+                if !loadedImages.isEmpty {
+                    foundImages.append(contentsOf: loadedImages)
                 }
             }
 
             if foundImages.isEmpty {
                 let supportedImageTypes: [NSPasteboard.PasteboardType] = [
-                    NSPasteboard.PasteboardType("public.png"),
-                    NSPasteboard.PasteboardType("public.jpeg"),
-                    NSPasteboard.PasteboardType("public.tiff"),
-                    NSPasteboard.PasteboardType("com.compuserve.gif"),
-                    NSPasteboard.PasteboardType("public.image"),
+                    NSPasteboard.PasteboardType(UTType.png.identifier),
+                    NSPasteboard.PasteboardType(UTType.jpeg.identifier),
+                    NSPasteboard.PasteboardType(UTType.tiff.identifier),
+                    NSPasteboard.PasteboardType(UTType.gif.identifier),
+                    NSPasteboard.PasteboardType(UTType.image.identifier),
                 ]
 
                 for type in supportedImageTypes {
                     if let data = pb.data(forType: type) {
                         foundImages.append(data)
-                        NSLog("Found direct image data of type: \(type)")
+                        logger.debug("Found direct image data of type: \(type.rawValue)")
                         break
                     }
                 }
@@ -183,13 +184,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             let selectedText = rich?.string ?? pb.string(forType: .string) ?? ""
 
             guard !selectedText.isEmpty else {
-                NSLog("No text selected for command: \(command.name) - pasteboard contained no text")
+                logger.info("No text selected for command: \(command.name) - pasteboard contained no text")
                 // Restore original clipboard using snapshot
                 pb.restore(snapshot: clipboardSnapshot)
                 return
             }
 
-            NSLog("Successfully captured text for command \(command.name): \(selectedText.prefix(50))...")
+            logger.debug("Successfully captured text for command \(command.name) (length: \(selectedText.count) characters)")
 
             // Store data in appState BEFORE restoring clipboard
             self.appState.selectedImages = foundImages
@@ -203,7 +204,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
             // NOW restore original clipboard using the snapshot
             pb.restore(snapshot: clipboardSnapshot)
-            NSLog("Restored original clipboard after capturing selection")
+            logger.debug("Restored original clipboard after capturing selection")
 
             // Process the command with the captured data
             await self.processCommandWithUI(command)
@@ -237,7 +238,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             let originalText = appState.selectedText
             if originalText.hasSuffix("\n") && !result.hasSuffix("\n") {
                 result += "\n"
-                NSLog("Added trailing newline to match input")
+                logger.debug("Added trailing newline to match input")
             }
 
             await MainActor.run {
@@ -263,7 +264,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 }
             }
         } catch {
-            NSLog("Error processing command \(command.name): \(error.localizedDescription)")
+            logger.error("Error processing command \(command.name): \(error.localizedDescription)")
 
             // Show error alert
             await MainActor.run {
@@ -282,23 +283,24 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private func waitForPasteboardChange(_ pb: NSPasteboard, initialChangeCount: Int) async {
         let startTime = Date()
         let timeout: TimeInterval = 2.0 // Increased timeout
-        let pollInterval: UInt64 = 5_000_000 // 5 milliseconds in nanoseconds (more responsive)
+        let pollInterval: Duration = .milliseconds(5)
 
         while pb.changeCount == initialChangeCount && Date().timeIntervalSince(startTime) < timeout {
             do {
-                try await Task.sleep(nanoseconds: pollInterval)
+                try await Task.sleep(for: pollInterval)
             } catch {
                 // Task was cancelled
-                NSLog("Clipboard monitoring cancelled: \(error)")
+                logger.debug("Clipboard monitoring cancelled: \(error.localizedDescription)")
                 return
             }
         }
 
         if pb.changeCount == initialChangeCount {
-            NSLog("Warning: Clipboard update timeout after \(timeout)s - no change detected")
+            logger.warning("Clipboard update timeout after \(timeout)s - no change detected")
         } else {
             let elapsed = Date().timeIntervalSince(startTime)
-            NSLog("Clipboard changed after \(String(format: "%.3f", elapsed))s")
+            let formattedElapsed = elapsed.formatted(.number.precision(.fractionLength(3)))
+            logger.debug("Clipboard changed after \(formattedElapsed)s")
         }
     }
 
@@ -325,7 +327,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
     private func setupMenuBar() {
         guard let statusBarItem = self.statusBarItem else {
-            print("Failed to create status bar item")
+            logger.error("Failed to create status bar item")
             return
         }
 
@@ -373,7 +375,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private func performRecoveryReset() {
         let domain = Bundle.main.bundleIdentifier!
         UserDefaults.standard.removePersistentDomain(forName: domain)
-        UserDefaults.standard.synchronize()
 
         WindowManager.shared.cleanupWindows()
 
@@ -487,7 +488,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
             // Capture the ENTIRE clipboard state before copying
             let clipboardSnapshot = pb.createSnapshot()
-            NSLog("Captured clipboard snapshot with \(clipboardSnapshot.itemCount) items")
+            logger.debug("Captured clipboard snapshot with \(clipboardSnapshot.itemCount) items")
 
             // Create and post Cmd+C event
             let src = CGEventSource(stateID: .hidSystemState)
@@ -500,55 +501,60 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             ku?.post(tap: .cgSessionEventTap)
 
             // Give the system a tiny moment to process the copy event
-            try? await Task.sleep(nanoseconds: 50_000_000) // 50ms - increased for reliability
+            try? await Task.sleep(for: .milliseconds(50)) // 50ms - increased for reliability
 
             await waitForPasteboardChange(pb, initialChangeCount: oldChangeCount)
 
             var foundImages: [Data] = []
+            var rich: NSAttributedString? = nil
+            var plainText = ""
 
-            let classes = [NSURL.self]
-            let options: [NSPasteboard.ReadingOptionKey: Any] = [
-                .urlReadingFileURLsOnly: true,
-                .urlReadingContentsConformToTypes: [
-                    "public.image",
-                    "public.png",
-                    "public.jpeg",
-                    "public.tiff",
-                    "com.compuserve.gif",
-                ],
-            ]
+            if pb.changeCount > oldChangeCount {
+                let classes = [NSURL.self]
+                let imageTypeIdentifiers = [
+                    UTType.image,
+                    UTType.png,
+                    UTType.jpeg,
+                    UTType.tiff,
+                    UTType.gif,
+                ].map(\.identifier)
 
-            if let urls = pb.readObjects(forClasses: classes, options: options) as? [URL] {
-                for url in urls {
-                    if let imageData = try? Data(contentsOf: url),
-                       NSImage(data: imageData) != nil {
-                        foundImages.append(imageData)
-                        NSLog("Loaded image data from file: \(url.lastPathComponent)")
-                    }
-                }
-            }
-
-            if foundImages.isEmpty {
-                let supportedImageTypes: [NSPasteboard.PasteboardType] = [
-                    NSPasteboard.PasteboardType("public.png"),
-                    NSPasteboard.PasteboardType("public.jpeg"),
-                    NSPasteboard.PasteboardType("public.tiff"),
-                    NSPasteboard.PasteboardType("com.compuserve.gif"),
-                    NSPasteboard.PasteboardType("public.image"),
+                let options: [NSPasteboard.ReadingOptionKey: Any] = [
+                    .urlReadingFileURLsOnly: true,
+                    .urlReadingContentsConformToTypes: imageTypeIdentifiers,
                 ]
 
-                for type in supportedImageTypes {
-                    if let data = pb.data(forType: type) {
-                        foundImages.append(data)
-                        NSLog("Found direct image data of type: \(type)")
-                        break
+                if let urls = pb.readObjects(forClasses: classes, options: options) as? [URL] {
+                    let loadedImages = await loadImageData(from: urls)
+                    if !loadedImages.isEmpty {
+                        foundImages.append(contentsOf: loadedImages)
                     }
                 }
-            }
 
-            // Read rich text and plain text BEFORE restoring clipboard
-            let rich = pb.readAttributedSelection()
-            let plainText = rich?.string ?? pb.string(forType: .string) ?? ""
+                if foundImages.isEmpty {
+                    let supportedImageTypes: [NSPasteboard.PasteboardType] = [
+                        NSPasteboard.PasteboardType(UTType.png.identifier),
+                        NSPasteboard.PasteboardType(UTType.jpeg.identifier),
+                        NSPasteboard.PasteboardType(UTType.tiff.identifier),
+                        NSPasteboard.PasteboardType(UTType.gif.identifier),
+                        NSPasteboard.PasteboardType(UTType.image.identifier),
+                    ]
+
+                    for type in supportedImageTypes {
+                        if let data = pb.data(forType: type) {
+                            foundImages.append(data)
+                            logger.debug("Found direct image data of type: \(type.rawValue)")
+                            break
+                        }
+                    }
+                }
+
+                // Read rich text and plain text BEFORE restoring clipboard
+                rich = pb.readAttributedSelection()
+                plainText = rich?.string ?? pb.string(forType: .string) ?? ""
+            } else {
+                logger.warning("Pasteboard did not change after copy; clearing selection to avoid stale context")
+            }
 
             // Store data in appState BEFORE restoring clipboard
             self.appState.selectedAttributedText = rich
@@ -557,7 +563,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
             // Restore original clipboard using the snapshot
             pb.restore(snapshot: clipboardSnapshot)
-            NSLog("Restored original clipboard after capturing selection")
+            logger.debug("Restored original clipboard after capturing selection")
 
             let window = PopupWindow(appState: self.appState)
             if !plainText.isEmpty || !foundImages.isEmpty {
@@ -581,7 +587,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         guard !isServiceTriggered else { return }
 
         guard let window = notification.object as? NSWindow else { return }
-        DispatchQueue.main.async { [weak self] in
+        Task { @MainActor [weak self] in
             if window == self?.settingsWindow {
                 self?.settingsHostingView = nil
                 self?.settingsWindow = nil
@@ -590,6 +596,33 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 self?.aboutWindow = nil
             }
         }
+    }
+}
+
+// MARK: - Image Loading
+
+private extension AppDelegate {
+    func loadImageData(from urls: [URL]) async -> [Data] {
+        await Task.detached(priority: .userInitiated) {
+            var images: [Data] = []
+            images.reserveCapacity(urls.count)
+
+            for url in urls {
+                if let imageData = try? Data(contentsOf: url),
+                   await Self.isValidImageData(imageData) {
+                    images.append(imageData)
+                    logger.debug("Loaded image data from file: \(url.lastPathComponent)")
+                }
+            }
+            return images
+        }.value
+    }
+
+    static func isValidImageData(_ data: Data) -> Bool {
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil) else {
+            return false
+        }
+        return CGImageSourceGetCount(source) > 0
     }
 }
 

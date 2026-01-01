@@ -4,8 +4,25 @@ import MLXLLM
 import MLXLMCommon
 import MLXRandom
 import SwiftUI
-import Combine
+import Observation
 import Hub
+import UniformTypeIdentifiers
+
+private let logger = AppLogger.logger("LocalModelProvider")
+
+// MARK: - Memory Monitoring Helper
+
+/// Logs GPU memory usage for debugging and performance optimization.
+/// Uses MLX.GPU.snapshot() to get current memory state.
+private func logGPUMemoryUsage(at checkpoint: String) {
+    #if DEBUG
+    let snapshot = MLX.GPU.snapshot()
+    let activeMB = Double(snapshot.activeMemory) / (1024 * 1024)
+    let cacheMB = Double(snapshot.cacheMemory) / (1024 * 1024)
+    let peakMB = Double(snapshot.peakMemory) / (1024 * 1024)
+    logger.debug("[\(checkpoint)] GPU Memory - Active: \(activeMB, privacy: .public)MB, Cache: \(cacheMB, privacy: .public)MB, Peak: \(peakMB, privacy: .public)MB")
+    #endif
+}
 
 // Constants for UserDefaults keys
 fileprivate let kModelStatusKey = "local_llm_model_status"
@@ -13,26 +30,37 @@ fileprivate let kModelInfoKey = "local_llm_model_info"
 
 
 @MainActor
-class LocalModelProvider: ObservableObject, AIProvider {
-    
-    @ObservedObject private var settings = AppSettings.shared
-    private var settingsCancellable: AnyCancellable?
-    
-    @Published var isProcessing = false
-    @Published var isDownloading = false
-    @Published var downloadProgress: Double = 0
-    @Published var downloadTask: Task<ModelContainer, Error>?
-    @Published var output = ""
-    @Published var modelInfo = ""
-    @Published var stat = ""
-    @Published var lastError: String?
-    @Published var retryCount: Int = 0
+@Observable
+class LocalModelProvider {
 
-    // Keep already loaded models alive so we don't pay the load cost after a model switch.
+    // Settings are observed manually via withObservationTracking, so ignore here
+    @ObservationIgnored
+    private let settings = AppSettings.shared
+
+    // UI-facing properties that should trigger view updates
+    var isProcessing = false
+    var isDownloading = false
+    var downloadProgress: Double = 0
+    var output = ""
+    var modelInfo = ""
+    var stat = ""
+    var lastError: String?
+    var retryCount: Int = 0
+
+    // Internal state - should NOT trigger observation
+    @ObservationIgnored
+    var downloadTask: Task<ModelContainer, Error>?
+
+    @ObservationIgnored
     private let modelCache = NSCache<NSString, ModelContainer>()
-    
+
+    @ObservationIgnored
     var running = false
+
+    @ObservationIgnored
     private var isCancelled = false
+
+    @ObservationIgnored
     private let maxRetries = 3
     
     // Controls whether the model uses its "thinking" mode (if supported).
@@ -53,6 +81,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
         return base.appendingPathComponent("WritingTools/MLXModels", isDirectory: true)
     }()
 
+    @ObservationIgnored
     private lazy var hub: HubApi = {
         // ensure the folder exists
         try? FileManager.default.createDirectory(at: Self.modelsRoot, withIntermediateDirectories: true)
@@ -116,10 +145,11 @@ class LocalModelProvider: ObservableObject, AIProvider {
         GenerateParameters(
             maxTokens: maxTokens,
             temperature: 0.6
+            // Note: KV cache quantization (kvBits: 4) is available but adds overhead.
+            // Only enable for memory-constrained devices or very long generations.
         )
     }
     let maxTokens = 10000
-    let displayEveryNTokens = 4
     
     enum LoadState: Equatable {
         case idle
@@ -144,7 +174,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
         }
     }
     
-    @Published var loadState = LoadState.idle
+    var loadState = LoadState.idle
     
     // Model Directory Calculation
     private var modelDirectory: URL? {
@@ -156,23 +186,30 @@ class LocalModelProvider: ObservableObject, AIProvider {
         modelCache.countLimit = 2
         if isPlatformSupported {
             MLX.GPU.set(cacheLimit: 20 * 1024 * 1024)
-            
-            settingsCancellable = settings.$selectedLocalLLMId.sink { [weak self] _ in
-                Task { @MainActor [weak self] in
-                    // When the selection changes, reset state and check the new model
-                    self?.resetModelState()
-                    self?.checkModelStatus()
-                }
-            }
+
+            observeSettings()
             checkModelStatus()
-            
+
         } else {
             modelInfo = "Local LLM is only available on Apple Silicon devices"
             loadState = .error("Platform not supported")
         }
     }
+
+    private func observeSettings() {
+        withObservationTracking {
+            _ = settings.selectedLocalLLMId
+        } onChange: { [weak self] in
+            Task { @MainActor [weak self] in
+                // When the selection changes, reset state and check the new model.
+                self?.resetModelState()
+                self?.checkModelStatus()
+                self?.observeSettings()
+            }
+        }
+    }
     
-    // --- Reset state when model selection changes ---
+    // Reset state when model selection changes
     private func resetModelState() {
         cancelDownload()
         cancel()
@@ -201,7 +238,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
         }
         
         guard !isDownloading, loadState != .loading else {
-            print("checkModelStatus: Skipping check, currently downloading or loading.")
+            logger.debug("checkModelStatus: Skipping check, currently downloading or loading.")
             return
         }
         
@@ -222,7 +259,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
                     let contents = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
                     isEmpty = contents.isEmpty
                 } catch {
-                    print("Error reading directory contents: \(error)")
+                    logger.error("Error reading directory contents: \(error.localizedDescription)")
                     isEmpty = true
                 }
             }
@@ -239,7 +276,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
             if exists && isDirectory.boolValue && isEmpty {
                 // Attempt to remove empty directory
                 try? FileManager.default.removeItem(at: modelDir)
-                print("checkModelStatus: Removed empty directory at \(modelDir.path)")
+                logger.debug("checkModelStatus: Removed empty directory at \(modelDir.path)")
             }
             loadState = .needsDownload
             modelInfo = "\(modelType.displayName) needs to be downloaded."
@@ -261,12 +298,12 @@ class LocalModelProvider: ObservableObject, AIProvider {
         }
         // Prevent starting if already downloading or task exists
         guard !isDownloading, downloadTask == nil else {
-            print("startDownload: Download already in progress or task exists.")
+            logger.info("startDownload: Download already in progress or task exists.")
             return
         }
         // Prevent starting if already downloaded/loading/loaded
         guard loadState == .needsDownload || loadState == .error("Download failed") || loadState == .idle || loadState == .checking else {
-            print("startDownload: Cannot start download from state \(loadState).")
+            logger.warning("startDownload: Cannot start download from state \(String(describing: self.loadState)).")
             // Update info based on state
             switch loadState {
             case .downloaded, .loaded: modelInfo = "\(selectedModelType?.displayName ?? "Model") is already available."
@@ -277,7 +314,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
         }
         
         
-        print("startDownload: Proceeding to initiate download for \(selectedModelType?.displayName ?? "Unknown").")
+        logger.debug("startDownload: Proceeding to initiate download for \(self.selectedModelType?.displayName ?? "Unknown").")
         
         isCancelled = false
         retryCount = 0
@@ -288,40 +325,40 @@ class LocalModelProvider: ObservableObject, AIProvider {
         loadState = .needsDownload
         
         downloadTask = Task {
-            print("startDownload: Task created, calling load()")
+            logger.debug("startDownload: Task created, calling load()")
             do {
                 let container = try await load()
                 // Success is handled within load() by setting state to .loaded
-                print("startDownload: Task finished successfully.")
+                logger.debug("startDownload: Task finished successfully.")
                 return container
             } catch {
                 // Errors (including cancellation) are handled within load()
-                print("startDownload: Task finished with error: \(error)")
+                logger.error("startDownload: Task finished with error: \(error.localizedDescription)")
                 throw error
             }
         }
-        print("startDownload: downloadTask assigned.")
+        logger.debug("startDownload: downloadTask assigned.")
     }
     
-    // --- cancelDownload ---
+    // cancelDownload
     func cancelDownload() {
         guard isPlatformSupported else { return }
         
         // Only proceed if a download is actually in progress
         guard isDownloading, let task = downloadTask else {
-            print("cancelDownload: No active download task to cancel.")
+            logger.info("cancelDownload: No active download task to cancel.")
             isDownloading = false
             downloadTask = nil
             isCancelled = false
             return
         }
         
-        print("cancelDownload: Initiating cancellation...")
+        logger.debug("cancelDownload: Initiating cancellation...")
         
         isCancelled = true
         task.cancel()
         
-        // --- Immediate UI Update ---
+        // Immediate UI Update
         isDownloading = false
         downloadProgress = 0 // Reset progress visually
         modelInfo = "Cancelling download..." // Update status immediately
@@ -344,7 +381,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
             return
         }
         guard !isDownloading, downloadTask == nil else {
-            print("retryDownload: Cannot retry while another download is active.")
+            logger.warning("retryDownload: Cannot retry while another download is active.")
             modelInfo = "Cannot retry: another download is active."
             return
         }
@@ -353,7 +390,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
         loadState = .needsDownload
         lastError = nil
         modelInfo = "Retrying download (\(retryCount)/\(maxRetries)) for \(selectedModelType?.displayName ?? "model")..."
-        print("retryDownload: Attempting retry \(retryCount)/\(maxRetries)")
+        logger.debug("retryDownload: Attempting retry \(self.retryCount)/\(self.maxRetries)")
         startDownload()
     }
     
@@ -397,12 +434,12 @@ class LocalModelProvider: ObservableObject, AIProvider {
             
             if exists && isDirectory.boolValue {
                 try FileManager.default.removeItem(at: modelDir)
-                print("Model directory deleted: \(modelDir.path)")
+                logger.debug("Model directory deleted: \(modelDir.path)")
             } else if exists { // It's a file? Try deleting anyway.
                 try FileManager.default.removeItem(at: modelDir)
-                print("Warning: Expected directory but found file at \(modelDir.path), removed.")
+                logger.warning("Expected directory but found file at \(modelDir.path), removed.")
             } else {
-                print("Model directory not found, nothing to delete: \(modelDir.path)")
+                logger.debug("Model directory not found, nothing to delete: \(modelDir.path)")
             }
             
             // Reset state *after* successful deletion or if not found
@@ -412,7 +449,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
             modelInfo = "\(modelType.displayName) deleted." // Update info *after* check
             
         } catch {
-            print("Failed to delete model \(modelType.displayName): \(error)")
+            logger.error("Failed to delete model \(modelType.displayName): \(error.localizedDescription)")
             lastError = "Failed to delete \(modelType.displayName): \(error.localizedDescription)"
             modelInfo = lastError!
             loadState = .error(lastError!)
@@ -429,7 +466,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
         }
         let cacheKey = cacheKey(for: config)
         
-        print("load: Function called. Current state: \(loadState)")
+        logger.debug("load: Function called. Current state: \(String(describing: self.loadState))")
 
         if let cached = modelCache.object(forKey: cacheKey) {
             loadState = .loaded(cached)
@@ -438,12 +475,12 @@ class LocalModelProvider: ObservableObject, AIProvider {
         }
 
         if case .loaded(let container) = loadState {
-            print("load: Model already loaded.")
+            logger.debug("load: Model already loaded.")
             modelCache.setObject(container, forKey: cacheKey)
             return container
         }
         if case .loading = loadState {
-            print("load: Model is already loading (called directly?).")
+            logger.debug("load: Model is already loading (called directly?).")
             // Wait for existing load? For now, throw error.
             throw NSError(domain: "LocalLLM", code: -3, userInfo: [NSLocalizedDescriptionKey: "Model is already loading."])
         }
@@ -454,7 +491,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
         
         // --- Download Block ---
         if case .needsDownload = loadState {
-            print("load: State is .needsDownload. Preparing to download \(modelType.displayName).")
+            logger.debug("load: State is .needsDownload. Preparing to download \(modelType.displayName).")
             // Ensure flags are accurate, though startDownload should have set them
             isDownloading = true
             // downloadProgress = 0 // Keep existing progress if resuming? No, start fresh.
@@ -466,7 +503,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
                 ? VLMModelFactory.shared
                 : LLMModelFactory.shared
                 
-                print("load: Calling \(modelType.isVisionModel ? "VLM" : "LLM")ModelFactory.shared.loadContainer for \(config.id)")
+                logger.debug("load: Calling \(modelType.isVisionModel ? "VLM" : "LLM")ModelFactory.shared.loadContainer for \(String(describing: config.id))")
                 
                 let modelContainer = try await factory.loadContainer(
                     hub: hub,
@@ -484,7 +521,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
                     }
                 }
                 // --- Download Success ---
-                print("load: loadContainer completed successfully for download.")
+                logger.debug("load: loadContainer completed successfully for download.")
                 isDownloading = false
                 downloadProgress = 1.0
                 downloadTask = nil // Clear task reference
@@ -492,12 +529,12 @@ class LocalModelProvider: ObservableObject, AIProvider {
                 modelInfo = "\(modelType.displayName) loaded. Weights: \(numParams / (1024 * 1024))M"
                 modelCache.setObject(modelContainer, forKey: cacheKey)
                 loadState = .loaded(modelContainer)
-                print("load: State set to .loaded")
+                logger.debug("load: State set to .loaded")
                 return modelContainer
                 
             } catch { // Catch ALL errors here
                 // --- Download Error/Cancellation ---
-                print("load: Error during loadContainer (download): \(error), isCancelled flag: \(isCancelled)")
+                logger.error("load: Error during loadContainer (download): \(error.localizedDescription), isCancelled flag: \(self.isCancelled)")
                 
                 // Determine if it was a user cancellation
                 let wasExplicitlyCancelled = isCancelled // Check our flag first
@@ -509,7 +546,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
                 downloadTask = nil // Clear task reference
                 
                 if wasExplicitlyCancelled || isCancellationError {
-                    print("load: Download cancelled.")
+                    logger.debug("load: Download cancelled.")
                     lastError = "Download cancelled." // Set user-facing error
                     modelInfo = lastError!
                     // State should revert correctly after checkModelStatus
@@ -521,7 +558,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
                     : "Error downloading \(modelType.displayName): \(nsError.localizedDescription)"
                     modelInfo = lastError ?? "Unknown download error"
                     loadState = .error(lastError!) // Set error state immediately
-                    print("load: State set to .error")
+                    logger.error("load: State set to .error")
                 }
                 
                 // Always re-check status after failure/cancellation to update UI correctly
@@ -536,7 +573,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
             }
             // --- Load from Disk Block ---
         } else if case .downloaded = loadState {
-            print("load: State is .downloaded. Loading \(modelType.displayName) from disk.")
+            logger.debug("load: State is .downloaded. Loading \(modelType.displayName) from disk.")
             loadState = .loading
             modelInfo = "Loading \(modelType.displayName)..."
             do {
@@ -544,28 +581,29 @@ class LocalModelProvider: ObservableObject, AIProvider {
                 ? VLMModelFactory.shared
                 : LLMModelFactory.shared
                 
-                print("load: Calling \(modelType.isVisionModel ? "VLM" : "LLM")ModelFactory.shared.loadContainer for \(config.id)")
+                logger.debug("load: Calling \(modelType.isVisionModel ? "VLM" : "LLM")ModelFactory.shared.loadContainer for \(String(describing: config.id))")
                 let modelContainer = try await factory.loadContainer(hub: hub, configuration: config)
-                print("load: loadContainer completed successfully (from disk).")
+                logger.debug("load: loadContainer completed successfully (from disk).")
+                logGPUMemoryUsage(at: "Model Loaded")
                 let numParams = await modelContainer.perform { context in context.model.numParameters() }
                 modelInfo = "\(modelType.displayName) loaded. Weights: \(numParams / (1024 * 1024))M"
                 modelCache.setObject(modelContainer, forKey: cacheKey)
                 loadState = .loaded(modelContainer)
-                print("load: State set to .loaded")
+                logger.debug("load: State set to .loaded")
                 return modelContainer
             } catch let error as NSError {
-                print("load: Error during loadContainer (from disk): \(error)")
+                logger.error("load: Error during loadContainer (from disk): \(error.localizedDescription)")
                 lastError = "Error loading \(modelType.displayName): \(error.localizedDescription)"
                 modelInfo = lastError!
                 loadState = .error(lastError!)
-                print("load: State set to .error")
+                logger.error("load: State set to .error")
                 // Optionally call checkModelStatus here too if loading error might change things
                 // checkModelStatus()
                 throw error
             }
             // --- Other States ---
         } else {
-            print("load: Cannot load model from current state: \(loadState)")
+            logger.warning("load: Cannot load model from current state: \(String(describing: self.loadState))")
             throw NSError(domain: "LocalLLM", code: -5, userInfo: [NSLocalizedDescriptionKey: "Cannot load model from current state: \(loadState)"])
         }
     }
@@ -579,7 +617,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
         }
         
         if running {
-            print("Generation already in progress, waiting...")
+            logger.debug("Generation already in progress, waiting...")
             while running { try await Task.sleep(for: .milliseconds(100)) }
         }
         
@@ -599,7 +637,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
         do {
             modelContainer = try await load()
         } catch {
-            print("Failed to load model for processing: \(error)")
+            logger.error("Failed to load model for processing: \(error.localizedDescription)")
             throw error
         }
         
@@ -636,7 +674,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
             }
         } catch {
             // Handle generation errors
-            print("Error during text generation: \(error)")
+            logger.error("Error during text generation: \(error.localizedDescription)")
             await MainActor.run { [weak self] in
                 self?.lastError = "Generation failed: \(error.localizedDescription)"
                 self?.stat = "Error"
@@ -645,11 +683,11 @@ class LocalModelProvider: ObservableObject, AIProvider {
         }
     }
     
-    private struct GenerationResult {
+    /// Stores generation result to pass out of perform block
+    private struct GenerationResult: Sendable {
         let text: String
-        let info: GenerateCompletionInfo?
-        let timeToFirstToken: TimeInterval?
-        let trailingFlush: String
+        let tokensPerSecond: Double
+        let timeToFirstToken: TimeInterval
     }
 
     private func generateResponse(
@@ -657,16 +695,16 @@ class LocalModelProvider: ObservableObject, AIProvider {
         modelContainer: ModelContainer,
         streaming: Bool
     ) async throws -> String {
+        logGPUMemoryUsage(at: "Generation Start")
         let parameters = generationParameters
-        let flushEvery = displayEveryNTokens
         let start = Date()
 
-        let result = try await modelContainer.perform { context in
-            var output = ""
-            var completion: GenerateCompletionInfo?
-            var timeToFirstToken: TimeInterval?
-            var pendingFlush = ""
-            var tokensSinceFlush = 0
+        // All generation must happen inside perform block because ModelContext is not Sendable.
+        // We replicate that pattern: batch tokens over time intervals for fewer UI updates.
+        let result: GenerationResult = try await modelContainer.perform { context in
+            var fullOutput = ""
+            var timeToFirstToken: TimeInterval = 0
+            var completionInfo: GenerateCompletionInfo?
 
             let input = try await context.processor.prepare(input: userInput)
             let stream = try MLXLMCommon.generate(
@@ -675,65 +713,88 @@ class LocalModelProvider: ObservableObject, AIProvider {
                 context: context
             )
 
-            for try await item in stream {
-                switch item {
-                case .chunk(let string):
-                    output += string
-                    if timeToFirstToken == nil {
-                        timeToFirstToken = Date().timeIntervalSince(start)
-                    }
+            if streaming {
+                // Batched streaming: accumulate tokens and flush periodically
+                // This mimics the official _throttle pattern but works within perform block
+                var pendingText = ""
+                var lastFlushTime = Date()
+                let flushInterval: TimeInterval = 0.1
 
-                    if streaming {
-                        pendingFlush += string
-                        tokensSinceFlush += 1
+                for try await item in stream {
+                    switch item {
+                    case .chunk(let text):
+                        fullOutput += text
+                        pendingText += text
+                        if timeToFirstToken == 0 {
+                            timeToFirstToken = Date().timeIntervalSince(start)
+                        }
 
-                        let shouldFlush = tokensSinceFlush == 1 || tokensSinceFlush >= flushEvery
-                        if shouldFlush {
-                            let flush = pendingFlush
-                            pendingFlush.removeAll()
-                            tokensSinceFlush = 0
-                            await MainActor.run { [weak self] in
-                                self?.output += flush
+                        // Flush to UI at most every 100ms (reduces main actor contention)
+                        let now = Date()
+                        if now.timeIntervalSince(lastFlushTime) >= flushInterval {
+                            let textToFlush = pendingText
+                            pendingText = ""
+                            lastFlushTime = now
+                            // Fire-and-forget: don't await to avoid blocking generation
+                            Task { @MainActor [weak self] in
+                                self?.output += textToFlush
                             }
                         }
+                    case .info(let info):
+                        completionInfo = info
+                    case .toolCall:
+                        break
                     }
-                case .info(let info):
-                    completion = info
-                case .toolCall:
-                    break
+                }
+
+                // Flush any remaining text
+                if !pendingText.isEmpty {
+                    let finalText = pendingText
+                    Task { @MainActor [weak self] in
+                        self?.output += finalText
+                    }
+                }
+            } else {
+                // Non-streaming: collect everything then update once
+                for try await item in stream {
+                    switch item {
+                    case .chunk(let text):
+                        fullOutput += text
+                        if timeToFirstToken == 0 {
+                            timeToFirstToken = Date().timeIntervalSince(start)
+                        }
+                    case .info(let info):
+                        completionInfo = info
+                    case .toolCall:
+                        break
+                    }
+                }
+
+                let finalOutput = fullOutput
+                Task { @MainActor [weak self] in
+                    self?.output = finalOutput
                 }
             }
 
             return GenerationResult(
-                text: output,
-                info: completion,
-                timeToFirstToken: timeToFirstToken,
-                trailingFlush: pendingFlush
+                text: fullOutput,
+                tokensPerSecond: completionInfo?.tokensPerSecond ?? 0,
+                timeToFirstToken: timeToFirstToken
             )
         }
 
-        if streaming {
-            if !result.trailingFlush.isEmpty {
-                await MainActor.run { [weak self] in
-                    self?.output += result.trailingFlush
-                }
-            }
-        } else {
-            await MainActor.run { [weak self] in
-                self?.output = result.text
-            }
-        }
-
-        let ttft = result.timeToFirstToken ?? 0
-        let tps = result.info?.tokensPerSecond ?? 0
+        // Update stats on main actor
         await MainActor.run { [weak self] in
-            self?.stat = "TTFT: \(String(format: "%.2f", ttft))s | TPS: \(String(format: "%.2f", tps))"
+            let ttftFormatted = String(format: "%.2f", result.timeToFirstToken)
+            let tpsFormatted = String(format: "%.2f", result.tokensPerSecond)
+            self?.stat = "TTFT: \(ttftFormatted)s | TPS: \(tpsFormatted)"
         }
+        logGPUMemoryUsage(at: "Generation Complete")
 
         return result.text
     }
     
-    // New method to process with LLM
+    // Process with LLM using proper Chat.Message format
     private func processWithLLM(
         modelContainer: ModelContainer,
         systemPrompt: String?,
@@ -742,9 +803,17 @@ class LocalModelProvider: ObservableObject, AIProvider {
     ) async throws -> String {
         MLXRandom.seed(UInt64(Date.timeIntervalSinceReferenceDate * 1000))
 
-        let finalPrompt = systemPrompt.map { "\($0)\n\nUser:\n\(userPrompt)" } ?? "User:\n\(userPrompt)"
-        let userInput = await UserInput(
-            prompt: finalPrompt,
+        // Use Chat.Message format for proper chat template application
+        var messages: [Chat.Message] = []
+
+        if let systemPrompt = systemPrompt, !systemPrompt.isEmpty {
+            messages.append(Chat.Message(role: .system, content: systemPrompt))
+        }
+
+        messages.append(Chat.Message(role: .user, content: userPrompt))
+
+        let userInput = UserInput(
+            chat: messages,
             additionalContext: ["enable_thinking": self.enableThinking]
         )
 
@@ -755,7 +824,6 @@ class LocalModelProvider: ObservableObject, AIProvider {
         )
     }
     
-    // New method to process with VLM
     private func processWithVLM(
         modelContainer: ModelContainer,
         systemPrompt: String?,
@@ -765,35 +833,56 @@ class LocalModelProvider: ObservableObject, AIProvider {
     ) async throws -> String {
         MLXRandom.seed(UInt64(Date.timeIntervalSinceReferenceDate * 1000))
         
-        // Create temporary URLs for images with better format handling
+        // Create temporary URLs for images with optimized format handling
         let imageURLs = try images.compactMap { imageData -> URL? in
-            // First try to create an NSImage from the data
-            guard let nsImage = NSImage(data: imageData) else {
-                print("Warning: Could not create NSImage from image data")
-                return nil
-            }
-            
-            // Convert to PNG format for better compatibility with VLMs
-            guard let tiffData = nsImage.tiffRepresentation,
-                  let bitmap = NSBitmapImageRep(data: tiffData),
-                  let pngData = bitmap.representation(using: .png, properties: [:]) else {
-                print("Warning: Could not convert image to PNG format")
-                return nil
-            }
-            
-            // Create temp file with PNG extension
             let tempDir = FileManager.default.temporaryDirectory
+
+            // Check if image data is already in a VLM-compatible format (PNG or JPEG)
+            // by checking magic bytes to avoid unnecessary conversion
+            let isPNG = imageData.count >= 8 && imageData.prefix(8).elementsEqual([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A])
+            let isJPEG = imageData.count >= 3 && imageData.prefix(3).elementsEqual([0xFF, 0xD8, 0xFF])
+
+            if isPNG {
+                // Already PNG - use directly without conversion
+                let fileName = UUID().uuidString + ".png"
+                let fileURL = tempDir.appendingPathComponent(fileName)
+                try imageData.write(to: fileURL)
+                return fileURL
+            } else if isJPEG {
+                // Already JPEG - use directly without conversion
+                let fileName = UUID().uuidString + ".jpg"
+                let fileURL = tempDir.appendingPathComponent(fileName)
+                try imageData.write(to: fileURL)
+                return fileURL
+            }
+
+            // For other formats, use CGImage directly (more efficient than TIFF intermediate)
+            guard let source = CGImageSourceCreateWithData(imageData as CFData, nil),
+                  let cgImage = CGImageSourceCreateImageAtIndex(source, 0, nil) else {
+                logger.warning("Could not create CGImage from image data")
+                return nil
+            }
+
             let fileName = UUID().uuidString + ".png"
             let fileURL = tempDir.appendingPathComponent(fileName)
-            
-            // Write PNG data to file
-            try pngData.write(to: fileURL)
+
+            // Write directly using CGImageDestination (avoids NSImage/TIFF overhead)
+            guard let destination = CGImageDestinationCreateWithURL(fileURL as CFURL, UTType.png.identifier as CFString, 1, nil) else {
+                logger.warning("Could not create image destination")
+                return nil
+            }
+            CGImageDestinationAddImage(destination, cgImage, nil)
+            guard CGImageDestinationFinalize(destination) else {
+                logger.warning("Could not finalize image destination")
+                return nil
+            }
+
             return fileURL
         }
         
         // Early return if no valid images
         if imageURLs.isEmpty && !images.isEmpty {
-            print("Warning: Failed to process all images for VLM")
+            logger.warning("Failed to process all images for VLM")
             throw NSError(domain: "LocalModelProvider", code: -3,
                           userInfo: [NSLocalizedDescriptionKey: "Failed to process images for vision model"])
         }
@@ -804,44 +893,36 @@ class LocalModelProvider: ObservableObject, AIProvider {
                 try? FileManager.default.removeItem(at: url)
             }
         }
-        // Increase GPU memory limit for VLM models
-        MLX.GPU.set(cacheLimit: 4 * 1024 * 1024 * 1024) // 4GB cache limit
-        
-        do {
-            // Create a chat-style input with images
-            var messages: [Chat.Message] = []
-            
-            // Add system message if provided
-            if let systemPrompt = systemPrompt, !systemPrompt.isEmpty {
-                messages.append(Chat.Message(role: .system, content: systemPrompt))
-            }
-            
-            // Convert image URLs to the format expected by MLX
-            let imageAttachments: [UserInput.Image] = imageURLs.map { .url($0) }
-            
-            // Add user message with text and images
-            messages.append(Chat.Message(
-                role: .user,
-                content: userPrompt,
-                images: imageAttachments
-            ))
-            
-            // Create chat input
-            let userInput = await UserInput(
-                chat: messages,
-                additionalContext: ["enable_thinking": self.enableThinking]
-            )
 
-            return try await generateResponse(
-                userInput: userInput,
-                modelContainer: modelContainer,
-                streaming: streaming
-            )
-        } catch {
-            // Reset GPU cache on error
-            MLX.GPU.set(cacheLimit: 20 * 1024 * 1024)
-            throw error
+        // Create a chat-style input with images
+        var messages: [Chat.Message] = []
+
+        // Add system message if provided
+        if let systemPrompt = systemPrompt, !systemPrompt.isEmpty {
+            messages.append(Chat.Message(role: .system, content: systemPrompt))
         }
+
+        // Convert image URLs to the format expected by MLX
+        let imageAttachments: [UserInput.Image] = imageURLs.map { .url($0) }
+
+        // Add user message with text and images
+        messages.append(Chat.Message(
+            role: .user,
+            content: userPrompt,
+            images: imageAttachments
+        ))
+
+        // Create chat input
+        let userInput = UserInput(
+            chat: messages,
+            additionalContext: ["enable_thinking": self.enableThinking]
+        )
+
+        return try await generateResponse(
+            userInput: userInput,
+            modelContainer: modelContainer,
+            streaming: streaming
+        )
     }
     
     
@@ -850,7 +931,7 @@ class LocalModelProvider: ObservableObject, AIProvider {
         // but setting running = false prevents new ones and stops the wait loop)
         Task { @MainActor in
             if running {
-                print("Attempting to cancel generation...")
+                logger.debug("Attempting to cancel generation...")
                 // You might need more sophisticated cancellation if MLXLLM adds support
             }
             running = false
@@ -859,3 +940,5 @@ class LocalModelProvider: ObservableObject, AIProvider {
         }
     }
 }
+
+extension LocalModelProvider: @MainActor AIProvider {}

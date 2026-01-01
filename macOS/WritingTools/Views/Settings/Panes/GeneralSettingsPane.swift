@@ -9,13 +9,13 @@ import SwiftUI
 import KeyboardShortcuts
 import AppKit
 
-struct GeneralSettingsPane: View {
-    @ObservedObject var appState: AppState
-    @ObservedObject var settings = AppSettings.shared
+struct GeneralSettingsPane<SaveButton: View>: View {
+    @Bindable var appState: AppState
+    @Bindable var settings = AppSettings.shared
     @Binding var needsSaving: Bool
     @Binding var showingCommandsManager: Bool
     var showOnlyApiSetup: Bool
-    var saveButton: AnyView
+    let saveButton: SaveButton
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -27,12 +27,12 @@ struct GeneralSettingsPane: View {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Set a global shortcut to quickly activate Writing Tools.")
                         .font(.footnote)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
 
                     HStack(alignment: .center, spacing: 12) {
                         Text("Activate Writing Tools:")
                             .frame(width: 180, alignment: .leading)
-                            .foregroundColor(.primary)
+                            .foregroundStyle(.primary)
                         KeyboardShortcuts.Recorder(
                             for: .showPopup,
                             onChange: { _ in
@@ -49,7 +49,7 @@ struct GeneralSettingsPane: View {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Manage your writing tools and assign keyboard shortcuts.")
                         .font(.footnote)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
 
                     Button(action: {
                         showingCommandsManager = true
@@ -62,7 +62,7 @@ struct GeneralSettingsPane: View {
                         .padding(.vertical, 8)
                         .padding(.horizontal, 12)
                         .background(Color(.controlBackgroundColor))
-                        .cornerRadius(8)
+                        .clipShape(.rect(cornerRadius: 8))
                     }
                     .buttonStyle(.plain)
                     .help("Open the Commands Manager to add, edit, or remove commands.")
@@ -72,7 +72,7 @@ struct GeneralSettingsPane: View {
                             Text("Open custom prompts in response window")
                             Text("When unchecked, custom prompts will replace selected text inline")
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                         }
                     }
                     .toggleStyle(.checkbox)
@@ -88,7 +88,7 @@ struct GeneralSettingsPane: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("You can rerun the onboarding flow to review permissions and quickly configure the app.")
                         .font(.footnote)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
 
                     HStack {
                         Button {

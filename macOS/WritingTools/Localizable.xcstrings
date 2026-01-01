@@ -285,6 +285,50 @@
         }
       }
     },
+    "Academic" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Akademisch"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Académico"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Académique"
+          }
+        }
+      }
+    },
+    "Acknowledge content beyond primary task" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inhalte außerhalb der Hauptaufgabe anerkennen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reconocer contenido más allá de la tarea principal"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reconnaître le contenu au-delà de la tâche principale"
+          }
+        }
+      }
+    },
     "Activate Writing Tools:" : {
       "localizations" : {
         "de" : {
@@ -347,6 +391,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ajouter une commande personnalisée"
+          }
+        }
+      }
+    },
+    "Add explanations or commentary" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erklärungen oder Kommentare hinzufügen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir explicaciones o comentarios"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter des explications ou commentaires"
           }
         }
       }
@@ -485,6 +551,72 @@
         }
       }
     },
+    "Allow the assistant to acknowledge or comment on content outside the main task" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dem Assistenten erlauben, Inhalte außerhalb der Hauptaufgabe zu bestätigen oder zu kommentieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permitir al asistente reconocer o comentar contenido ajeno a la tarea principal."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autoriser l'assistant à approuver ou à commenter le contenu en dehors de la tâche principale"
+          }
+        }
+      }
+    },
+    "Allow the assistant to provide explanations alongside the output" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlauben Sie dem Assistenten, neben der Ausgabe auch Erklärungen zu liefern."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permita que el asistente proporcione explicaciones junto con el resultado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permettre à l'assistant de fournir des explications en plus du résultat"
+          }
+        }
+      }
+    },
+    "Allow the assistant to respond to questions or requests found in the input text" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlauben Sie dem Assistenten, auf Fragen oder Anfragen im Eingabetext zu antworten."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permitir que el asistente responda a las preguntas o solicitudes que se encuentren en el texto introducido."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permettre à l'assistant de répondre aux questions ou demandes contenues dans le texte saisi."
+          }
+        }
+      }
+    },
     "Anthropic" : {
       "localizations" : {
         "de" : {
@@ -574,7 +706,26 @@
       }
     },
     "API Key:" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API-Schlüssel:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clave API:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clé API :"
+          }
+        }
+      }
     },
     "Appearance" : {
       "localizations" : {
@@ -752,6 +903,28 @@
         }
       }
     },
+    "Avoid Words:" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vermeide Wörter:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Evitar palabras:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Éviter les mots:"
+          }
+        }
+      }
+    },
     "Back" : {
       "localizations" : {
         "de" : {
@@ -819,7 +992,26 @@
       }
     },
     "Base URL:" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Basis-URL:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL base:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL de base :"
+          }
+        }
+      }
     },
     "Basic Settings" : {
       "extractionState" : "manual",
@@ -906,6 +1098,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Commandes intégrées"
+          }
+        }
+      }
+    },
+    "Business" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geschäftlich"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profesional"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Professionnel"
           }
         }
       }
@@ -1038,6 +1252,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Impossible de poursuivre en raison d'une erreur."
+          }
+        }
+      }
+    },
+    "Casual" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lässig"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Informal"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Décontracté"
           }
         }
       }
@@ -1351,28 +1587,6 @@
         }
       }
     },
-    "Command shortcut:" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Befehlskurzbefehl:"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Atajo de comandos:"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Raccourci de commande :"
-          }
-        }
-      }
-    },
     "Command Type" : {
       "localizations" : {
         "de" : {
@@ -1594,6 +1808,28 @@
         }
       }
     },
+    "Configure your prompt using structured fields" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konfigurieren Sie Ihre Eingabeaufforderung mithilfe strukturierter Felder."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configure su mensaje utilizando campos estructurados."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurez votre invite à l'aide de champs structurés."
+          }
+        }
+      }
+    },
     "Connection Settings" : {
       "localizations" : {
         "de" : {
@@ -1612,6 +1848,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Paramètres de connexion"
+          }
+        }
+      }
+    },
+    "Constraints" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einschränkungen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restricciones"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contraintes"
+          }
+        }
+      }
+    },
+    "Conversational" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konversationell"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conversacional"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conversationnel"
           }
         }
       }
@@ -1882,7 +2162,26 @@
       }
     },
     "Custom Provider" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benutzerdefinierter Anbieter"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proveedor personalizado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fournisseur personnalisé"
+          }
+        }
+      }
     },
     "Decrease text size" : {
       "localizations" : {
@@ -1924,6 +2223,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modèles par défaut : %@, gpt-4o, gpt-4o-mini, etc."
+          }
+        }
+      }
+    },
+    "Define step-by-step instructions for complex tasks" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schritt-für-Schritt-Anweisungen für komplexe Aufgaben definieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Define instrucciones paso a paso para tareas complejas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Définir des instructions étape par étape pour des tâches complexes"
+          }
+        }
+      }
+    },
+    "Define the assistant's role or persona" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Definieren Sie die Rolle oder Persona des Assistenten."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Defina el papel o la personalidad del asistente."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Définir le rôle ou la personnalité de l'assistant"
           }
         }
       }
@@ -1990,6 +2333,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Supprimer le modèle"
+          }
+        }
+      }
+    },
+    "Describe what the assistant should do" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beschreiben Sie, was der Assistent tun soll."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Describa lo que debe hacer el asistente."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Décrivez ce que l'assistant doit faire."
           }
         }
       }
@@ -2242,14 +2607,269 @@
         }
       }
     },
+    "e.g., 50" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "z. B. 50"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ej., 50"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ex. 50"
+          }
+        }
+      }
+    },
+    "e.g., 500" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "z. B. 500"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ej., 500"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ex. 500"
+          }
+        }
+      }
+    },
+    "e.g., correct grammar and spelling errors" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "z. B. Grammatik- und Rechtschreibfehler korrigieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ej., corregir errores gramaticales y ortográficos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ex. corriger les erreurs de grammaire et d'orthographe"
+          }
+        }
+      }
+    },
+    "e.g., ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "z. B. ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ej., ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ex. ERROR_TEXT_INCOMPATIBLE_WITH_REQUEST"
+          }
+        }
+      }
+    },
     "e.g., gpt-4o-mini" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "z. B. gpt-4o-mini"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ej., gpt-4o-mini"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ex. gpt-4o-mini"
+          }
+        }
+      }
     },
     "e.g., gpt-4o-mini, claude-3-5-sonnet" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "z. B. gpt-4o-mini, claude-3-5-sonnet"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ej., gpt-4o-mini, claude-3-5-sonnet"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ex. gpt-4o-mini, claude-3-5-sonnet"
+          }
+        }
+      }
+    },
+    "e.g., helpful, authoritative" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "z. B. hilfreich, autoritär"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ej., útil, autoritativo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ex., utile, autoritaire"
+          }
+        }
+      }
     },
     "e.g., https://api.example.com/v1" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "z. B. https://api.example.com/v1"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ej., https://api.example.com/v1"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ex. https://api.example.com/v1"
+          }
+        }
+      }
+    },
+    "e.g., input, English, auto" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "z. B. input, Deutsch, auto"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ej., entrada, español, auto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ex. entré, français, auto"
+          }
+        }
+      }
+    },
+    "e.g., only corrected text, Markdown table" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "z. B. nur korrigierter Text, Markdown-Tabelle"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ej., solo texto corregido, tabla Markdown"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ex. seulement texte corrigé, tableau Markdown"
+          }
+        }
+      }
+    },
+    "e.g., proofreading assistant, summarization expert" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "z. B. Korrekturlese-Assistent, Zusammenfassungs-Experte"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ej., asistente de corrección, experto en resumen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ex., assistant de relecture, expert en résumé"
+          }
+        }
+      }
+    },
+    "e.g., very, really" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "z. B. sehr, wirklich"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ej., muy, realmente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ex., très, vraiment"
+          }
+        }
+      }
     },
     "Edit Built-In Command" : {
       "localizations" : {
@@ -2335,6 +2955,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modifier la commande"
+          }
+        }
+      }
+    },
+    "Editor" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editor"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Éditeur"
+          }
+        }
+      }
+    },
+    "Editor Mode" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editor-Modus"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modo de editor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mode éditeur"
           }
         }
       }
@@ -2427,6 +3091,50 @@
         }
       }
     },
+    "Engage with user requests in text" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf Benutzeranfragen in Textform reagieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Responder a las solicitudes de los usuarios por escrito."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Répondre aux demandes des utilisateurs par écrit"
+          }
+        }
+      }
+    },
+    "Enter your prompt as plain text" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geben Sie Ihre Eingabeaufforderung als einfachen Text ein."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Introduzca su mensaje como texto sin formato."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entrez votre invite sous forme de texte brut."
+          }
+        }
+      }
+    },
     "Error" : {
       "localizations" : {
         "de" : {
@@ -2445,6 +3153,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erreur"
+          }
+        }
+      }
+    },
+    "Error Handling" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehlerbehandlung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manejo de errores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestion des erreurs"
           }
         }
       }
@@ -2577,6 +3307,72 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Terminer et commencer à utiliser WritingTools"
+          }
+        }
+      }
+    },
+    "First Person" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erste Person"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primera persona"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Première personne"
+          }
+        }
+      }
+    },
+    "Formal" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formell"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formal"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formel"
+          }
+        }
+      }
+    },
+    "Formatting Rules" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formatierungsregeln"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reglas de formato"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Règles de formatage"
           }
         }
       }
@@ -3137,13 +3933,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lebenszeit beibehalten"
+            "value" : "Verweildauer"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mantener vivo el tiempo"
+            "value" : "Tiempo de mantenimiento activo"
           }
         },
         "fr" : {
@@ -3159,19 +3955,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lebenserhaltungszeit (z. B. 5 m, 1 h)"
+            "value" : "Verweildauer (z. B. 5 m, 1 h)"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tiempo de mantenimiento de la vida (por ejemplo, 5m, 1h)"
+            "value" : "Tiempo de mantenimiento activo (por ejemplo, 5m, 1h)"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Durée de maintien en vie (par exemple, 5m, 1h)"
+            "value" : "Durée de maintien actif (par exemple, 5m, 1h)"
           }
         }
       }
@@ -3199,28 +3995,6 @@
         }
       }
     },
-    "Keyboard Shortcut" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tastaturkurzbefehl"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Atajo de teclado"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Raccourci clavier"
-          }
-        }
-      }
-    },
     "Keyboard Shortcuts" : {
       "localizations" : {
         "de" : {
@@ -3243,8 +4017,49 @@
         }
       }
     },
+    "Language Preservation" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spracherhaltung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preservación del idioma"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Préservation de la langue"
+          }
+        }
+      }
+    },
     "Leave empty to use the default model for the selected provider. Examples: gpt-4o-mini (OpenAI), claude-3-5-sonnet-20240620 (Anthropic), gemini-flash-latest (Gemini)" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lassen Sie dieses Feld leer, um das Standardmodell für den ausgewählten Anbieter zu verwenden. Beispiele: gpt-4o-mini (OpenAI), claude-3-5-sonnet-20240620 (Anthropic), gemini-flash-latest (Gemini)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déjelo vacío para usar el modelo predeterminado del proveedor seleccionado. Ejemplos: gpt-4o-mini (OpenAI), claude-3-5-sonnet-20240620 (Anthropic), gemini-flash-latest (Gemini)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laissez vide pour utiliser le modèle par défaut du fournisseur sélectionné. Exemples : gpt-4o-mini (OpenAI), claude-3-5-sonnet-20240620 (Anthropic), gemini-flash-latest (Gemini)"
+          }
+        }
+      }
     },
     "Loading %@..." : {
       "localizations" : {
@@ -3534,6 +4349,50 @@
         }
       }
     },
+    "Main" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haupt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Principal"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Principal"
+          }
+        }
+      }
+    },
+    "Maintain the original text formatting (line breaks, spacing, etc.)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Behalten Sie die ursprüngliche Textformatierung bei (Zeilenumbrüche, Abstände usw.)."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantenga el formato original del texto (saltos de línea, espaciado, etc.)."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conserver la mise en forme originale du texte (sauts de ligne, espacement, etc.)"
+          }
+        }
+      }
+    },
     "Manage Commands" : {
       "localizations" : {
         "de" : {
@@ -3574,6 +4433,72 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gérez vos outils d'écriture et attribuez des raccourcis clavier."
+          }
+        }
+      }
+    },
+    "Max Length:" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximale Länge:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Longitud máxima:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Longueur maximale:"
+          }
+        }
+      }
+    },
+    "Message to return when text is incompatible with request" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nachricht zurückgeben, wenn Text mit Anforderung inkompatibel ist"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mensaje a devolver cuando el texto es incompatible con la solicitud"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Message à renvoyer lorsque le texte est incompatible avec la demande"
+          }
+        }
+      }
+    },
+    "Min Length:" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minimale Länge:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Longitud mínima:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Longueur minimale:"
           }
         }
       }
@@ -3621,9 +4546,6 @@
           }
         }
       }
-    },
-    "Model (optional):" : {
-
     },
     "Model Configuration" : {
       "localizations" : {
@@ -3737,7 +4659,26 @@
       }
     },
     "Model:" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modell:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelo:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modèle :"
+          }
+        }
+      }
     },
     "Name" : {
       "localizations" : {
@@ -3757,6 +4698,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nom"
+          }
+        }
+      }
+    },
+    "Neutral" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neutral"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neutral"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neutre"
           }
         }
       }
@@ -4465,6 +5428,28 @@
         }
       }
     },
+    "Options" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optionen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opciones"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Options"
+          }
+        }
+      }
+    },
     "Or Custom Model Name" : {
       "localizations" : {
         "de" : {
@@ -4510,8 +5495,71 @@
         }
       }
     },
+    "Output Format" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgabeformat"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formato de salida"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format de sortie"
+          }
+        }
+      }
+    },
     "Override the default AI provider for this specific command" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überschreibe den standardmäßigen KI-Anbieter für diesen spezifischen Befehl."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anula el proveedor de IA predeterminado para este comando específico."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remplacer le fournisseur d'IA par défaut pour cette commande spécifique."
+          }
+        }
+      }
+    },
+    "Personality:" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Persönlichkeit:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personalidad:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personnalité :"
+          }
+        }
+      }
     },
     "Please select a different AI Provider in Settings if you are on an Intel Mac." : {
       "localizations" : {
@@ -4557,6 +5605,160 @@
         }
       }
     },
+    "Preserve core message/meaning" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kernbotschaft/Bedeutung beibehalten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conservar mensaje principal/contenido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conserver le message principal/le sens"
+          }
+        }
+      }
+    },
+    "Preserve essential information" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wesentliche Informationen beibehalten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conservar información esencial"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conserver les informations essentielles"
+          }
+        }
+      }
+    },
+    "Preserve format" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format beibehalten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conservar formato"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conserver le format"
+          }
+        }
+      }
+    },
+    "Preserve formatting" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formatierung beibehalten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conservar formato"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conserver la mise en forme"
+          }
+        }
+      }
+    },
+    "Preserve Options" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beibehalten-Optionen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opciones de preservación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Options de préservation"
+          }
+        }
+      }
+    },
+    "Preserve style" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stil beibehalten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conservar estilo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conserver le style"
+          }
+        }
+      }
+    },
+    "Preserve tone" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ton beibehalten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conservar tono"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conserver le ton"
+          }
+        }
+      }
+    },
     "Preserves formatting for supported apps" : {
       "localizations" : {
         "de" : {
@@ -4597,6 +5799,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Appuyez sur votre raccourci global pour ouvrir la fenêtre contextuelle. Sélectionnez du texte ou des images dans n'importe quelle application et exécutez une commande. Des commandes intégrées sont disponibles et vous pouvez ajouter les vôtres."
+          }
+        }
+      }
+    },
+    "Preview" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschau"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vista previa"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aperçu"
+          }
+        }
+      }
+    },
+    "Process Steps" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prozessschritte"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pasos del proceso"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Étapes du processus"
           }
         }
       }
@@ -4647,24 +5893,24 @@
         }
       }
     },
-    "Prompt" : {
+    "Prompt Preview" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Prompt"
+            "value" : "Prompt-Vorschau"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pregunte a"
+            "value" : "Vista previa del prompt"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Invite"
+            "value" : "Aperçu du prompt"
           }
         }
       }
@@ -4759,7 +6005,26 @@
       }
     },
     "Provider:" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anbieter:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proveedor:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fournisseur :"
+          }
+        }
+      }
     },
     "Recheck current permission statuses." : {
       "localizations" : {
@@ -4800,7 +6065,29 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "État de l'actualisation"
+            "value" : "Actualiser l'état"
+          }
+        }
+      }
+    },
+    "Register:" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Registrieren:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Registrar:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer :"
           }
         }
       }
@@ -5022,6 +6309,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Réécrire"
+          }
+        }
+      }
+    },
+    "Role" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rolle"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rol"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rôle"
+          }
+        }
+      }
+    },
+    "Rules" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regeln"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reglas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Règles"
           }
         }
       }
@@ -5358,6 +6689,28 @@
         }
       }
     },
+    "Show Preview" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschau anzeigen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar vista previa"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher l'aperçu"
+          }
+        }
+      }
+    },
     "Show Response in Chat Window" : {
       "localizations" : {
         "de" : {
@@ -5407,7 +6760,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Standard verwendet Systemhintergründe. Glas respektiert Transparenzpräferenzen. OLED verwendet tiefe Schwarztien."
+            "value" : "Standard verwendet Systemhintergründe. Glas respektiert Transparenzpräferenzen. OLED verwendet tiefe Schwarztöne."
           }
         },
         "es" : {
@@ -5442,6 +6795,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Status: %@"
+          }
+        }
+      }
+    },
+    "Style Guidelines" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stilrichtlinien"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Directrices de estilo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Directives stylistiques"
           }
         }
       }
@@ -5481,7 +6856,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cuadro"
+            "value" : "Tabla"
           }
         },
         "fr" : {
@@ -5492,12 +6867,34 @@
         }
       }
     },
+    "Task" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aufgabe"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tarea"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tâche"
+          }
+        }
+      }
+    },
     "Text-only model" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reines Textmodell"
+            "value" : "Modell für Text nur"
           }
         },
         "es" : {
@@ -5515,7 +6912,26 @@
       }
     },
     "The base URL of your API endpoint (e.g., https://api.openai.com/v1)" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Basis-URL Ihres API-Endpunkts (z. B. https://api.openai.com/v1)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La URL base de tu punto final de API (p. ej., https://api.openai.com/v1)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'URL de base de votre point de terminaison API (p. ex., https://api.openai.com/v1)"
+          }
+        }
+      }
     },
     "The latest version is already installed!" : {
       "localizations" : {
@@ -5540,7 +6956,26 @@
       }
     },
     "The model identifier to use" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der zu verwendende Modell-Bezeichner"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El identificador del modelo a usar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'identifiant du modèle à utiliser"
+          }
+        }
+      }
     },
     "Theme" : {
       "localizations" : {
@@ -5582,6 +7017,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Réflexion..."
+          }
+        }
+      }
+    },
+    "Third Person" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dritte Person"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tercera persona"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Troisième personne"
           }
         }
       }
@@ -5674,6 +7131,50 @@
         }
       }
     },
+    "Tone:" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ton:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tono:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ton :"
+          }
+        }
+      }
+    },
+    "Treat input as content (not instructions)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eingabe als Inhalt behandeln (nicht als Anweisungen)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tratar la entrada como contenido (no como instrucciones)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traiter l'entrée comme contenu (non comme des instructions)"
+          }
+        }
+      }
+    },
     "Try downloading again if the previous attempt failed." : {
       "localizations" : {
         "de" : {
@@ -5696,8 +7197,115 @@
         }
       }
     },
+    "Use 'input' to preserve the original language" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwenden Sie „input“, um die Originalsprache beizubehalten."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliza «input» para conservar el idioma original."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utilisez « input » pour conserver la langue d'origine."
+          }
+        }
+      }
+    },
+    "Use Code Blocks" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code-Blöcke verwenden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar bloques de código"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliser des blocs de code"
+          }
+        }
+      }
+    },
     "Use custom AI provider for this command" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benutzerdefinierten KI-Anbieter für diesen Befehl verwenden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar proveedor de IA personalizado para este comando"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliser un fournisseur d'IA personnalisé pour cette commande"
+          }
+        }
+      }
+    },
+    "Use Headers" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überschriften verwenden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar encabezados"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliser des en-têtes"
+          }
+        }
+      }
+    },
+    "Use Lists" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listen verwenden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar listas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliser des listes"
+          }
+        }
+      }
     },
     "Use local OCR or Ollama's vision model for images." : {
       "localizations" : {
@@ -5717,6 +7325,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Utilisez l'OCR local ou le modèle de vision d'Ollama pour les images."
+          }
+        }
+      }
+    },
+    "Use Markdown" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Markdown verwenden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar Markdown"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliser Markdown"
           }
         }
       }
@@ -5743,6 +7373,28 @@
         }
       }
     },
+    "Use Tables" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabellen verwenden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar tablas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliser des tableaux"
+          }
+        }
+      }
+    },
     "Version & Updates" : {
       "localizations" : {
         "de" : {
@@ -5761,6 +7413,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Version et mises à jour"
+          }
+        }
+      }
+    },
+    "Version: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version: %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version: %@"
           }
         }
       }
@@ -5811,28 +7485,6 @@
         }
       }
     },
-    "Version: 5.5 (Based on Windows Port version 8.0)" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Version: 5.5 (Basierend auf Windows Port Version 8.0)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Versión: 5.5 (Basado en la versión 8.0 del puerto de Windows)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Version : 5.5 (Basée sur Windows Port version 8.0)"
-          }
-        }
-      }
-    },
     "View Releases" : {
       "localizations" : {
         "de" : {
@@ -5877,6 +7529,28 @@
         }
       }
     },
+    "Voice:" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stimme:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voz:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voix :"
+          }
+        }
+      }
+    },
     "What should your AI do with your selected text? (Prompt)" : {
       "localizations" : {
         "de" : {
@@ -5917,6 +7591,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lorsqu'elle est activée, les réponses apparaîtront dans une fenêtre de chat au lieu de remplacer le texte sélectionné."
+          }
+        }
+      }
+    },
+    "When enabled, the selected text is treated as content to process, not as instructions" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn diese Option aktiviert ist, wird der ausgewählte Text als zu verarbeitender Inhalt behandelt und nicht als Anweisung."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando está habilitado, el texto seleccionado se trata como contenido para procesar, no como instrucciones."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lorsque cette option est activée, le texte sélectionné est traité comme du contenu à traiter, et non comme des instructions."
           }
         }
       }
@@ -6164,10 +7860,48 @@
       }
     },
     "Your API authentication key" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihr API-Authentifizierungsschlüssel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu clave de autenticación de API"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre clé d'authentification API"
+          }
+        }
+      }
     },
     "Your API key" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihr API-Schlüssel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu clave API"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre clé API"
+          }
+        }
+      }
     },
     "Your message" : {
       "localizations" : {

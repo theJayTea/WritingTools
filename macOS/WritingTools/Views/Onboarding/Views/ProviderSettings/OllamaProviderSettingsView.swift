@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct OllamaProviderSettingsView: View {
-  @ObservedObject var settings: AppSettings
+  @Bindable var settings: AppSettings
 
   var body: some View {
     VStack(alignment: .leading, spacing: 12) {
@@ -26,7 +26,7 @@ struct OllamaProviderSettingsView: View {
       VStack(alignment: .leading, spacing: 6) {
         Text("Image Recognition Mode")
           .font(.subheadline)
-          .foregroundColor(.secondary)
+          .foregroundStyle(.secondary)
         Picker("Image Mode", selection: $settings.ollamaImageMode) {
           ForEach(OllamaImageMode.allCases) { mode in
             Text(mode.displayName).tag(mode)
@@ -36,7 +36,7 @@ struct OllamaProviderSettingsView: View {
 
         Text("Use local OCR or Ollama's vision model for images.")
           .font(.caption)
-          .foregroundColor(.secondary)
+          .foregroundStyle(.secondary)
       }
 
       LinkText()

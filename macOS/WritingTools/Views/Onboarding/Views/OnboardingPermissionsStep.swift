@@ -35,7 +35,8 @@ struct OnboardingPermissionsStep: View {
         secondaryActionTitle: "Open Settings",
         onPrimary: {
           OnboardingPermissionsHelper.requestAccessibility()
-          DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+          Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(500))
             onRefresh()
           }
         },
@@ -53,7 +54,7 @@ struct OnboardingPermissionsStep: View {
             "If enabled, you can run OCR on screenshot snippets. This requires Screen Recording permission."
           )
           .font(.caption)
-          .foregroundColor(.secondary)
+          .foregroundStyle(.secondary)
         }
       }
       .toggleStyle(.switch)
@@ -74,9 +75,7 @@ struct OnboardingPermissionsStep: View {
           secondaryActionTitle: "Open Settings",
           onPrimary: {
             OnboardingPermissionsHelper.requestScreenRecording { granted in
-              DispatchQueue.main.async {
-                isScreenRecordingGranted = granted
-              }
+              isScreenRecordingGranted = granted
             }
           },
           onSecondary: {
@@ -99,7 +98,7 @@ struct OnboardingPermissionsStep: View {
               systemImage: "checkmark.circle"
             )
           }
-          .foregroundColor(.secondary)
+          .foregroundStyle(.secondary)
         }
         .padding(8)
       }
@@ -137,7 +136,8 @@ struct OnboardingPermissionsHelper {
     let options: CFDictionary = [key: true] as CFDictionary
     _ = AXIsProcessTrustedWithOptions(options)
 
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+    Task { @MainActor in
+      try? await Task.sleep(for: .milliseconds(200))
       if let url = URL(
         string:
           "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
@@ -157,9 +157,11 @@ struct OnboardingPermissionsHelper {
 
   static func requestScreenRecording(completion: @escaping (Bool) -> Void) {
     if #available(macOS 10.15, *) {
-      DispatchQueue.global(qos: .userInitiated).async {
+      Task.detached(priority: .userInitiated) {
         let granted = CGRequestScreenCaptureAccess()
-        completion(granted)
+        await MainActor.run {
+          completion(granted)
+        }
       }
     } else {
       completion(true)

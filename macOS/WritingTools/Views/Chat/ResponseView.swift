@@ -1,5 +1,6 @@
 import SwiftUI
 import MarkdownView
+import Observation
 
 // MARK: - String Extension for Markdown Processing
 
@@ -68,8 +69,8 @@ struct ChatMessage: Identifiable, Equatable, Sendable {
 // MARK: - Response View
 
 struct ResponseView: View {
-    @StateObject private var viewModel: ResponseViewModel
-    @ObservedObject private var settings = AppSettings.shared
+    @State private var viewModel: ResponseViewModel
+    @Bindable private var settings = AppSettings.shared
     @Environment(\.colorScheme) var colorScheme
     @State private var inputText: String = ""
     @State private var isRegenerating: Bool = false
@@ -80,7 +81,7 @@ struct ResponseView: View {
     @State private var showError: Bool = false
     
     init(content: String, selectedText: String, option: WritingOption? = nil, provider: any AIProvider) {
-        self._viewModel = StateObject(wrappedValue: ResponseViewModel(
+        self._viewModel = State(initialValue: ResponseViewModel(
             content: content,
             selectedText: selectedText,
             option: option,
@@ -150,7 +151,7 @@ struct ResponseView: View {
                                         .scaleEffect(0.8)
                                     Text("Thinking...")
                                         .font(.system(size: 14))
-                                        .foregroundColor(.secondary)
+                                        .foregroundStyle(.secondary)
                                 }
                                 .padding(12)
                                 .background(
@@ -269,17 +270,17 @@ struct ChatMessageView: View {
             HStack(spacing: 8) {
                 Text(message.timestamp.formatted(.dateTime.hour().minute()))
                     .font(.caption2)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                 
                 Button(action: copyEntireMessage) {
                     if showCopiedFeedback {
                         Text("Copied")
                             .font(.caption2)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     } else {
                         Image(systemName: "doc.on.doc")
                             .font(.caption2)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                 }
                 .buttonStyle(.plain)
@@ -291,11 +292,13 @@ struct ChatMessageView: View {
     }
     
     private func copyEntireMessage() {
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(message.content, forType: .string)
+        let pasteboard = NSPasteboard.general
+        pasteboard.prepareForNewContents(with: [])
+        pasteboard.writeObjects([message.content as NSString])
         
         showCopiedFeedback = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(2))
             showCopiedFeedback = false
         }
     }
@@ -304,21 +307,22 @@ struct ChatMessageView: View {
 // MARK: - View Model
 
 @MainActor
-final class ResponseViewModel: ObservableObject {
+@Observable
+final class ResponseViewModel {
     
     // UserDefaults key for persistent font size storage
     private static let fontSizeKey = "ResponseView.fontSize"
     private static let defaultFontSize: CGFloat = 14
     
-    @Published var messages: [ChatMessage] = []
-    @Published var fontSize: CGFloat = 14 {
+    var messages: [ChatMessage] = []
+    var fontSize: CGFloat = 14 {
             didSet {
                 // Save font size to UserDefaults whenever it changes
                 UserDefaults.standard.set(fontSize, forKey: Self.fontSizeKey)
             }
     }
-    @Published var showCopyConfirmation = false
-    @Published var isProcessing = false
+    var showCopyConfirmation = false
+    var isProcessing = false
     
     private let content: String
     private let selectedText: String
@@ -419,7 +423,7 @@ final class ResponseViewModel: ObservableObject {
         // Add conversation history
         if recentHistory.count > 2 { // More than just the initial exchange
             prompt += "Conversation history:\n\n"
-            for (index, exchange) in recentHistory.dropLast(1).enumerated() {
+            for (_, exchange) in recentHistory.dropLast(1).enumerated() {
                 let role = exchange.role == "user" ? "User" : "Assistant"
                 prompt += "\(role): \(exchange.content)\n\n"
             }
@@ -437,11 +441,13 @@ final class ResponseViewModel: ObservableObject {
             return "\(message.role.capitalized): \(message.content)"
         }.joined(separator: "\n\n")
         
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(conversationText, forType: .string)
+        let pasteboard = NSPasteboard.general
+        pasteboard.prepareForNewContents(with: [])
+        pasteboard.writeObjects([conversationText as NSString])
         
         showCopyConfirmation = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(2))
             self.showCopyConfirmation = false
         }
     }

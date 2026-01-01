@@ -1,4 +1,7 @@
 import Foundation
+import Observation
+
+private let logger = AppLogger.logger("CustomProvider")
 
 struct CustomProviderConfig {
     let baseURL: String
@@ -6,9 +9,9 @@ struct CustomProviderConfig {
     let model: String
 }
 
-@MainActor
-class CustomProvider: ObservableObject, AIProvider {
-    @Published var isProcessing: Bool = false
+@Observable
+final class CustomProvider: AIProvider {
+    var isProcessing: Bool = false
 
     private let config: CustomProviderConfig
     private var currentTask: Task<Void, Never>?
@@ -21,7 +24,7 @@ class CustomProvider: ObservableObject, AIProvider {
         isProcessing = true
         defer { isProcessing = false }
 
-        NSLog("CustomProvider: Starting request with baseURL=\(config.baseURL), model=\(config.model)")
+        logger.debug("CustomProvider: Starting request with baseURL=\(self.config.baseURL), model=\(self.config.model)")
 
         // Validate configuration
         guard !config.baseURL.isEmpty else {
@@ -54,7 +57,7 @@ class CustomProvider: ObservableObject, AIProvider {
             throw CustomProviderError.invalidConfiguration("Could not construct valid URL")
         }
 
-        NSLog("CustomProvider: Using URL: \(url.absoluteString)")
+        logger.debug("CustomProvider: Using URL: \(url.absoluteString)")
 
         // Prepare the request
         var request = URLRequest(url: url)
@@ -88,12 +91,12 @@ class CustomProvider: ObservableObject, AIProvider {
 
         request.httpBody = try JSONSerialization.data(withJSONObject: requestBody)
 
-        NSLog("CustomProvider: Sending request to \(url.absoluteString)")
+        logger.debug("CustomProvider: Sending request to \(url.absoluteString)")
 
         // Make the request
         let (data, response) = try await URLSession.shared.data(for: request)
 
-        NSLog("CustomProvider: Received response")
+        logger.debug("CustomProvider: Received response")
 
         // Check HTTP response
         guard let httpResponse = response as? HTTPURLResponse else {
@@ -113,31 +116,31 @@ class CustomProvider: ObservableObject, AIProvider {
         // Parse response
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             let responseString = String(data: data, encoding: .utf8) ?? "Unable to decode response"
-            NSLog("CustomProvider: Failed to parse JSON. Response: \(responseString)")
+            logger.error("CustomProvider: Failed to parse JSON. Response: \(responseString)")
             throw CustomProviderError.invalidResponse("Could not parse JSON response from API")
         }
 
         guard let choices = json["choices"] as? [[String: Any]] else {
-            NSLog("CustomProvider: No 'choices' array in response")
+            logger.error("CustomProvider: No 'choices' array in response")
             throw CustomProviderError.invalidResponse("Response missing 'choices' array")
         }
 
         guard let firstChoice = choices.first else {
-            NSLog("CustomProvider: 'choices' array is empty")
+            logger.error("CustomProvider: 'choices' array is empty")
             throw CustomProviderError.invalidResponse("'choices' array is empty")
         }
 
         guard let message = firstChoice["message"] as? [String: Any] else {
-            NSLog("CustomProvider: No 'message' object in first choice")
+            logger.error("CustomProvider: No 'message' object in first choice")
             throw CustomProviderError.invalidResponse("First choice missing 'message' object")
         }
 
         guard let content = message["content"] as? String else {
-            NSLog("CustomProvider: No 'content' string in message")
+            logger.error("CustomProvider: No 'content' string in message")
             throw CustomProviderError.invalidResponse("Message missing 'content' string")
         }
 
-        NSLog("CustomProvider: Successfully extracted content (length: \(content.count))")
+        logger.debug("CustomProvider: Successfully extracted content (length: \(content.count))")
         return content
     }
 

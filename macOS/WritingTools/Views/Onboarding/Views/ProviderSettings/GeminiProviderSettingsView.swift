@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct GeminiProviderSettingsView: View {
-  @ObservedObject var settings: AppSettings
+  @Bindable var settings: AppSettings
 
   var body: some View {
     VStack(alignment: .leading, spacing: 12) {

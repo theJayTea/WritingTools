@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MistralSettingsView: View {
-    @ObservedObject var settings = AppSettings.shared
+    @Bindable var settings = AppSettings.shared
     @Binding var needsSaving: Bool
 
     var body: some View {
@@ -17,7 +17,7 @@ struct MistralSettingsView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("API Configuration")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     
                     TextField("API Key", text: $settings.mistralApiKey)
                         .textFieldStyle(.roundedBorder)
@@ -29,7 +29,7 @@ struct MistralSettingsView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Model Selection")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     
                     Picker("Model", selection: $settings.mistralModel) {
                         ForEach(MistralModel.allCases, id: \.self) { model in

@@ -1,32 +1,37 @@
 import SwiftUI
+import Observation
+import UniformTypeIdentifiers
 
+private let logger = AppLogger.logger("AppState")
+
+@Observable
 @MainActor
-class AppState: ObservableObject {
+final class AppState {
     static let shared = AppState()
 
-    @Published var geminiProvider: GeminiProvider
-    @Published var openAIProvider: OpenAIProvider
-    @Published var mistralProvider: MistralProvider
-    @Published var anthropicProvider: AnthropicProvider
-    @Published var ollamaProvider: OllamaProvider
-    @Published var localLLMProvider: LocalModelProvider
-    @Published var openRouterProvider: OpenRouterProvider
+    var geminiProvider: GeminiProvider
+    var openAIProvider: OpenAIProvider
+    var mistralProvider: MistralProvider
+    var anthropicProvider: AnthropicProvider
+    var ollamaProvider: OllamaProvider
+    var localLLMProvider: LocalModelProvider
+    var openRouterProvider: OpenRouterProvider
 
-    @Published var customInstruction: String = ""
-    @Published var selectedText: String = ""
-    @Published var isPopupVisible: Bool = false
-    @Published var isProcessing: Bool = false
-    @Published var previousApplication: NSRunningApplication?
-    @Published var selectedImages: [Data] = []
+    var customInstruction: String = ""
+    var selectedText: String = ""
+    var isPopupVisible: Bool = false
+    var isProcessing: Bool = false
+    var previousApplication: NSRunningApplication?
+    var selectedImages: [Data] = []
 
     // Command management
-    @Published var commandManager = CommandManager()
-    @Published var customCommandsManager = CustomCommandsManager()
+    var commandManager = CommandManager()
+    var customCommandsManager = CustomCommandsManager()
 
     // Current provider with UI binding support
-    @Published private(set) var currentProvider: String
+    private(set) var currentProvider: String
 
-    @Published var selectedAttributedText: NSAttributedString? = nil
+    var selectedAttributedText: NSAttributedString? = nil
 
     var activeProvider: any AIProvider {
         switch currentProvider {
@@ -53,15 +58,15 @@ class AppState: ObservableObject {
     func getProvider(for command: CommandModel) -> any AIProvider {
         let providerName = command.providerOverride ?? currentProvider
 
-        NSLog("AppState.getProvider: command=\(command.name), providerOverride=\(command.providerOverride ?? "nil"), providerName=\(providerName)")
+        logger.debug("AppState.getProvider: command=\(command.name), providerOverride=\(command.providerOverride ?? "nil"), providerName=\(providerName)")
 
         // Handle custom provider
         if providerName == "custom" {
-            NSLog("AppState.getProvider: Custom provider selected")
+            logger.debug("AppState.getProvider: Custom provider selected")
             if let baseURL = command.customProviderBaseURL,
                let apiKey = command.customProviderApiKey,
                let model = command.customProviderModel {
-                NSLog("AppState.getProvider: Creating CustomProvider with baseURL=\(baseURL), model=\(model)")
+                logger.debug("AppState.getProvider: Creating CustomProvider with baseURL=\(baseURL), model=\(model)")
                 let config = CustomProviderConfig(
                     baseURL: baseURL,
                     apiKey: apiKey,
@@ -69,7 +74,7 @@ class AppState: ObservableObject {
                 )
                 return CustomProvider(config: config)
             } else {
-                NSLog("AppState.getProvider: Custom provider config incomplete - baseURL=\(command.customProviderBaseURL ?? "nil"), apiKey=\(command.customProviderApiKey != nil ? "set" : "nil"), model=\(command.customProviderModel ?? "nil")")
+                logger.warning("AppState.getProvider: Custom provider config incomplete - baseURL=\(command.customProviderBaseURL ?? "nil"), apiKey=\(command.customProviderApiKey != nil ? "set" : "nil"), model=\(command.customProviderModel ?? "nil")")
             }
             // Fallback to active provider if custom config is incomplete
             return activeProvider
@@ -224,7 +229,7 @@ class AppState: ObservableObject {
             asettings.mistralApiKey.isEmpty &&
             asettings.openRouterApiKey.isEmpty &&
             asettings.anthropicApiKey.isEmpty {
-            print("Warning: No API keys configured.")
+            logger.warning("No API keys configured.")
         }
 
         // Perform migration from old system to new CommandManager if needed
@@ -264,7 +269,6 @@ class AppState: ObservableObject {
     func setCurrentProvider(_ provider: String) {
         currentProvider = provider
         AppSettings.shared.currentProvider = provider
-        objectWillChange.send()
     }
 
     func saveMistralConfig(apiKey: String, baseURL: String, model: String) {
@@ -289,7 +293,7 @@ class AppState: ObservableObject {
 
         let config = AnthropicConfig(apiKey: apiKey, model: model)
         anthropicProvider = AnthropicProvider(config: config)
-        print("AppState: Anthropic config saved and provider updated.")
+        logger.debug("Anthropic config saved and provider updated.")
     }
 
     // For updating Ollama settings
@@ -340,7 +344,7 @@ class AppState: ObservableObject {
                 // This is important for triple-click selections which include the trailing newline
                 if selectedText.hasSuffix("\n") && !result.hasSuffix("\n") {
                     result += "\n"
-                    NSLog("Added trailing newline to match input")
+                    logger.debug("Added trailing newline to match input")
                 }
 
                 if command.useResponseWindow {
@@ -363,7 +367,7 @@ class AppState: ObservableObject {
                     }
                 }
             } catch {
-                NSLog("Error processing command: \(error)")
+                logger.error("Error processing command: \(error.localizedDescription)")
             }
 
             isProcessing = false
@@ -377,8 +381,9 @@ class AppState: ObservableObject {
         let clipboardSnapshot = NSPasteboard.general.createSnapshot()
 
         // Set the new text on the clipboard
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(newText, forType: .string)
+        let pasteboard = NSPasteboard.general
+        pasteboard.prepareForNewContents(with: [])
+        pasteboard.writeObjects([newText as NSString])
 
         // Reactivate previous application
         if let previousApp = previousApplication {
@@ -390,33 +395,31 @@ class AppState: ObservableObject {
     }
 
     private func activateWindowAndPaste(for app: NSRunningApplication, clipboardSnapshot: ClipboardSnapshot) {
-        var attempts = 0
-        let maxAttempts = 100 // ~1 second with 10ms intervals
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            let maxAttempts = 100 // ~1 second with 10ms intervals
+            let startTime = Date()
+            var attempts = 0
 
-        let timer = Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true) { [weak self] timer in
-            attempts += 1
-
-            // Check if target app is now frontmost or max attempts reached
-            if NSWorkspace.shared.frontmostApplication?.bundleIdentifier == app.bundleIdentifier
-                || attempts >= maxAttempts {
-                timer.invalidate()
-                Task { @MainActor in
+            while true {
+                let isFrontmost =
+                    NSWorkspace.shared.frontmostApplication?.bundleIdentifier == app.bundleIdentifier
+                if isFrontmost || attempts >= maxAttempts || Date().timeIntervalSince(startTime) >= 2.0 {
                     // Perform the paste
-                    self?.simulatePaste()
+                    self.simulatePaste()
 
                     // Wait a moment for the paste to complete, then restore the clipboard
-                    try? await Task.sleep(nanoseconds: 100_000_000) // 100ms
+                    try? await Task.sleep(for: .milliseconds(100))
 
                     // Restore the original clipboard content
                     NSPasteboard.general.restore(snapshot: clipboardSnapshot)
-                    NSLog("Clipboard restored after paste")
+                    logger.debug("Clipboard restored after paste")
+                    break
                 }
-            }
-        }
 
-        // Safety: invalidate timer after 2 seconds regardless
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            timer.invalidate()
+                attempts += 1
+                try? await Task.sleep(for: .milliseconds(10))
+            }
         }
     }
 
@@ -433,7 +436,7 @@ class AppState: ObservableObject {
         mutable.applyCharacterDiff(from: original.string, to: corrected)
 
         let pb = NSPasteboard.general
-        pb.clearContents()
+        pb.prepareForNewContents(with: [])
 
         // Prefer HTML for web editors (e.g., Gmail in browsers), then RTF, always include plain text
         let fullRange = NSRange(location: 0, length: mutable.length)
@@ -450,21 +453,19 @@ class AppState: ObservableObject {
             ]
         )
 
-        // Declare available types in priority order
-        var types: [NSPasteboard.PasteboardType] = []
-        if htmlData != nil { types.append(.html) }
-        if rtfData != nil { types.append(.rtf) }
-        types.append(.string)
-
-        pb.declareTypes(types, owner: nil)
+        let item = NSPasteboardItem()
 
         if let htmlData {
-            pb.setData(htmlData, forType: .html)
+            let htmlType = NSPasteboard.PasteboardType(UTType.html.identifier)
+            item.setData(htmlData, forType: htmlType)
         }
         if let rtfData {
-            pb.setData(rtfData, forType: .rtf)
+            let rtfType = NSPasteboard.PasteboardType(UTType.rtf.identifier)
+            item.setData(rtfData, forType: rtfType)
         }
-        pb.setString(corrected, forType: .string)
+        item.setString(corrected, forType: .string)
+
+        pb.writeObjects([item])
 
         if let previous = previousApplication {
             previous.activate()
@@ -476,20 +477,20 @@ class AppState: ObservableObject {
 
     private func simulatePaste() {
         guard let source = CGEventSource(stateID: .hidSystemState) else {
-            NSLog("Failed to create CGEventSource")
+            logger.error("Failed to create CGEventSource")
             return
         }
 
         // Create Command + V key down event
         guard let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: true) else {
-            NSLog("Failed to create key down event")
+            logger.error("Failed to create key down event")
             return
         }
         keyDown.flags = .maskCommand
 
         // Create Command + V key up event
         guard let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: false) else {
-            NSLog("Failed to create key up event")
+            logger.error("Failed to create key up event")
             return
         }
         keyUp.flags = .maskCommand

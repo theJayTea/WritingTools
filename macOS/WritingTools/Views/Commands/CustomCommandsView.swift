@@ -1,8 +1,9 @@
 import SwiftUI
+import Observation
 
 struct CustomCommandsView: View {
-    @ObservedObject var commandsManager: CustomCommandsManager
-    @ObservedObject private var settings = AppSettings.shared
+    @Bindable var commandsManager: CustomCommandsManager
+    @Bindable private var settings = AppSettings.shared
     @Environment(\.dismiss) var dismiss
     @State private var isAddingNew = false
     @State private var selectedCommand: CustomCommand?
@@ -18,7 +19,7 @@ struct CustomCommandsView: View {
                 Button(action: { dismiss() }) {
                     Image(systemName: "xmark.circle.fill")
                         .font(.title2)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
                 .buttonStyle(.plain)
             }
@@ -85,7 +86,7 @@ struct CustomCommandRow: View {
                     .font(.headline)
                 Text(command.prompt)
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                     .lineLimit(2)
             }
             Spacer()
@@ -102,7 +103,7 @@ struct CustomCommandRow: View {
             Button(action: { onDelete(command) }) {
                 Image(systemName: "trash")
                     .font(.title2)
-                    .foregroundColor(.red)
+                    .foregroundStyle(.red)
             }
             .buttonStyle(.plain)
             .padding(.horizontal, 4)
@@ -112,8 +113,8 @@ struct CustomCommandRow: View {
 }
 
 struct CustomCommandEditor: View {
-    @ObservedObject var commandsManager: CustomCommandsManager
-    @ObservedObject private var settings = AppSettings.shared
+    @Bindable var commandsManager: CustomCommandsManager
+    @Bindable private var settings = AppSettings.shared
     @Binding var isPresented: Bool
     @Environment(\.dismiss) var dismiss
     
@@ -126,7 +127,7 @@ struct CustomCommandEditor: View {
     @State private var showingIconPicker = false
     
     init(commandsManager: CustomCommandsManager, isPresented: Binding<Bool>, editingCommand: CustomCommand? = nil) {
-        self.commandsManager = commandsManager
+        _commandsManager = Bindable(wrappedValue: commandsManager)
         self._isPresented = isPresented
         self.editingCommand = editingCommand
         
@@ -148,7 +149,7 @@ struct CustomCommandEditor: View {
                 Button(action: { dismiss() }) {
                     Image(systemName: "xmark.circle.fill")
                         .font(.title2)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
                 .buttonStyle(.plain)
             }
@@ -173,13 +174,13 @@ struct CustomCommandEditor: View {
                                 HStack {
                                     Image(systemName: selectedIcon)
                                         .font(.title2)
-                                        .foregroundColor(.accentColor)
+                                        .foregroundStyle(Color.accentColor)
                                     Text("Change Icon")
-                                        .foregroundColor(.accentColor)
+                                        .foregroundStyle(Color.accentColor)
                                 }
                                 .padding(8)
                                 .background(Color(.controlBackgroundColor))
-                                .cornerRadius(6)
+                                .clipShape(.rect(cornerRadius: 6))
                             }
                             .buttonStyle(.plain)
                         }
@@ -194,7 +195,7 @@ struct CustomCommandEditor: View {
                             .font(.body)
                             .padding(4)
                             .background(Color(.textBackgroundColor))
-                            .cornerRadius(6)
+                            .clipShape(.rect(cornerRadius: 6))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 6)
                                     .stroke(Color.gray.opacity(0.2), lineWidth: 1)
@@ -206,7 +207,7 @@ struct CustomCommandEditor: View {
                     
                     Text("When enabled, responses will appear in a chat window instead of replacing the selected text.")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                         .padding(.horizontal)
                 }
                 .padding()

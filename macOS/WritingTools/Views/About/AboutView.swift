@@ -1,8 +1,19 @@
 import SwiftUI
 
 struct AboutView: View {
-    @ObservedObject private var settings = AppSettings.shared
+    @Bindable private var settings = AppSettings.shared
     @State private var updateChecker = UpdateChecker.shared
+
+    private var appVersion: String {
+        let shortVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
+        let buildVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String
+
+        if let shortVersion, let buildVersion, shortVersion != buildVersion {
+            return "\(shortVersion) (\(buildVersion))"
+        }
+
+        return shortVersion ?? buildVersion ?? "Unknown"
+    }
     
     var body: some View {
         VStack(spacing: 12) {
@@ -16,7 +27,7 @@ struct AboutView: View {
 
                 Text("Writing Tools is a free, lightweight utility that enhances your writing with AI.")
                     .multilineTextAlignment(.center)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                     .font(.title3)
                     .padding(.horizontal)
             }
@@ -53,7 +64,7 @@ struct AboutView: View {
             // Version and updates
             GroupBox("Version & Updates") {
                 VStack(spacing: 8) {
-                    Text("Version: 5.5 (Based on Windows Port version 8.0)")
+                    Text("Version: \(appVersion)")
                         .font(.caption)
                         .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -62,17 +73,17 @@ struct AboutView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                     } else if let error = updateChecker.checkError {
                         Text(error)
-                            .foregroundColor(.red)
+                            .foregroundStyle(.red)
                             .font(.caption)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     } else if updateChecker.updateAvailable {
                         Text("A new version is available!")
-                            .foregroundColor(.green)
+                            .foregroundStyle(.green)
                             .font(.caption)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     } else {
                         Text("The latest version is already installed!")
-                            .foregroundColor(.green)
+                            .foregroundStyle(.green)
                             .font(.caption)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }

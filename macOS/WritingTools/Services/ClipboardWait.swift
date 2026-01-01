@@ -7,6 +7,8 @@
 
 import AppKit
 
+private let logger = AppLogger.logger("ClipboardWait")
+
 func waitForPasteboardUpdate(
   _ pb: NSPasteboard,
   initialChangeCount: Int,
@@ -17,9 +19,9 @@ func waitForPasteboardUpdate(
     timeout
   {
       do {
-          try await Task.sleep(nanoseconds: 20_000_000)
+          try await Task.sleep(for: .milliseconds(20))
       } catch {
-          NSLog("Task sleep interrupted: \(error)")
+          logger.debug("Task sleep interrupted: \(error.localizedDescription)")
       } // 20 ms
   }
 }

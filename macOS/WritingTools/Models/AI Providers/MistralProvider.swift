@@ -1,5 +1,8 @@
 import Foundation
 import AIProxy
+import Observation
+
+private let logger = AppLogger.logger("MistralProvider")
 
 struct MistralConfig: Codable {
     var apiKey: String
@@ -23,9 +26,9 @@ enum MistralModel: String, CaseIterable {
     }
 }
 
-@MainActor
-class MistralProvider: ObservableObject, AIProvider {
-    @Published var isProcessing = false
+@Observable
+final class MistralProvider: AIProvider {
+    var isProcessing = false
     private var config: MistralConfig
     private var aiProxyService: MistralService?
     private var currentTask: Task<Void, Never>?
@@ -87,12 +90,7 @@ class MistralProvider: ObservableObject, AIProvider {
                         compiledResponse += content
                     }
                     if let usage = chunk.usage {
-                        print("""
-                                Used:
-                                 \(usage.promptTokens ?? 0) prompt tokens
-                                 \(usage.completionTokens ?? 0) completion tokens
-                                 \(usage.totalTokens ?? 0) total tokens
-                                """)
+                        logger.debug("Usage: prompt \(usage.promptTokens ?? 0), completion \(usage.completionTokens ?? 0), total \(usage.totalTokens ?? 0)")
                     }
                 }
                 return compiledResponse
@@ -104,7 +102,7 @@ class MistralProvider: ObservableObject, AIProvider {
                 ), secondsToWait: 60)
                 
                 /*if let usage = response.usage {
-                    print("""
+                    logger.debug("""
                             Used:
                              \(usage.promptTokens ?? 0) prompt tokens
                              \(usage.completionTokens ?? 0) completion tokens
@@ -116,12 +114,12 @@ class MistralProvider: ObservableObject, AIProvider {
             }
             
         } catch AIProxyError.unsuccessfulRequest(let statusCode, let responseBody) {
-            print("Received non-200 status code: \(statusCode) with response body: \(responseBody)")
+            logger.error("Received non-200 status code: \(statusCode) with response body: \(responseBody)")
             throw NSError(domain: "MistralAPI",
                           code: statusCode,
                           userInfo: [NSLocalizedDescriptionKey: "API error: \(responseBody)"])
         } catch {
-            print("Could not create mistral chat completion: \(error.localizedDescription)")
+            logger.error("Could not create mistral chat completion: \(error.localizedDescription)")
             throw error
         }
     }

@@ -10,7 +10,7 @@ enum AppTheme: String {
 
 struct WindowBackground: ViewModifier {
     @Environment(\.colorScheme) var colorScheme
-    @ObservedObject private var settings = AppSettings.shared
+    @Bindable private var settings = AppSettings.shared
     let useGradient: Bool
     let cornerRadius: CGFloat?
 
@@ -41,11 +41,7 @@ struct WindowBackground: ViewModifier {
                         Color.black
                     }
                 }
-                .clipShape(
-                    RoundedRectangle(
-                        cornerRadius: cornerRadius ?? 0,
-                        style: .continuous)
-                )
+                .clipShape(.rect(cornerRadius: cornerRadius ?? 0))
             )
     }
 }
@@ -118,6 +114,7 @@ struct MeshLikeGradientBackground: View {
                     }
                 }
                 .blur(radius: 100)
+                .drawingGroup()
             }
         } else {
             // Dark mode version

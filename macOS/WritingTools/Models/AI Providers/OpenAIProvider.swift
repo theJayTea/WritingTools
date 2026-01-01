@@ -1,5 +1,8 @@
 import Foundation
 import AIProxy
+import Observation
+
+private let logger = AppLogger.logger("OpenAIProvider")
 
 struct OpenAIConfig: Codable {
     var apiKey: String
@@ -7,26 +10,26 @@ struct OpenAIConfig: Codable {
     var model: String
     
     static let defaultBaseURL = "https://api.openai.com"
-    static let defaultModel = "gpt-4o"
+    static let defaultModel = "gpt-5"
 }
 
 enum OpenAIModel: String, CaseIterable {
-    case gpt4 = "gpt-4.1"
-    case gpt4o = "gpt-4o"
-    case gpt4oMini = "gpt-4o-mini"
+    case gpt4_1 = "gpt-4.1"
+    case gpt5 = "gpt-5.2"
+    case gpt5Mini = "gpt-5-mini"
     
     var displayName: String {
         switch self {
-        case .gpt4: return "GPT-4.1 (Most Capable)"
-        case .gpt4o: return "GPT-4o (Optimized)"
-        case .gpt4oMini: return "GPT-4o Mini (Lightweight)"
+        case .gpt4_1: return "GPT-4.1 (Older Model)"
+        case .gpt5: return "GPT-5.2 (Most Capable)"
+        case .gpt5Mini: return "GPT-5 Mini (Lightweight)"
         }
     }
 }
 
-@MainActor
-class OpenAIProvider: ObservableObject, AIProvider {
-    @Published var isProcessing = false
+@Observable
+final class OpenAIProvider: AIProvider {
+    var isProcessing = false
         private var config: OpenAIConfig
         private var aiProxyService: OpenAIService?
         private var currentTask: Task<Void, Never>?
@@ -117,12 +120,12 @@ class OpenAIProvider: ObservableObject, AIProvider {
                 }
                 
             } catch AIProxyError.unsuccessfulRequest(let statusCode, let responseBody) {
-                print("Received non-200 status code: \(statusCode) with response body: \(responseBody)")
+                logger.error("Received non-200 status code: \(statusCode) with response body: \(responseBody)")
                 throw NSError(domain: "OpenAIAPI",
                               code: statusCode,
                               userInfo: [NSLocalizedDescriptionKey: "API error: \(responseBody)"])
             } catch {
-                print("Could not create OpenAI chat completion: \(error.localizedDescription)")
+                logger.error("Could not create OpenAI chat completion: \(error.localizedDescription)")
                 throw error
             }
         }
@@ -191,7 +194,7 @@ class OpenAIProvider: ObservableObject, AIProvider {
         
         guard (200...299).contains(httpResponse.statusCode) else {
             let errorBody = String(data: data, encoding: .utf8) ?? "Unknown error"
-            print("Custom OpenAI Request Failed: \(httpResponse.statusCode) - \(errorBody)")
+            logger.error("Custom OpenAI Request Failed: \(httpResponse.statusCode) - \(errorBody)")
             throw NSError(domain: "OpenAIAPI", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: "API Error: \(errorBody)"])
         }
         
@@ -210,7 +213,7 @@ class OpenAIProvider: ObservableObject, AIProvider {
             let decoded = try JSONDecoder().decode(ChatCompletionResponse.self, from: data)
             return decoded.choices.first?.message.content ?? ""
         } catch {
-            print("Failed to decode response: \(error)")
+            logger.error("Failed to decode response: \(error.localizedDescription)")
              throw NSError(domain: "OpenAIAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to parse API response."])
         }
     }

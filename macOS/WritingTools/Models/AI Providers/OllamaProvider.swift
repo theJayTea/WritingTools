@@ -1,5 +1,5 @@
 import Foundation
-import Combine
+import Observation
 
 struct OllamaConfig: Codable {
     var baseURL: String         // Accepts either "http://host:11434" or ".../api"
@@ -31,11 +31,10 @@ private struct GenerateChunk: Decodable {
     let error: String?
 }
 
-@MainActor
-final class OllamaProvider: ObservableObject, AIProvider {
-    @Published var isProcessing = false
+@Observable
+final class OllamaProvider: AIProvider {
+    var isProcessing = false
     private var config: OllamaConfig
-    private var imageMode: OllamaImageMode { AppSettings.shared.ollamaImageMode }
 
     init(config: OllamaConfig) {
         self.config = config
@@ -66,6 +65,7 @@ final class OllamaProvider: ObservableObject, AIProvider {
         var imagesForOllama: [String] = []
 
         if !images.isEmpty {
+            let imageMode = await MainActor.run { AppSettings.shared.ollamaImageMode }
             switch imageMode {
             case .ocr:
                 let ocrText = await OCRManager.shared.extractText(from: images)

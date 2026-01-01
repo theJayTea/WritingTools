@@ -3,7 +3,7 @@ import SwiftUI
 @main
 struct writing_toolsApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    @StateObject private var appState = AppState.shared
+    @State private var appState = AppState.shared
     
     var body: some Scene {
         WindowGroup {

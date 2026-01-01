@@ -2,8 +2,8 @@ import SwiftUI
 import ApplicationServices
 
 @MainActor struct OnboardingView: View {
-  @ObservedObject var appState: AppState
-  @ObservedObject var settings = AppSettings.shared
+  @Bindable var appState: AppState
+  @Bindable var settings = AppSettings.shared
 
   @State private var currentStep = 0
   @State private var isAccessibilityGranted = AXIsProcessTrusted()
@@ -47,7 +47,7 @@ import ApplicationServices
           .multilineTextAlignment(.center)
         Text(steps[currentStep].description)
           .font(.body)
-          .foregroundColor(.secondary)
+          .foregroundStyle(.secondary)
           .multilineTextAlignment(.center)
           .padding(.horizontal)
       }
@@ -210,12 +210,10 @@ import ApplicationServices
     appState.setCurrentProvider(settings.currentProvider)
     settings.hasCompletedOnboarding = true
 
-    DispatchQueue.main.async {
-      if let window = NSApplication.shared.windows.first(where: {
-        $0.identifier?.rawValue == "OnboardingWindow"
-      }) {
-        window.close()
-      }
+    if let window = NSApplication.shared.windows.first(where: {
+      $0.identifier?.rawValue == "OnboardingWindow"
+    }) {
+      window.close()
     }
   }
 }

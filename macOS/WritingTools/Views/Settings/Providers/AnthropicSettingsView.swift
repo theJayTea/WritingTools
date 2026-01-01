@@ -9,7 +9,7 @@ import SwiftUI
 import AppKit
 
 struct AnthropicSettingsView: View {
-    @ObservedObject var settings = AppSettings.shared
+    @Bindable var settings = AppSettings.shared
     @Binding var needsSaving: Bool
 
     var body: some View {
@@ -18,7 +18,7 @@ struct AnthropicSettingsView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("API Configuration")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     
                     TextField("API Key", text: $settings.anthropicApiKey)
                         .textFieldStyle(.roundedBorder)
@@ -28,7 +28,7 @@ struct AnthropicSettingsView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Model Selection")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     
                     Picker("Model", selection: $settings.anthropicModel) {
                         ForEach(AnthropicModel.allCases, id: \.self) { model in
@@ -45,7 +45,7 @@ struct AnthropicSettingsView: View {
                         .onChange(of: settings.anthropicModel) { _, _ in needsSaving = true }
                     Text("E.g., \(AnthropicModel.claude45Haiku.rawValue), \(AnthropicModel.claude45Sonnet.rawValue), etc.")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
             }
             .padding(.bottom, 4)
