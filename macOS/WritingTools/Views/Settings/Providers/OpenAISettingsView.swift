@@ -25,7 +25,7 @@ struct OpenAISettingsView: View {
                             needsSaving = true
                         }
                     
-                    TextField("Base URL", text: $settings.openAIBaseURL)
+                    TextField("Base URL (e.g. https://api.openai.com/v1)", text: $settings.openAIBaseURL)
                         .textFieldStyle(.roundedBorder)
                         .onChange(of: settings.openAIBaseURL) { _, _ in
                             needsSaving = true
@@ -47,6 +47,12 @@ struct OpenAISettingsView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+
+                Toggle("Force Streaming", isOn: $settings.openAIForceStreaming)
+                    .onChange(of: settings.openAIForceStreaming) { _, _ in
+                        needsSaving = true
+                    }
+                    .help("Enable this if your API provider requires streaming responses (e.g. some third-party proxies).")
                 
             }
             .padding(.bottom, 4)

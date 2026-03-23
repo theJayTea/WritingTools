@@ -8,8 +8,9 @@ struct OpenAIConfig: Codable, Sendable {
     var apiKey: String
     var baseURL: String
     var model: String
-    
-    static let defaultBaseURL = "https://api.openai.com"
+    var forceStreaming: Bool = false
+
+    static let defaultBaseURL = "https://api.openai.com/v1"
     static let defaultModel = "gpt-5.2"
 }
 
@@ -125,12 +126,24 @@ final class OpenAIProvider: AIProvider {
     // MARK: - Custom Request Implementation
     
     private static func performCustomOpenAIRequest(config: OpenAIConfig, systemPrompt: String?, userPrompt: String, images: [Data]) async throws -> String {
+        // When the API requires streaming, collect SSE chunks into a single result
+        if config.forceStreaming {
+            var result = ""
+            try await performCustomOpenAIStreamingRequest(
+                config: config,
+                systemPrompt: systemPrompt,
+                userPrompt: userPrompt,
+                images: images,
+                onChunk: { chunk in result += chunk }
+            )
+            return result
+        }
+
         // Construct URL
         var urlString = config.baseURL
         if urlString.hasSuffix("/") {
             urlString = String(urlString.dropLast())
         }
-        // Append /chat/completions if not present (simple heuristic, can be improved)
         if !urlString.hasSuffix("/chat/completions") {
              urlString += "/chat/completions"
         }
