@@ -159,12 +159,7 @@ import ApplicationServices
   }
 
   private func openPrivacyPane(anchor: String) {
-    if let url = URL(
-      string:
-        "x-apple.systemsettings:com.apple.settings.PrivacySecurity.extension?\(anchor)"
-    ) {
-      NSWorkspace.shared.open(url)
-    }
+    OnboardingPermissionsHelper.openPrivacyPane(anchor: anchor)
   }
 
   private func openCommandsManager() {

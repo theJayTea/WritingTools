@@ -161,7 +161,8 @@ final class AppState {
             let config = OpenAIConfig(
                 apiKey: asettings.openAIApiKey,
                 baseURL: asettings.openAIBaseURL,
-                model: model
+                model: model,
+                forceStreaming: asettings.openAIForceStreaming
             )
             provider = OpenAIProvider(config: config)
 
@@ -281,7 +282,8 @@ final class AppState {
         let openAIConfig = OpenAIConfig(
             apiKey: asettings.openAIApiKey,
             baseURL: asettings.openAIBaseURL,
-            model: asettings.openAIModel
+            model: asettings.openAIModel,
+            forceStreaming: asettings.openAIForceStreaming
         )
         self.openAIProvider = OpenAIProvider(config: openAIConfig)
 
@@ -370,7 +372,7 @@ final class AppState {
         asettings.openAIProject = project
         asettings.openAIModel = model
 
-        let config = OpenAIConfig(apiKey: apiKey, baseURL: baseURL, model: model)
+        let config = OpenAIConfig(apiKey: apiKey, baseURL: baseURL, model: model, forceStreaming: asettings.openAIForceStreaming)
         openAIProvider = OpenAIProvider(config: config)
         clearProviderCache()
     }

@@ -14,7 +14,7 @@ import ui.CustomPopupWindow
 import ui.OnboardingWindow
 import ui.ResponseWindow
 import ui.SettingsWindow
-from aiprovider import GeminiProvider, OllamaProvider, OpenAICompatibleProvider, obfuscate_api_key
+from aiprovider import GeminiProvider, OllamaProvider, OpenAICompatibleProvider, OpenAIResponsesProvider, obfuscate_api_key
 from pynput import keyboard as pykeyboard
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import QLocale, Signal, Slot
@@ -72,7 +72,7 @@ class WritingToolApp(QtWidgets.QApplication):
         self.setup_ctrl_c_listener()
 
         # Setup available AI providers
-        self.providers = [GeminiProvider(self), OpenAICompatibleProvider(self), OllamaProvider(self)]
+        self.providers = [GeminiProvider(self), OpenAICompatibleProvider(self), OpenAIResponsesProvider(self), OllamaProvider(self)]
 
         if not self.config:
             logging.debug('No config found, showing onboarding')
@@ -758,7 +758,22 @@ class WritingToolApp(QtWidgets.QApplication):
                 logging.debug('Sending request to AI provider')
                 
                 # Format conversation differently based on provider
-                if isinstance(self.current_provider, GeminiProvider):
+                if isinstance(self.current_provider, OpenAIResponsesProvider):
+                    # Responses API supports stateful chaining via previous_response_id.
+                    # Build a messages list and pass the cached id when available.
+                    messages = [{"role": "system", "content": system_instruction}]
+                    for msg in history:
+                        role = "assistant" if msg["role"] == "assistant" else "user"
+                        messages.append({"role": role, "content": msg["content"]})
+
+                    response_text = self.current_provider.get_response(
+                        system_instruction,
+                        messages,
+                        return_response=True,
+                        previous_response_id=self.current_provider._last_response_id
+                    )
+
+                elif isinstance(self.current_provider, GeminiProvider):
                     # For Gemini, use the proper history format with roles
                     chat_messages = []
                     

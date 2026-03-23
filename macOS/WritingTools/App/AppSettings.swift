@@ -65,6 +65,10 @@ final class AppSettings {
     var openAIProject: String? {
         didSet { defaults.set(openAIProject, forKey: "openai_project") }
     }
+
+    var openAIForceStreaming: Bool {
+        didSet { defaults.set(openAIForceStreaming, forKey: "openai_force_streaming") }
+    }
     
     var currentProvider: String {
         didSet { defaults.set(currentProvider, forKey: "current_provider") }
@@ -202,6 +206,7 @@ final class AppSettings {
         self.openAIModel = defaults.string(forKey: "openai_model") ?? OpenAIConfig.defaultModel
         self.openAIOrganization = defaults.string(forKey: "openai_organization")
         self.openAIProject = defaults.string(forKey: "openai_project")
+        self.openAIForceStreaming = defaults.bool(forKey: "openai_force_streaming")
         
         self.mistralApiKey = keychain.bootstrapRetrieve(forKey: "mistral_api_key") ?? ""
         self.mistralBaseURL = defaults.string(forKey: "mistral_base_url") ?? MistralConfig.defaultBaseURL

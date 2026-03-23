@@ -575,3 +575,171 @@ class OllamaProvider(AIProvider):
 
     def cancel(self):
         self.close_requested = True
+
+
+class OpenAIResponsesProvider(AIProvider):
+    """
+    Provider for the OpenAI Responses API (/v1/responses).
+
+    The Responses API differs from the Chat Completions API:
+      • Endpoint:  POST /v1/responses  (not /v1/chat/completions)
+      • Input:     'input' field (list of message dicts or a plain string)
+      • Output:    response.output[0].content[0].text
+      • Multi-turn: stateful via 'previous_response_id' – no need to replay full history
+
+    Settings:
+      api_key       – OpenAI (or compatible) API key
+      api_base      – Base URL, default https://api.openai.com/v1
+      api_model     – Model, default gpt-4o-mini
+    """
+
+    def __init__(self, app):
+        self.close_requested = False
+        self.client = None
+        self._last_response_id = None  # stateful multi-turn tracking
+
+        settings = [
+            TextSetting(
+                name="api_key",
+                display_name="API Key",
+                description="Your OpenAI API key (or compatible service key)."
+            ),
+            TextSetting(
+                name="api_base",
+                display_name="API Base URL",
+                default_value="https://api.openai.com/v1",
+                description="Base URL for the Responses API endpoint."
+            ),
+            DropdownSetting(
+                name="api_model",
+                display_name="Model",
+                default_value="gpt-4o-mini",
+                description="Model to use with the Responses API.",
+                options=[
+                    ("gpt-4o-mini (fast & cheap)", "gpt-4o-mini"),
+                    ("gpt-4o (powerful)", "gpt-4o"),
+                    ("o3-mini (reasoning)", "o3-mini"),
+                    ("o1 (advanced reasoning)", "o1"),
+                ],
+                allow_custom=True,
+                custom_placeholder="e.g. gpt-4.1 or your custom model name"
+            ),
+        ]
+        super().__init__(
+            app,
+            "OpenAI Responses API",
+            settings,
+            "• Uses OpenAI's newer Responses API (/v1/responses).\n"
+            "• Supports stateful multi-turn conversations natively.\n"
+            "• Compatible with gpt-4o, gpt-4o-mini, o3-mini, o1, and more.\n"
+            "• Click the button below to get your API key.",
+            "openai",
+            "Get OpenAI API Key",
+            lambda: webbrowser.open("https://platform.openai.com/account/api-keys")
+        )
+
+    # ------------------------------------------------------------------
+    # Configuration helpers
+    # ------------------------------------------------------------------
+
+    def load_config(self, config: dict):
+        if "api_key" in config:
+            config = config.copy()
+            config["api_key"] = deobfuscate_api_key(config["api_key"])
+        super().load_config(config)
+
+    def save_config(self):
+        config = {}
+        for setting in self.settings:
+            value = setting.get_value()
+            if setting.name == "api_key":
+                value = obfuscate_api_key(value)
+            config[setting.name] = value
+        self.app.config["providers"][self.provider_name] = config
+        self.app.save_config(self.app.config)
+
+    # ------------------------------------------------------------------
+    # Lifecycle
+    # ------------------------------------------------------------------
+
+    def after_load(self):
+        """Create the OpenAI client pointed at the configured base URL."""
+        self.client = OpenAI(
+            api_key=self.api_key,
+            base_url=self.api_base,
+        )
+        self._last_response_id = None
+
+    def before_load(self):
+        self.client = None
+        self._last_response_id = None
+
+    def cancel(self):
+        self.close_requested = True
+
+    # ------------------------------------------------------------------
+    # Core request
+    # ------------------------------------------------------------------
+
+    def get_response(
+        self,
+        system_instruction: str,
+        prompt,
+        return_response: bool = False,
+        previous_response_id: str = None
+    ) -> str:
+        """
+        Send a request to the Responses API and return the text.
+
+        Args:
+            system_instruction: System-level instruction string.
+            prompt:             Either a plain string (single-turn) or a list of
+                                {"role": ..., "content": ...} dicts (multi-turn fallback).
+            return_response:    If True return the text directly; otherwise emit via signal.
+            previous_response_id: Responses API stateful chaining id.
+        """
+        self.close_requested = False
+
+        # Build the input list for the Responses API
+        if isinstance(prompt, list):
+            # Multi-turn list passed from process_followup_question.
+            # The Responses API accepts the same message-dict format when passed
+            # under the 'input' key, so we can use it directly.
+            input_messages = prompt
+        else:
+            # Single-turn: system instruction + user message
+            input_messages = [
+                {"role": "system", "content": system_instruction},
+                {"role": "user",   "content": prompt},
+            ]
+
+        # Build kwargs – only pass previous_response_id when we have one
+        kwargs = {
+            "model": self.api_model,
+            "input": input_messages,
+        }
+        if previous_response_id:
+            kwargs["previous_response_id"] = previous_response_id
+
+        try:
+            response = self.client.responses.create(**kwargs)
+            # Extract text from the Responses API output format
+            response_text = response.output[0].content[0].text.strip()
+            # Cache the response id for potential stateful follow-ups
+            self._last_response_id = getattr(response, "id", None)
+
+            if not return_response and not hasattr(self.app, "current_response_window"):
+                self.app.output_ready_signal.emit(response_text)
+            return response_text
+
+        except Exception as e:
+            error_str = str(e)
+            logging.error(f"OpenAIResponsesProvider error: {error_str}")
+            if "rate limit" in error_str.lower() or "exceeded" in error_str.lower():
+                self.app.show_message_signal.emit(
+                    "Rate Limit Hit",
+                    "You've hit an API rate or usage limit. Please try again later or adjust your settings."
+                )
+            else:
+                self.app.show_message_signal.emit("Error", f"An error occurred: {error_str}")
+            return ""

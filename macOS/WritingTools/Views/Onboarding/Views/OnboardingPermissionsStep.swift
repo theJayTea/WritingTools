@@ -118,12 +118,7 @@ struct OnboardingPermissionsStep: View {
         Spacer()
 
         Button("Open Privacy & Security") {
-          if let url = URL(
-            string:
-              "x-apple.systemsettings:com.apple.settings.PrivacySecurity.extension"
-          ) {
-            NSWorkspace.shared.open(url)
-          }
+          OnboardingPermissionsHelper.openPrivacyPane()
         }
         .buttonStyle(.link)
         .accessibilityLabel("Open Privacy and Security settings")
@@ -137,6 +132,23 @@ struct OnboardingPermissionsStep: View {
 // MARK: - Permission Helpers
 
 struct OnboardingPermissionsHelper {
+  /// Opens a Privacy & Security pane, trying the legacy `systempreferences:` scheme first
+  /// (works on macOS 14–26+) and falling back to the `systemsettings:` scheme (macOS 13–15).
+  @discardableResult
+  static func openPrivacyPane(anchor: String? = nil) -> Bool {
+    let suffix = anchor.map { "?\($0)" } ?? ""
+    let urls = [
+      "x-apple.systempreferences:com.apple.preference.security\(suffix)",
+      "x-apple.systemsettings:com.apple.settings.PrivacySecurity.extension\(suffix)",
+    ]
+    for string in urls {
+      if let url = URL(string: string), NSWorkspace.shared.open(url) {
+        return true
+      }
+    }
+    return false
+  }
+
   static func requestAccessibility() {
     let key = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as CFString
     let options: CFDictionary = [key: true] as CFDictionary
@@ -144,12 +156,7 @@ struct OnboardingPermissionsHelper {
 
     Task { @MainActor in
       try? await Task.sleep(for: .milliseconds(200))
-      if let url = URL(
-        string:
-          "x-apple.systemsettings:com.apple.settings.PrivacySecurity.extension?Privacy_Accessibility"
-      ) {
-        NSWorkspace.shared.open(url)
-      }
+      openPrivacyPane(anchor: "Privacy_Accessibility")
     }
   }
 
