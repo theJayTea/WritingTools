@@ -150,6 +150,9 @@ import ApplicationServices
     .onAppear {
       refreshPermissionStatuses()
     }
+    .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+      refreshPermissionStatuses()
+    }
   }
 
   private func refreshPermissionStatuses() {
@@ -159,12 +162,7 @@ import ApplicationServices
   }
 
   private func openPrivacyPane(anchor: String) {
-    if let url = URL(
-      string:
-        "x-apple.systemsettings:com.apple.settings.PrivacySecurity.extension?\(anchor)"
-    ) {
-      NSWorkspace.shared.open(url)
-    }
+    SystemSettingsOpener.openPrivacyPane(anchor: anchor)
   }
 
   private func openCommandsManager() {
