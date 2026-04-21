@@ -13,8 +13,11 @@ enum SystemSettingsOpener {
   @MainActor
   static func openPrivacyPane(anchor: String? = nil) {
     let query = anchor.map { "?\($0)" } ?? ""
+    // System Settings still registers the x-apple.systempreferences URL scheme.
     let urls = [
+      "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension\(query)",
       "x-apple.systempreferences:com.apple.preference.security\(query)",
+      "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension",
       "x-apple.systempreferences:com.apple.preference.security",
     ]
 
