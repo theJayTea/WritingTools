@@ -1,24 +1,33 @@
 import os
+import shutil
 import subprocess
 import sys
 
 
 def run_pyinstaller_build():
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+
+    icon_name = "app_icon.ico" if sys.platform.startswith("win") else "app_icon.png"
+    icon_path = os.path.join("icons", icon_name)
+    data_separator = ";" if sys.platform.startswith("win") else ":"
+
+    # Ensure compiled locale files are available in one-file builds.
+    add_data_locales = f"locales{data_separator}locales"
+
     pyinstaller_command = [
         "pyinstaller",
         "--onefile",
         "--windowed",
-        "--icon=icons/app_icon.ico",
+        f"--icon={icon_path}",
         "--name=Writing Tools",
         "--clean",
         "--noconfirm",
+        "--add-data", add_data_locales,
         # Exclude unnecessary modules
         "--exclude-module", "tkinter",
-        "--exclude-module", "unittest",
         "--exclude-module", "IPython",
         "--exclude-module", "jedi",
         "--exclude-module", "email_validator",
-        "--exclude-module", "cryptography",
         "--exclude-module", "psutil",
         "--exclude-module", "pyzmq",
         "--exclude-module", "tornado",
@@ -74,26 +83,21 @@ def run_pyinstaller_build():
     ]
 
     try:
-        # Remove previous build directories
-        if os.path.exists('dist'):
-            os.system("rmdir /s /q dist")
-        if os.path.exists('build'):
-            os.system("rmdir /s /q build")
-        if os.path.exists('__pycache__'):
-            os.system("rmdir /s /q __pycache__")
+        # Remove previous build directories in a cross-platform way.
+        for folder in ("dist", "build", "__pycache__"):
+            target = os.path.join(base_dir, folder)
+            if os.path.exists(target):
+                shutil.rmtree(target)
 
         # Run PyInstaller
-        subprocess.run(pyinstaller_command, check=True)
+        subprocess.run(pyinstaller_command, check=True, cwd=base_dir)
         print("Build completed successfully!")
 
-        # Clean up unnecessary files
-        if os.path.exists('build'):
-            os.system("rmdir /s /q build")
-        if os.path.exists('__pycache__'):
-            os.system("rmdir /s /q __pycache__")
-
-        # No need to copy data files manually since they are included
-        # in the executable using --add-data
+        # Clean up intermediate build folders.
+        for folder in ("build", "__pycache__"):
+            target = os.path.join(base_dir, folder)
+            if os.path.exists(target):
+                shutil.rmtree(target)
 
     except subprocess.CalledProcessError as e:
         print(f"Build failed with error: {e}")
