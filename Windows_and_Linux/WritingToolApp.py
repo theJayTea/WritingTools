@@ -49,6 +49,9 @@ class WritingToolApp(QtWidgets.QApplication):
         # Check if config migration is needed for v8 (Gemini model update)
         self._migrate_config_for_v8()
 
+        # Check if config migration is needed for v9 (Gemma 4 model update)
+        self._migrate_config_for_v9()
+
         self.options = None
         self.options_path = None
         self.load_options()
@@ -231,6 +234,62 @@ class WritingToolApp(QtWidgets.QApplication):
                 'Please restart Writing Tools.'
             )
             # Exit the app so user can restart
+            sys.exit(0)
+
+    def _migrate_config_for_v9(self):
+        """
+        Migrate config for v9 update:
+        Google removed the Gemma 3 models (gemma-3-27b-it, gemma-3-4b-it) from their API.
+        Update saved model names to Gemma 4 equivalents so existing users don't get 404 errors.
+
+        Model mapping:
+          gemma-3-27b-it  ->  gemma-4-27b-it
+          gemma-3-4b-it   ->  gemma-4-9b-it
+        """
+        # Skip if no config exists (new user going through onboarding)
+        if not self.config:
+            logging.debug('No config to migrate (new user)')
+            return
+
+        # Check if already migrated
+        if self.config.get('is_config_file_updated_for_v9', False):
+            logging.debug('Config already migrated for v9, skipping')
+            return
+
+        logging.info('Migrating config for v9 (Gemma 4 model update)...')
+
+        _GEMMA3_TO_GEMMA4 = {
+            'gemma-3-27b-it': 'gemma-4-27b-it',
+            'gemma-3-4b-it':  'gemma-4-9b-it',
+        }
+
+        config_changed = False
+        if 'providers' in self.config and 'Gemini (Recommended)' in self.config['providers']:
+            gemini_config = self.config['providers']['Gemini (Recommended)']
+            old_model = gemini_config.get('model_name', '')
+
+            if old_model in _GEMMA3_TO_GEMMA4:
+                new_model = _GEMMA3_TO_GEMMA4[old_model]
+                gemini_config['model_name'] = new_model
+                logging.info(f'Updated Gemini model from "{old_model}" to "{new_model}"')
+                config_changed = True
+
+        # Set the migration flag
+        self.config['is_config_file_updated_for_v9'] = True
+
+        # Save the updated config
+        self.save_config(self.config)
+        logging.info('Config migration for v9 complete')
+
+        # Only show restart message if we actually changed something
+        if config_changed:
+            QMessageBox.information(
+                None,
+                'Writing Tools Updated',
+                'Writing Tools has just completed an internal update to use Gemma 4 models '
+                '(your config.json has been updated).\n\n'
+                'Please restart Writing Tools.'
+            )
             sys.exit(0)
 
     def load_options(self):

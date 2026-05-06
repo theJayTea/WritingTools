@@ -10,8 +10,8 @@ struct GeminiConfig: Codable, Sendable {
 }
 
 enum GeminiModel: String, CaseIterable {
-    case gemmabig = "gemma-3-27b-it"
-    case gemmasmall = "gemma-3-4b-it"
+    case gemmabig = "gemma-4-27b-it"
+    case gemmasmall = "gemma-4-9b-it"
     case flashlite = "gemini-flash-lite-latest"
     case flash = "gemini-3-flash-preview"
     case pro = "gemini-3.1-pro-preview"
@@ -19,8 +19,8 @@ enum GeminiModel: String, CaseIterable {
     
     var displayName: String {
         switch self {
-        case .gemmabig: return "Gemma 3 27b (Very Intelligent | unlimited)"
-        case .gemmasmall: return "Gemma 3 4b (Intelligent | unlimited)"
+        case .gemmabig: return "Gemma 4 27B (Very Intelligent | unlimited)"
+        case .gemmasmall: return "Gemma 4 9B (Intelligent | unlimited)"
         case .flashlite: return "Gemini Flash Lite Latest (Intelligent | ~20 uses/min)"
         case .flash: return "Gemini Flash 3 (Very Intelligent | ~20 uses/min)"
         case .pro: return "Gemini Pro 3.1 (Peak Intelligence | ~5 uses/min)"

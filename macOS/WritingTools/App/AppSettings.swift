@@ -192,8 +192,18 @@ final class AppSettings {
         
         // Load API Keys from Keychain (post-migration) using synchronous bootstrap read
         self.geminiApiKey = keychain.bootstrapRetrieve(forKey: "gemini_api_key") ?? ""
-        let geminiModelStr = defaults.string(forKey: "gemini_model") ?? GeminiModel.gemmabig.rawValue
-        self.geminiModel = GeminiModel(rawValue: geminiModelStr) ?? .gemmabig
+        // Migrate deprecated Gemma 3 model names to Gemma 4 equivalents.
+        let rawGeminiModel = defaults.string(forKey: "gemini_model") ?? GeminiModel.gemmabig.rawValue
+        let migratedGeminiModelStr: String
+        switch rawGeminiModel {
+        case "gemma-3-27b-it": migratedGeminiModelStr = GeminiModel.gemmabig.rawValue
+        case "gemma-3-4b-it":  migratedGeminiModelStr = GeminiModel.gemmasmall.rawValue
+        default:               migratedGeminiModelStr = rawGeminiModel
+        }
+        if migratedGeminiModelStr != rawGeminiModel {
+            defaults.set(migratedGeminiModelStr, forKey: "gemini_model")
+        }
+        self.geminiModel = GeminiModel(rawValue: migratedGeminiModelStr) ?? .gemmabig
         
         self.geminiCustomModel = defaults.string(forKey: "gemini_custom_model") ?? ""
         

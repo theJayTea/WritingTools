@@ -38,8 +38,8 @@ from abc import ABC, abstractmethod
 from typing import List
 
 # External libraries
-import google.generativeai as genai
-from google.generativeai.types import HarmBlockThreshold, HarmCategory
+from google import genai
+from google.genai import types as genai_types
 from ollama import Client as OllamaClient
 from openai import OpenAI
 from PySide6 import QtWidgets
@@ -321,28 +321,29 @@ class GeminiProvider(AIProvider):
     """
     Provider for Google's Gemini API.
     
-    Uses google.generativeai.GenerativeModel.generate_content() to generate text.
-    Streaming is no longer offered so we always do a single-shot call.
+    Uses google.genai Client to generate text via the v1 API, which supports
+    Gemma 4 and all current Gemini models. System instructions are passed
+    per-request via GenerateContentConfig for correct behaviour with all models.
     """
     def __init__(self, app):
         self.close_requested = False
-        self.model = None
+        self.client = None
 
         settings = [
             TextSetting(name="api_key", display_name="API Key", description="Paste your Gemini API key here"),
             DropdownSetting(
                 name="model_name",
                 display_name="Model",
-                default_value="gemma-3-27b-it",
+                default_value="gemma-4-27b-it",
                 description="Select Gemini model to use",
                 options=[
-                    ("⭐ Gemma 3 27B (very intelligent | unlimited usage)", "gemma-3-27b-it"),
-                    ("Gemma 3 4B (intelligent | unlimited usage)", "gemma-3-4b-it"),
+                    ("⭐ Gemma 4 27B (very intelligent | unlimited usage)", "gemma-4-27b-it"),
+                    ("Gemma 4 9B (intelligent | unlimited usage)", "gemma-4-9b-it"),
                     ("Gemini Flash Latest (very intelligent | only 20 uses/day)", "gemini-flash-latest"),
                     ("Gemini Flash Lite Latest (intelligent | only 20 uses/day)", "gemini-flash-lite-latest"),
                 ],
                 allow_custom=True,
-                custom_placeholder="e.g., gemini-3-pro-preview"
+                custom_placeholder="e.g., gemini-2.5-pro"
             )
         ]
         super().__init__(app, "Gemini (Recommended)", settings,
@@ -355,18 +356,42 @@ class GeminiProvider(AIProvider):
 
     def get_response(self, system_instruction: str, prompt: str, return_response: bool = False) -> str:
         """
-        Generate content using Gemini.
-        
-        Always performs a single-shot request with streaming disabled.
+        Generate content using Gemini via the google-genai SDK.
+
+        Passes the system instruction per-request through GenerateContentConfig so
+        it is handled correctly by all models (Gemma 4, Gemini, etc.).
         Returns the full response text if return_response is True,
         otherwise emits the text via the output_ready_signal.
         """
         self.close_requested = False
 
-        # Single-shot call with streaming disabled
-        response = self.model.generate_content(
-            contents=[system_instruction, prompt],
-            stream=False
+        response = self.client.models.generate_content(
+            model=self.model_name,
+            contents=prompt,
+            config=genai_types.GenerateContentConfig(
+                system_instruction=system_instruction,
+                candidate_count=1,
+                max_output_tokens=1000,
+                temperature=0.5,
+                safety_settings=[
+                    genai_types.SafetySetting(
+                        category='HARM_CATEGORY_HARASSMENT',
+                        threshold='BLOCK_NONE',
+                    ),
+                    genai_types.SafetySetting(
+                        category='HARM_CATEGORY_HATE_SPEECH',
+                        threshold='BLOCK_NONE',
+                    ),
+                    genai_types.SafetySetting(
+                        category='HARM_CATEGORY_SEXUALLY_EXPLICIT',
+                        threshold='BLOCK_NONE',
+                    ),
+                    genai_types.SafetySetting(
+                        category='HARM_CATEGORY_DANGEROUS_CONTENT',
+                        threshold='BLOCK_NONE',
+                    ),
+                ],
+            ),
         )
 
         try:
@@ -410,26 +435,12 @@ class GeminiProvider(AIProvider):
 
     def after_load(self):
         """
-        Configure the google.generativeai client and create the generative model.
+        Configure the google-genai client using the provided API key.
         """
-        genai.configure(api_key=self.api_key)
-        self.model = genai.GenerativeModel(
-            model_name=self.model_name,
-            generation_config=genai.types.GenerationConfig(
-                candidate_count=1,
-                max_output_tokens=1000,
-                temperature=0.5
-            ),
-            safety_settings={
-                HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
-                HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
-                HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
-                HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
-            }
-        )
+        self.client = genai.Client(api_key=self.api_key)
 
     def before_load(self):
-        self.model = None
+        self.client = None
 
     def cancel(self):
         self.close_requested = True
