@@ -18,7 +18,9 @@ def run_pyinstaller_build():
         "--exclude-module", "IPython",
         "--exclude-module", "jedi",
         "--exclude-module", "email_validator",
-        "--exclude-module", "cryptography",
+        # NOTE: do NOT exclude `cryptography` — google-genai's auth chain pulls
+        # it in heavily during `genai.Client()` construction. Excluding it
+        # makes the compiled exe crash on startup.
         "--exclude-module", "psutil",
         "--exclude-module", "pyzmq",
         "--exclude-module", "tornado",
