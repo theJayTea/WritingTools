@@ -38,8 +38,8 @@ from abc import ABC, abstractmethod
 from typing import List
 
 # External libraries
-import google.generativeai as genai
-from google.generativeai.types import HarmBlockThreshold, HarmCategory
+from google import genai
+from google.genai import types as genai_types
 from ollama import Client as OllamaClient
 from openai import OpenAI
 from PySide6 import QtWidgets
@@ -319,58 +319,138 @@ class AIProvider(ABC):
 
 class GeminiProvider(AIProvider):
     """
-    Provider for Google's Gemini API.
-    
-    Uses google.generativeai.GenerativeModel.generate_content() to generate text.
-    Streaming is no longer offered so we always do a single-shot call.
+    Provider for Google's Gemini API (using the new unified `google-genai` SDK).
+
+    Uses `client.models.generate_content()` for single-shot generation. The same
+    method is used for follow-up chat too — the entire conversation history is
+    passed via `contents` as a list of `Content` objects, so we don't need the
+    SDK's chat session abstraction.
+
+    System instruction is passed via `GenerateContentConfig.system_instruction`
+    (not concatenated into `contents`, as the legacy SDK required).
+
+    Thinking is disabled (set to "minimal", the lowest level the API exposes)
+    on Gemini 3-family models. Gemma models don't have a thinking process, so
+    `thinking_config` is omitted for them — passing it could otherwise error.
     """
+
+    # Disable safety filtering across all categories (best-effort; some models
+    # may still soft-refuse). Defined once, reused per request.
+    _SAFETY_SETTINGS = [
+        genai_types.SafetySetting(category="HARM_CATEGORY_HARASSMENT", threshold="BLOCK_NONE"),
+        genai_types.SafetySetting(category="HARM_CATEGORY_HATE_SPEECH", threshold="BLOCK_NONE"),
+        genai_types.SafetySetting(category="HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold="BLOCK_NONE"),
+        genai_types.SafetySetting(category="HARM_CATEGORY_DANGEROUS_CONTENT", threshold="BLOCK_NONE"),
+    ]
+
     def __init__(self, app):
         self.close_requested = False
-        self.model = None
+        self.client = None
 
         settings = [
             TextSetting(name="api_key", display_name="API Key", description="Paste your Gemini API key here"),
             DropdownSetting(
                 name="model_name",
                 display_name="Model",
-                default_value="gemma-3-27b-it",
+                default_value="gemini-flash-latest",
                 description="Select Gemini model to use",
                 options=[
-                    ("⭐ Gemma 3 27B (very intelligent | unlimited usage)", "gemma-3-27b-it"),
-                    ("Gemma 3 4B (intelligent | unlimited usage)", "gemma-3-4b-it"),
-                    ("Gemini Flash Latest (very intelligent | only 20 uses/day)", "gemini-flash-latest"),
-                    ("Gemini Flash Lite Latest (intelligent | only 20 uses/day)", "gemini-flash-lite-latest"),
+                    # `gemini-flash-latest` is a Google-managed alias that currently
+                    # points to Gemini 3 Flash Preview — fast (~1–2s) and high
+                    # quality. Capped at 20 free requests/day per the model's free
+                    # tier.
+                    ("⭐ Gemini Flash Latest (very fast | only 20 free uses/day)", "gemini-flash-latest"),
+                    # Gemma 4 models are unlimited on the free tier but noticeably
+                    # slower (8–15s typical) since they run on different
+                    # infrastructure.
+                    ("Gemma 4 31B (slow | unlimited free use)", "gemma-4-31b-it"),
+                    ("Gemma 4 26B A4B (slow | unlimited free use)", "gemma-4-26b-a4b-it"),
                 ],
                 allow_custom=True,
-                custom_placeholder="e.g., gemini-3-pro-preview"
+                custom_placeholder="e.g., gemini-3.1-pro-preview"
             )
         ]
         super().__init__(app, "Gemini (Recommended)", settings,
-            "• Google’s Gemini is a powerful AI model available for free!\n"
+            "• Google's Gemini is a powerful AI model available for free!\n"
             "• An API key is required to connect to Gemini on your behalf.\n"
             "• Click the button below to get your API key.",
             "gemini",
             "Get API Key",
             lambda: webbrowser.open("https://aistudio.google.com/app/apikey"))
 
-    def get_response(self, system_instruction: str, prompt: str, return_response: bool = False) -> str:
+    def _build_config(self, system_instruction: str) -> "genai_types.GenerateContentConfig":
+        """
+        Build a per-call GenerateContentConfig.
+
+        We don't override temperature: Gemini 3 docs explicitly recommend leaving
+        it at the default of 1.0 (lower values can cause looping / degraded
+        output on reasoning-heavy tasks). The old SDK code set it to 0.5; we drop
+        that override here.
+        """
+        # Thinking is disabled across the board for Writing Tools (latency matters
+        # more than reasoning depth for proofread/rewrite/summary flows).
+        #
+        # • Gemma 4 *is* capable of thinking, but is off by default. Per
+        #   https://ai.google.dev/gemma/docs/core/gemma_on_gemini_api#thinking,
+        #   thinking on Gemma 4 is binary and "you enable it in the API by setting
+        #   the thinking level to 'high'". So omitting thinking_config keeps
+        #   Gemma 4 in its default-off state.
+        # • Gemini 3 Flash / Flash-Lite cannot fully disable thinking. The
+        #   lowest exposed level is "minimal", which the docs say "matches the
+        #   'no thinking' setting for most queries".
+        is_gemma = "gemma" in (self.model_name or "").lower()
+        kwargs = {
+            "system_instruction": system_instruction,
+            "safety_settings": self._SAFETY_SETTINGS,
+            "max_output_tokens": 1000,
+        }
+        if not is_gemma:
+            kwargs["thinking_config"] = genai_types.ThinkingConfig(thinking_level="minimal")
+        return genai_types.GenerateContentConfig(**kwargs)
+
+    @staticmethod
+    def _messages_to_contents(messages: list) -> list:
+        """
+        Convert OpenAI-style chat history into google-genai `Content` objects.
+
+        Maps roles: assistant → "model", everything else → "user". Any "system"
+        entries are dropped because Gemini takes the system instruction via the
+        config object instead of as an in-history message.
+        """
+        contents = []
+        for m in messages:
+            role = m.get("role")
+            if role == "system":
+                continue
+            text = m.get("content", "")
+            gemini_role = "model" if role == "assistant" else "user"
+            contents.append(genai_types.Content(role=gemini_role, parts=[genai_types.Part(text=text)]))
+        return contents
+
+    def get_response(self, system_instruction: str, prompt, return_response: bool = False) -> str:
         """
         Generate content using Gemini.
-        
-        Always performs a single-shot request with streaming disabled.
-        Returns the full response text if return_response is True,
-        otherwise emits the text via the output_ready_signal.
+
+        `prompt` may be either a plain string (the typical inline-tool flow) or a
+        list of OpenAI-style message dicts (the follow-up chat flow). In both
+        cases we make a single-shot non-streaming request.
+
+        Returns the response text when `return_response` is True; otherwise emits
+        it via `output_ready_signal` for inline replacement.
         """
         self.close_requested = False
 
-        # Single-shot call with streaming disabled
-        response = self.model.generate_content(
-            contents=[system_instruction, prompt],
-            stream=False
-        )
-
         try:
-            response_text = response.text.rstrip('\n')
+            contents = self._messages_to_contents(prompt) if isinstance(prompt, list) else prompt
+
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=contents,
+                config=self._build_config(system_instruction),
+            )
+
+            response_text = (response.text or "").rstrip('\n')
+
             if not return_response and not hasattr(self.app, 'current_response_window'):
                 self.app.output_ready_signal.emit(response_text)
                 self.app.replace_text(True)
@@ -379,10 +459,9 @@ class GeminiProvider(AIProvider):
         except Exception as e:
             logging.error(f"Error processing Gemini response: {e}")
             self.app.output_ready_signal.emit("An error occurred while processing the response.")
+            return ""
         finally:
             self.close_requested = False
-
-        return ""
 
     def load_config(self, config: dict):
         """
@@ -410,26 +489,14 @@ class GeminiProvider(AIProvider):
 
     def after_load(self):
         """
-        Configure the google.generativeai client and create the generative model.
+        Construct the new `google-genai` Client. The model and per-call options
+        are passed at request time via `client.models.generate_content`, so we
+        don't pre-instantiate a model here.
         """
-        genai.configure(api_key=self.api_key)
-        self.model = genai.GenerativeModel(
-            model_name=self.model_name,
-            generation_config=genai.types.GenerationConfig(
-                candidate_count=1,
-                max_output_tokens=1000,
-                temperature=0.5
-            ),
-            safety_settings={
-                HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
-                HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
-                HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
-                HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
-            }
-        )
+        self.client = genai.Client(api_key=self.api_key)
 
     def before_load(self):
-        self.model = None
+        self.client = None
 
     def cancel(self):
         self.close_requested = True

@@ -25,9 +25,12 @@ def run_pyinstaller_build():
         "--add-data", add_data_locales,
         # Exclude unnecessary modules
         "--exclude-module", "tkinter",
+        "--exclude-module", "unittest",
         "--exclude-module", "IPython",
         "--exclude-module", "jedi",
         "--exclude-module", "email_validator",
+        # NOTE: do NOT exclude `cryptography` - google-genai auth paths rely
+        # on it during `genai.Client()` construction.
         "--exclude-module", "psutil",
         "--exclude-module", "pyzmq",
         "--exclude-module", "tornado",
