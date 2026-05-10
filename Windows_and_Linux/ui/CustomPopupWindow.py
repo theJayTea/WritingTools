@@ -4,6 +4,7 @@ import os
 import sys
 from functools import partial
 
+from pynput import keyboard as pykeyboard
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
@@ -95,6 +96,9 @@ class ButtonEditDialog(QDialog):
             "icon": "icons/magnifying-glass",
             "open_in_window": False
         }
+        # The hotkey input is created in init_ui; tracked here so the
+        # parent window can read it back from get_button_data().
+        self.hotkey_input = None
         self.setWindowTitle(title)
         self.init_ui()
         
@@ -160,11 +164,44 @@ class ButtonEditDialog(QDialog):
         
         self.replace_radio.setChecked(not self.button_data.get("open_in_window", False))
         self.window_radio.setChecked(self.button_data.get("open_in_window", False))
-        
+
         radio_layout.addWidget(self.replace_radio)
         radio_layout.addWidget(self.window_radio)
         layout.addLayout(radio_layout)
-        
+
+        # Direct hotkey (optional). Lets the user fire this button from
+        # anywhere without opening the popup first. Stored per-button in
+        # options.json under a "hotkey" key; absent = no hotkey, which is
+        # how every existing/legacy button starts.
+        hotkey_label = QLabel("Direct hotkey (optional):")
+        hotkey_label.setStyleSheet(f"color: {'#fff' if colorMode == 'dark' else '#333'}; font-weight: bold;")
+        layout.addWidget(hotkey_label)
+
+        self.hotkey_input = QLineEdit()
+        self.hotkey_input.setStyleSheet(f"""
+            QLineEdit {{
+                padding: 8px;
+                border: 1px solid {'#777' if colorMode == 'dark' else '#ccc'};
+                border-radius: 8px;
+                background-color: {'#333' if colorMode == 'dark' else 'white'};
+                color: {'#fff' if colorMode == 'dark' else '#000'};
+            }}
+        """)
+        self.hotkey_input.setPlaceholderText("e.g. ctrl+j  (leave blank for none)")
+        self.hotkey_input.setText(self.button_data.get("hotkey", ""))
+        layout.addWidget(self.hotkey_input)
+
+        hotkey_hint = QLabel(
+            "Press this combination from anywhere to run this button "
+            "directly, skipping the popup.\nUse '+' between keys, e.g. "
+            "ctrl+j or ctrl+shift+p."
+        )
+        hotkey_hint.setStyleSheet(
+            f"color: {'#bbb' if colorMode == 'dark' else '#555'}; font-size: 12px;"
+        )
+        hotkey_hint.setWordWrap(True)
+        layout.addWidget(hotkey_hint)
+
         # OK & Cancel
         btn_layout = QHBoxLayout()
         ok_button = QPushButton("OK")
@@ -198,7 +235,7 @@ class ButtonEditDialog(QDialog):
         """)
 
     def get_button_data(self):
-        return {
+        data = {
             "name": self.name_input.text(),
             "prefix": "Make this change to the following text:\n\n",
             # Retrieve multiline text
@@ -206,6 +243,13 @@ class ButtonEditDialog(QDialog):
             "icon": "icons/custom",
             "open_in_window": self.window_radio.isChecked()
         }
+        # Only include `hotkey` if the user actually typed one. Old
+        # configs and buttons-without-hotkeys stay shaped exactly as
+        # before — no empty-string clutter in options.json.
+        hotkey = self.hotkey_input.text().strip().lower() if self.hotkey_input else ""
+        if hotkey:
+            data["hotkey"] = hotkey
+        return data
 
 class DraggableButton(QtWidgets.QPushButton):
     def __init__(self, parent_popup, key, text):
@@ -330,13 +374,11 @@ class DraggableButton(QtWidgets.QPushButton):
             self.icon_container.setGeometry(0, 0, self.width(), self.height())
 
 class CustomPopupWindow(QtWidgets.QWidget):
-    def __init__(self, app, selected_text):
+    def __init__(self, app):
         super().__init__()
         self.app = app
-        self.selected_text = selected_text
         self.edit_mode = False
-        self.has_text = bool(selected_text.strip())
-        
+
         self.drag_label = None
         self.edit_button = None
         self.reset_button = None
@@ -462,7 +504,7 @@ class CustomPopupWindow(QtWidgets.QWidget):
         input_layout.setContentsMargins(0,0,0,0)
         
         self.custom_input = QLineEdit()
-        self.custom_input.setPlaceholderText(_("Describe your change...") if self.has_text else _("Ask your AI..."))
+        self.custom_input.setPlaceholderText(_("Describe your change..."))
         self.custom_input.setStyleSheet(f"""
             QLineEdit {{
                 padding: 8px;
@@ -498,14 +540,9 @@ class CustomPopupWindow(QtWidgets.QWidget):
         input_layout.addWidget(send_btn)
         
         content_layout.addWidget(self.input_area)
-        
-        if self.has_text:
-            self.build_buttons_list()
-            self.rebuild_grid_layout(content_layout)
-        else:
-            # If no text, hide the edit button; user can only do custom instructions
-            self.edit_button.hide()
-            self.custom_input.setMinimumWidth(300)
+
+        self.build_buttons_list()
+        self.rebuild_grid_layout(content_layout)
 
         # show update notice if applicable
         if self.app.config.get("update_available", False):
@@ -553,7 +590,13 @@ class CustomPopupWindow(QtWidgets.QWidget):
                                     v["icon"] + ('_dark' if colorMode=='dark' else '_light') + '.png')
             if os.path.exists(icon_path):
                 b.setIcon(QtGui.QIcon(icon_path))
-                
+
+            # Tooltip surfaces the direct hotkey (if any) for discoverability.
+            # Buttons without a hotkey get no tooltip — keeps things uncluttered.
+            hotkey = (v.get("hotkey") or "").strip()
+            if hotkey:
+                b.setToolTip(f"Direct hotkey: {hotkey}")
+
             if not self.edit_mode:
                 b.clicked.connect(partial(self.on_generic_instruction, k))
             self.button_widgets.append(b)
@@ -595,8 +638,8 @@ class CustomPopupWindow(QtWidgets.QWidget):
         
         parent_layout.addLayout(grid)
         
-        # Add New button (only in edit mode & only if we have text)
-        if self.edit_mode and self.has_text:
+        # Add New button (only in edit mode)
+        if self.edit_mode:
             add_btn = QPushButton("+ Add New")
             add_btn.setStyleSheet(f"""
                 QPushButton {{
@@ -779,26 +822,98 @@ class CustomPopupWindow(QtWidgets.QWidget):
                 error_msg.setText(f"An error occurred while resetting: {str(e)}")
                 error_msg.exec_()
 
+    def _validate_hotkey(self, hotkey, exclude_button=None):
+        """
+        Check a button hotkey string for validity and conflicts.
+
+        Returns (ok, error_message). Empty hotkey is always ok — the dialog
+        omits the field on save, which means "no direct hotkey for this
+        button". This is also how every legacy/old options.json entry
+        looks, so absence is always safe.
+
+        `exclude_button` skips the named button when checking conflicts —
+        used during edit so a button doesn't conflict with its own
+        previously-saved hotkey.
+        """
+        if not hotkey:
+            return True, None
+
+        # Authoritative format check: try parsing it the same way the
+        # listener will. Catches typos, unknown key names, missing
+        # modifiers, etc. without us having to maintain a regex.
+        try:
+            pykeyboard.HotKey.parse(self.app._to_pynput_hotkey(hotkey))
+        except Exception as e:
+            return False, (
+                f"'{hotkey}' isn't a valid hotkey.\n\n"
+                f"Use '+' between keys, e.g. ctrl+j or ctrl+shift+p.\n"
+                f"({e})"
+            )
+
+        # Conflict with the global Writing Tools shortcut. Same combination
+        # can't dispatch to both the popup and a direct fire.
+        global_shortcut = (self.app.config.get('shortcut') or 'ctrl+space').strip().lower()
+        if hotkey == global_shortcut:
+            return False, (
+                f"'{hotkey}' is already used as the main Writing Tools "
+                f"hotkey (set in Settings). Pick a different combination."
+            )
+
+        # Conflict with another button's hotkey.
+        data = self.load_options()
+        for k, v in data.items():
+            if k == exclude_button:
+                continue
+            other = (v.get('hotkey') or '').strip().lower()
+            if other and other == hotkey:
+                return False, (
+                    f"'{hotkey}' is already used by the '{k}' button. "
+                    f"Pick a different combination."
+                )
+
+        return True, None
+
+    @staticmethod
+    def _build_button_entry(bd, existing=None):
+        """
+        Assemble the options.json entry for a button from dialog output.
+        Preserves any non-dialog fields already on the existing entry, and
+        only writes `hotkey` when the user provided one (legacy-clean).
+        """
+        entry = dict(existing) if existing else {}
+        entry["prefix"] = bd["prefix"]
+        entry["instruction"] = bd["instruction"]
+        entry["icon"] = bd["icon"]
+        entry["open_in_window"] = bd["open_in_window"]
+        if bd.get("hotkey"):
+            entry["hotkey"] = bd["hotkey"]
+        else:
+            # User cleared the hotkey field — drop the key so re-saving
+            # doesn't leave a stale binding behind.
+            entry.pop("hotkey", None)
+        return entry
+
     def add_new_button_clicked(self):
         dialog = ButtonEditDialog(self, title="Add New Button")
-        if dialog.exec_():
+        while dialog.exec_():
             bd = dialog.get_button_data()
+            ok, err = self._validate_hotkey(bd.get("hotkey", ""))
+            if not ok:
+                QtWidgets.QMessageBox.warning(self, "Invalid hotkey", err)
+                # Re-open the dialog with the user's entries preserved so
+                # they can fix the hotkey instead of starting over.
+                continue
             data = self.load_options()
-            data[bd["name"]] = {
-                "prefix": bd["prefix"],
-                "instruction": bd["instruction"],
-                "icon": bd["icon"],  # uses 'icons/custom'
-                "open_in_window": bd["open_in_window"]
-            }
+            data[bd["name"]] = self._build_button_entry(bd)
             self.save_options(data)
 
             self.build_buttons_list()
             self.rebuild_grid_layout()
 
             self.hide()
-            
+
             QtWidgets.QMessageBox.information(
-                self, 
+                self,
                 "Quitting to apply button...",
                 "Writing Tools needs to relaunch to apply your fancy button & will now quit.\nPlease relaunch Writing Tools.exe to see your new button."
             )
@@ -806,6 +921,7 @@ class CustomPopupWindow(QtWidgets.QWidget):
             self.app.load_options()
             self.close()
             QtCore.QTimer.singleShot(100, self.app.exit_app)
+            return
 
 
     def edit_button_clicked(self, btn):
@@ -814,19 +930,21 @@ class CustomPopupWindow(QtWidgets.QWidget):
         data = self.load_options()
         bd = data[key]
         bd["name"] = key
-        
+
         dialog = ButtonEditDialog(self, bd)
-        if dialog.exec_():
+        while dialog.exec_():
             new_data = dialog.get_button_data()
+            # Pass `exclude_button=key` so we don't flag the button's own
+            # current hotkey as a conflict with itself.
+            ok, err = self._validate_hotkey(new_data.get("hotkey", ""), exclude_button=key)
+            if not ok:
+                QtWidgets.QMessageBox.warning(self, "Invalid hotkey", err)
+                continue
             data = self.load_options()
+            existing = data.get(key)
             if new_data["name"] != key:
                 del data[key]
-            data[new_data["name"]] = {
-                "prefix": new_data["prefix"],
-                "instruction": new_data["instruction"],
-                "icon": new_data["icon"],
-                "open_in_window": new_data["open_in_window"]
-            }
+            data[new_data["name"]] = self._build_button_entry(new_data, existing=existing)
             self.save_options(data)
 
             self.build_buttons_list()
@@ -836,7 +954,7 @@ class CustomPopupWindow(QtWidgets.QWidget):
 
             # Show message about relaunch requirement
             QtWidgets.QMessageBox.information(
-                self, 
+                self,
                 "Quitting to apply changes to this button...",
                 "Writing Tools needs to relaunch to apply your changes & will now quit.\nPlease relaunch Writing Tools.exe to see your changes."
             )
@@ -845,6 +963,7 @@ class CustomPopupWindow(QtWidgets.QWidget):
             self.app.load_options()
             self.close()
             QtCore.QTimer.singleShot(100, self.app.exit_app)
+            return
 
     def delete_button_clicked(self, btn):
         """Handle deletion of a button."""
@@ -894,12 +1013,12 @@ class CustomPopupWindow(QtWidgets.QWidget):
     def on_custom_change(self):
         txt = self.custom_input.text().strip()
         if txt:
-            self.app.process_option('Custom', self.selected_text, txt)
+            self.app.process_option('Custom', txt)
             self.close()
 
     def on_generic_instruction(self, instruction):
         if not self.edit_mode:
-            self.app.process_option(instruction, self.selected_text)
+            self.app.process_option(instruction)
             self.close()
 
     def eventFilter(self, obj, event):

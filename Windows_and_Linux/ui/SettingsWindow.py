@@ -362,6 +362,9 @@ class SettingsWindow(QtWidgets.QWidget):
         self.app.config['streaming'] = False
         self.app.config['provider'] = self.provider_dropdown.currentText()
 
+        # Mark config as updated for v8 (new users start with this flag set)
+        self.app.config['is_config_file_updated_for_v8'] = True
+
         self.app.providers[self.provider_dropdown.currentIndex()].save_config()
 
         provider_name = self.app.config.get('provider', 'Gemini')
