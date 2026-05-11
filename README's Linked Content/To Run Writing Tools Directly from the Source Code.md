@@ -11,13 +11,19 @@ After extracting the folder, open your **Terminal** (or **Command Prompt**) in t
 - Windows:
    ```bash
    cd path\to\Windows_and_Linux
-   pip install -r requirements.txt
+   py -m venv .venv
+   .venv\Scripts\activate
+   python -m pip install -r requirements.txt
    ```
 
 - Linux:
    ```bash
    cd /path/to/Windows_and_Linux
-   pip3 install -r requirements.txt
+   # Debian/Ubuntu only (one-time): install venv support
+   sudo apt install -y python3-venv
+   python3 -m venv .venv
+   source .venv/bin/activate
+   python -m pip install -r requirements.txt
    ```
 Of course, you'll need to have [Python installed](https://www.python.org/downloads/)!
 
@@ -33,6 +39,12 @@ Of course, you'll need to have [Python installed](https://www.python.org/downloa
    ```bash
    python3 main.py
    ```
+
+**Optional Linux desktop integration (manual/source install):**
+```bash
+cd /path/to/Windows_and_Linux
+./install-local-linux.sh
+```
 
 
 ### [**◀️ Back to main page**](https://github.com/theJayTea/WritingTools)

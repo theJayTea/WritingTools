@@ -7,6 +7,12 @@ Windows_and_Linux/config.json
 **/__pycache__
 **/*.mo
 **/pot_files
+Windows_and_Linux/dist/
+Windows_and_Linux/packaging/stage/
+Windows_and_Linux/packaging/dist/
+Windows_and_Linux/*.deb
+Windows_and_Linux/*.venv
+Windows_and_Linux/packaging/nfpm.yaml
 
 # Xcode user-specific data
 **/xcuserdata/

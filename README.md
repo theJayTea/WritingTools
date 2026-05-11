@@ -90,6 +90,18 @@ Aside from being the only Windows/Linux program like Apple's Writing Tools, and 
 ### **🐧 Linux (work-in-progress)**:
 [Run it from the source code](https://github.com/theJayTea/WritingTools/blob/main/README's%20Linked%20Content/To%20Run%20Writing%20Tools%20Directly%20from%20the%20Source%20Code.md)
 
+You can also build an installable `.deb` package yourself:
+1. `cd Windows_and_Linux`
+2. On Debian/Ubuntu, install venv support (one-time): `sudo apt install -y python3-venv`
+3. Create and activate a virtual environment: `python3 -m venv .venv && source .venv/bin/activate`
+4. Install requirements: `python -m pip install -r requirements.txt`
+5. Install nFPM (packager): https://nfpm.goreleaser.com/docs/install/
+6. Build package: `./build-deb.sh`
+7. Install package: `sudo apt install ./packaging/dist/*.deb`
+
+Note: on first launch, `writing-tools` auto-initializes your user profile under `~/.local/share/writingtools`.
+`install-local-linux.sh` remains available for manual/source installs.
+
 Writing Tools works well on x11. On Wayland, there are a few caveats:
 - [it works on XWayland apps](https://github.com/theJayTea/WritingTools/issues/34#issuecomment-2461633556)
 - [and it works if you disable Wayland for individual Flatpaks with Flatseal.](https://github.com/theJayTea/WritingTools/issues/93#issuecomment-2576511041)

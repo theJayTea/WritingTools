@@ -5,28 +5,46 @@ Here's how to compile it with PyInstaller and a virtual environment:
 
 1. First, create and activate a virtual environment:
 ```bash
-# Install virtualenv if you haven't already
-pip install virtualenv
+# Debian/Ubuntu only (one-time): install venv support
+sudo apt install -y python3-venv
 
 # Create a new virtual environment
-virtualenv myvenv
+python3 -m venv .venv
 
 # Activate it
 # On Windows:
-myvenv\Scripts\activate
+.venv\Scripts\activate
 # On Linux:
-source myvenv/bin/activate
+source .venv/bin/activate
 ```
 
 2. Once activated, install the required packages:
 
 ```bash
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 3. Build Writing Tools:
 ```bash
 python pyinstaller-build-script.py
+```
+
+4. (Linux optional) Build a Debian package:
+
+Install nFPM first (one-time) using the official installation instructions:
+https://nfpm.goreleaser.com/docs/install/
+
+```bash
+# Build .deb (outputs to packaging/dist/)
+./build-deb.sh
+
+# Install it
+sudo apt install ./packaging/dist/*.deb
+```
+
+5. (Linux optional) Manual source install without `.deb`:
+```bash
+./install-local-linux.sh
 ```
 
 ### macOS Version (by [Aryamirsepasi](https://github.com/Aryamirsepasi)) build instructions:
