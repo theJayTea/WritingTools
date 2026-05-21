@@ -1,0 +1,256 @@
+# Dutch translations for PACKAGE package.
+# Copyright (C) 2025 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#  <momos1796@gmail.com>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-28 19:44+0100\n"
+"PO-Revision-Date: 2025-01-27 22:14+0100\n"
+"Last-Translator: contact@caduffy.com\n"
+"Language-Team: Dutch\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.5\n"
+
+#: ui/AboutWindow.py:44
+msgid "Over 'Writing Tools'"
+msgstr ""
+
+#: ui/AboutWindow.py:49
+msgid ""
+"Writing Tools is een gratis en lichtgewicht tool die je helpt je schrijven "
+"te verbeteren met AI, vergelijkbaar met Apple's nieuwe functie Apple Intelligence. Het werkt "
+"met een breed assortiment AI LLM's, zowel online als lokaal."
+msgstr ""
+
+#: ui/AboutWindow.py:54
+msgid "Met zorg gemaakt door Jesai, een student in het voortgezet onderwijs."
+msgstr ""
+
+#: ui/AboutWindow.py:55
+msgid "Kijk ook eens naar mijn andere AI-app"
+msgstr ""
+
+#: ui/AboutWindow.py:55
+msgid "Het is een nieuwe AI-tutor die gratis is in de Google Play Store :)"
+msgstr ""
+
+#: ui/AboutWindow.py:56
+msgid "Contact opnemen"
+msgstr ""
+
+#: ui/AboutWindow.py:60
+msgid ""
+"Writing Tools zou niet zijn waar het nu is zonder de <u>fantastische</u> "
+"medewerkers"
+msgstr ""
+
+#: ui/AboutWindow.py:62
+msgid ""
+"SUitgebreide refactored Writing Tools en ondersteuning toegevoegd voor OpenAI Compatible API, "
+"gestreamde reacties en de tekstgeneratiemodus "
+"wanneer er geen tekst is geselecteerd."
+msgstr ""
+
+#: ui/AboutWindow.py:64
+msgid ""
+"Ondersteuning voor Linux toegevoegd, overgestapt op de pynput API om de stabiliteit van Windows te verbeteren. "
+"Ondersteuning voor Ollama API, aangepaste opties en lokalisatie toegevoegd. "
+"Diverse bugs opgelost en ondersteuning voor sierlijke beëindiging toegevoegd door SIGINT-signaal te verwerken."
+msgstr ""
+
+#: ui/AboutWindow.py:66
+msgid ""
+"Helped add dark mode, the plain theme, tray menu fixes, and UI improvements."
+msgstr ""
+
+#: ui/AboutWindow.py:68
+msgid "Verbeterde de betrouwbaarheid van tekstselectie."
+msgstr ""
+
+#: ui/AboutWindow.py:70
+msgid "De afgeronde hoeken anti-aliased en mooier gemaakt."
+msgstr ""
+
+#: ui/AboutWindow.py:72
+msgid ""
+"Het About-venster aanzienlijk verbeterd, scrolbaar gemaakt en dingen opgeschoond."
+"Ook onze .gitignore & requirements.txt verbeterd."
+msgstr ""
+
+#: ui/AboutWindow.py:74
+msgid "Geholpen bij het toevoegen van de start-on-boot instelling."
+msgstr ""
+
+#: ui/CustomPopupWindow.py:75 ui/CustomPopupWindow.py:74
+msgid "Beschrijf je verandering..."
+msgstr ""
+
+#: ui/CustomPopupWindow.py:75 ui/CustomPopupWindow.py:74
+msgid "Vraag je AI..."
+msgstr ""
+
+#: ui/CustomPopupWindow.py:109
+msgid "Proeflezen"
+msgstr ""
+
+#: ui/CustomPopupWindow.py:110
+msgid "Herschrijven"
+msgstr ""
+
+#: ui/CustomPopupWindow.py:111
+msgid "Vriendelijk"
+msgstr ""
+
+#: ui/CustomPopupWindow.py:112
+msgid "Professioneel"
+msgstr ""
+
+#: ui/CustomPopupWindow.py:113
+msgid "Beknopt"
+msgstr ""
+
+#: ui/CustomPopupWindow.py:114
+msgid "Overzicht"
+msgstr ""
+
+#: ui/CustomPopupWindow.py:115
+msgid "Kernpunten"
+msgstr ""
+
+#: ui/CustomPopupWindow.py:116
+msgid "Tafel"
+msgstr ""
+
+#: ui/OnboardingWindow.py:24 ui/OnboardingWindow.py:40
+#: ui/OnboardingWindow.py:26 ui/OnboardingWindow.py:42
+msgid "Welkom bij 'Writing Tools'"
+msgstr ""
+
+#: ui/OnboardingWindow.py:45 ui/OnboardingWindow.py:47
+msgid ""
+"Optimaliseer je schrijfwerk direct met AI door je tekst te selecteren en"
+"Writing Tools op te roepen met \"ctrl+space\", waar dan ook."
+msgstr ""
+
+#: ui/OnboardingWindow.py:47 ui/OnboardingWindow.py:49
+msgid ""
+"Maak een samenvatting van artikelen, YouTube-video's of documenten "
+"waarmee je kunt chatten door alle tekst te selecteren met \"ctrl+a\""
+msgstr ""
+
+#: ui/OnboardingWindow.py:48 ui/OnboardingWindow.py:50
+msgid ""
+"(of selecteer het YouTube-transcript in de beschrijving), Roep "
+"Writing Tools op en kies overzicht."
+msgstr ""
+
+#: ui/OnboardingWindow.py:50 ui/OnboardingWindow.py:52
+msgid ""
+"Chat op elk moment met AI door Writing Tools op te roepen zonder tekst te selecteren."
+msgstr ""
+
+#: ui/OnboardingWindow.py:52 ui/OnboardingWindow.py:54
+msgid "Ondersteunt een groot aantal AI-modellen:"
+msgstr ""
+
+#: ui/OnboardingWindow.py:53 ui/OnboardingWindow.py:55
+msgid "Gemini 2.0"
+msgstr ""
+
+#: ui/OnboardingWindow.py:54 ui/OnboardingWindow.py:56
+msgid "Elke OpenAI Compatibel API — inclusief lokale LLMs!"
+msgstr ""
+
+#: ui/OnboardingWindow.py:75 ui/OnboardingWindow.py:77
+msgid "Kies je thema:"
+msgstr ""
+
+#: ui/OnboardingWindow.py:80 ui/OnboardingWindow.py:82
+msgid "Gradiënt"
+msgstr ""
+
+#: ui/OnboardingWindow.py:81 ui/SettingsWindow.py:239 ui/OnboardingWindow.py:83
+#: ui/SettingsWindow.py:244
+msgid "Gewoon"
+msgstr ""
+
+#: ui/OnboardingWindow.py:90 ui/OnboardingWindow.py:92
+msgid "Volgende"
+msgstr ""
+
+#: ui/ResponseWindow.py:301 ui/ResponseWindow.py:303
+msgid "Antword"
+msgstr ""
+
+#: ui/ResponseWindow.py:379 ui/ResponseWindow.py:385
+msgid "Selecteer om te kopiëren met opmaak"
+msgstr ""
+
+#: ui/ResponseWindow.py:384 ui/ResponseWindow.py:390
+msgid "Kopiëren als Markdown"
+msgstr ""
+
+#: ui/ResponseWindow.py:395 ui/ResponseWindow.py:507 ui/ResponseWindow.py:509
+#: ui/ResponseWindow.py:516 ui/ResponseWindow.py:520 ui/ResponseWindow.py:401
+#: ui/ResponseWindow.py:513 ui/ResponseWindow.py:515 ui/ResponseWindow.py:522
+#: ui/ResponseWindow.py:526
+msgid "Denken"
+msgstr ""
+
+#: ui/ResponseWindow.py:429 ui/ResponseWindow.py:530 ui/ResponseWindow.py:435
+#: ui/ResponseWindow.py:536
+msgid "Stel een vervolgvraag"
+msgstr ""
+
+#: ui/SettingsWindow.py:32 ui/SettingsWindow.py:151 ui/SettingsWindow.py:205
+#: WritingToolApp.py:568 ui/SettingsWindow.py:37 ui/SettingsWindow.py:156
+#: ui/SettingsWindow.py:210 WritingToolApp.py:569
+msgid "Settings"
+msgstr ""
+
+#: ui/SettingsWindow.py:211 ui/SettingsWindow.py:216
+msgid "Start bij opstarten"
+msgstr ""
+
+#: ui/SettingsWindow.py:218 ui/SettingsWindow.py:223
+msgid "Sneltoets:"
+msgstr ""
+
+#: ui/SettingsWindow.py:233 ui/SettingsWindow.py:238
+msgid "Achtergrondthema:"
+msgstr ""
+
+#: ui/SettingsWindow.py:238 ui/SettingsWindow.py:243
+msgid "Wazig verloop"
+msgstr ""
+
+#: ui/SettingsWindow.py:250 ui/SettingsWindow.py:255
+msgid "Kies AI-aanbieder:"
+msgstr ""
+
+#: ui/SettingsWindow.py:307 ui/SettingsWindow.py:312
+msgid "AI-instelling voltooien"
+msgstr ""
+
+#: ui/SettingsWindow.py:307 ui/SettingsWindow.py:312
+msgid "Opslaan"
+msgstr ""
+
+#: ui/SettingsWindow.py:326 ui/SettingsWindow.py:331
+msgid "Start Writing Tools opnieuw op om de wijzigingen door te voeren."
+msgstr ""
+
+#: WritingToolApp.py:571 WritingToolApp.py:572
+msgid "Over"
+msgstr ""
+
+#: WritingToolApp.py:574 WritingToolApp.py:575
+msgid "Uitgang"
+msgstr ""
