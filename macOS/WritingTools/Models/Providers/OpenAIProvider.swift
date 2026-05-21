@@ -44,13 +44,13 @@ final class OpenAIProvider: AIProvider {
             isProcessing = false
         }
 
-        guard !config.apiKey.isEmpty else {
-            throw NSError(domain: "OpenAIAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "API key is missing."])
-        }
-
         // Check for custom Base URL
         if !config.baseURL.isEmpty && config.baseURL != OpenAIConfig.defaultBaseURL {
             return try await Self.performCustomOpenAIRequest(config: config, systemPrompt: systemPrompt, userPrompt: userPrompt, images: images)
+        }
+
+        guard !config.apiKey.isEmpty else {
+            throw NSError(domain: "OpenAIAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "API key is missing."])
         }
 
         let baseURL = config.baseURL.isEmpty ? OpenAIConfig.defaultBaseURL : config.baseURL
@@ -141,7 +141,9 @@ final class OpenAIProvider: AIProvider {
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.setValue("Bearer \(config.apiKey)", forHTTPHeaderField: "Authorization")
+        if !config.apiKey.isEmpty {
+            request.setValue("Bearer \(config.apiKey)", forHTTPHeaderField: "Authorization")
+        }
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.timeoutInterval = 60
         
@@ -236,7 +238,9 @@ final class OpenAIProvider: AIProvider {
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.setValue("Bearer \(config.apiKey)", forHTTPHeaderField: "Authorization")
+        if !config.apiKey.isEmpty {
+            request.setValue("Bearer \(config.apiKey)", forHTTPHeaderField: "Authorization")
+        }
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.timeoutInterval = 60
         
@@ -318,10 +322,6 @@ final class OpenAIProvider: AIProvider {
             activeTask = nil
         }
         
-        guard !config.apiKey.isEmpty else {
-            throw NSError(domain: "OpenAIAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "API key is missing."])
-        }
-        
         // For custom base URLs, use manual SSE streaming
         if !config.baseURL.isEmpty && config.baseURL != OpenAIConfig.defaultBaseURL {
             let config = self.config
@@ -337,6 +337,10 @@ final class OpenAIProvider: AIProvider {
             activeTask = streamTask
             try await streamTask.value
             return
+        }
+
+        guard !config.apiKey.isEmpty else {
+            throw NSError(domain: "OpenAIAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "API key is missing."])
         }
         
         let baseURL = config.baseURL.isEmpty ? OpenAIConfig.defaultBaseURL : config.baseURL
