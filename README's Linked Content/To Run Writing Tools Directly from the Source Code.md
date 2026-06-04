@@ -34,5 +34,13 @@ Of course, you'll need to have [Python installed](https://www.python.org/downloa
    python3 main.py
    ```
 
+If you want a launcher icon in your app menu and a reusable local install (so you do not need to run from terminal every day), use:
+
+```bash
+bash build-and-install-local-linux.sh
+```
+
+from the `Windows_and_Linux` folder.
+
 
 ### [**◀️ Back to main page**](https://github.com/theJayTea/WritingTools)
