@@ -587,9 +587,17 @@ class OpenAICompatibleProvider(AIProvider):
 class OllamaProvider(AIProvider):
     """
     Provider for connecting to an Ollama server.
-    
+
     Uses the /chat endpoint of the Ollama server to generate a response.
     Streaming is not used.
+
+    Thinking is explicitly disabled (`think=False`) so reasoning-capable
+    models like qwen3 / deepseek-r1 / gpt-oss don't burn latency on an
+    internal chain-of-thought before answering. For GPT-OSS specifically,
+    Ollama only accepts string levels ("low" / "medium" / "high") instead
+    of a boolean, so we use "low" — the closest to "off" it offers.
+
+    Reference: https://docs.ollama.com/capabilities/thinking
     """
     def __init__(self, app):
         self.close_requested = None
@@ -598,17 +606,40 @@ class OllamaProvider(AIProvider):
         settings = [
             TextSetting("api_base", "API Base URL", "http://localhost:11434", "E.g. http://localhost:11434"),
             TextSetting("api_model", "API Model", "llama3.1:8b", "E.g. llama3.1:8b"),
-            TextSetting("keep_alive", "Time to keep the model loaded in memory in minutes", "5", "E.g. 5")
+            TextSetting("keep_alive", "Time to keep the model loaded in memory in minutes", "5", "E.g. 5"),
+            # num_ctx default 4096: Ollama's default of 2048 is too small for our
+            # system prompt + long user input, which used to cause silent truncation.
+            TextSetting("num_ctx", "Context window size (num_ctx)", "4096", "E.g. 4096. Larger = more memory, but supports longer inputs."),
+            # num_predict cap bounds latency and prevents runaway generation on local
+            # models. Our responses (proofread/rewrite/summary) are short by design.
+            TextSetting("num_predict", "Max output tokens (num_predict)", "1000", "E.g. 1000. Caps response length to bound latency."),
+            # 0.4 is a good writing-assistant default — deterministic enough for
+            # proofreading, not robotic for rewrites. Range is 0.0–1.0.
+            TextSetting("temperature", "Temperature", "0.4", "0.0 = deterministic, 1.0 = creative. 0.4 is a good writing-assistant default."),
         ]
         super().__init__(app, "Ollama (For Experts)", settings,
             "• Connect to an Ollama server (local LLM).",
             "ollama", "Ollama Set-up Instructions",
             lambda: webbrowser.open("https://github.com/theJayTea/WritingTools?tab=readme-ov-file#-optional-ollama-local-llm-instructions-for-windows-v7-onwards"))
 
+    def _safe_int(self, value, default):
+        """Parse a TextSetting value as int, falling back to `default` on bad input."""
+        try:
+            return int(value) if str(value).strip() else default
+        except (ValueError, TypeError):
+            return default
+
+    def _safe_float(self, value, default):
+        """Parse a TextSetting value as float, falling back to `default` on bad input."""
+        try:
+            return float(value) if str(value).strip() else default
+        except (ValueError, TypeError):
+            return default
+
     def get_response(self, system_instruction: str, prompt: str | list, return_response: bool = False) -> str:
         """
         Send a chat request to the Ollama server.
-        
+
         Always performs a non-streaming request.
         Returns the response text if return_response is True,
         otherwise emits it via output_ready_signal.
@@ -623,8 +654,23 @@ class OllamaProvider(AIProvider):
                 {"role": "user", "content": prompt}
             ]
 
+        # GPT-OSS only accepts string think levels; everything else accepts bool.
+        # "low" is the closest to "off" GPT-OSS offers.
+        think_value = "low" if "gpt-oss" in (self.api_model or "").lower() else False
+
+        options = {
+            "num_ctx": self._safe_int(getattr(self, "num_ctx", None), 4096),
+            "num_predict": self._safe_int(getattr(self, "num_predict", None), 1000),
+            "temperature": self._safe_float(getattr(self, "temperature", None), 0.4),
+        }
+
         try:
-            response = self.client.chat(model=self.api_model, messages=messages)
+            response = self.client.chat(
+                model=self.api_model,
+                messages=messages,
+                think=think_value,
+                options=options,
+            )
             response_text = response['message']['content'].strip()
             if not return_response and not hasattr(self.app, 'current_response_window'):
                 self.app.output_ready_signal.emit(response_text)
