@@ -25,6 +25,9 @@ class HistoryEntryWidget(QtWidgets.QWidget):
     owning HistoryWindow so only one entry is expanded at a time.
     """
 
+    # Emitted when the user requests deletion of this entry.
+    on_delete_requested = None
+
     def __init__(self, entry, parent=None):
         super().__init__(parent)
         self.entry = entry or {}
@@ -44,6 +47,34 @@ class HistoryEntryWidget(QtWidgets.QWidget):
             root_layout = QtWidgets.QVBoxLayout(self)
             root_layout.setContentsMargins(0, 0, 0, 0)
             root_layout.setSpacing(6)
+
+            # Horizontal row: [delete button] [preview/title button]
+            self.row_widget = QtWidgets.QWidget()
+            row_layout = QtWidgets.QHBoxLayout(self.row_widget)
+            row_layout.setContentsMargins(0, 0, 0, 0)
+            row_layout.setSpacing(6)
+
+            self.delete_button = QtWidgets.QPushButton("×")
+            self.delete_button.setFixedSize(28, 28)
+            self.delete_button.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
+            self.delete_button.setToolTip(_("Delete this entry"))
+            self.delete_button.setStyleSheet(f"""
+                QPushButton {{
+                    text-align: center;
+                    font-size: 16px;
+                    font-weight: bold;
+                    border-radius: 6px;
+                    background-color: {'#3a3a3a' if colorMode == 'dark' else '#e0e0e0'};
+                    color: {'#ff6b6b' if colorMode == 'dark' else '#cc0000'};
+                    border: 1px solid {'#555555' if colorMode == 'dark' else '#cccccc'};
+                }}
+                QPushButton:hover {{
+                    background-color: {'#ff6b6b' if colorMode == 'dark' else '#ff6b6b'};
+                    color: {'#ffffff' if colorMode == 'dark' else '#ffffff'};
+                }}
+            """)
+            self.delete_button.clicked.connect(self._on_delete_clicked)
+            row_layout.addWidget(self.delete_button)
 
             self.preview_button = QtWidgets.QToolButton()
             self.preview_button.setCheckable(True)
@@ -74,7 +105,9 @@ class HistoryEntryWidget(QtWidgets.QWidget):
                 }}
             """)
             self.preview_button.toggled.connect(self._toggle_expanded)
-            root_layout.addWidget(self.preview_button)
+            row_layout.addWidget(self.preview_button, 1)
+
+            root_layout.addWidget(self.row_widget)
 
             self.details_widget = QtWidgets.QWidget()
             self.details_widget.setVisible(False)
@@ -115,6 +148,11 @@ class HistoryEntryWidget(QtWidgets.QWidget):
         except Exception as e:
             logging.error(f'HistoryEntryWidget._build_ui failed: {e}', exc_info=True)
             raise
+
+    def _on_delete_clicked(self):
+        entry_id = self.entry.get('id')
+        if entry_id and callable(self.on_delete_requested):
+            self.on_delete_requested(entry_id)
 
     def _toggle_expanded(self, expanded):
         self.preview_button.setArrowType(
@@ -232,10 +270,13 @@ class HistoryWindow(QtWidgets.QWidget):
         self.scroll_content = None
         self.entries_layout = None
         self.entry_widgets = []
+        self.search_input = None
         # Persist size/position between openings so the window reliably
         # re-appears where the user last left it (and not off-screen on
         # multi-monitor setups).
         self._settings = QSettings('WritingTools', 'HistoryWindow')
+        # Callback wired by HistoryManager to handle deletion.
+        self._on_delete_entry = None
         self._build_ui()
         self._restore_geometry()
         # When the window closes, snapshot the current geometry for next time.
@@ -297,6 +338,22 @@ class HistoryWindow(QtWidgets.QWidget):
             self.subtitle_label.setWordWrap(True)
             content_layout.addWidget(self.subtitle_label)
 
+            # Search bar
+            self.search_input = QtWidgets.QLineEdit()
+            self.search_input.setPlaceholderText(_("Search history..."))
+            self.search_input.setStyleSheet(f"""
+                QLineEdit {{
+                    padding: 8px 12px;
+                    border-radius: 6px;
+                    border: 1px solid {'#555555' if colorMode == 'dark' else '#cccccc'};
+                    background-color: {'#2a2a2a' if colorMode == 'dark' else '#ffffff'};
+                    color: {'#ffffff' if colorMode == 'dark' else '#222222'};
+                    font-size: 13px;
+                }}
+            """)
+            self.search_input.textChanged.connect(self._on_search_text_changed)
+            content_layout.addWidget(self.search_input)
+
             self.empty_label = QtWidgets.QLabel(_("No history yet."))
             self.empty_label.setStyleSheet(
                 f"font-size: 14px; color: {'#d0d0d0' if colorMode == 'dark' else '#666666'};"
@@ -329,6 +386,40 @@ class HistoryWindow(QtWidgets.QWidget):
         self.history_entries = entries or []
         self._render_entries()
 
+    def set_on_delete_entry(self, callback):
+        """
+        Set the callback invoked when the user confirms deletion of an entry.
+        Signature: callback(entry_id: str) -> None
+        """
+        self._on_delete_entry = callback
+
+    def _filtered_entries(self):
+        query = (self.search_input.text() or '').strip().lower() if self.search_input else ''
+        if not query:
+            return self.history_entries
+
+        filtered = []
+        for entry in self.history_entries:
+            # Search across all relevant text fields
+            searchable_parts = [
+                str(entry.get('input') or ''),
+                str(entry.get('output') or ''),
+                str(entry.get('option') or ''),
+                str(entry.get('timestamp') or ''),
+            ]
+            # Also include conversation content
+            conversation = entry.get('conversation') or []
+            if isinstance(conversation, list):
+                for turn in conversation:
+                    if isinstance(turn, dict):
+                        searchable_parts.append(str(turn.get('content') or ''))
+
+            full_text = ' '.join(searchable_parts).lower()
+            if query in full_text:
+                filtered.append(entry)
+
+        return filtered
+
     def _render_entries(self):
         # Wipe any existing entry widgets.
         try:
@@ -337,19 +428,28 @@ class HistoryWindow(QtWidgets.QWidget):
             logging.error(f'Failed to clear entries layout: {e}', exc_info=True)
         self.entry_widgets = []
 
-        if not self.history_entries:
+        entries = self._filtered_entries()
+
+        if not entries:
             self.empty_label.setVisible(True)
+            # Update label text based on whether there is history but no match
+            if self.history_entries and (self.search_input and self.search_input.text().strip()):
+                self.empty_label.setText(_("No matching entries."))
+            else:
+                self.empty_label.setText(_("No history yet."))
             # Re-add the trailing stretch that clear_layout removed.
             self.entries_layout.addStretch()
             return
 
         self.empty_label.setVisible(False)
 
-        for entry in self.history_entries:
+        for entry in entries:
             entry_widget = HistoryEntryWidget(entry)
             # Wire the accordion: when this entry expands, collapse all
             # sibling entries that are currently expanded.
             entry_widget.on_expanded_changed = self._on_entry_expanded_changed
+            # Wire deletion
+            entry_widget.on_delete_requested = self._on_entry_delete_requested
             self.entry_widgets.append(entry_widget)
             self.entries_layout.addWidget(entry_widget)
 
@@ -376,13 +476,45 @@ class HistoryWindow(QtWidgets.QWidget):
                 # blocking signals suppresses the toggled() slot.
                 entry_widget._toggle_expanded(False)
 
+    def _on_entry_delete_requested(self, entry_id):
+        """
+        Show a confirmation dialog before proceeding with deletion.
+        """
+        reply = QtWidgets.QMessageBox.question(
+            self,
+            _("Delete Entry"),
+            _("Are you sure you want to delete this history entry?"),
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
+            QtWidgets.QMessageBox.StandardButton.No
+        )
+        if reply == QtWidgets.QMessageBox.StandardButton.Yes:
+            if callable(self._on_delete_entry):
+                try:
+                    self._on_delete_entry(entry_id)
+                except Exception as e:
+                    logging.error(f'on_delete_entry callback failed: {e}', exc_info=True)
+
+    def _on_search_text_changed(self):
+        self._render_entries()
+
     def retranslate_ui(self):
         self.setWindowTitle(_("History"))
         self.title_label.setText(_("History"))
         self.subtitle_label.setText(
             _("Click a title to expand the full conversation. Only one entry is open at a time.")
         )
-        self.empty_label.setText(_("No history yet."))
+        if self.search_input:
+            self.search_input.setPlaceholderText(_("Search history..."))
+
+        # Retranslate based on current state
+        entries = self._filtered_entries()
+        if not entries:
+            if self.history_entries and (self.search_input and self.search_input.text().strip()):
+                self.empty_label.setText(_("No matching entries."))
+            else:
+                self.empty_label.setText(_("No history yet."))
+        else:
+            self.empty_label.setText(_("No history yet."))
 
         for entry_widget in self.entry_widgets:
             entry_widget.retranslate_ui()

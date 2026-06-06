@@ -279,6 +279,26 @@ class HistoryManager:
         self._save_history_entries()
         self._emit_updated()
 
+    def delete_entry(self, entry_id):
+        """
+        Remove a single history entry by its id.
+        """
+        if not entry_id:
+            return False
+
+        with self._history_lock:
+            original_len = len(self.history_entries)
+            self.history_entries = [
+                e for e in self.history_entries if e.get('id') != entry_id
+            ]
+            deleted = len(self.history_entries) < original_len
+
+        if deleted:
+            self._save_history_entries()
+            self._emit_updated()
+            self.refresh_window()
+        return deleted
+
     def set_pending_inline_history(self, option, input_text):
         """
         Cache inline request metadata until replacement output arrives.
@@ -348,6 +368,7 @@ class HistoryManager:
         try:
             if not self.history_window:
                 self.history_window = ui.HistoryWindow.HistoryWindow()
+                self.history_window.set_on_delete_entry(self.delete_entry)
             self.history_window.set_history_entries(self.snapshot())
 
             # Restore from minimized state if needed — `show()` alone won't
