@@ -7,8 +7,9 @@ protocol AIProvider {
     // Indicates if provider is processing a request
     var isProcessing: Bool { get set }
 
-    // Process text with optional system prompt and images
-    func processText(systemPrompt: String?, userPrompt: String, images: [Data], streaming: Bool) async throws -> String
+    // Process text with optional system prompt and images (non-streaming).
+    // Streaming is handled exclusively by `processTextStreaming`.
+    func processText(systemPrompt: String?, userPrompt: String, images: [Data]) async throws -> String
     
     /// Process text with streaming support - calls onChunk for each token received
     /// Default implementation falls back to non-streaming
@@ -35,8 +36,7 @@ extension AIProvider {
         let result = try await processText(
             systemPrompt: systemPrompt,
             userPrompt: userPrompt,
-            images: images,
-            streaming: false
+            images: images
         )
         onChunk(result)
     }
@@ -75,6 +75,26 @@ func detectAnthropicMediaType(_ data: Data) -> AnthropicImageMediaType {
         return .webp
     }
     return .jpeg
+}
+
+// MARK: - Streaming Helpers
+
+/// Awaits a detached streaming `task` while forwarding the calling task's
+/// cancellation to it.
+///
+/// Providers run their SSE byte reading and per-chunk JSON decoding inside a
+/// `Task.detached` so that work happens off the main actor (decoding hundreds
+/// of chunks on the main thread during a long generation janks the UI). They
+/// hop back to the main actor only to deliver each chunk via the `@MainActor`
+/// `onChunk` closure. This helper keeps `provider.cancel()` (which cancels the
+/// stored task) *and* an upstream task cancellation both able to interrupt the
+/// stream promptly.
+nonisolated func awaitForwardingCancellation(_ task: Task<Void, any Error>) async throws {
+    try await withTaskCancellationHandler {
+        try await task.value
+    } onCancel: {
+        task.cancel()
+    }
 }
 
 // MARK: - Retry Utility for API Calls

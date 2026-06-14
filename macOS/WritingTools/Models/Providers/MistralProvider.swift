@@ -37,7 +37,7 @@ final class MistralProvider: AIProvider {
         self.config = config
     }
     
-    func processText(systemPrompt: String? = "You are a helpful writing assistant.", userPrompt: String, images: [Data] = [], streaming: Bool = false) async throws -> String {
+    func processText(systemPrompt: String? = "You are a helpful writing assistant.", userPrompt: String, images: [Data] = []) async throws -> String {
         isProcessing = true
         defer {
             isProcessing = false
@@ -67,36 +67,21 @@ final class MistralProvider: AIProvider {
         messages.append(.user(content: combinedPrompt))
 
         do {
-            if streaming {
-                var compiledResponse = ""
-                let stream = try await mistralService.streamingChatCompletionRequest(body: .init(
-                    messages: messages,
+            try Task.checkCancellation()
+            let requestMessages = messages
+            let response = try await withRetry {
+                try await mistralService.chatCompletionRequest(body: .init(
+                    messages: requestMessages,
                     model: config.model
                 ), secondsToWait: 60)
-
-                for try await chunk in stream {
-                    try Task.checkCancellation()
-                    if let content = chunk.choices.first?.delta.content {
-                        compiledResponse += content
-                    }
-                    if let usage = chunk.usage {
-                        logger.debug("Usage: prompt \(usage.promptTokens ?? 0), completion \(usage.completionTokens ?? 0), total \(usage.totalTokens ?? 0)")
-                    }
-                }
-                return compiledResponse
-
-            } else {
-                try Task.checkCancellation()
-                let requestMessages = messages
-                let response = try await withRetry {
-                    try await mistralService.chatCompletionRequest(body: .init(
-                        messages: requestMessages,
-                        model: config.model
-                    ), secondsToWait: 60)
-                }
-
-                return response.choices.first?.message.content ?? ""
             }
+
+            let content = response.choices.first?.message.content ?? ""
+            guard !content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                throw NSError(domain: "MistralAPI", code: -1,
+                              userInfo: [NSLocalizedDescriptionKey: "No text content in response."])
+            }
+            return content
 
         } catch AIProxyError.unsuccessfulRequest(let statusCode, let responseBody) {
             logger.error("Received non-200 status code: \(statusCode) with response body: \(responseBody)")
@@ -142,24 +127,27 @@ final class MistralProvider: AIProvider {
         }
         messages.append(.user(content: combinedPrompt))
 
-        // Wrap work in a stored task so cancel() can interrupt it
-        let streamTask = Task { @MainActor in
-            let stream = try await mistralService.streamingChatCompletionRequest(body: .init(
-                messages: messages,
-                model: config.model
+        // Run the stream off the main actor; hop to main only for onChunk.
+        let service = mistralService
+        let model = config.model
+        let requestMessages = messages
+        let streamTask = Task.detached {
+            let stream = try await service.streamingChatCompletionRequest(body: .init(
+                messages: requestMessages,
+                model: model
             ), secondsToWait: 60)
 
             for try await chunk in stream {
                 try Task.checkCancellation()
                 if let content = chunk.choices.first?.delta.content {
-                    onChunk(content)
+                    await onChunk(content)
                 }
             }
         }
         activeTask = streamTask
 
         do {
-            try await streamTask.value
+            try await awaitForwardingCancellation(streamTask)
         } catch AIProxyError.unsuccessfulRequest(let statusCode, let responseBody) {
             logger.error("Mistral streaming error (\(statusCode)): \(responseBody)")
             throw NSError(domain: "MistralAPI", code: statusCode,

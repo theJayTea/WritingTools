@@ -23,6 +23,7 @@ final class CommandModelCodingTests: XCTestCase {
         XCTAssertFalse(decoded.isBuiltIn)
         XCTAssertFalse(decoded.hasShortcut)
         XCTAssertFalse(decoded.preserveFormatting)
+        XCTAssertFalse(decoded.isHidden)
         XCTAssertNil(decoded.providerOverride)
         XCTAssertNil(decoded.modelOverride)
         XCTAssertNil(decoded.customProviderBaseURL)
@@ -40,6 +41,7 @@ final class CommandModelCodingTests: XCTestCase {
             isBuiltIn: true,
             hasShortcut: true,
             preserveFormatting: true,
+            isHidden: true,
             providerOverride: "openai",
             modelOverride: "gpt-4o",
             customProviderBaseURL: "https://api.example.com",
@@ -57,6 +59,7 @@ final class CommandModelCodingTests: XCTestCase {
         XCTAssertTrue(decoded.isBuiltIn)
         XCTAssertTrue(decoded.hasShortcut)
         XCTAssertTrue(decoded.preserveFormatting)
+        XCTAssertTrue(decoded.isHidden)
         XCTAssertEqual(decoded.providerOverride, "openai")
         XCTAssertEqual(decoded.modelOverride, "gpt-4o")
         XCTAssertEqual(decoded.customProviderBaseURL, "https://api.example.com")
@@ -95,6 +98,7 @@ final class CommandModelCodingTests: XCTestCase {
         XCTAssertNil(json?["isBuiltIn"])
         XCTAssertNil(json?["hasShortcut"])
         XCTAssertNil(json?["preserveFormatting"])
+        XCTAssertNil(json?["isHidden"])
         // Nil optionals should also be omitted
         XCTAssertNil(json?["providerOverride"])
         XCTAssertNil(json?["modelOverride"])
@@ -112,7 +116,8 @@ final class CommandModelCodingTests: XCTestCase {
             useResponseWindow: true,
             isBuiltIn: true,
             hasShortcut: true,
-            preserveFormatting: true
+            preserveFormatting: true,
+            isHidden: true
         )
 
         let data = try JSONEncoder().encode(command)
@@ -122,6 +127,7 @@ final class CommandModelCodingTests: XCTestCase {
         XCTAssertEqual(json?["isBuiltIn"] as? Bool, true)
         XCTAssertEqual(json?["hasShortcut"] as? Bool, true)
         XCTAssertEqual(json?["preserveFormatting"] as? Bool, true)
+        XCTAssertEqual(json?["isHidden"] as? Bool, true)
     }
 
     // MARK: - Legacy data compatibility
@@ -158,6 +164,7 @@ final class CommandModelCodingTests: XCTestCase {
         XCTAssertFalse(decoded.isBuiltIn)
         XCTAssertFalse(decoded.hasShortcut)
         XCTAssertFalse(decoded.preserveFormatting)
+        XCTAssertFalse(decoded.isHidden)
     }
 
     // MARK: - updatedAt timestamp

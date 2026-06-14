@@ -65,6 +65,9 @@ class LocalModelProvider {
     private var isCancelled = false
 
     @ObservationIgnored
+    private var memoryPressureSource: DispatchSourceMemoryPressure?
+
+    @ObservationIgnored
     private let maxRetries = 3
     
     // Controls whether the model uses its "thinking" mode (if supported).
@@ -181,6 +184,7 @@ class LocalModelProvider {
             MLXRandom.seed(UInt64(Date.timeIntervalSinceReferenceDate * 1000))
 
             observeSettings()
+            startMemoryPressureMonitoring()
             Task { await checkModelStatus() }
 
         } else {
@@ -242,7 +246,11 @@ class LocalModelProvider {
     private func resetModelState() {
         cancelDownload()
         cancel()
-        
+
+        // Releasing the previously-loaded model so switching between local
+        // models doesn't accumulate multiple multi-GB containers in memory.
+        releaseLoadedModelMemory()
+
         loadState = .idle
         modelInfo = ""
         lastError = nil
@@ -662,7 +670,7 @@ class LocalModelProvider {
     }
     
     // Fix #2/#3/#13: Synchronous state reset, no busy-wait, guard against concurrent generation
-    func processText(systemPrompt: String?, userPrompt: String, images: [Data], streaming: Bool = false) async throws -> String {
+    func processText(systemPrompt: String?, userPrompt: String, images: [Data]) async throws -> String {
         guard isPlatformSupported else {
             throw NSError(domain: "LocalLLM", code: -1, userInfo: [NSLocalizedDescriptionKey: "Platform not supported"])
         }
@@ -702,7 +710,7 @@ class LocalModelProvider {
                     systemPrompt: systemPrompt,
                     userPrompt: userPrompt,
                     images: images,
-                    streaming: streaming
+                    streaming: false
                 )
             } else {
                 var combinedPrompt = userPrompt
@@ -717,7 +725,7 @@ class LocalModelProvider {
                     modelContainer: modelContainer,
                     systemPrompt: systemPrompt,
                     userPrompt: combinedPrompt,
-                    streaming: streaming
+                    streaming: false
                 )
             }
         }
@@ -757,7 +765,7 @@ class LocalModelProvider {
         systemPrompt: String?,
         userPrompt: String,
         images: [Data],
-        onChunk: @escaping @MainActor (String) -> Void
+        onChunk: @escaping @Sendable @MainActor (String) -> Void
     ) async throws {
         guard isPlatformSupported else {
             throw NSError(domain: "LocalLLM", code: -1, userInfo: [NSLocalizedDescriptionKey: "Platform not supported"])
@@ -1133,6 +1141,59 @@ class LocalModelProvider {
         running = false
         isProcessing = false
         // Don't cancel download here, that's separate
+    }
+
+    // MARK: - Memory Reclamation
+
+    /// Drops the in-memory model container and returns MLX's cached GPU buffers
+    /// to the system. Safe to call repeatedly. Does NOT touch the on-disk
+    /// weights, so a subsequent generation simply re-loads from disk.
+    private func releaseLoadedModelMemory() {
+        cachedContainer = nil
+        Memory.clearCache()
+    }
+
+    /// Unloads the loaded model and reclaims its memory.
+    ///
+    /// A loaded 4-bit model can pin several GB of unified memory plus GPU
+    /// buffers for the whole app lifetime. We release it when the user switches
+    /// away from the local provider or when the system reports memory pressure.
+    /// `loadState` drops from `.loaded` back to `.downloaded`; the weights stay
+    /// on disk. This is a no-op while a generation or load is in flight so we
+    /// never tear the model out from under active work.
+    func unload() {
+        guard !running, loadState != .loading else { return }
+
+        let hadModel = cachedContainer != nil
+        releaseLoadedModelMemory()
+
+        if case .loaded = loadState {
+            loadState = .downloaded
+        }
+
+        if hadModel {
+            logger.debug("Unloaded local model and cleared GPU cache")
+            logGPUMemoryUsage(at: "unload")
+        }
+    }
+
+    /// Listens for system memory-pressure warnings and proactively unloads the
+    /// model to avoid being jetsammed on memory-constrained Macs.
+    private func startMemoryPressureMonitoring() {
+        let source = DispatchSource.makeMemoryPressureSource(
+            eventMask: [.warning, .critical],
+            queue: .main
+        )
+        source.setEventHandler { [weak self] in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                logger.warning("Memory pressure detected — unloading local model")
+                self.cancel()
+                self.unload()
+            }
+        }
+        source.resume()
+        memoryPressureSource = source
     }
 }
 

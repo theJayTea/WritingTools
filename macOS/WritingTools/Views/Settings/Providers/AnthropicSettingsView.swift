@@ -56,7 +56,7 @@ struct AnthropicSettingsView: View {
                             .textFieldStyle(.roundedBorder)
                             .font(.caption)
                     }
-                    Text("E.g., \(AnthropicModel.claude45Haiku.rawValue), \(AnthropicModel.claude45Sonnet.rawValue), etc.")
+                    Text("E.g., \(AnthropicModel.claude45Haiku.rawValue), \(AnthropicModel.claude46Sonnet.rawValue), etc.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

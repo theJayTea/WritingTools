@@ -88,10 +88,13 @@ final class CommandExecutionEngine {
       appState.isProcessing = false
 
       let selectedText = input.source == .selectedText ? appState.selectedText : "Image selection (OCR)"
+      // Hand the response window its OWN provider instance. The window calls
+      // provider.cancel() when it closes; using the shared singleton (as the
+      // inline `provider` above is) would cancel unrelated in-flight requests.
       openStreamingResponseWindow(
         title: command.name,
         selectedText: selectedText,
-        provider: provider,
+        provider: appState.makeIsolatedProvider(for: command),
         systemPrompt: command.prompt,
         userPrompt: input.userPrompt,
         images: input.images,
@@ -106,9 +109,19 @@ final class CommandExecutionEngine {
     var result = try await provider.processText(
       systemPrompt: command.prompt,
       userPrompt: input.userPrompt,
-      images: input.images,
-      streaming: false
+      images: input.images
     )
+
+    // Never replace the user's selection with empty output. An empty result
+    // (refusal, content filter, truncation) would otherwise delete the selected
+    // text. Surface an error instead and leave the selection untouched.
+    guard !result.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+      throw NSError(
+        domain: "CommandExecution",
+        code: -1,
+        userInfo: [NSLocalizedDescriptionKey: "The AI returned an empty response. Your selected text was left unchanged."]
+      )
+    }
 
     if input.source == .selectedText {
       result = Self.normalizedInlineReplacement(
@@ -174,7 +187,7 @@ final class CommandExecutionEngine {
       openStreamingResponseWindow(
         title: "AI Response",
         selectedText: selectedText.isEmpty ? trimmedInstruction : selectedText,
-        provider: appState.activeProvider,
+        provider: appState.makeIsolatedActiveProvider(),
         systemPrompt: systemPrompt,
         userPrompt: userPrompt,
         images: appState.selectedImages,
@@ -189,9 +202,16 @@ final class CommandExecutionEngine {
     var result = try await appState.activeProvider.processText(
       systemPrompt: systemPrompt,
       userPrompt: userPrompt,
-      images: appState.selectedImages,
-      streaming: false
+      images: appState.selectedImages
     )
+
+    guard !result.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+      throw NSError(
+        domain: "CommandExecution",
+        code: -1,
+        userInfo: [NSLocalizedDescriptionKey: "The AI returned an empty response. Your selected text was left unchanged."]
+      )
+    }
 
     result = Self.normalizedInlineReplacement(
       result,

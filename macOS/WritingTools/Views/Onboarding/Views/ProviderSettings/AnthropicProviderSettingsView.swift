@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AnthropicProviderSettingsView: View {
   @Bindable var settings: AppSettings
-  @State private var modelSelection: AnthropicModel = .claude45Sonnet
+  @State private var modelSelection: AnthropicModel = .claude46Sonnet
 
   var body: some View {
     VStack(alignment: .leading, spacing: 12) {

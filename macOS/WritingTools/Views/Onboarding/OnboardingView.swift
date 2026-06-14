@@ -5,6 +5,7 @@ import ApplicationServices
   @Bindable var appState: AppState
   @Bindable var settings = AppSettings.shared
   @Environment(\.accessibilityReduceMotion) var reduceMotion
+  @Environment(\.openSettings) private var openSettings
 
   @State private var currentStep = 0
   @State private var isAccessibilityGranted = AXIsProcessTrusted()
@@ -181,21 +182,13 @@ import ApplicationServices
 
     // Set the target tab before triggering the action so the pane restores correctly.
     UserDefaults.standard.set("AI Provider", forKey: "lastSettingsTab")
-    NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
 
-    // In an accessory (menu-bar) app there may be no key window after the
-    // onboarding window closes, so the Settings window can open behind other
-    // apps.  Mirror the working pattern from MenuBarMenu: yield once to let
-    // SwiftUI finish presenting the window, then bring it to front.
-    Task { @MainActor in
-      await Task.yield()
-      if let settingsWindow = NSApp.windows.first(where: {
-        $0.identifier?.rawValue == "com_apple_SwiftUI_Settings_window"
-          || $0.title.contains("Settings")
-      }), settingsWindow.isVisible {
-        WindowManager.shared.bringWindowToFront(settingsWindow)
-      }
-    }
+    // Capture existing windows before opening Settings, then use the SwiftUI
+    // environment action (not the private `showSettingsWindow:` selector) and
+    // let WindowManager raise the newly created Settings window to the front.
+    let preexisting = Set(NSApplication.shared.windows.map(\.windowNumber))
+    openSettings()
+    WindowManager.shared.raiseSettingsWindow(excluding: preexisting)
   }
 
   @MainActor

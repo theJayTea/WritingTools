@@ -33,18 +33,12 @@ struct MenuBarMenu: View {
     var body: some View {
         // Settings - use Button with openSettings to ensure proper activation
         Button("Settings") {
+            // Capture which windows exist *before* opening Settings so the new
+            // Settings window can be identified without a localized title or a
+            // private window identifier (both of which proved unreliable).
+            let preexisting = Set(NSApp.windows.map(\.windowNumber))
             openSettings()
-            // For accessory apps, activate after opening so the window
-            // comes to front above other applications.
-            Task { @MainActor in
-                await Task.yield()
-                if let settingsWindow = NSApp.windows.first(where: {
-                    $0.identifier?.rawValue == "com_apple_SwiftUI_Settings_window"
-                        || $0.title.contains("Settings")
-                }), settingsWindow.isVisible {
-                    WindowManager.shared.bringWindowToFront(settingsWindow)
-                }
-            }
+            WindowManager.shared.raiseSettingsWindow(excluding: preexisting)
         }
         .keyboardShortcut(",", modifiers: .command)
         

@@ -103,6 +103,20 @@ class PopupWindow: NSPanel {
       }
     }
 
+    // Let the SwiftUI content report the height it actually needs at this fixed
+    // width, so Dynamic Type or long localized command names that exceed the
+    // per-row estimate above don't get clipped. We only ever grow to fit and
+    // never shrink below the estimate, and we skip this on the very first
+    // layout (before the window has been sized) so the initial appearance keeps
+    // its proven behavior.
+    if hasCompletedInitialLayout, let hosting = retainedHostingView {
+      hosting.layoutSubtreeIfNeeded()
+      let measuredHeight = hosting.fittingSize.height
+      if measuredHeight > contentHeight {
+        contentHeight = measuredHeight
+      }
+    }
+
     guard contentView != nil else { return }
 
     let animate = hasCompletedInitialLayout

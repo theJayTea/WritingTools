@@ -13,15 +13,15 @@ struct AnthropicConfig: Codable, Sendable {
 
 enum AnthropicModel: String, CaseIterable {
     case claude45Haiku = "claude-haiku-4-5"
-    case claude45Sonnet = "claude-sonnet-4-6"
-    case claude41Opus = "claude-opus-4-6"
+    case claude46Sonnet = "claude-sonnet-4-6"
+    case claude46Opus = "claude-opus-4-6"
     case custom
-    
+
     var displayName: String {
         switch self {
         case .claude45Haiku: return "Claude 4.5 Haiku (Fastest, Most Affordable)"
-        case .claude45Sonnet: return "Claude 4.6 Sonnet (Best Coding Model)"
-        case .claude41Opus: return "Claude 4.6 Opus (Most Capable, Expensive)"
+        case .claude46Sonnet: return "Claude 4.6 Sonnet (Best Coding Model)"
+        case .claude46Opus: return "Claude 4.6 Opus (Most Capable, Expensive)"
         case .custom: return "Custom"
         }
     }
@@ -42,8 +42,7 @@ final class AnthropicProvider: AIProvider {
     func processText(
         systemPrompt: String? = "You are a helpful writing assistant.",
         userPrompt: String,
-        images: [Data] = [],
-        streaming: Bool = false
+        images: [Data] = []
     ) async throws -> String {
         isProcessing = true
         defer {
@@ -87,56 +86,30 @@ final class AnthropicProvider: AIProvider {
         )
 
         do {
-            if streaming {
-                var compiledResponse = ""
-                let stream = try await anthropicService.streamingMessageRequest(
+            try Task.checkCancellation()
+            let response = try await withRetry {
+                try await anthropicService.messageRequest(
                     body: requestBody,
                     secondsToWait: 60
                 )
+            }
+            var compiledResponse = ""
 
-                for try await event in stream {
-                    try Task.checkCancellation()
-                    guard case let .contentBlockDelta(contentBlockDelta) = event else {
-                        continue
-                    }
+            for content in response.content {
+                switch content {
+                case .textBlock(let textBlock):
+                    compiledResponse += textBlock.text
+                case .toolUseBlock(let toolUseBlock):
+                    logger.debug("Anthropic tool use: \(toolUseBlock.name) input: \(toolUseBlock.input)")
+                case .serverToolUseBlock(let serverToolUseBlock):
+                    logger.debug("Anthropic server tool use: \(serverToolUseBlock.name) input: \(serverToolUseBlock.input)")
+                case .thinkingBlock, .redactedThinkingBlock, .webSearchToolResultBlock, .futureProof:
+                    continue
+                }
+            }
 
-                    switch contentBlockDelta.delta {
-                    case .textDelta(let textDelta):
-                        compiledResponse += textDelta.text
-                    case .inputJSONDelta, .citationsDelta, .thinkingDelta, .signatureDelta, .futureProof:
-                        continue
-                    }
-                }
-
-                if !compiledResponse.isEmpty {
-                    return compiledResponse
-                }
-            } else {
-                try Task.checkCancellation()
-                let response = try await withRetry {
-                    try await anthropicService.messageRequest(
-                        body: requestBody,
-                        secondsToWait: 60
-                    )
-                }
-                var compiledResponse = ""
-
-                for content in response.content {
-                    switch content {
-                    case .textBlock(let textBlock):
-                        compiledResponse += textBlock.text
-                    case .toolUseBlock(let toolUseBlock):
-                        logger.debug("Anthropic tool use: \(toolUseBlock.name) input: \(toolUseBlock.input)")
-                    case .serverToolUseBlock(let serverToolUseBlock):
-                        logger.debug("Anthropic server tool use: \(serverToolUseBlock.name) input: \(serverToolUseBlock.input)")
-                    case .thinkingBlock, .redactedThinkingBlock, .webSearchToolResultBlock, .futureProof:
-                        continue
-                    }
-                }
-
-                if !compiledResponse.isEmpty {
-                    return compiledResponse
-                }
+            if !compiledResponse.isEmpty {
+                return compiledResponse
             }
 
             throw NSError(
@@ -195,10 +168,13 @@ final class AnthropicProvider: AIProvider {
             system: systemPrompt.map(AnthropicSystemPrompt.text)
         )
 
-        // Wrap work in a stored task so cancel() can interrupt it
-        let streamTask = Task { @MainActor in
-            let stream = try await anthropicService.streamingMessageRequest(
-                body: requestBody,
+        // Run the stream off the main actor (decode work stays off the UI
+        // thread); hop to the main actor only to deliver each chunk.
+        let service = anthropicService
+        let body = requestBody
+        let streamTask = Task.detached {
+            let stream = try await service.streamingMessageRequest(
+                body: body,
                 secondsToWait: 60
             )
             for try await event in stream {
@@ -206,7 +182,7 @@ final class AnthropicProvider: AIProvider {
                 guard case let .contentBlockDelta(contentBlockDelta) = event else { continue }
                 switch contentBlockDelta.delta {
                 case .textDelta(let textDelta):
-                    onChunk(textDelta.text)
+                    await onChunk(textDelta.text)
                 case .inputJSONDelta, .citationsDelta, .thinkingDelta, .signatureDelta, .futureProof:
                     continue
                 }
@@ -215,7 +191,7 @@ final class AnthropicProvider: AIProvider {
         activeTask = streamTask
 
         do {
-            try await streamTask.value
+            try await awaitForwardingCancellation(streamTask)
         } catch AIProxyError.unsuccessfulRequest(let statusCode, let responseBody) {
             logger.error("Anthropic streaming error (\(statusCode)): \(responseBody)")
             throw NSError(domain: "AnthropicAPI", code: statusCode,

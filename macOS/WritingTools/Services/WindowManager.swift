@@ -9,6 +9,7 @@ class WindowManager: NSObject, NSWindowDelegate {
 
     private var onboardingWindow: NSWindow?
     private var aboutWindow: NSWindow?
+    private var settingsWindow: NSWindow?
 
     // Track a single PopupWindow
     private var popupWindow: PopupWindow?
@@ -44,13 +45,54 @@ class WindowManager: NSObject, NSWindowDelegate {
 
     /// Activates the app and brings the given window to the front.
     ///
-    /// Accessory apps (`NSApp.activationPolicy == .accessory`) don't appear in the
-    /// Dock, so `NSApp.activate()` alone may not suffice. `orderFrontRegardless()`
-    /// ensures the window appears above other apps even if activation is delayed.
+    /// All callers here (About, Settings, Onboarding, response windows) are
+    /// explicit, user-invoked `.normal`-level windows. For an accessory
+    /// (menu-bar, no-Dock) app, `NSApp.activate()` + `makeKeyAndOrderFront`
+    /// alone frequently leaves such a window *behind* the app the user was last
+    /// in — so `orderFrontRegardless()` is required to actually surface it.
+    ///
+    /// This is NOT the focus-stealing anti-pattern: the popup deliberately does
+    /// not use this method (it rides the high `.popUpMenu` window level instead),
+    /// so restoring `orderFrontRegardless()` here cannot interfere with typing in
+    /// another app during a capture.
     func bringWindowToFront(_ window: NSWindow) {
         NSApp.activate()
         window.makeKeyAndOrderFront(nil)
         window.orderFrontRegardless()
+    }
+
+    /// Brings the SwiftUI `Settings` scene window to the front after
+    /// `openSettings()` has been invoked.
+    ///
+    /// `preexistingWindowNumbers` must be captured *before* calling
+    /// `openSettings()`. The Settings window is then identified as the newly
+    /// created titled window — locale-independent and without depending on the
+    /// SwiftUI Settings window's private identifier, which varies across macOS
+    /// versions. Once found it is cached so a later re-open can raise it directly.
+    func raiseSettingsWindow(excluding preexistingWindowNumbers: Set<Int>) {
+        Task { @MainActor in
+            for _ in 0..<30 {
+                // Reuse a previously-identified Settings window once it's visible.
+                if let cached = settingsWindow, cached.isVisible {
+                    bringWindowToFront(cached)
+                    return
+                }
+                // Otherwise it's the titled window that wasn't open beforehand.
+                if let newWindow = NSApp.windows.first(where: {
+                    !preexistingWindowNumbers.contains($0.windowNumber)
+                        && $0.isVisible
+                        && $0.styleMask.contains(.titled)
+                        && !($0 is PopupWindow)
+                }) {
+                    settingsWindow = newWindow
+                    bringWindowToFront(newWindow)
+                    return
+                }
+                try? await Task.sleep(for: .milliseconds(20))
+            }
+            // Last resort: at least bring the app forward.
+            NSApp.activate()
+        }
     }
 
     func removeResponseWindow(_ window: ResponseWindow) {

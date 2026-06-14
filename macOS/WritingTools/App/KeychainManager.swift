@@ -132,17 +132,24 @@ actor KeychainManager {
     
     // MARK: - Clear All
     
+    /// Removes every API key this app stores under its Keychain service.
+    ///
+    /// This covers both the named provider keys and the per-command custom
+    /// provider keys (whose account names are UUID-suffixed and can't be
+    /// enumerated individually). Matching on the service alone with
+    /// `kSecAttrSynchronizableAny` deletes the local and iCloud-synced copies
+    /// in a single pass. Unlike the previous implementation, failures are
+    /// surfaced to the caller instead of being silently swallowed.
     func clearAllApiKeys() throws {
-        let apiKeyNames = [
-            "gemini_api_key",
-            "openai_api_key",
-            "mistral_api_key",
-            "anthropic_api_key",
-            "openrouter_api_key"
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: Self.serviceName,
+            kSecAttrSynchronizable as String: kSecAttrSynchronizableAny
         ]
-        
-        for keyName in apiKeyNames {
-            try? delete(forKey: keyName)
+
+        let status = SecItemDelete(query as CFDictionary)
+        guard status == errSecSuccess || status == errSecItemNotFound else {
+            throw KeychainError.failedToDelete(status)
         }
     }
     
@@ -287,6 +294,22 @@ actor KeychainManager {
     /// Synchronous retrieve from synchronizable keychain for use from non-async contexts.
     nonisolated func bootstrapRetrieveSynchronizable(forKey key: String) -> String? {
         bootstrapRetrieve(forKey: key, scope: .any)
+    }
+
+    /// Synchronous "clear all API keys" for non-async contexts such as
+    /// `AppSettings.resetAll()`, where the deletion must complete before the
+    /// app shows a "Reset Complete" confirmation or relaunches. Mirrors the
+    /// async `clearAllApiKeys()` (service-wide delete across both scopes).
+    /// Returns `true` on success or when nothing was present.
+    @discardableResult
+    nonisolated func clearAllApiKeysSync() -> Bool {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: Self.serviceName,
+            kSecAttrSynchronizable as String: kSecAttrSynchronizableAny
+        ]
+        let status = SecItemDelete(query as CFDictionary)
+        return status == errSecSuccess || status == errSecItemNotFound
     }
 
     // MARK: - Nonisolated Custom Provider Key Helpers

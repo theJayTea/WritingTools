@@ -21,7 +21,7 @@ final class CustomProvider: AIProvider {
         self.config = config
     }
 
-    func processText(systemPrompt: String?, userPrompt: String, images: [Data], streaming: Bool) async throws -> String {
+    func processText(systemPrompt: String?, userPrompt: String, images: [Data]) async throws -> String {
         isProcessing = true
         defer {
             isProcessing = false
@@ -63,8 +63,8 @@ final class CustomProvider: AIProvider {
         requestBuilder.httpBody = try JSONSerialization.data(withJSONObject: requestBody)
         let request = requestBuilder
 
-        // Wrap work in a stored task so cancel() can interrupt it
-        let streamTask = Task { @MainActor in
+        // Run the stream off the main actor; hop to main only for onChunk.
+        let streamTask = Task.detached {
             let (stream, response) = try await URLSession.shared.bytes(for: request)
             guard let http = response as? HTTPURLResponse else {
                 throw CustomProviderError.networkError("Invalid response from server")
@@ -90,12 +90,12 @@ final class CustomProvider: AIProvider {
                       let choices = json["choices"] as? [[String: Any]],
                       let delta = choices.first?["delta"] as? [String: Any],
                       let content = delta["content"] as? String else { continue }
-                onChunk(content)
+                await onChunk(content)
             }
         }
         activeTask = streamTask
 
-        try await streamTask.value
+        try await awaitForwardingCancellation(streamTask)
     }
 
     func cancel() {
@@ -245,6 +245,11 @@ final class CustomProvider: AIProvider {
         guard let content = message["content"] as? String else {
             logger.error("CustomProvider: No 'content' string in message")
             throw CustomProviderError.invalidResponse("Message missing 'content' string")
+        }
+
+        guard !content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            logger.error("CustomProvider: 'content' string is empty")
+            throw CustomProviderError.invalidResponse("Response contained no text content")
         }
 
         logger.debug("CustomProvider: Successfully extracted content (length: \(content.count))")

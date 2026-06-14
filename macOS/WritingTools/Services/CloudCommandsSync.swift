@@ -310,15 +310,27 @@ final class CloudCommandsSync {
       // If a command currently exists after merge, it is no longer deleted.
       effectiveTombstones.subtract(mergedCommands.map(\.id))
 
+      // C2: Determine whether the reconciled result diverges from what iCloud
+      // currently holds. Divergence happens when a local-only command survived
+      // the merge, a local edit won a per-command timestamp race, or a remote
+      // command was dropped by a local tombstone. In those cases we MUST push the
+      // reconciled state back; otherwise the two devices stay permanently out of
+      // sync until the user happens to make another edit.
+      let remoteSnapshot = Dictionary(
+        remoteCommands.map { ($0.id, $0.updatedAt) },
+        uniquingKeysWith: { first, _ in first }
+      )
+      let mergedSnapshot = Dictionary(
+        mergedCommands.map { ($0.id, $0.updatedAt) },
+        uniquingKeysWith: { first, _ in first }
+      )
+      let mergedDivergesFromRemote = remoteSnapshot != mergedSnapshot
+
       // Suppress pushes while applying remote changes. The `replaceAllCommands`
       // call fires a `CommandsChanged` notification which would otherwise
-      // schedule a redundant push-back of the data we just received.
-      //
-      // Note: when the per-command merge keeps a locally-newer command (so the
-      // merged result diverges from the remote set), `suppressPush` blocks the
-      // immediate re-push that would propagate it back. This is acceptable: the
-      // next local edit or app launch reconciles and pushes the newer version.
-      // We deliberately do not force an extra push here to avoid push/pull churn.
+      // schedule a redundant push-back of the data we just received. We re-enable
+      // pushing afterward and, if the merge diverged from remote, schedule one
+      // deliberate deferred push (see below) instead of relying on a future edit.
       do {
         suppressPush = true
         defer { suppressPush = false }
@@ -329,9 +341,26 @@ final class CloudCommandsSync {
       deletedCommandTimestamps = deletedCommandTimestamps.filter { effectiveTombstones.contains($0.key) }
       _ = compactDeletedTombstones(maxCount: maxDeletedTombstones, maxDeletedIdsBytes: nil)
       knownLocalCommandIds = Set(mergedCommands.map(\.id))
+
+      // Keep CommandManager's built-in deletion record in step with the merged
+      // tombstone set, so a built-in deleted on another device stays deleted
+      // here even across a future defaults re-initialization.
+      AppState.shared.commandManager.reconcileDeletedBuiltInIds(withTombstones: effectiveTombstones)
       persistLocalSyncState()
       UserDefaults.standard.set(remoteMTime, forKey: localMTimeKey)
       syncHealth = .synced
+
+      // C2: propagate a reconciled-but-divergent merge back to iCloud via the
+      // normal debounced push. `suppressPush` is already false here (its `defer`
+      // ran when the apply block above exited), and `schedulePush` captures the
+      // current `cloudApplyGeneration`, so the push is skipped automatically if
+      // another pull supersedes it before the debounce fires. Once both sides
+      // hold identical data, the other device's next merge converges and does not
+      // push back — so this cannot loop.
+      if mergedDivergesFromRemote {
+        logger.info("CloudCommandsSync: merged state diverges from remote; scheduling deferred push-back")
+        schedulePush()
+      }
     } catch {
       logger.error("CloudCommandsSync: decode error: \(error.localizedDescription)")
     }

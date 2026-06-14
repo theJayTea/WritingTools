@@ -1,6 +1,8 @@
 import Foundation
 import Observation
 
+private let logger = AppLogger.logger("OllamaProvider")
+
 struct OllamaConfig: Codable, Sendable {
     var baseURL: String         // Accepts either "http://host:11434" or ".../api"
     var model: String
@@ -59,8 +61,7 @@ final class OllamaProvider: AIProvider {
     func processText(
         systemPrompt: String? = "You are a helpful writing assistant.",
         userPrompt: String,
-        images: [Data] = [],
-        streaming: Bool = false
+        images: [Data] = []
     ) async throws -> String {
         isProcessing = true
         defer {
@@ -108,7 +109,7 @@ final class OllamaProvider: AIProvider {
         var body: [String: Any] = [
             "model": config.model,
             "messages": messages,
-            "stream": streaming
+            "stream": false
         ]
         if let keepAlive = config.keepAlive, !keepAlive.isEmpty {
             body["keep_alive"] = keepAlive
@@ -122,18 +123,14 @@ final class OllamaProvider: AIProvider {
         requestBuilder.setValue("application/json", forHTTPHeaderField: "Content-Type")
         requestBuilder.setValue("application/json", forHTTPHeaderField: "Accept")
         requestBuilder.timeoutInterval = 60
-        
+
         // Capture as immutable value for Swift 6 concurrency
         let request = requestBuilder
 
         // 4) Execute request with retry for transient failures
         return try await withRetry(config: .default) {
             try Task.checkCancellation()
-            if streaming {
-                return try await Self.performStreaming(request)
-            } else {
-                return try await Self.performOneShot(request)
-            }
+            return try await Self.performOneShot(request)
         }
     }
 
@@ -200,8 +197,8 @@ final class OllamaProvider: AIProvider {
         requestBuilder.timeoutInterval = 60
         let request = requestBuilder
 
-        // Wrap work in a stored task so cancel() can interrupt it
-        let streamTask = Task { @MainActor in
+        // Run the stream off the main actor; hop to main only for onChunk.
+        let streamTask = Task.detached {
             let (stream, response) = try await URLSession.shared.bytes(for: request)
             guard let http = response as? HTTPURLResponse else {
                 throw Self.makeClientError("Invalid response from server.")
@@ -219,7 +216,7 @@ final class OllamaProvider: AIProvider {
                 guard let data = line.data(using: .utf8) else { continue }
                 if let chunk = try? JSONDecoder().decode(ChatChunk.self, from: data) {
                     if let t = chunk.message?.content {
-                        onChunk(t)
+                        await onChunk(t)
                     }
                     if chunk.done == true { break }
                     if let err = chunk.error, !err.isEmpty {
@@ -230,7 +227,17 @@ final class OllamaProvider: AIProvider {
         }
         activeTask = streamTask
 
-        try await streamTask.value
+        // Mirror the error handling of the other providers: surface a clean,
+        // logged error rather than letting a raw transport NSError escape.
+        do {
+            try await awaitForwardingCancellation(streamTask)
+        } catch is CancellationError {
+            // User cancelled; not an error worth surfacing.
+            throw CancellationError()
+        } catch {
+            logger.error("Ollama streaming request failed: \(error.localizedDescription)")
+            throw error
+        }
     }
 
     func cancel() {
@@ -260,36 +267,6 @@ final class OllamaProvider: AIProvider {
             throw makeClientError("Failed to parse response.")
         }
         return text
-    }
-
-    nonisolated private static func performStreaming(_ request: URLRequest) async throws -> String {
-        var aggregate = ""
-        let (stream, response) = try await URLSession.shared.bytes(for: request)
-        guard let http = response as? HTTPURLResponse else {
-            throw makeClientError("Invalid response from server.")
-        }
-
-        if http.statusCode != 200 {
-            var data = Data()
-            for try await byte in stream {
-                data.append(byte)
-            }
-            let message = decodeServerError(from: data)
-            throw makeServerError(http.statusCode, message)
-        }
-
-        for try await line in stream.lines {
-            try Task.checkCancellation()
-            guard let data = line.data(using: .utf8) else { continue }
-            if let chunk = try? JSONDecoder().decode(ChatChunk.self, from: data) {
-                if let t = chunk.message?.content { aggregate += t }
-                if chunk.done == true { break }
-                if let err = chunk.error, !err.isEmpty {
-                    throw makeServerError(500, err)
-                }
-            }
-        }
-        return aggregate
     }
 
     // MARK: - Utilities

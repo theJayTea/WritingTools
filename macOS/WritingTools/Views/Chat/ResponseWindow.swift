@@ -27,7 +27,7 @@ class ResponseWindow: NSWindow {
 
     super.init(
       contentRect: NSRect(x: 0, y: 0, width: 600, height: 500),
-      styleMask: [.titled, .closable, .resizable, .miniaturizable, .fullSizeContentView],
+      styleMask: [.titled, .closable, .resizable, .miniaturizable],
       backing: .buffered,
       defer: false
     )
@@ -67,7 +67,7 @@ class ResponseWindow: NSWindow {
 
     super.init(
       contentRect: NSRect(x: 0, y: 0, width: 600, height: 500),
-      styleMask: [.titled, .closable, .resizable, .miniaturizable, .fullSizeContentView],
+      styleMask: [.titled, .closable, .resizable, .miniaturizable],
       backing: .buffered,
       defer: false
     )
@@ -82,8 +82,13 @@ class ResponseWindow: NSWindow {
   }
 
   private func configureThemedChrome() {
-    titlebarAppearsTransparent = true
-    titlebarSeparatorStyle = .none
+    // NOTE: deliberately NOT using `.fullSizeContentView` + a transparent
+    // titlebar here. With fullSizeContentView the NSHostingController fills the
+    // whole window, so the ScrollView starts *under* the titlebar and scrolled
+    // chat bubbles bleed up through the transparent titlebar. A standard titlebar
+    // keeps the content below it, which fixes the bleed.
+    titlebarAppearsTransparent = false
+    titlebarSeparatorStyle = .automatic
     isMovableByWindowBackground = true
   }
 
@@ -101,8 +106,12 @@ class ResponseWindow: NSWindow {
   override func close() {
     // Persist this window's frame under the shared name so the next
     // response window opens at the same size/position.
+    //
+    // Deregistration from WindowManager is handled exclusively by
+    // `windowWillClose(_:)`, which `super.close()` triggers. Doing it here
+    // too would deregister twice and risks touching a partially torn-down
+    // window during app teardown.
     self.saveFrame(usingName: Self.sharedAutosaveName)
-    WindowManager.shared.removeResponseWindow(self)
     super.close()
   }
 }

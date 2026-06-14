@@ -76,8 +76,20 @@ final class UpdateChecker {
         do {
             var request = URLRequest(url: url)
             request.timeoutInterval = 15
-            let (data, _) = try await URLSession.shared.data(for: request)
-            
+            let (data, response) = try await URLSession.shared.data(for: request)
+
+            // Reject anything that isn't a clean 200. A 404/5xx returns an HTML
+            // error page whose body could otherwise be mis-parsed as a version
+            // number (e.g. the "404" in the status text), producing a bogus
+            // "update available" or suppressing a real one.
+            guard let httpResponse = response as? HTTPURLResponse,
+                  httpResponse.statusCode == 200 else {
+                let code = (response as? HTTPURLResponse)?.statusCode ?? -1
+                checkError = "Update check failed (HTTP \(code))"
+                logger.warning("Update check returned non-200 status: \(code)")
+                return
+            }
+
             // Print raw data for debugging
             if let rawString = String(data: data, encoding: .utf8) {
                 logger.debug("Raw version data: '\(rawString)'")

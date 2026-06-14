@@ -246,9 +246,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
 
             window.positionNearMouse()
+            // Activate cooperatively and make the popup key. We deliberately do
+            // NOT call orderFrontRegardless(): it bypasses the window server's
+            // normal activation handshake and can yank focus away from the app
+            // the user is actively typing in, dropping keystrokes (see the note
+            // in WindowManager.bringWindowToFront).
             NSApp.activate()
             window.makeKeyAndOrderFront(nil)
-            window.orderFrontRegardless()
         }
     }
 

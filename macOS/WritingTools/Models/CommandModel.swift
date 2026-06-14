@@ -11,6 +11,10 @@ struct CommandModel: Codable, Identifiable, Equatable {
     var hasShortcut: Bool
     var preserveFormatting: Bool
 
+    /// When true, the command is hidden from the quick-access popup grid but
+    /// remains visible in the Manage Commands list so it can be shown again.
+    var isHidden: Bool
+
     /// Timestamp of the last content edit to this command.
     /// Used for timestamp-based iCloud merge so that the most recently edited
     /// version of a command wins. Legacy data and built-ins without a stored
@@ -48,6 +52,7 @@ struct CommandModel: Codable, Identifiable, Equatable {
         case isBuiltIn
         case hasShortcut
         case preserveFormatting
+        case isHidden
         case providerOverride
         case modelOverride
         case customProviderBaseURL
@@ -72,6 +77,7 @@ struct CommandModel: Codable, Identifiable, Equatable {
         hasShortcut = try c.decodeIfPresent(Bool.self, forKey: .hasShortcut) ?? false
         preserveFormatting = try c.decodeIfPresent(Bool.self,
                                                    forKey: .preserveFormatting) ?? false
+        isHidden = try c.decodeIfPresent(Bool.self, forKey: .isHidden) ?? false
         providerOverride = try c.decodeIfPresent(String.self, forKey: .providerOverride)
         modelOverride = try c.decodeIfPresent(String.self, forKey: .modelOverride)
         customProviderBaseURL = try c.decodeIfPresent(String.self, forKey: .customProviderBaseURL)
@@ -99,6 +105,7 @@ struct CommandModel: Codable, Identifiable, Equatable {
         if preserveFormatting {
             try c.encode(preserveFormatting, forKey: .preserveFormatting)
         }
+        if isHidden { try c.encode(isHidden, forKey: .isHidden) }
         if let providerOverride = providerOverride {
             try c.encode(providerOverride, forKey: .providerOverride)
         }
@@ -139,6 +146,7 @@ struct CommandModel: Codable, Identifiable, Equatable {
          isBuiltIn: Bool = false,
          hasShortcut: Bool = false,
          preserveFormatting: Bool = false,
+         isHidden: Bool = false,
          providerOverride: String? = nil,
          modelOverride: String? = nil,
          customProviderBaseURL: String? = nil,
@@ -152,6 +160,7 @@ struct CommandModel: Codable, Identifiable, Equatable {
         self.isBuiltIn = isBuiltIn
         self.hasShortcut = hasShortcut
         self.preserveFormatting = preserveFormatting
+        self.isHidden = isHidden
         self.providerOverride = providerOverride
         self.modelOverride = modelOverride
         self.customProviderBaseURL = customProviderBaseURL

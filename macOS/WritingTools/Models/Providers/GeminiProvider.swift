@@ -13,7 +13,7 @@ enum GeminiModel: String, CaseIterable {
     case gemmabig = "gemma-3-27b-it"
     case gemmasmall = "gemma-3-4b-it"
     case flashlite = "gemini-flash-lite-latest"
-    case flash = "gemini-3-flash-preview"
+    case flash = "gemini-3.5-flash"
     case pro = "gemini-3.1-pro-preview"
     case custom = "custom"
     
@@ -22,7 +22,7 @@ enum GeminiModel: String, CaseIterable {
         case .gemmabig: return "Gemma 3 27b (Very Intelligent | unlimited)"
         case .gemmasmall: return "Gemma 3 4b (Intelligent | unlimited)"
         case .flashlite: return "Gemini Flash Lite Latest (Intelligent | ~20 uses/min)"
-        case .flash: return "Gemini Flash 3 (Very Intelligent | ~20 uses/min)"
+        case .flash: return "Gemini 3.5 Flash (Very Intelligent | ~20 uses/min)"
         case .pro: return "Gemini Pro 3.1 (Peak Intelligence | ~5 uses/min)"
         case .custom: return "Custom"
         }
@@ -40,7 +40,7 @@ final class GeminiProvider: AIProvider {
         self.config = config
     }
     
-    func processText(systemPrompt: String? = "You are a helpful writing assistant.", userPrompt: String, images: [Data] = [], streaming: Bool = false) async throws -> String {
+    func processText(systemPrompt: String? = "You are a helpful writing assistant.", userPrompt: String, images: [Data] = []) async throws -> String {
         isProcessing = true
         defer {
             isProcessing = false
@@ -131,18 +131,21 @@ final class GeminiProvider: AIProvider {
             ]
         )
 
-        // Wrap work in a stored task so cancel() can interrupt it
-        let streamTask = Task { @MainActor in
-            let stream = try await geminiService.generateStreamingContentRequest(
-                body: requestBody,
-                model: config.modelName,
+        // Run the stream off the main actor; hop to main only for onChunk.
+        let service = geminiService
+        let body = requestBody
+        let model = config.modelName
+        let streamTask = Task.detached {
+            let stream = try await service.generateStreamingContentRequest(
+                body: body,
+                model: model,
                 secondsToWait: 60
             )
             for try await chunk in stream {
                 try Task.checkCancellation()
                 for part in chunk.candidates?.first?.content?.parts ?? [] {
                     if case .text(let text) = part {
-                        onChunk(text)
+                        await onChunk(text)
                     }
                 }
             }
@@ -150,7 +153,7 @@ final class GeminiProvider: AIProvider {
         activeTask = streamTask
 
         do {
-            try await streamTask.value
+            try await awaitForwardingCancellation(streamTask)
         } catch AIProxyError.unsuccessfulRequest(let statusCode, let responseBody) {
             logger.error("Gemini streaming error (\(statusCode)): \(responseBody)")
             throw NSError(domain: "GeminiAPI", code: statusCode,

@@ -4,21 +4,38 @@ import Observation
 
 // MARK: - String Extension for Markdown Processing
 
+/// Compiled-once regexes for markdown fence normalization.
+///
+/// These patterns are constant literals, so compilation cannot fail and the
+/// objects are safe to reuse across threads for matching. Caching them avoids
+/// rebuilding an `NSRegularExpression` on every render pass while streaming.
+private enum MarkdownFenceRegex {
+    /// Matches an entire response wrapped in ```markdown / ```md fences.
+    static let outerCodeBlock = try! NSRegularExpression(
+        pattern: #"^```(?:markdown|md)\s*\n([\s\S]*?)\n```$"#,
+        options: [.caseInsensitive]
+    )
+
+    /// Matches a partial, not-yet-closed ```markdown / ```md fence (streaming).
+    static let partialOuterFence = try! NSRegularExpression(
+        pattern: #"^```(?:markdown|md)\s*\n([\s\S]*)$"#,
+        options: [.caseInsensitive]
+    )
+}
+
 extension String {
     /// Strips outer markdown code block wrapper if the entire response is wrapped in one.
     /// Some AI models wrap their entire response in ```markdown fences.
     fileprivate func strippingOuterCodeBlock() -> String {
         let trimmed = self.trimmingCharacters(in: .whitespacesAndNewlines)
-        
+
         // Only unwrap markdown wrappers so legitimate code fences (e.g. ```swift) stay intact.
-        let pattern = #"^```(?:markdown|md)\s*\n([\s\S]*?)\n```$"#
-        
-        guard let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]),
-              let match = regex.firstMatch(in: trimmed, options: [], range: NSRange(trimmed.startIndex..., in: trimmed)),
+        let regex = MarkdownFenceRegex.outerCodeBlock
+        guard let match = regex.firstMatch(in: trimmed, options: [], range: NSRange(trimmed.startIndex..., in: trimmed)),
               let contentRange = Range(match.range(at: 1), in: trimmed) else {
             return self
         }
-        
+
         return String(trimmed[contentRange])
     }
     
@@ -40,10 +57,9 @@ extension String {
 
     private func strippingPartialOuterMarkdownFence() -> String {
         let trimmed = self.trimmingCharacters(in: .whitespacesAndNewlines)
-        let pattern = #"^```(?:markdown|md)\s*\n([\s\S]*)$"#
 
-        guard let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]),
-              let match = regex.firstMatch(in: trimmed, options: [], range: NSRange(trimmed.startIndex..., in: trimmed)),
+        let regex = MarkdownFenceRegex.partialOuterFence
+        guard let match = regex.firstMatch(in: trimmed, options: [], range: NSRange(trimmed.startIndex..., in: trimmed)),
               let contentRange = Range(match.range(at: 1), in: trimmed) else {
             return self
         }
@@ -307,6 +323,13 @@ struct ResponseView: View {
                 .accessibilityHint("Returns text size to the default")
             }
         }
+        // The window uses fullSizeContentView + a transparent titlebar so the
+        // themed background can extend edge-to-edge. Without an explicit toolbar
+        // background, scrolled chat bubbles render up *through* the transparent
+        // titlebar. A visible toolbar background lays a material strip across the
+        // titlebar that the content scrolls cleanly beneath (standard macOS
+        // behavior, e.g. Mail/Messages).
+        .toolbarBackground(.visible, for: .windowToolbar)
         .alert("Error", isPresented: $showError, presenting: errorMessage) { _ in
             Button("OK") { errorMessage = nil }
         } message: { message in

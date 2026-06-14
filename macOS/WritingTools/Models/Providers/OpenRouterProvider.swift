@@ -44,8 +44,7 @@ final class OpenRouterProvider: AIProvider {
     func processText(
         systemPrompt: String? = "You are a helpful writing assistant.",
         userPrompt: String,
-        images: [Data] = [],
-        streaming: Bool = false
+        images: [Data] = []
     ) async throws -> String {
         isProcessing = true
         defer {
@@ -90,23 +89,16 @@ final class OpenRouterProvider: AIProvider {
         )
 
         do {
-            if streaming {
-                var compiledResponse = ""
-                let stream = try await openRouterService.streamingChatCompletionRequest(body: requestBody)
-                for try await chunk in stream {
-                    try Task.checkCancellation()
-                    if let content = chunk.choices.first?.delta.content {
-                        compiledResponse += content
-                    }
-                }
-                return compiledResponse
-            } else {
-                try Task.checkCancellation()
-                let response = try await withRetry {
-                    try await openRouterService.chatCompletionRequest(body: requestBody)
-                }
-                return response.choices.first?.message.content ?? ""
+            try Task.checkCancellation()
+            let response = try await withRetry {
+                try await openRouterService.chatCompletionRequest(body: requestBody)
             }
+            let content = response.choices.first?.message.content ?? ""
+            guard !content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                throw NSError(domain: "OpenRouterAPI", code: -1,
+                              userInfo: [NSLocalizedDescriptionKey: "No text content in response."])
+            }
+            return content
         } catch AIProxyError.unsuccessfulRequest(let statusCode, let responseBody) {
             logger.error("OpenRouter error (\(statusCode)): \(responseBody)")
             throw NSError(
@@ -165,20 +157,22 @@ final class OpenRouterProvider: AIProvider {
             route: .fallback
         )
 
-        // Wrap work in a stored task so cancel() can interrupt it
-        let streamTask = Task { @MainActor in
-            let stream = try await openRouterService.streamingChatCompletionRequest(body: requestBody)
+        // Run the stream off the main actor; hop to main only for onChunk.
+        let service = openRouterService
+        let body = requestBody
+        let streamTask = Task.detached {
+            let stream = try await service.streamingChatCompletionRequest(body: body)
             for try await chunk in stream {
                 try Task.checkCancellation()
                 if let content = chunk.choices.first?.delta.content {
-                    onChunk(content)
+                    await onChunk(content)
                 }
             }
         }
         activeTask = streamTask
 
         do {
-            try await streamTask.value
+            try await awaitForwardingCancellation(streamTask)
         } catch AIProxyError.unsuccessfulRequest(let statusCode, let responseBody) {
             logger.error("OpenRouter streaming error (\(statusCode)): \(responseBody)")
             throw NSError(domain: "OpenRouterAPI", code: statusCode,

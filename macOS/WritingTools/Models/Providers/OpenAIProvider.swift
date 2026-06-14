@@ -39,7 +39,7 @@ final class OpenAIProvider: AIProvider {
         self.config = config
     }
     
-    func processText(systemPrompt: String? = "You are a helpful writing assistant.", userPrompt: String, images: [Data] = [], streaming: Bool = false) async throws -> String {
+    func processText(systemPrompt: String? = "You are a helpful writing assistant.", userPrompt: String, images: [Data] = []) async throws -> String {
         isProcessing = true
         defer {
             isProcessing = false
@@ -83,33 +83,24 @@ final class OpenAIProvider: AIProvider {
         }
 
         do {
-            if streaming {
-                var compiledResponse = ""
-                let stream = try await openAIService.streamingChatCompletionRequest(body: .init(
+            try Task.checkCancellation()
+            let requestMessages = messages
+            let response = try await withRetry {
+                try await openAIService.chatCompletionRequest(body: .init(
                     model: config.model,
-                    messages: messages
+                    messages: requestMessages
                 ), secondsToWait: 60)
-
-                for try await chunk in stream {
-                    try Task.checkCancellation()
-                    if let content = chunk.choices.first?.delta.content {
-                        compiledResponse += content
-                    }
-                }
-                return compiledResponse
-
-            } else {
-                try Task.checkCancellation()
-                let requestMessages = messages
-                let response = try await withRetry {
-                    try await openAIService.chatCompletionRequest(body: .init(
-                        model: config.model,
-                        messages: requestMessages
-                    ), secondsToWait: 60)
-                }
-
-                return response.choices.first?.message.content ?? ""
             }
+
+            let content = response.choices.first?.message.content ?? ""
+            // Treat an empty/refused completion as a failure rather than success.
+            // Returning "" here would let the inline path replace (delete) the
+            // user's selected text. Mirrors Anthropic/Gemini behavior.
+            guard !content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                throw NSError(domain: "OpenAIAPI", code: -1,
+                              userInfo: [NSLocalizedDescriptionKey: "No text content in response."])
+            }
+            return content
 
         } catch AIProxyError.unsuccessfulRequest(let statusCode, let responseBody) {
             logger.error("Received non-200 status code: \(statusCode) with response body: \(responseBody)")
@@ -203,19 +194,25 @@ final class OpenAIProvider: AIProvider {
             let choices: [Choice]
         }
         
+        let decoded: ChatCompletionResponse
         do {
-            let decoded = try JSONDecoder().decode(ChatCompletionResponse.self, from: data)
-            return decoded.choices.first?.message.content ?? ""
+            decoded = try JSONDecoder().decode(ChatCompletionResponse.self, from: data)
         } catch {
             logger.error("Failed to decode response: \(error.localizedDescription)")
-             throw NSError(domain: "OpenAIAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to parse API response."])
+            throw NSError(domain: "OpenAIAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to parse API response."])
         }
+        let content = decoded.choices.first?.message.content ?? ""
+        guard !content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw NSError(domain: "OpenAIAPI", code: -1,
+                          userInfo: [NSLocalizedDescriptionKey: "No text content in response."])
+        }
+        return content
     }
 
     
     // MARK: - Custom Streaming Request Implementation
     
-    private static func performCustomOpenAIStreamingRequest(
+    nonisolated private static func performCustomOpenAIStreamingRequest(
         config: OpenAIConfig,
         systemPrompt: String?,
         userPrompt: String,
@@ -294,7 +291,7 @@ final class OpenAIProvider: AIProvider {
                   let choices = json["choices"] as? [[String: Any]],
                   let delta = choices.first?["delta"] as? [String: Any],
                   let content = delta["content"] as? String else { continue }
-            onChunk(content)
+            await onChunk(content)
         }
     }
 
@@ -325,7 +322,7 @@ final class OpenAIProvider: AIProvider {
         // For custom base URLs, use manual SSE streaming
         if !config.baseURL.isEmpty && config.baseURL != OpenAIConfig.defaultBaseURL {
             let config = self.config
-            let streamTask = Task { @MainActor in
+            let streamTask = Task.detached {
                 try await Self.performCustomOpenAIStreamingRequest(
                     config: config,
                     systemPrompt: systemPrompt,
@@ -335,7 +332,7 @@ final class OpenAIProvider: AIProvider {
                 )
             }
             activeTask = streamTask
-            try await streamTask.value
+            try await awaitForwardingCancellation(streamTask)
             return
         }
         
@@ -367,24 +364,27 @@ final class OpenAIProvider: AIProvider {
             messages.append(.user(content: .parts(parts)))
         }
 
-        // Wrap work in a stored task so cancel() can interrupt it
-        let streamTask = Task { @MainActor in
-            let stream = try await openAIService.streamingChatCompletionRequest(body: .init(
-                model: config.model,
-                messages: messages
+        // Run the stream off the main actor; hop to main only for onChunk.
+        let service = openAIService
+        let model = config.model
+        let requestMessages = messages
+        let streamTask = Task.detached {
+            let stream = try await service.streamingChatCompletionRequest(body: .init(
+                model: model,
+                messages: requestMessages
             ), secondsToWait: 60)
-            
+
             for try await chunk in stream {
                 try Task.checkCancellation()
                 if let content = chunk.choices.first?.delta.content {
-                    onChunk(content)
+                    await onChunk(content)
                 }
             }
         }
         activeTask = streamTask
-        
+
         do {
-            try await streamTask.value
+            try await awaitForwardingCancellation(streamTask)
         } catch AIProxyError.unsuccessfulRequest(let statusCode, let responseBody) {
             logger.error("Received non-200 status code: \(statusCode) with response body: \(responseBody)")
             throw NSError(domain: "OpenAIAPI",

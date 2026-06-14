@@ -45,6 +45,16 @@ final class CommandManager {
         }
     }
     
+    /// Show or hide a command in the quick-access popup grid. The command stays
+    /// in the Manage Commands list either way. Routed through `updateCommand` so
+    /// the change stamps `updatedAt` and wins the timestamp-based iCloud merge.
+    func setHidden(_ hidden: Bool, for command: CommandModel) {
+        guard command.isHidden != hidden else { return }
+        var updated = command
+        updated.isHidden = hidden
+        updateCommand(updated)
+    }
+
     func deleteCommand(_ command: CommandModel) {
         commands.removeAll { $0.id == command.id }
 
@@ -203,6 +213,30 @@ final class CommandManager {
         if let encoded = try? JSONEncoder().encode(deletedDefaultIds) {
             UserDefaults.standard.set(encoded, forKey: deletedDefaultsKey)
         }
+    }
+
+    /// Reconciles the locally-tracked deleted built-in IDs against the set of
+    /// tombstones that is authoritative after an iCloud sync merge.
+    ///
+    /// Built-in deletions are pushed to iCloud via the generic tombstone
+    /// mechanism (a deleted built-in disappears from `commands`), but a device
+    /// that *receives* such a tombstone removes the command through
+    /// `replaceAllCommands` without ever recording it here. That left
+    /// `deletedDefaultIds` out of sync, so a later defaults re-initialization
+    /// (corruption recovery, reset) could resurrect a built-in the user had
+    /// deleted on another device. Calling this after a pull keeps the two in
+    /// lock-step: only IDs that are both a known default and tombstoned (and not
+    /// currently present) count as deleted; anything live is treated as
+    /// un-deleted. Returns true if the tracked set changed.
+    @discardableResult
+    func reconcileDeletedBuiltInIds(withTombstones tombstones: Set<UUID>) -> Bool {
+        let defaultIds = Set(CommandModel.defaultCommands.map(\.id))
+        let liveIds = Set(commands.map(\.id))
+        let newDeleted = defaultIds.intersection(tombstones).subtracting(liveIds)
+        guard newDeleted != deletedDefaultIds else { return false }
+        deletedDefaultIds = newDeleted
+        saveDeletedDefaultIds()
+        return true
     }
 
     private func containsLegacyCustomProviderKey(in data: Data) -> Bool {

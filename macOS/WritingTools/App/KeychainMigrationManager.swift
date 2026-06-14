@@ -74,20 +74,31 @@ final class KeychainMigrationManager {
 
             migratedKeys.append(oldKey)
             logger.debug("Migrated: \(oldKey)")
-            // Remove from UserDefaults only after verified migration
-            userDefaults.removeObject(forKey: oldKey)
         }
-        
+
         // Log migration results
         logMigration(migratedKeys: migratedKeys, failedKeys: failedKeys)
 
         if failedKeys.isEmpty {
+            // Only now that EVERY key migrated and verified do we delete the
+            // originals from UserDefaults. Deleting per-key inside the loop was a
+            // data-loss hazard: if a later key's keychain write failed, migration
+            // was never marked complete, yet the already-deleted originals were
+            // gone — so the next launch's re-run found empty values and silently
+            // lost those keys forever.
+            for oldKey in migratedKeys {
+                userDefaults.removeObject(forKey: oldKey)
+            }
             markMigrationComplete()
             logger.info("Keychain migration complete. Migrated: \(migratedKeys.count)")
             return .success(migratedKeys: migratedKeys)
         }
 
-        logger.error("Keychain migration incomplete. Migrated: \(migratedKeys.count), Failed: \(failedKeys.count)")
+        // Partial failure: leave ALL originals (including the ones that migrated
+        // this pass) in UserDefaults so the next launch can safely retry. The
+        // keychain bootstrapSave is an upsert, so re-migrating an already-written
+        // key is harmless.
+        logger.error("Keychain migration incomplete. Migrated: \(migratedKeys.count), Failed: \(failedKeys.count). Originals retained for retry.")
         return .failed(migratedKeys: migratedKeys, failedKeys: failedKeys)
     }
     

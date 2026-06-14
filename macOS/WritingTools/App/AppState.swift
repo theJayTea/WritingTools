@@ -260,6 +260,83 @@ final class AppState {
         cacheInsertionOrder.removeAll()
     }
 
+    // MARK: - Isolated (non-shared) provider instances
+
+    /// Returns a brand-new provider instance for a command, never a shared
+    /// singleton or a cached override instance.
+    ///
+    /// Response windows own their provider for the lifetime of the window and
+    /// call `provider.cancel()` when they close. If they used the shared
+    /// singletons (as `getProvider(for:)` returns for the default case), closing
+    /// one window would cancel an unrelated in-flight request running on the same
+    /// singleton (another window, or an inline command). Handing each window its
+    /// own instance removes that cross-contamination.
+    ///
+    /// The on-device local model is a single multi-GB instance that cannot be
+    /// duplicated, so it is still shared.
+    func makeIsolatedProvider(for command: CommandModel) -> any AIProvider {
+        let providerName = command.providerOverride ?? currentProvider
+        if providerName == "custom" {
+            // Custom commands already build a fresh CustomProvider per call.
+            return getProvider(for: command)
+        }
+        return buildProvider(providerName: providerName, modelOverride: command.modelOverride)
+    }
+
+    /// Like `activeProvider`, but a fresh, non-shared instance (see
+    /// `makeIsolatedProvider(for:)`).
+    func makeIsolatedActiveProvider() -> any AIProvider {
+        buildProvider(providerName: currentProvider, modelOverride: nil)
+    }
+
+    /// Constructs a new provider instance from the current persisted settings.
+    private func buildProvider(providerName: String, modelOverride: String?) -> any AIProvider {
+        let s = AppSettings.shared
+        switch providerName {
+        case "openai":
+            return OpenAIProvider(config: OpenAIConfig(
+                apiKey: s.openAIApiKey,
+                baseURL: s.openAIBaseURL,
+                model: modelOverride ?? s.openAIModel
+            ))
+        case "gemini":
+            let model = modelOverride ?? ((s.geminiModel == .custom) ? s.geminiCustomModel : s.geminiModel.rawValue)
+            return GeminiProvider(config: GeminiConfig(apiKey: s.geminiApiKey, modelName: model))
+        case "anthropic":
+            return AnthropicProvider(config: AnthropicConfig(
+                apiKey: s.anthropicApiKey,
+                model: modelOverride ?? s.anthropicModel
+            ))
+        case "ollama":
+            return OllamaProvider(config: OllamaConfig(
+                baseURL: s.ollamaBaseURL,
+                model: modelOverride ?? s.ollamaModel,
+                keepAlive: s.ollamaKeepAlive
+            ))
+        case "mistral":
+            return MistralProvider(config: MistralConfig(
+                apiKey: s.mistralApiKey,
+                baseURL: s.mistralBaseURL,
+                model: modelOverride ?? s.mistralModel
+            ))
+        case "openrouter":
+            let model: String
+            if let modelOverride {
+                model = modelOverride
+            } else {
+                let modelEnum = OpenRouterModel(rawValue: s.openRouterModel)
+                model = (modelEnum == .custom)
+                    ? s.openRouterCustomModel
+                    : (modelEnum?.rawValue ?? s.openRouterModel)
+            }
+            return OpenRouterProvider(config: OpenRouterConfig(apiKey: s.openRouterApiKey, model: model))
+        default:
+            // "local" and any unknown provider: the local model is a single
+            // shared heavy instance that cannot be duplicated.
+            return localLLMProvider
+        }
+    }
+
     /// Returns the current API key for the given provider name (used for cache key hashing).
     private static func currentAPIKey(for providerName: String) -> String {
         let s = AppSettings.shared
@@ -400,6 +477,16 @@ final class AppState {
 
     // Update provider and persist to settings
     func setCurrentProvider(_ provider: String) {
+        // When switching to any cloud provider, release the local model's
+        // memory (potentially several GB) since it's no longer needed. The
+        // weights stay on disk and reload on demand if the user returns.
+        let cloudProviders: Set<String> = [
+            "openai", "gemini", "anthropic", "ollama", "mistral", "openrouter"
+        ]
+        if cloudProviders.contains(provider) {
+            localLLMProvider.unload()
+        }
+
         currentProvider = provider
         AppSettings.shared.currentProvider = provider
     }
@@ -584,6 +671,13 @@ final class AppState {
             // Capture the changeCount after we wrote text so we can detect external changes
             let changeCountAfterWrite = NSPasteboard.general.changeCount
             activateWindowAndPaste(for: previousApp, clipboardSnapshot: clipboardSnapshot, expectedChangeCount: changeCountAfterWrite)
+        } else {
+            // No target app to paste into. We've already replaced the clipboard
+            // with the processed result; rather than silently discarding the
+            // user's original clipboard with no feedback, tell them the result is
+            // available to paste manually.
+            logger.warning("replaceSelectedText: no previous application to paste into; result left on clipboard for manual paste")
+            showManualPasteFallbackAlert()
         }
     }
 
@@ -806,6 +900,9 @@ final class AppState {
             }
             let changeCountAfterWrite = NSPasteboard.general.changeCount
             activateWindowAndPaste(for: previous, clipboardSnapshot: clipboardSnapshot, expectedChangeCount: changeCountAfterWrite)
+        } else {
+            logger.warning("replaceSelectedTextPreservingAttributes: no previous application to paste into; result left on clipboard for manual paste")
+            showManualPasteFallbackAlert()
         }
     }
 
@@ -834,6 +931,22 @@ final class AppState {
         // Post to cgSessionEventTap for more predictable ordering
         keyDown.post(tap: .cgSessionEventTap)
         keyUp.post(tap: .cgSessionEventTap)
+    }
+
+    private func showManualPasteFallbackAlert() {
+        let alert = NSAlert()
+        alert.messageText = "Couldn't Identify Where to Paste"
+        alert.informativeText =
+            "Writing Tools couldn't determine which app to paste into, so your processed text is on the clipboard — switch to your document and paste it with ⌘V."
+        alert.alertStyle = .informational
+        alert.addButton(withTitle: "OK")
+
+        NSApp.activate()
+        if let keyWindow = NSApp.keyWindow {
+            alert.beginSheetModal(for: keyWindow)
+        } else {
+            alert.runModal()
+        }
     }
 
     private func showPasteTimeoutAlert(targetApp: NSRunningApplication) {

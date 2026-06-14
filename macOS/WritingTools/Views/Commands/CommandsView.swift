@@ -127,7 +127,10 @@ struct CommandsView: View {
                 CommandRow(
                     command: command,
                     onEdit: { command in editingCommand = command },
-                    onDelete: { command in commandManager.deleteCommand(command) }
+                    onDelete: { command in commandManager.deleteCommand(command) },
+                    onToggleHidden: { command in
+                        commandManager.setHidden(!command.isHidden, for: command)
+                    }
                 )
             }
         }
@@ -153,7 +156,10 @@ struct CommandsView: View {
                 CommandRow(
                     command: command,
                     onEdit: { command in editingCommand = command },
-                    onDelete: { command in commandManager.deleteCommand(command) }
+                    onDelete: { command in commandManager.deleteCommand(command) },
+                    onToggleHidden: { command in
+                        commandManager.setHidden(!command.isHidden, for: command)
+                    }
                 )
             }
             .onMove { source, destination in
@@ -190,10 +196,11 @@ struct CommandRow: View {
     let command: CommandModel
     let onEdit: (CommandModel) -> Void
     let onDelete: (CommandModel) -> Void
-    
+    let onToggleHidden: (CommandModel) -> Void
+
     @Environment(\.colorScheme) var colorScheme
     @State private var showDeleteConfirmation = false
-    
+
     var body: some View {
         HStack(spacing: 16) {
             // Icon with consistent size and styling
@@ -205,27 +212,58 @@ struct CommandRow: View {
                     RoundedRectangle(cornerRadius: 6)
                         .fill(Color.accentColor.opacity(0.1))
                 )
-            
+                .opacity(command.isHidden ? 0.5 : 1)
+
             VStack(alignment: .leading, spacing: 4) {
                 Text(command.name)
                     .font(.headline)
-                
-                Text(command.isBuiltIn ? "Built-in" : "Custom")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .padding(.vertical, 2)
-                    .padding(.horizontal, 6)
-                    .background(
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(command.isBuiltIn ?
-                                  Color.blue.opacity(0.2) :
-                                  Color.green.opacity(0.2))
-                    )
+                    .opacity(command.isHidden ? 0.5 : 1)
+
+                HStack(spacing: 6) {
+                    Text(command.isBuiltIn ? "Built-in" : "Custom")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .padding(.vertical, 2)
+                        .padding(.horizontal, 6)
+                        .background(
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(command.isBuiltIn ?
+                                      Color.blue.opacity(0.2) :
+                                      Color.green.opacity(0.2))
+                        )
+
+                    if command.isHidden {
+                        Text("Hidden")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .padding(.vertical, 2)
+                            .padding(.horizontal, 6)
+                            .background(
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(Color.secondary.opacity(0.2))
+                            )
+                    }
+                }
             }
-            
+
             Spacer()
-            
+
             HStack(spacing: 12) {
+                Button(action: { onToggleHidden(command) }) {
+                    Image(systemName: command.isHidden ? "eye.slash" : "eye")
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                        .frame(width: 28, height: 28)
+                        .background(Color.secondary.opacity(0.1))
+                        .clipShape(.circle)
+                }
+                .buttonStyle(.plain)
+                .help(command.isHidden ? "Show command" : "Hide command")
+                .accessibilityLabel(command.isHidden ? "Show \(command.name)" : "Hide \(command.name)")
+                .accessibilityHint(command.isHidden ?
+                                   "Show this command in the popup" :
+                                   "Hide this command from the popup")
+
                 Button(action: { onEdit(command) }) {
                     Image(systemName: "pencil")
                         .font(.body)

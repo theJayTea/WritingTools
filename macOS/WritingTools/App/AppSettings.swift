@@ -365,9 +365,11 @@ final class AppSettings {
         guard let domain = Bundle.main.bundleIdentifier else { return }
         UserDefaults.standard.removePersistentDomain(forName: domain)
 
-        // Clear Keychain API keys
-        Task {
-            try? await keychain.clearAllApiKeys()
+        // Clear Keychain API keys synchronously so the caller (e.g. a recovery
+        // reset that immediately shows a "Reset Complete" alert or relaunches)
+        // can't race an in-flight async deletion and leave keys behind.
+        if !keychain.clearAllApiKeysSync() {
+            Self.logger.error("Failed to clear API keys from keychain during reset")
         }
 
         // Reset in-memory state to defaults so subsequent didSet writes don't
