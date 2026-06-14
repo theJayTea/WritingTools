@@ -25,8 +25,9 @@ struct PermissionRow: View {
   var body: some View {
     HStack(alignment: .top, spacing: 14) {
       Image(systemName: icon)
-        .font(.system(size: 28))
-        .foregroundStyle(status == .granted ? .green : .blue)
+        .font(.largeTitle)
+        .imageScale(.large)
+        .foregroundStyle(status == .granted ? AnyShapeStyle(.green) : AnyShapeStyle(Color.accentColor))
         .frame(width: 36)
 
       VStack(alignment: .leading, spacing: 6) {

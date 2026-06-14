@@ -12,7 +12,7 @@ struct LoadingBorderModifier: ViewModifier {
                         ZStack {
                             // Subtle background
                             RoundedRectangle(cornerRadius: 8)
-                                .fill(Color.gray.opacity(0.05))
+                                .fill(Color(.controlBackgroundColor))
                             
                             // Progress spinner that matches macOS style
                             ProgressView()

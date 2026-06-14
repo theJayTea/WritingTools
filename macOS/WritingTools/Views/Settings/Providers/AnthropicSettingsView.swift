@@ -10,11 +10,9 @@ import AppKit
 
 struct AnthropicSettingsView: View {
     @Bindable var settings = AppSettings.shared
-    @Binding var needsSaving: Bool
     @State private var modelSelection: AnthropicModel
 
-    init(needsSaving: Binding<Bool>) {
-        self._needsSaving = needsSaving
+    init() {
         // Initialize model selection from current settings to avoid flash on appear
         let currentModel = AppSettings.shared.anthropicModel
         if let knownModel = AnthropicModel(rawValue: currentModel), knownModel != .custom {
@@ -33,7 +31,6 @@ struct AnthropicSettingsView: View {
                         .foregroundStyle(.secondary)
                     
                     SecureAPIKeyField("API Key", text: $settings.anthropicApiKey)
-                        .onChange(of: settings.anthropicApiKey) { _, _ in needsSaving = true }
                 }
                 
                 VStack(alignment: .leading, spacing: 8) {
@@ -52,14 +49,12 @@ struct AnthropicSettingsView: View {
                         if newValue != .custom {
                             settings.anthropicModel = newValue.rawValue
                         }
-                        needsSaving = true
                     }
-                    
+
                     if modelSelection == .custom {
                         TextField("Custom Model Name", text: $settings.anthropicModel)
                             .textFieldStyle(.roundedBorder)
                             .font(.caption)
-                            .onChange(of: settings.anthropicModel) { _, _ in needsSaving = true }
                     }
                     Text("E.g., \(AnthropicModel.claude45Haiku.rawValue), \(AnthropicModel.claude45Sonnet.rawValue), etc.")
                         .font(.caption)

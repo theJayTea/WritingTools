@@ -8,10 +8,10 @@ class WindowManager: NSObject, NSWindowDelegate {
     static let shared = WindowManager()
 
     private var onboardingWindow: NSWindow?
-    private var settingsWindow: NSWindow?
+    private var aboutWindow: NSWindow?
 
     // Track a single PopupWindow
-    private weak var popupWindow: PopupWindow?
+    private var popupWindow: PopupWindow?
 
     enum PopupDismissSuppressionReason: Hashable {
         case commandEditorSheet
@@ -57,6 +57,12 @@ class WindowManager: NSObject, NSWindowDelegate {
         responseWindows.remove(window)
     }
 
+    private func configureThemedChrome(for window: NSWindow) {
+        window.titlebarAppearsTransparent = true
+        window.titlebarSeparatorStyle = .none
+        window.isMovableByWindowBackground = true
+    }
+
     // MARK: - Popup Window
 
     func registerPopupWindow(_ window: PopupWindow) {
@@ -92,47 +98,7 @@ class WindowManager: NSObject, NSWindowDelegate {
         }
     }
 
-    // MARK: - Onboarding & Settings
-
-    func transitionFromOnboardingToSettings(appState: AppState) {
-        if let existingSettingsWindow = settingsWindow, existingSettingsWindow.isVisible {
-            onboardingWindow?.close()
-            onboardingWindow = nil
-            bringWindowToFront(existingSettingsWindow)
-            return
-        }
-
-        let currentOnboardingWindow = onboardingWindow
-
-        let newSettingsWindow = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 560, height: 520),
-            styleMask: [.titled, .closable, .resizable],
-            backing: .buffered,
-            defer: false
-        )
-
-        newSettingsWindow.title = "Complete Setup"
-        newSettingsWindow.identifier = NSUserInterfaceItemIdentifier("SettingsWindow")
-        newSettingsWindow.isReleasedWhenClosed = false
-        newSettingsWindow.minSize = NSSize(width: 520, height: 440)
-
-        let settingsView =
-            SettingsView(appState: appState, showOnlyApiSetup: true)
-        let hostingView = NSHostingView(rootView: settingsView)
-        newSettingsWindow.contentView = hostingView
-        newSettingsWindow.delegate = self
-
-        settingsWindow = newSettingsWindow
-
-        // Center window BEFORE display
-        newSettingsWindow.level = .normal
-        newSettingsWindow.center()
-        
-        currentOnboardingWindow?.close()
-        onboardingWindow = nil
-        
-        bringWindowToFront(newSettingsWindow)
-    }
+    // MARK: - Onboarding
 
     func setOnboardingWindow(
         _ window: NSWindow,
@@ -140,58 +106,67 @@ class WindowManager: NSObject, NSWindowDelegate {
     ) {
         onboardingWindow = window
         window.delegate = self
-        window.level = .floating
+        window.level = .normal
         window.identifier = NSUserInterfaceItemIdentifier("OnboardingWindow")
         
         window.center()
     }
 
-    func registerSettingsWindow(
-        _ window: NSWindow,
-        hostingView: NSHostingView<SettingsView>
-    ) {
-        settingsWindow = window
-        window.delegate = self
-        window.identifier = NSUserInterfaceItemIdentifier("SettingsWindow")
-    }
-
-    func closeSettingsWindow() {
-        if let window = settingsWindow {
-            window.close()
-            settingsWindow = nil
-        }
-    }
-
     func showOnboarding(appState: AppState, title: String = "Welcome to Writing Tools") {
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 640, height: 720),
-            styleMask: [.titled, .closable, .miniaturizable, .resizable],
+            styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
         window.title = title
         window.isReleasedWhenClosed = false
         window.minSize = NSSize(width: 560, height: 600)
+        configureThemedChrome(for: window)
 
         let onboardingView = OnboardingView(appState: appState)
         let hostingView = NSHostingView(rootView: onboardingView)
         window.contentView = hostingView
-        window.level = .floating
+        window.level = .normal
 
         setOnboardingWindow(window, hostingView: hostingView)
         bringWindowToFront(window)
+    }
+
+    // MARK: - About Window
+
+    func showAboutWindow() {
+        // Reuse existing window if it's still open
+        if let existing = aboutWindow, existing.isVisible {
+            bringWindowToFront(existing)
+            return
+        }
+
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 400, height: 400),
+            styleMask: [.titled, .closable, .fullSizeContentView],
+            backing: .buffered,
+            defer: false
+        )
+        window.identifier = NSUserInterfaceItemIdentifier("AboutWindow")
+        window.isReleasedWhenClosed = false
+        window.contentView = NSHostingView(rootView: AboutView())
+        window.title = "About Writing Tools"
+        configureThemedChrome(for: window)
+        window.delegate = self
+        window.center()
+
+        bringWindowToFront(window)
+        aboutWindow = window
     }
 
     // MARK: - Window Delegate
 
     func windowDidBecomeKey(_ notification: Notification) {
         guard let window = notification.object as? NSWindow else { return }
-        let isOnboardingWindow = (window === onboardingWindow)
         let preferredLevel: NSWindow.Level
         if window is PopupWindow {
             preferredLevel = .popUpMenu
-        } else if isOnboardingWindow {
-            preferredLevel = .floating
         } else {
             preferredLevel = .normal
         }
@@ -223,8 +198,8 @@ class WindowManager: NSObject, NSWindowDelegate {
             removeResponseWindow(responseWindow)
         } else if window === onboardingWindow {
             onboardingWindow = nil
-        } else if window === settingsWindow {
-            settingsWindow = nil
+        } else if window === aboutWindow {
+            aboutWindow = nil
         }
 
         window.delegate = nil
@@ -236,6 +211,7 @@ class WindowManager: NSObject, NSWindowDelegate {
         let windowsToClose = getAllWindows()
 
         windowsToClose.forEach { window in
+            (window as? PopupWindow)?.cleanup()
             // Set delegate to nil to prevent callbacks during close
             window.delegate = nil
             window.close()
@@ -250,8 +226,8 @@ class WindowManager: NSObject, NSWindowDelegate {
             windows.append(onboardingWindow)
         }
 
-        if let settingsWindow {
-            windows.append(settingsWindow)
+        if let aboutWindow {
+            windows.append(aboutWindow)
         }
 
         if let popup = popupWindow {
@@ -264,7 +240,7 @@ class WindowManager: NSObject, NSWindowDelegate {
 
     private func clearAllWindows() {
         onboardingWindow = nil
-        settingsWindow = nil
+        aboutWindow = nil
         responseWindows.removeAllObjects()
         clearPopupDismissSuppressionState()
         popupWindow = nil

@@ -76,7 +76,7 @@ import ApplicationServices
           case 3:
             OnboardingFinishStep(
               appState: appState,
-              onOpenCommandsManager: openCommandsManager,
+              onConfigureProvider: openProviderSettings,
               onFinish: saveSettingsAndFinish
             )
           default:
@@ -98,7 +98,7 @@ import ApplicationServices
               .fill(
                 currentStep >= index
                   ? Color.accentColor
-                  : Color.gray.opacity(0.3)
+                  : Color.secondary.opacity(0.3)
               )
               .frame(width: 10, height: 10)
           }
@@ -139,7 +139,7 @@ import ApplicationServices
         }
       }
       .padding(16)
-      .background(Color(.windowBackgroundColor))
+      .auxiliaryWindowSurface(useGradient: settings.useGradientTheme)
     }
     .frame(minWidth: 560, idealWidth: 640, maxWidth: 860, minHeight: 600, idealHeight: 720, maxHeight: 900)
     .background(
@@ -167,8 +167,35 @@ import ApplicationServices
     }
   }
 
-  private func openCommandsManager() {
-    WindowManager.shared.transitionFromOnboardingToSettings(appState: appState)
+  private func openProviderSettings() {
+    // Mark onboarding complete so the app does not re-show it on next launch.
+    settings.hasCompletedOnboarding = true
+
+    // Close the onboarding window, then open the standard SwiftUI Settings
+    // scene on the AI Provider pane (matching the prior "complete setup" intent).
+    if let window = NSApplication.shared.windows.first(where: {
+      $0.identifier?.rawValue == "OnboardingWindow"
+    }) {
+      window.close()
+    }
+
+    // Set the target tab before triggering the action so the pane restores correctly.
+    UserDefaults.standard.set("AI Provider", forKey: "lastSettingsTab")
+    NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+
+    // In an accessory (menu-bar) app there may be no key window after the
+    // onboarding window closes, so the Settings window can open behind other
+    // apps.  Mirror the working pattern from MenuBarMenu: yield once to let
+    // SwiftUI finish presenting the window, then bring it to front.
+    Task { @MainActor in
+      await Task.yield()
+      if let settingsWindow = NSApp.windows.first(where: {
+        $0.identifier?.rawValue == "com_apple_SwiftUI_Settings_window"
+          || $0.title.contains("Settings")
+      }), settingsWindow.isVisible {
+        WindowManager.shared.bringWindowToFront(settingsWindow)
+      }
+    }
   }
 
   @MainActor

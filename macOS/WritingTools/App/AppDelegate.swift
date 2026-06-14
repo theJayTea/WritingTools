@@ -7,7 +7,7 @@ private let logger = AppLogger.logger("AppDelegate")
 /// AppDelegate handles keyboard shortcuts, services, and popup window management.
 /// Menu bar UI is handled by SwiftUI's MenuBarExtra in writing_toolsApp.swift.
 @MainActor
-class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate {
     private var iCloudSyncObserver: NSObjectProtocol?
     private var iCloudQuotaObserver: NSObjectProtocol?
     private var clipboardRestoreObserver: NSObjectProtocol?
@@ -51,7 +51,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            MainActor.assumeIsolated {
+            Task { @MainActor in
                 self?.setupCommandShortcuts()
             }
         }
@@ -162,11 +162,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         // Flush cloud sync: cancel debounce, push immediately, and synchronize
         CloudCommandsSync.shared.flushAndSynchronize()
 
-        NotificationCenter.default.removeObserver(
-            self,
-            name: NSNotification.Name("CommandsChanged"),
-            object: nil
-        )
+        if let commandsChangedObserver {
+            NotificationCenter.default.removeObserver(commandsChangedObserver)
+            self.commandsChangedObserver = nil
+        }
         if let iCloudSyncObserver {
             NotificationCenter.default.removeObserver(iCloudSyncObserver)
             self.iCloudSyncObserver = nil
@@ -188,8 +187,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
 
     private func performRecoveryReset() {
-        guard let domain = Bundle.main.bundleIdentifier else { return }
-        UserDefaults.standard.removePersistentDomain(forName: domain)
+        // Stop sync first so an in-flight pull can't fight the reset.
+        CloudCommandsSync.shared.stop()
+
+        // resetAll() clears the Keychain API keys and resets in-memory settings,
+        // and also removes the UserDefaults persistent domain. Without this, the
+        // next launch's keychain migration would find no source and lose API keys.
+        AppSettings.shared.resetAll()
 
         WindowManager.shared.cleanupWindows()
 

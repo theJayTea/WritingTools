@@ -134,9 +134,7 @@ struct AboutView: View {
             Spacer()
         }
         .padding()
-        .frame(width: 420, height: 420)
-        .frame(minWidth: 400, minHeight: 380)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(minWidth: 400, idealWidth: 420, minHeight: 380, idealHeight: 420)
         .windowBackground(useGradient: settings.useGradientTheme)
     }
 }

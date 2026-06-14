@@ -9,7 +9,6 @@ import SwiftUI
 
 struct GeminiSettingsView: View {
     @Bindable var settings = AppSettings.shared
-    @Binding var needsSaving: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -20,9 +19,6 @@ struct GeminiSettingsView: View {
                         .foregroundStyle(.secondary)
                     
                     SecureAPIKeyField("API Key", text: $settings.geminiApiKey)
-                        .onChange(of: settings.geminiApiKey) { _, _ in
-                            needsSaving = true
-                        }
                 }
                 
                 VStack(alignment: .leading, spacing: 8) {
@@ -37,16 +33,10 @@ struct GeminiSettingsView: View {
                     }
                     .pickerStyle(.menu)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .onChange(of: settings.geminiModel) { _, _ in
-                        needsSaving = true
-                    }
-                    
+
                     if settings.geminiModel == .custom {
                         TextField("Custom Model Name", text: $settings.geminiCustomModel)
                             .textFieldStyle(.roundedBorder)
-                            .onChange(of: settings.geminiCustomModel) { _, _ in
-                                needsSaving = true
-                            }
                             .padding(.top, 4)
                     }
                 }

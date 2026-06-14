@@ -9,7 +9,6 @@ import SwiftUI
 
 struct MistralSettingsView: View {
     @Bindable var settings = AppSettings.shared
-    @Binding var needsSaving: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -20,9 +19,6 @@ struct MistralSettingsView: View {
                         .foregroundStyle(.secondary)
                     
                     SecureAPIKeyField("API Key", text: $settings.mistralApiKey)
-                        .onChange(of: settings.mistralApiKey) { _, _ in
-                            needsSaving = true
-                        }
                 }
                 
                 VStack(alignment: .leading, spacing: 8) {
@@ -37,9 +33,6 @@ struct MistralSettingsView: View {
                     }
                     .pickerStyle(.menu)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .onChange(of: settings.mistralModel) { _, _ in
-                        needsSaving = true
-                    }
                 }
             }
             .padding(.bottom, 4)

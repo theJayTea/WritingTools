@@ -23,10 +23,11 @@ final class AppSettings {
     // MARK: - Published Settings
     var themeStyle: AppTheme {
         didSet {
+            guard !isBootstrapping else { return }
             defaults.set(themeStyle.rawValue, forKey: "theme_style")
         }
     }
-    
+
     // API Keys now use computed properties backed by Keychain
     var geminiApiKey: String = "" {
         didSet {
@@ -34,108 +35,165 @@ final class AppSettings {
             scheduleKeychainWrite(geminiApiKey, forKey: "gemini_api_key")
         }
     }
-    
+
     var geminiModel: GeminiModel {
-        didSet { defaults.set(geminiModel.rawValue, forKey: "gemini_model") }
+        didSet {
+            guard !isBootstrapping else { return }
+            defaults.set(geminiModel.rawValue, forKey: "gemini_model")
+        }
     }
-    
+
     var geminiCustomModel: String {
-        didSet { defaults.set(geminiCustomModel, forKey: "gemini_custom_model") }
+        didSet {
+            guard !isBootstrapping else { return }
+            defaults.set(geminiCustomModel, forKey: "gemini_custom_model")
+        }
     }
-    
+
     var openAIApiKey: String = "" {
         didSet {
             guard !isBootstrapping, oldValue != openAIApiKey else { return }
             scheduleKeychainWrite(openAIApiKey, forKey: "openai_api_key")
         }
     }
-    
+
     var openAIBaseURL: String {
-        didSet { defaults.set(openAIBaseURL, forKey: "openai_base_url") }
+        didSet {
+            guard !isBootstrapping else { return }
+            defaults.set(openAIBaseURL, forKey: "openai_base_url")
+        }
     }
-    
+
     var openAIModel: String {
-        didSet { defaults.set(openAIModel, forKey: "openai_model") }
+        didSet {
+            guard !isBootstrapping else { return }
+            defaults.set(openAIModel, forKey: "openai_model")
+        }
     }
-    
+
     var openAIOrganization: String? {
-        didSet { defaults.set(openAIOrganization, forKey: "openai_organization") }
+        didSet {
+            guard !isBootstrapping else { return }
+            defaults.set(openAIOrganization, forKey: "openai_organization")
+        }
     }
-    
+
     var openAIProject: String? {
-        didSet { defaults.set(openAIProject, forKey: "openai_project") }
+        didSet {
+            guard !isBootstrapping else { return }
+            defaults.set(openAIProject, forKey: "openai_project")
+        }
     }
-    
+
     var currentProvider: String {
-        didSet { defaults.set(currentProvider, forKey: "current_provider") }
+        didSet {
+            guard !isBootstrapping else { return }
+            defaults.set(currentProvider, forKey: "current_provider")
+        }
     }
-    
+
     var shortcutText: String {
-        didSet { defaults.set(shortcutText, forKey: "shortcut") }
+        didSet {
+            guard !isBootstrapping else { return }
+            defaults.set(shortcutText, forKey: "shortcut")
+        }
     }
-    
+
     var hasCompletedOnboarding: Bool {
-        didSet { defaults.set(hasCompletedOnboarding, forKey: "has_completed_onboarding") }
+        didSet {
+            guard !isBootstrapping else { return }
+            defaults.set(hasCompletedOnboarding, forKey: "has_completed_onboarding")
+        }
     }
-    
+
     var useGradientTheme: Bool {
         themeStyle != .standard
     }
-    
+
     // MARK: - HotKey data
     var hotKeyCode: Int {
-        didSet { defaults.set(hotKeyCode, forKey: "hotKey_keyCode") }
+        didSet {
+            guard !isBootstrapping else { return }
+            defaults.set(hotKeyCode, forKey: "hotKey_keyCode")
+        }
     }
     var hotKeyModifiers: Int {
-        didSet { defaults.set(hotKeyModifiers, forKey: "hotKey_modifiers") }
+        didSet {
+            guard !isBootstrapping else { return }
+            defaults.set(hotKeyModifiers, forKey: "hotKey_modifiers")
+        }
     }
     var hotkeysPaused: Bool {
-        didSet { defaults.set(hotkeysPaused, forKey: "hotkeys_paused") }
+        didSet {
+            guard !isBootstrapping else { return }
+            defaults.set(hotkeysPaused, forKey: "hotkeys_paused")
+        }
     }
-    
+
     var mistralApiKey: String = "" {
         didSet {
             guard !isBootstrapping, oldValue != mistralApiKey else { return }
             scheduleKeychainWrite(mistralApiKey, forKey: "mistral_api_key")
         }
     }
-    
+
     var mistralBaseURL: String {
-        didSet { defaults.set(mistralBaseURL, forKey: "mistral_base_url") }
+        didSet {
+            guard !isBootstrapping else { return }
+            defaults.set(mistralBaseURL, forKey: "mistral_base_url")
+        }
     }
-    
+
     var mistralModel: String {
-        didSet { defaults.set(mistralModel, forKey: "mistral_model") }
+        didSet {
+            guard !isBootstrapping else { return }
+            defaults.set(mistralModel, forKey: "mistral_model")
+        }
     }
-    
+
     // Ollama settings:
     var ollamaBaseURL: String {
-        didSet { defaults.set(ollamaBaseURL, forKey: "ollama_base_url") }
+        didSet {
+            guard !isBootstrapping else { return }
+            defaults.set(ollamaBaseURL, forKey: "ollama_base_url")
+        }
     }
-    
+
     var ollamaModel: String {
-        didSet { defaults.set(ollamaModel, forKey: "ollama_model") }
+        didSet {
+            guard !isBootstrapping else { return }
+            defaults.set(ollamaModel, forKey: "ollama_model")
+        }
     }
-    
+
     var ollamaKeepAlive: String {
-        didSet { defaults.set(ollamaKeepAlive, forKey: "ollama_keep_alive") }
+        didSet {
+            guard !isBootstrapping else { return }
+            defaults.set(ollamaKeepAlive, forKey: "ollama_keep_alive")
+        }
     }
-    
+
     var ollamaImageMode: OllamaImageMode {
-        didSet { defaults.set(ollamaImageMode.rawValue, forKey: "ollama_image_mode") }
+        didSet {
+            guard !isBootstrapping else { return }
+            defaults.set(ollamaImageMode.rawValue, forKey: "ollama_image_mode")
+        }
     }
-    
+
     var anthropicApiKey: String = "" {
         didSet {
             guard !isBootstrapping, oldValue != anthropicApiKey else { return }
             scheduleKeychainWrite(anthropicApiKey, forKey: "anthropic_api_key")
         }
     }
-    
+
     var anthropicModel: String {
-        didSet { defaults.set(anthropicModel, forKey: "anthropic_model") }
+        didSet {
+            guard !isBootstrapping else { return }
+            defaults.set(anthropicModel, forKey: "anthropic_model")
+        }
     }
-    
+
     var openRouterApiKey: String = "" {
         didSet {
             guard !isBootstrapping, oldValue != openRouterApiKey else { return }
@@ -143,24 +201,37 @@ final class AppSettings {
         }
     }
     var openRouterModel: String {
-        didSet { defaults.set(openRouterModel, forKey: "openrouter_model") }
+        didSet {
+            guard !isBootstrapping else { return }
+            defaults.set(openRouterModel, forKey: "openrouter_model")
+        }
     }
     var openRouterCustomModel: String {
-        didSet { defaults.set(openRouterCustomModel, forKey: "openrouter_custom_model") }
+        didSet {
+            guard !isBootstrapping else { return }
+            defaults.set(openRouterCustomModel, forKey: "openrouter_custom_model")
+        }
     }
-    
+
     // Store the ID (rawValue) of the selected local LLM model type
     var selectedLocalLLMId: String? {
-        didSet { defaults.set(selectedLocalLLMId, forKey: "selected_local_llm_id") }
+        didSet {
+            guard !isBootstrapping else { return }
+            defaults.set(selectedLocalLLMId, forKey: "selected_local_llm_id")
+        }
     }
-    
+
     // MARK: - Custom Commands Settings
     var openCustomCommandsInResponseWindow: Bool {
-        didSet { defaults.set(openCustomCommandsInResponseWindow, forKey: "open_custom_commands_in_response_window") }
+        didSet {
+            guard !isBootstrapping else { return }
+            defaults.set(openCustomCommandsInResponseWindow, forKey: "open_custom_commands_in_response_window")
+        }
     }
 
     var enableICloudCommandSync: Bool {
         didSet {
+            guard !isBootstrapping else { return }
             defaults.set(enableICloudCommandSync, forKey: "enable_icloud_command_sync")
             NotificationCenter.default.post(name: .iCloudCommandSyncPreferenceDidChange, object: nil)
         }
@@ -286,6 +357,10 @@ final class AppSettings {
     }
 
     // MARK: - Convenience
+
+    /// Wipes all persisted settings and resets the singleton's in-memory state to
+    /// defaults. Safe to call multiple times (idempotent). The `isBootstrapping`
+    /// guard is reused to suppress re-persisting defaults during the in-memory reset.
     func resetAll() {
         guard let domain = Bundle.main.bundleIdentifier else { return }
         UserDefaults.standard.removePersistentDomain(forName: domain)
@@ -294,5 +369,43 @@ final class AppSettings {
         Task {
             try? await keychain.clearAllApiKeys()
         }
+
+        // Reset in-memory state to defaults so subsequent didSet writes don't
+        // re-persist stale values. Re-engage the bootstrapping guard for the
+        // duration of the reset, then release it.
+        isBootstrapping = true
+
+        themeStyle = .gradient
+        geminiApiKey = ""
+        geminiModel = GeminiModel(rawValue: GeminiModel.gemmabig.rawValue) ?? .gemmabig
+        geminiCustomModel = ""
+        openAIApiKey = ""
+        openAIBaseURL = OpenAIConfig.defaultBaseURL
+        openAIModel = OpenAIConfig.defaultModel
+        openAIOrganization = nil
+        openAIProject = nil
+        currentProvider = "gemini"
+        shortcutText = "⌥ Space"
+        hasCompletedOnboarding = false
+        hotKeyCode = 0
+        hotKeyModifiers = 0
+        hotkeysPaused = false
+        mistralApiKey = ""
+        mistralBaseURL = MistralConfig.defaultBaseURL
+        mistralModel = MistralConfig.defaultModel
+        ollamaBaseURL = OllamaConfig.defaultBaseURL
+        ollamaModel = OllamaConfig.defaultModel
+        ollamaKeepAlive = OllamaConfig.defaultKeepAlive
+        ollamaImageMode = .ocr
+        anthropicApiKey = ""
+        anthropicModel = AnthropicConfig.defaultModel
+        selectedLocalLLMId = nil
+        openRouterApiKey = ""
+        openRouterModel = OpenRouterConfig.defaultModel
+        openRouterCustomModel = ""
+        openCustomCommandsInResponseWindow = true
+        enableICloudCommandSync = false
+
+        isBootstrapping = false
     }
 }

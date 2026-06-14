@@ -8,26 +8,18 @@
 import SwiftUI
 import AppKit
 
-struct AIProviderSettingsPane<SaveButton: View, CompleteSetupButton: View>: View {
+struct AIProviderSettingsPane: View {
     @Bindable var appState: AppState
     @Bindable var settings = AppSettings.shared
-    @Binding var needsSaving: Bool
-    var showOnlyApiSetup: Bool
-    let saveButton: SaveButton
-    let completeSetupButton: CompleteSetupButton
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            Text("AI Provider Settings")
-                .font(.headline)
-                .accessibilityAddTraits(.isHeader)
-
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Select AI Service")
-                    .font(.subheadline)
+        Form {
+            Section {
+                Text("Choose the AI service Writing Tools uses for commands and custom prompts.")
+                    .font(.footnote)
                     .foregroundStyle(.secondary)
 
-                Picker("Provider", selection: $settings.currentProvider) {
+                Picker("AI Provider", selection: $settings.currentProvider) {
                     if LocalModelProvider.isAppleSilicon {
                         Text("Local LLM").tag("local")
                     }
@@ -39,48 +31,43 @@ struct AIProviderSettingsPane<SaveButton: View, CompleteSetupButton: View>: View
                     Text("OpenRouter").tag("openrouter")
                 }
                 .pickerStyle(.menu)
-                .frame(maxWidth: .infinity, alignment: .leading)
                 .accessibilityLabel("AI Provider")
                 .accessibilityHint("Select which AI service to use for processing.")
                 .onChange(of: settings.currentProvider) { _, newValue in
                     if newValue == "local" && !LocalModelProvider.isAppleSilicon {
                         settings.currentProvider = "gemini"
                     }
-                    needsSaving = true
                 }
                 .help("Select which AI service to use for processing.")
+            } header: {
+                Text("Provider")
             }
 
-            Divider()
-                .padding(.vertical, 2)
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: 0) {
-                    if settings.currentProvider == "gemini" {
-                        GeminiSettingsView(needsSaving: $needsSaving)
-                    } else if settings.currentProvider == "mistral" {
-                        MistralSettingsView(needsSaving: $needsSaving)
-                    } else if settings.currentProvider == "anthropic" {
-                        AnthropicSettingsView(needsSaving: $needsSaving)
-                    } else if settings.currentProvider == "openai" {
-                        OpenAISettingsView(needsSaving: $needsSaving)
-                    } else if settings.currentProvider == "ollama" {
-                        OllamaSettingsView(needsSaving: $needsSaving)
-                    } else if settings.currentProvider == "openrouter" {
-                        OpenRouterSettingsView(needsSaving: $needsSaving)
-                    } else if settings.currentProvider == "local" {
-                        LocalLLMSettingsView(provider: appState.localLLMProvider)
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
+            Section {
+                providerSettingsContent
+            } header: {
+                Text("Configuration")
             }
-            .accessibilityLabel("Provider settings")
+        }
+        .formStyle(.grouped)
+    }
 
-            if !showOnlyApiSetup {
-                saveButton
-            } else {
-                completeSetupButton
-            }
+    @ViewBuilder
+    private var providerSettingsContent: some View {
+        if settings.currentProvider == "gemini" {
+            GeminiSettingsView()
+        } else if settings.currentProvider == "mistral" {
+            MistralSettingsView()
+        } else if settings.currentProvider == "anthropic" {
+            AnthropicSettingsView()
+        } else if settings.currentProvider == "openai" {
+            OpenAISettingsView()
+        } else if settings.currentProvider == "ollama" {
+            OllamaSettingsView()
+        } else if settings.currentProvider == "openrouter" {
+            OpenRouterSettingsView()
+        } else if settings.currentProvider == "local" {
+            LocalLLMSettingsView(provider: appState.localLLMProvider)
         }
     }
 }

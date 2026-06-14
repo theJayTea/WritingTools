@@ -15,6 +15,10 @@ enum AppTheme: String, CaseIterable {
         case .oled: return "OLED"
         }
     }
+
+    var usesThemedAuxiliarySurfaces: Bool {
+        self != .standard
+    }
 }
 
 struct WindowBackground: ViewModifier {
@@ -35,23 +39,38 @@ struct WindowBackground: ViewModifier {
         return settings.themeStyle
     }
 
+    @ViewBuilder
     func body(content: Content) -> some View {
-        content
-            .background(
-                Group {
-                    switch currentTheme {
-                    case .standard:
-                        Color(.windowBackgroundColor)
-                    case .gradient:
-                        MeshLikeGradientBackground()
-                    case .glass:
-                        GlassmorphicBackground()
-                    case .oled:
-                        Color.black
-                    }
+        if #available(macOS 15.0, *) {
+            content
+                .background {
+                    themedBackground
+                        .clipShape(.rect(cornerRadius: cornerRadius ?? 0))
                 }
-                .clipShape(.rect(cornerRadius: cornerRadius ?? 0))
-            )
+                .containerBackground(for: .window) {
+                    themedBackground
+                }
+        } else {
+            content
+                .background {
+                    themedBackground
+                        .clipShape(.rect(cornerRadius: cornerRadius ?? 0))
+                }
+        }
+    }
+
+    @ViewBuilder
+    private var themedBackground: some View {
+        switch currentTheme {
+        case .standard:
+            Color(.windowBackgroundColor)
+        case .gradient:
+            MeshLikeGradientBackground()
+        case .glass:
+            GlassmorphicBackground()
+        case .oled:
+            Color.black
+        }
     }
 }
 
@@ -168,9 +187,38 @@ extension Color {
     }
 }
 
+struct AuxiliaryWindowSurface: ViewModifier {
+    @Bindable private var settings = AppSettings.shared
+    let useGradient: Bool
+
+    private var currentTheme: AppTheme {
+        useGradient ? settings.themeStyle : .standard
+    }
+
+    private var surfaceStyle: AnyShapeStyle {
+        guard currentTheme.usesThemedAuxiliarySurfaces else {
+            return AnyShapeStyle(Color(.windowBackgroundColor))
+        }
+
+        if currentTheme == .oled {
+            return AnyShapeStyle(Color.black)
+        }
+
+        return AnyShapeStyle(Material.bar)
+    }
+
+    func body(content: Content) -> some View {
+        content.background(surfaceStyle)
+    }
+}
+
 extension View {
     func windowBackground(useGradient: Bool, cornerRadius: CGFloat? = nil) -> some View {
         modifier(WindowBackground(useGradient: useGradient, cornerRadius: cornerRadius))
+    }
+
+    func auxiliaryWindowSurface(useGradient: Bool) -> some View {
+        modifier(AuxiliaryWindowSurface(useGradient: useGradient))
     }
 }
 

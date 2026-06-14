@@ -111,7 +111,10 @@ struct CommandEditor: View {
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
-                .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                .disabled(
+                    name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                    || Self.isPromptEffectivelyEmpty(prompt)
+                )
             }
             .padding([.horizontal, .bottom], 20)
             .padding(.top, 6)
@@ -324,6 +327,10 @@ struct CommandEditor: View {
         let trimmedName = Self.trimmedNameForSave(name)
         guard !trimmedName.isEmpty else { return }
 
+        // Require a non-empty (effective) prompt so we never persist a command
+        // that would run with no instructions.
+        guard !Self.isPromptEffectivelyEmpty(prompt) else { return }
+
         clearCustomProviderValidationErrors()
         guard validateCustomProviderFieldsIfNeeded() else { return }
         let normalizedTrimmedName = Self.normalizedCommandName(trimmedName)
@@ -347,7 +354,17 @@ struct CommandEditor: View {
         updatedCommand.prompt = prompt
         updatedCommand.icon = selectedIcon
         updatedCommand.useResponseWindow = useResponseWindow
-        updatedCommand.hasShortcut = hasShortcut
+
+        // The persisted `hasShortcut` must reflect whether a key was actually
+        // recorded. Toggling the switch ON without recording a shortcut would
+        // otherwise leave a dead handler registered in AppDelegate.
+        updatedCommand.hasShortcut = KeyboardShortcuts.getShortcut(for: .commandShortcut(for: command.id)) != nil
+
+        // Keep the stored top-level formatting flag in sync with the prompt's
+        // effective value so `preserveFormatting` and `effectivePreserveFormatting`
+        // never diverge (the advanced editor writes rules.preserve_formatting
+        // into the JSON but does not touch this stored bool directly).
+        updatedCommand.preserveFormatting = updatedCommand.effectivePreserveFormatting
 
         // Save provider override settings
         if useCustomProvider {
@@ -396,6 +413,21 @@ struct CommandEditor: View {
 
     static func trimmedNameForSave(_ value: String) -> String {
         value.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    /// Whether the prompt is effectively blank and therefore not savable.
+    /// A raw prompt that is empty after trimming is rejected. For a structured
+    /// (JSON) prompt we additionally reject one whose effective `task` is blank,
+    /// since that would run with no actual instruction.
+    static func isPromptEffectivelyEmpty(_ value: String) -> Bool {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty { return true }
+
+        if let structure = PromptStructure.from(jsonString: trimmed) {
+            return structure.task.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
+
+        return false
     }
 
     static func hasDuplicateName(

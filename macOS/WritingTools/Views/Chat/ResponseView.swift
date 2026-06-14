@@ -22,9 +22,49 @@ extension String {
         return String(trimmed[contentRange])
     }
     
-    /// Applies all markdown normalizations for AI responses
-    fileprivate func normalizedForMarkdown() -> String {
+    /// Applies all markdown normalizations for completed AI responses.
+    func normalizedForMarkdown() -> String {
         return self.strippingOuterCodeBlock()
+    }
+
+    /// Produces markdown that is safe to hand to the renderer while a response is still streaming.
+    /// This does not change the stored response; it only makes incomplete fences render predictably.
+    func renderableMarkdownForResponse(isStreaming: Bool) -> String {
+        guard isStreaming else {
+            return normalizedForMarkdown()
+        }
+
+        return strippingPartialOuterMarkdownFence()
+            .balancingUnclosedCodeFenceForDisplay()
+    }
+
+    private func strippingPartialOuterMarkdownFence() -> String {
+        let trimmed = self.trimmingCharacters(in: .whitespacesAndNewlines)
+        let pattern = #"^```(?:markdown|md)\s*\n([\s\S]*)$"#
+
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]),
+              let match = regex.firstMatch(in: trimmed, options: [], range: NSRange(trimmed.startIndex..., in: trimmed)),
+              let contentRange = Range(match.range(at: 1), in: trimmed) else {
+            return self
+        }
+
+        var content = String(trimmed[contentRange])
+        if content.hasSuffix("\n```") {
+            content.removeLast(4)
+        }
+        return content
+    }
+
+    private func balancingUnclosedCodeFenceForDisplay() -> String {
+        let fenceCount = self.components(separatedBy: .newlines).reduce(0) { count, line in
+            line.trimmingCharacters(in: .whitespaces).hasPrefix("```") ? count + 1 : count
+        }
+
+        guard fenceCount.isMultiple(of: 2) == false else {
+            return self
+        }
+
+        return self + "\n```"
     }
 }
 
@@ -61,10 +101,19 @@ struct ResponseView: View {
     @Bindable private var settings = AppSettings.shared
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.accessibilityReduceMotion) var reduceMotion
+    /// Seeds the markdown base font size from the Dynamic Type `.body` metric so
+    /// the default scales with the user's preferred text size. The user's +/-
+    /// delta is applied on top of this scaled base.
+    @ScaledMetric(relativeTo: .body) private var baseFontSize: Double = 14
     @State private var inputText: String = ""
     @State private var isRegenerating: Bool = false
     @State private var errorMessage: String?
     @State private var showError: Bool = false
+    @State private var isPinnedToLatest: Bool = true
+    @State private var scrollViewportHeight: CGFloat = 0
+
+    private let bottomAnchorId = "response-scroll-bottom-anchor"
+    private let scrollCoordinateSpaceName = "response-scroll-coordinate-space"
     
     init(
         content: String,
@@ -103,66 +152,27 @@ struct ResponseView: View {
         ))
     }
     
+    /// Effective markdown font size: the Dynamic Type-scaled base plus the
+    /// user's +/- delta (relative to the stored default of 14). This keeps the
+    /// user-facing font-size controls working while letting the default respond
+    /// to the system text size.
+    private var effectiveFontSize: CGFloat {
+        let userDelta = viewModel.fontSize - ResponseViewModel.defaultFontSize
+        return CGFloat(baseFontSize) + userDelta
+    }
+
     var body: some View {
         VStack(spacing: 0) {
-            // Toolbar
-            HStack(spacing: 16) {
-                Button(action: { viewModel.copyContent() }) {
-                    Label(viewModel.showCopyConfirmation ? "Copied!" : "Copy All",
-                          systemImage: viewModel.showCopyConfirmation ? "checkmark" : "doc.on.doc")
-                    .frame(minWidth: 80)
-                }
-                .buttonStyle(.borderedProminent)
-                .animation(reduceMotion ? nil : .easeInOut, value: viewModel.showCopyConfirmation)
-                
-                Spacer()
-                
-                HStack(spacing: 12) {
-                    Button(action: { viewModel.fontSize -= 1 }) {
-                        Label("Decrease text size", systemImage: "textformat.size.smaller")
-                            .labelStyle(.iconOnly)
-                    }
-                    .buttonStyle(.borderless)
-                    .disabled(viewModel.fontSize <= 10)
-                    .keyboardShortcut("-", modifiers: .command)
-                    .accessibilityLabel("Decrease text size")
-                    .accessibilityHint("Makes the response text smaller")
-                    
-                    Button(action: { viewModel.fontSize += 1 }) {
-                        Label("Increase text size", systemImage: "textformat.size.larger")
-                            .labelStyle(.iconOnly)
-                    }
-                    .buttonStyle(.borderless)
-                    .disabled(viewModel.fontSize >= 20)
-                    .keyboardShortcut("+", modifiers: .command)
-                    .accessibilityLabel("Increase text size")
-                    .accessibilityHint("Makes the response text larger")
-                    
-                    Button(action: {
-                        viewModel.fontSize = 14
-                    }) {
-                        Label("Reset Font Size", systemImage: "arrow.counterclockwise")
-                            .labelStyle(.iconOnly)
-                    }
-                    .buttonStyle(.borderless)
-                    .keyboardShortcut("0", modifiers: .command)
-                    .accessibilityLabel("Reset text size")
-                    .accessibilityHint("Returns text size to the default")
-                }
-            }
-            .padding()
-            .background(Color.clear)
-            
             // Chat messages area
             ScrollViewReader { proxy in
                 ScrollView {
                     LazyVStack(spacing: 16) {
                         ForEach(viewModel.messages) { message in
-                            ChatMessageView(message: message, fontSize: viewModel.fontSize)
+                            ChatMessageView(message: message, fontSize: effectiveFontSize)
                                 .id(message.id)
                                 .frame(maxWidth: .infinity, alignment: message.role == "user" ? .trailing : .leading)
                         }
-                        
+
                         // Show loading indicator only when processing and no streaming message is visible
                         if viewModel.isProcessing && !(viewModel.messages.last?.isStreaming == true) {
                             HStack(alignment: .top, spacing: 12) {
@@ -170,7 +180,7 @@ struct ResponseView: View {
                                     ProgressView()
                                         .scaleEffect(0.8)
                                     Text("Thinking...")
-                                        .font(.system(size: 14))
+                                        .font(.body)
                                         .foregroundStyle(.secondary)
                                 }
                                 .padding(12)
@@ -181,38 +191,62 @@ struct ResponseView: View {
                                 Spacer(minLength: 15)
                             }
                             .padding(.top, 4)
+                            .accessibilityElement(children: .combine)
+                            .accessibilityLabel("Thinking")
                         }
+
+                        Color.clear
+                            .frame(height: 1)
+                            .id(bottomAnchorId)
+                            .background(
+                                GeometryReader { marker in
+                                    Color.clear.preference(
+                                        key: ScrollBottomOffsetKey.self,
+                                        value: marker.frame(in: .named(scrollCoordinateSpaceName)).maxY
+                                    )
+                                }
+                            )
                     }
                     .padding()
                 }
-                .onChange(of: viewModel.messages) { oldValue, newValue in
-                    // Only scroll if messages were added (not on initial load)
-                    guard newValue.count > oldValue.count else {
-                        return
+                .coordinateSpace(name: scrollCoordinateSpaceName)
+                .background(
+                    GeometryReader { viewport in
+                        Color.clear.preference(key: ScrollViewportHeightKey.self, value: viewport.size.height)
                     }
-                    
-                    if let lastId = newValue.last?.id {
-                        if reduceMotion {
-                            proxy.scrollTo(lastId, anchor: .bottom)
-                        } else {
-                            withAnimation {
-                                proxy.scrollTo(lastId, anchor: .bottom)
-                            }
+                )
+                .overlay(alignment: .bottomTrailing) {
+                    if !isPinnedToLatest && viewModel.isProcessing {
+                        Button {
+                            scrollToLatest(proxy, animated: !reduceMotion)
+                        } label: {
+                            Label("Jump to Latest", systemImage: "arrow.down.to.line.compact")
                         }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                        .padding()
+                        .help("Jump to Latest")
                     }
                 }
-                .onChange(of: viewModel.messages.last?.content) { _, _ in
-                    guard let lastMessage = viewModel.messages.last, lastMessage.isStreaming else {
+                .onPreferenceChange(ScrollViewportHeightKey.self) { height in
+                    updateScrollViewportHeight(height)
+                }
+                .onPreferenceChange(ScrollBottomOffsetKey.self) { bottomOffset in
+                    updatePinnedToLatest(bottomOffset: bottomOffset)
+                }
+                .onChange(of: viewModel.messages) { oldValue, newValue in
+                    guard newValue.count > oldValue.count, isPinnedToLatest else {
                         return
                     }
 
-                    if reduceMotion {
-                        proxy.scrollTo(lastMessage.id, anchor: .bottom)
-                    } else {
-                        withAnimation(.linear(duration: 0.1)) {
-                            proxy.scrollTo(lastMessage.id, anchor: .bottom)
-                        }
+                    scrollToLatest(proxy, animated: !reduceMotion)
+                }
+                .onChange(of: viewModel.messages.last?.content) { _, _ in
+                    guard viewModel.messages.last?.isStreaming == true, isPinnedToLatest else {
+                        return
                     }
+
+                    scrollToLatest(proxy, animated: !reduceMotion, duration: 0.1)
                 }
             }
             
@@ -234,9 +268,45 @@ struct ResponseView: View {
                 .padding(.horizontal)
                 .padding(.vertical, 8)
             }
-            .background(Color(.windowBackgroundColor))
+            .auxiliaryWindowSurface(useGradient: settings.useGradientTheme)
         }
         .windowBackground(useGradient: settings.useGradientTheme)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button(action: { viewModel.copyContent() }) {
+                    Label(viewModel.showCopyConfirmation ? "Copied!" : "Copy All",
+                          systemImage: viewModel.showCopyConfirmation ? "checkmark" : "doc.on.doc")
+                }
+                .animation(reduceMotion ? nil : .easeInOut, value: viewModel.showCopyConfirmation)
+            }
+
+            ToolbarItemGroup(placement: .automatic) {
+                Button(action: { viewModel.fontSize -= 1 }) {
+                    Label("Decrease text size", systemImage: "textformat.size.smaller")
+                }
+                .disabled(viewModel.fontSize <= ResponseViewModel.minimumFontSize)
+                .keyboardShortcut("-", modifiers: .command)
+                .accessibilityLabel("Decrease text size")
+                .accessibilityHint("Makes the response text smaller")
+
+                Button(action: { viewModel.fontSize += 1 }) {
+                    Label("Increase text size", systemImage: "textformat.size.larger")
+                }
+                .disabled(viewModel.fontSize >= ResponseViewModel.maximumFontSize)
+                .keyboardShortcut("+", modifiers: .command)
+                .accessibilityLabel("Increase text size")
+                .accessibilityHint("Makes the response text larger")
+
+                Button(action: {
+                    viewModel.fontSize = ResponseViewModel.defaultFontSize
+                }) {
+                    Label("Reset Font Size", systemImage: "arrow.counterclockwise")
+                }
+                .keyboardShortcut("0", modifiers: .command)
+                .accessibilityLabel("Reset text size")
+                .accessibilityHint("Returns text size to the default")
+            }
+        }
         .alert("Error", isPresented: $showError, presenting: errorMessage) { _ in
             Button("OK") { errorMessage = nil }
         } message: { message in
@@ -244,6 +314,45 @@ struct ResponseView: View {
         }
         .onDisappear {
             viewModel.cancelOngoingTasks()
+        }
+    }
+
+    private func scrollToLatest(_ proxy: ScrollViewProxy, animated: Bool, duration: Double? = nil) {
+        let action = {
+            proxy.scrollTo(bottomAnchorId, anchor: .bottom)
+        }
+
+        guard animated else {
+            action()
+            return
+        }
+
+        if let duration {
+            withAnimation(.linear(duration: duration)) {
+                action()
+            }
+        } else {
+            withAnimation {
+                action()
+            }
+        }
+    }
+
+    private func updateScrollViewportHeight(_ height: CGFloat) {
+        guard height.isFinite, abs(scrollViewportHeight - height) > 0.5 else {
+            return
+        }
+        scrollViewportHeight = height
+    }
+
+    private func updatePinnedToLatest(bottomOffset: CGFloat) {
+        guard scrollViewportHeight > 0, bottomOffset.isFinite else {
+            return
+        }
+
+        let nextValue = bottomOffset <= scrollViewportHeight + 80
+        if isPinnedToLatest != nextValue {
+            isPinnedToLatest = nextValue
         }
     }
     
@@ -266,14 +375,35 @@ struct ResponseView: View {
     }
 }
 
+private struct ScrollViewportHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
+private struct ScrollBottomOffsetKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
 // MARK: - Chat Message View
 
 struct ChatMessageView: View {
     let message: ChatMessage
     let fontSize: CGFloat
     @Environment(\.accessibilityReduceMotion) var reduceMotion
+    @Environment(\.legibilityWeight) private var legibilityWeight
     @State private var showCopiedFeedback: Bool = false
-    
+    /// Container-relative width for a single bubble. Caps at ~82% of the
+    /// available width so bubbles use a generous, readable proportion of wide
+    /// windows without running fully edge-to-edge.
+    @State private var bubbleMaxWidth: CGFloat = 500
+
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             if message.role == "assistant" {
@@ -284,6 +414,15 @@ struct ChatMessageView: View {
                 bubbleView(role: message.role).transition(.move(edge: .trailing))
             }
         }
+        .background(
+            GeometryReader { proxy in
+                Color.clear
+                    .onAppear { updateBubbleMaxWidth(proxy.size.width) }
+                    .onChange(of: proxy.size.width) { _, newWidth in
+                        updateBubbleMaxWidth(newWidth)
+                    }
+            }
+        )
         .padding(.top, 4)
         .animation(reduceMotion ? nil : .spring(), value: message.role)
     }
@@ -292,28 +431,18 @@ struct ChatMessageView: View {
     private func bubbleView(role: String) -> some View {
         VStack(alignment: role == "assistant" ? .leading : .trailing, spacing: 2) {
             Group {
-                if message.isStreaming && role == "assistant" {
-                    if !message.content.isEmpty {
-                        Text(message.content)
-                            .font(.system(size: fontSize))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .textSelection(.enabled)
-                    }
-                } else {
-                    RichMarkdownView(text: message.content, fontSize: fontSize)
-                        // Keep markdown constrained to bubble width while allowing vertical growth.
-                        .fixedSize(horizontal: false, vertical: true)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .textSelection(.enabled)
+                if !message.content.isEmpty {
+                    WidthConstrainedMarkdown(
+                        text: message.content.renderableMarkdownForResponse(isStreaming: message.isStreaming && role == "assistant"),
+                        fontSize: fontSize,
+                        legibilityWeight: legibilityWeight
+                    )
                 }
             }
             .chatBubbleStyle(isFromUser: message.role == "user", isEmpty: message.isStreaming && message.content.isEmpty)
             .accessibilityLabel(message.role == "user" ? "Your message" : "Assistant's response")
             .accessibilityValue(message.content)
             .contextMenu {
-                Button("Copy Selection") {
-                    NSApp.sendAction(#selector(NSText.copy(_:)), to: nil, from: nil)
-                }
                 Button("Copy Message") {
                     copyEntireMessage()
                 }
@@ -330,33 +459,54 @@ struct ChatMessageView: View {
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Generating response")
                 } else {
                     Text(message.timestamp.formatted(.dateTime.hour().minute()))
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                     
-                    Button(action: copyEntireMessage) {
-                        if showCopiedFeedback {
-                            Text("Copied")
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                        } else {
-                            Image(systemName: "doc.on.doc")
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    .buttonStyle(.plain)
-                    .help(showCopiedFeedback ? "" : "Copy Message")
-                    .accessibilityLabel("Copy message")
-                    .accessibilityHint("Copies this message to the clipboard")
+                    copyButton
                 }
             }
             .padding(.bottom, 2)
         }
-        .frame(maxWidth: 500, alignment: role == "assistant" ? .leading : .trailing)
+        .frame(maxWidth: bubbleMaxWidth, alignment: role == "assistant" ? .leading : .trailing)
     }
-    
+
+    /// Copy-message button. The `.help` tooltip is omitted entirely while the
+    /// "Copied" confirmation is showing rather than passing an empty string.
+    @ViewBuilder
+    private var copyButton: some View {
+        let button = Button(action: copyEntireMessage) {
+            if showCopiedFeedback {
+                Text("Copied")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            } else {
+                Image(systemName: "doc.on.doc")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Copy message")
+        .accessibilityHint("Copies this message to the clipboard")
+
+        if showCopiedFeedback {
+            button
+        } else {
+            button.help("Copy Message")
+        }
+    }
+
+    private func updateBubbleMaxWidth(_ availableWidth: CGFloat) {
+        let nextWidth = max(280, availableWidth * 0.82)
+        if abs(bubbleMaxWidth - nextWidth) > 0.5 {
+            bubbleMaxWidth = nextWidth
+        }
+    }
+
     private func copyEntireMessage() {
         let pasteboard = NSPasteboard.general
         pasteboard.prepareForNewContents(with: [])
@@ -378,12 +528,22 @@ final class ResponseViewModel {
 
     // UserDefaults key for persistent font size storage
     private static let fontSizeKey = "ResponseView.fontSize"
-    private static let defaultFontSize: CGFloat = 14
+    static let defaultFontSize: CGFloat = 14
+    static let minimumFontSize: CGFloat = 10
+    static let maximumFontSize: CGFloat = 20
+
+    private static func clampedFontSize(_ fontSize: CGFloat) -> CGFloat {
+        min(max(fontSize, minimumFontSize), maximumFontSize)
+    }
 
     var messages: [ChatMessage] = []
     var fontSize: CGFloat = 14 {
         didSet {
-            // Debounce font size saves to prevent race conditions from rapid slider changes
+            let clampedFontSize = Self.clampedFontSize(fontSize)
+            if fontSize != clampedFontSize {
+                fontSize = clampedFontSize
+            }
+            // Debounce font size saves to prevent race conditions from rapid slider movements
             scheduleFontSizeSave()
         }
     }
@@ -423,7 +583,7 @@ final class ResponseViewModel {
 
         // Load saved font size from UserDefaults, or use default
         let savedFontSize = UserDefaults.standard.object(forKey: Self.fontSizeKey) as? CGFloat
-        self.fontSize = savedFontSize ?? Self.defaultFontSize
+        self.fontSize = Self.clampedFontSize(savedFontSize ?? Self.defaultFontSize)
 
         // Add initial assistant message
         messages.append(ChatMessage(role: "assistant", content: self.content))
@@ -452,7 +612,7 @@ final class ResponseViewModel {
         self.provider = provider
 
         let savedFontSize = UserDefaults.standard.object(forKey: Self.fontSizeKey) as? CGFloat
-        self.fontSize = savedFontSize ?? Self.defaultFontSize
+        self.fontSize = Self.clampedFontSize(savedFontSize ?? Self.defaultFontSize)
 
         // Start with a streaming placeholder
         messages.append(ChatMessage(role: "assistant", content: "", isStreaming: true))
@@ -651,9 +811,9 @@ final class ResponseViewModel {
             
             isProcessing = false
         } catch {
-            // Remove the streaming message on error
             if let idx = messages.firstIndex(where: { $0.id == messageId }) {
-                messages.remove(at: idx)
+                messages[idx].content = "Error: \(error.localizedDescription)"
+                messages[idx].isStreaming = false
             }
             isProcessing = false
             throw error
@@ -742,17 +902,74 @@ final class ResponseViewModel {
     }
 }
 
+// MARK: - Width-Constrained Markdown Wrapper
+
+/// Reads the available width via `GeometryReader` and proposes it as an
+/// explicit constraint to `RichMarkdownView`, so that the MarkdownView
+/// library's internal `FlowLayout` / `ViewThatFits` logic receives a
+/// concrete container width and can wrap or scroll LaTeX images properly.
+private struct WidthConstrainedMarkdown: View {
+    let text: String
+    let fontSize: CGFloat
+    let legibilityWeight: LegibilityWeight?
+
+    @State private var contentHeight: CGFloat = 1
+
+    var body: some View {
+        GeometryReader { geo in
+            RichMarkdownView(text: text, fontSize: fontSize, legibilityWeight: legibilityWeight)
+                .frame(width: max(geo.size.width, 1), alignment: .leading)
+                .fixedSize(horizontal: false, vertical: true)
+                .textSelection(.enabled)
+                .background(
+                    GeometryReader { inner in
+                        Color.clear
+                            .preference(key: ContentHeightKey.self, value: inner.size.height)
+                    }
+                )
+        }
+        .frame(height: max(contentHeight, 1), alignment: .topLeading)
+        .clipped()
+        .onPreferenceChange(ContentHeightKey.self) { height in
+            updateContentHeight(height)
+        }
+    }
+
+    private func updateContentHeight(_ height: CGFloat) {
+        guard height.isFinite, height > 0, abs(contentHeight - height) > 0.5 else {
+            return
+        }
+        contentHeight = height
+    }
+}
+
+private struct ContentHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
+}
+
 // MARK: - Rich Markdown View
 
 struct RichMarkdownView: View {
     let text: String
     let fontSize: CGFloat
+    let legibilityWeight: LegibilityWeight?
+
+    private var bodyWeight: Font.Weight {
+        legibilityWeight == .bold ? .semibold : .regular
+    }
+
+    private var supportingWeight: Font.Weight {
+        legibilityWeight == .bold ? .bold : .semibold
+    }
 
     var body: some View {
         MarkdownView(text)
             .markdownMathRenderingEnabled()
             // Body text (paragraphs, list items, etc.)
-            .font(.system(size: fontSize), for: .body)
+            .font(.system(size: fontSize, weight: bodyWeight), for: .body)
             // Headings - scaled relative to base font size
             .font(.system(size: fontSize * 1.4, weight: .bold), for: .h1)
             .font(.system(size: fontSize * 1.25, weight: .bold), for: .h2)
@@ -761,15 +978,15 @@ struct RichMarkdownView: View {
             .font(.system(size: fontSize * 1.05, weight: .medium), for: .h5)
             .font(.system(size: fontSize, weight: .medium), for: .h6)
             // Code blocks
-            .font(.system(size: fontSize, design: .monospaced), for: .codeBlock)
+            .font(.system(size: fontSize, weight: bodyWeight, design: .monospaced), for: .codeBlock)
             // Block quotes
-            .font(.system(size: fontSize), for: .blockQuote)
+            .font(.system(size: fontSize, weight: bodyWeight), for: .blockQuote)
             // Tables
-            .font(.system(size: fontSize, weight: .semibold), for: .tableHeader)
-            .font(.system(size: fontSize), for: .tableBody)
+            .font(.system(size: fontSize, weight: supportingWeight), for: .tableHeader)
+            .font(.system(size: fontSize, weight: bodyWeight), for: .tableBody)
             // Math
-            .font(.system(size: fontSize), for: .inlineMath)
-            .font(.system(size: fontSize + 2), for: .displayMath)
+            .font(.system(size: fontSize, weight: bodyWeight), for: .inlineMath)
+            .font(.system(size: fontSize + 2, weight: bodyWeight), for: .displayMath)
             // Tint for inline code
             .tint(.primary, for: .inlineCodeBlock)
     }

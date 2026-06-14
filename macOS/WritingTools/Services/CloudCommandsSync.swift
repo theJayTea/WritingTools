@@ -60,6 +60,8 @@ final class CloudCommandsSync {
   private var pushDebounceTask: Task<Void, Never>?
   private let pushDebounceDelay: Duration = .milliseconds(300)
   private let kvsValueQuotaBytes = 1_000_000
+  /// `NSUbiquitousKeyValueStore` allows at most 1024 keys total per store.
+  private let kvsMaxKeyCount = 1024
   private let quotaWarningDebounceInterval: TimeInterval = 30
   private let maxDeletedTombstones = 512
 
@@ -264,6 +266,10 @@ final class CloudCommandsSync {
   }
 
   private func pullFromICloudIfNewer() async {
+    // An in-flight pull Task may have been scheduled before `stop()` ran.
+    // Bail out so we never mutate command state after sync was disabled.
+    guard started else { return }
+
     guard let remoteMTime = store.object(forKey: mtimeKey) as? Date else {
       return
     }
@@ -307,6 +313,12 @@ final class CloudCommandsSync {
       // Suppress pushes while applying remote changes. The `replaceAllCommands`
       // call fires a `CommandsChanged` notification which would otherwise
       // schedule a redundant push-back of the data we just received.
+      //
+      // Note: when the per-command merge keeps a locally-newer command (so the
+      // merged result diverges from the remote set), `suppressPush` blocks the
+      // immediate re-push that would propagate it back. This is acceptable: the
+      // next local edit or app launch reconciles and pushes the newer version.
+      // We deliberately do not force an extra push here to avoid push/pull churn.
       do {
         suppressPush = true
         defer { suppressPush = false }
@@ -327,18 +339,30 @@ final class CloudCommandsSync {
 
   /// Merges local and remote command lists by command ID.
   ///
-  /// Strategy:
-  /// - Commands present in both: use the remote version (remote is newer since
-  ///   we only pull when `remoteMTime > localMTime`).
+  /// Per-command timestamp rule (protects offline local edits from being clobbered):
+  /// - Commands present in BOTH: keep whichever side has the later `updatedAt`.
+  ///   On a tie (equal timestamps, including the `.distantPast` default used by
+  ///   built-ins/migration), prefer the REMOTE version. This is the existing
+  ///   convention and avoids needless local churn when nothing meaningfully changed.
+  ///   The store-level `remoteMTime > localMTime` gate still decides *whether* a pull
+  ///   happens at all; this rule decides which version wins for each shared command so
+  ///   a command edited locally more recently than its remote counterpart survives.
   /// - Commands only in remote: add them (new from another device).
   /// - Commands only in local: keep them (created locally, not yet pushed).
   ///
-  /// Ordering follows the remote list, with local-only commands appended at the end.
+  /// Ordering follows the remote list (for shared and remote-only commands), with
+  /// local-only commands appended at the end.
   nonisolated static func mergeCommands(local: [CommandModel], remote: [CommandModel]) -> [CommandModel] {
     let remoteIds = Set(remote.map(\.id))
+    let localById = Dictionary(local.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
 
-    // Start with the remote list (preserving remote ordering and content)
-    var merged = remote
+    // Start from the remote list, preserving remote ordering. For each shared
+    // command, swap in the local version only when local is strictly newer.
+    var merged = remote.map { remoteCommand -> CommandModel in
+      guard let localCommand = localById[remoteCommand.id] else { return remoteCommand }
+      // Local wins only when strictly newer; ties go to remote.
+      return localCommand.updatedAt > remoteCommand.updatedAt ? localCommand : remoteCommand
+    }
 
     // Append any local-only commands (not present in remote) at the end
     for command in local where !remoteIds.contains(command.id) {
@@ -540,6 +564,7 @@ final class CloudCommandsSync {
     let mtimeBytes: Int
     let nonManagedBytes: Int
     let totalBytes: Int
+    let keyCount: Int
     let isWithinQuota: Bool
   }
 
@@ -549,8 +574,10 @@ final class CloudCommandsSync {
     mtime: Date
   ) -> KVSPreflightResult {
     let managedKeys: Set<String> = [dataKey, deletedIdsKey, mtimeKey]
+    var nonManagedKeyCount = 0
     let nonManagedBytes = store.dictionaryRepresentation.reduce(into: 0) { partialResult, entry in
       guard !managedKeys.contains(entry.key) else { return }
+      nonManagedKeyCount += 1
       partialResult += estimatedKVSValueSize(of: entry.value)
     }
 
@@ -558,6 +585,12 @@ final class CloudCommandsSync {
     let deletedIdsBytes = deletedIdsPayload.isEmpty ? 0 : estimatedKVSValueSize(of: deletedIdsPayload)
     let mtimeBytes = estimatedKVSValueSize(of: mtime)
     let totalBytes = nonManagedBytes + commandBytes + deletedIdsBytes + mtimeBytes
+
+    // Managed keys this push actually writes: dataKey and mtimeKey are always
+    // written; deletedIdsKey is written only when the payload is non-empty
+    // (otherwise the existing object is removed).
+    let managedKeyCount = 2 + (deletedIdsPayload.isEmpty ? 0 : 1)
+    let keyCount = nonManagedKeyCount + managedKeyCount
 
     let isWithinPerValueLimit =
       commandBytes <= kvsValueQuotaBytes
@@ -570,7 +603,12 @@ final class CloudCommandsSync {
       mtimeBytes: mtimeBytes,
       nonManagedBytes: nonManagedBytes,
       totalBytes: totalBytes,
-      isWithinQuota: isWithinPerValueLimit && totalBytes <= kvsValueQuotaBytes
+      keyCount: keyCount,
+      // KVS enforces both a byte budget and a 1024-key limit; exceeding either
+      // is treated as a quota failure.
+      isWithinQuota: isWithinPerValueLimit
+        && totalBytes <= kvsValueQuotaBytes
+        && keyCount <= kvsMaxKeyCount
     )
   }
 

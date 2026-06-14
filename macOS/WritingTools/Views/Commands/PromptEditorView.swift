@@ -35,10 +35,34 @@ struct PromptEditorView: View {
     }
 
     var body: some View {
-        if useHorizontalLayout {
-            horizontalLayoutBody
-        } else {
-            verticalLayoutBody
+        Group {
+            if useHorizontalLayout {
+                horizontalLayoutBody
+            } else {
+                verticalLayoutBody
+            }
+        }
+        .confirmationDialog(
+            "Convert to Advanced mode?",
+            isPresented: $showModeChangeAlert,
+            titleVisibility: .visible
+        ) {
+            Button("Convert") {
+                if let target = pendingMode {
+                    // Apply the content transform first, then flip the picker
+                    // with the re-entrancy guard set so .onChange does not
+                    // re-trigger the warning.
+                    applyModeChange(to: target)
+                    isApplyingConfirmedModeChange = true
+                    selectedMode = target
+                }
+                pendingMode = nil
+            }
+            Button("Cancel", role: .cancel) {
+                pendingMode = nil
+            }
+        } message: {
+            Text("Your prompt text will be moved into the structured \"Task\" field. You can switch back to Simple mode to restore your original text.")
         }
     }
     
@@ -261,14 +285,52 @@ struct PromptEditorView: View {
     // MARK: - Mode Change Handler
 
     @State private var showModeChangeAlert = false
+    /// The mode the user is trying to switch to while a confirmation is pending.
+    @State private var pendingMode: EditorMode?
+    /// Snapshot of the free-text prompt taken when we first leave Simple mode,
+    /// so we can restore the user's original text if they switch back.
+    @State private var cachedSimpleText: String?
+    /// Set while programmatically applying a user-confirmed conversion so the
+    /// resulting picker `.onChange` does not re-present the warning.
+    @State private var isApplyingConfirmedModeChange = false
+
+    /// True when switching to the given mode would lossily transform the user's
+    /// content (free text stuffed into the structured `task` field).
+    private func isLossyConversion(to newMode: EditorMode) -> Bool {
+        guard newMode == .advanced else { return false }
+        // Parsing as JSON is lossless; only non-JSON free text is at risk.
+        if PromptStructure.from(jsonString: simplePromptText) != nil { return false }
+        return !simplePromptText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
 
     private func handleModeChange(to newMode: EditorMode) {
+        // A confirmed conversion has already transformed the content; just clear
+        // the guard and skip the warning + re-applying the transform.
+        if isApplyingConfirmedModeChange {
+            isApplyingConfirmedModeChange = false
+            return
+        }
+
+        // Warn before a destructive/lossy Simple -> Advanced conversion. Revert
+        // the picker to Simple until the user confirms.
+        if isLossyConversion(to: newMode) {
+            pendingMode = newMode
+            selectedMode = .simple
+            showModeChangeAlert = true
+            return
+        }
+        applyModeChange(to: newMode)
+    }
+
+    private func applyModeChange(to newMode: EditorMode) {
         if newMode == .advanced {
             // Switching to advanced: try to parse simple text as JSON
             if let parsed = PromptStructure.from(jsonString: simplePromptText) {
                 promptStructure = parsed
             } else if !simplePromptText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                // Preserve the user's text as the "task" field so nothing is lost
+                // Cache the original free text so a later switch-back can restore it,
+                // then preserve the user's text as the "task" field so nothing is lost.
+                cachedSimpleText = simplePromptText
                 var structure = PromptStructure.default
                 structure.task = simplePromptText
                 promptStructure = structure
@@ -277,8 +339,15 @@ struct PromptEditorView: View {
             prompt = updated
             advancedPreviewText = updated
         } else {
-            // Switching to simple: use current prompt value
-            simplePromptText = prompt
+            // Switching to simple: restore the cached free text if we have one,
+            // otherwise fall back to the current (serialized) prompt value.
+            if let cached = cachedSimpleText {
+                simplePromptText = cached
+                prompt = cached
+                cachedSimpleText = nil
+            } else {
+                simplePromptText = prompt
+            }
         }
     }
 }

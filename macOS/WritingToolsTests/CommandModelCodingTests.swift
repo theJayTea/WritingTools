@@ -100,6 +100,8 @@ final class CommandModelCodingTests: XCTestCase {
         XCTAssertNil(json?["modelOverride"])
         XCTAssertNil(json?["customProviderBaseURL"])
         XCTAssertNil(json?["customProviderModel"])
+        // updated_at is always encoded to support timestamp-based merge
+        XCTAssertNotNil(json?["updated_at"])
     }
 
     func testTrueBoolsArePresent() throws {
@@ -156,6 +158,38 @@ final class CommandModelCodingTests: XCTestCase {
         XCTAssertFalse(decoded.isBuiltIn)
         XCTAssertFalse(decoded.hasShortcut)
         XCTAssertFalse(decoded.preserveFormatting)
+    }
+
+    // MARK: - updatedAt timestamp
+
+    func testMissingUpdatedAtDefaultsToDistantPast() throws {
+        // JSON from before the updated_at field existed.
+        let legacyJSON: [String: Any] = [
+            "id": UUID().uuidString,
+            "name": "NoTimestamp",
+            "prompt": "test",
+            "icon": "pencil",
+        ]
+
+        let data = try JSONSerialization.data(withJSONObject: legacyJSON)
+        let decoded = try JSONDecoder().decode(CommandModel.self, from: data)
+
+        XCTAssertEqual(decoded.updatedAt, .distantPast)
+    }
+
+    func testUpdatedAtRoundTrips() throws {
+        let stamp = Date(timeIntervalSince1970: 1_700_000_000)
+        let original = CommandModel(
+            name: "Stamped",
+            prompt: "test",
+            icon: "pencil",
+            updatedAt: stamp
+        )
+
+        let data = try JSONEncoder().encode(original)
+        let decoded = try JSONDecoder().decode(CommandModel.self, from: data)
+
+        XCTAssertEqual(decoded.updatedAt, stamp)
     }
 
     // MARK: - Built-in IDs are stable

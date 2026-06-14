@@ -1,14 +1,14 @@
 import SwiftUI
 
 struct AppleStyleTextFieldModifier: ViewModifier {
-    @Environment(\.colorScheme) var colorScheme
     @Environment(\.accessibilityReduceMotion) var reduceMotion
     let isLoading: Bool
     let text: String
     let onSubmit: () -> Void
-    
+
     @State private var isAnimating: Bool = false
     @State private var isHovered: Bool = false
+    @FocusState private var isFocused: Bool
     
     private let animationDuration = 0.3
     private let animationDelay: Duration = .milliseconds(300)
@@ -22,9 +22,10 @@ struct AppleStyleTextFieldModifier: ViewModifier {
         ZStack(alignment: .trailing) {
             HStack(spacing: 0) {
                 content
-                    .font(.system(size: 14))
-                    .foregroundStyle(colorScheme == .dark ? .white : .primary)
+                    .font(.body)
+                    .foregroundStyle(.primary)
                     .padding(12)
+                    .focused($isFocused)
                     .onSubmit {
                         performSubmitAnimation()
                     }
@@ -37,9 +38,9 @@ struct AppleStyleTextFieldModifier: ViewModifier {
                 Button(action: performSubmitAnimation) {
                     Image(systemName: isLoading ? "hourglass" : "paperplane.fill")
                         .foregroundStyle(.white)
-                        .font(.system(size: 12))
+                        .font(.callout)
                         .frame(width: 24, height: 24)
-                        .background(isLoading ? Color.gray : Color.blue)
+                        .background(isLoading ? AnyShapeStyle(.secondary) : AnyShapeStyle(Color.accentColor))
                         .clipShape(.circle)
                         .scaleEffect(isHovered ? 1.05 : 1.0)
                         .opacity(isHovered ? 1.0 : 0.9)
@@ -58,15 +59,10 @@ struct AppleStyleTextFieldModifier: ViewModifier {
         .frame(height: 36)
         .background(
             ZStack {
-                if colorScheme == .dark {
-                    Color.black.opacity(0.2)
-                        .blur(radius: 0.5)
-                } else {
-                    Color(.textBackgroundColor)
-                }
-                
+                Color(.textBackgroundColor)
+
                 if isLoading {
-                    Color.gray.opacity(0.1)
+                    Color(.controlBackgroundColor)
                 }
             }
         )
@@ -74,12 +70,13 @@ struct AppleStyleTextFieldModifier: ViewModifier {
         .overlay(
             RoundedRectangle(cornerRadius: 6)
                 .strokeBorder(
-                    isAnimating
-                        ? Color.blue.opacity(0.8)
-                        : Color.gray.opacity(0.2),
-                    lineWidth: isAnimating ? 2 : 0.5
+                    (isAnimating || isFocused)
+                        ? AnyShapeStyle(Color.accentColor)
+                        : AnyShapeStyle(Color(.separatorColor)),
+                    lineWidth: (isAnimating || isFocused) ? 2 : 0.5
                 )
                 .animation(animation, value: isAnimating)
+                .animation(.easeInOut(duration: 0.15), value: isFocused)
         )
     }
     

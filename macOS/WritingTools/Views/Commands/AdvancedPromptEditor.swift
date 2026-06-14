@@ -49,13 +49,27 @@ struct AdvancedPromptEditor: View {
                 // Boolean toggles
                 Toggle("Acknowledge content beyond primary task", isOn: Binding(
                     get: { promptStructure.rules.effectiveAcknowledgeContent },
-                    set: { promptStructure.rules.acknowledgeContent = $0 }
+                    set: { newValue in
+                        // Write the canonical key and drop the legacy aliases so
+                        // the JSON carries a single source of truth (canonical
+                        // still wins in the effective fallback chain).
+                        promptStructure.rules.acknowledgeContent = newValue
+                        promptStructure.rules.acknowledgeContentBeyondSummary = nil
+                        promptStructure.rules.acknowledgeContentBeyondKeyPoints = nil
+                        promptStructure.rules.acknowledgeContentBeyondTable = nil
+                    }
                 ))
                 .help("Allow the assistant to acknowledge or comment on content outside the main task")
 
                 Toggle("Add explanations or commentary", isOn: Binding(
                     get: { promptStructure.rules.effectiveAddExplanations },
-                    set: { promptStructure.rules.addExplanations = $0 }
+                    set: { newValue in
+                        // Write the canonical key and drop the legacy aliases.
+                        promptStructure.rules.addExplanations = newValue
+                        promptStructure.rules.addExplanationsBeyondSummary = nil
+                        promptStructure.rules.addExplanationsOutsideKeyPoints = nil
+                        promptStructure.rules.addExplanationsOutsideTable = nil
+                    }
                 ))
                 .help("Allow the assistant to provide explanations alongside the output")
 

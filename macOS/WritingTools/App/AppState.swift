@@ -60,6 +60,29 @@ final class AppState {
 
     var selectedAttributedText: NSAttributedString? = nil
 
+    // MARK: - Paste-back serialization
+    //
+    // The paste-back lifecycle (simulate ⌘V, wait, then restore the original
+    // clipboard) is asynchronous and fire-and-forget. Without serialization, two
+    // rapid command invocations could each write the pasteboard and schedule a
+    // ~500ms restore that interleaves with the other's write — letting an older
+    // restore clobber a newer paste's clipboard content. `ClipboardCoordinator.isBusy`
+    // only guards the CAPTURE critical section, so we need a dedicated guard here.
+    //
+    // `isPastingBack` mirrors that pattern: it is held for the entire paste-back
+    // flow (write already done by the caller → paste → delay → restore). A new
+    // paste-back awaits the in-flight one rather than dropping the user's content.
+    @ObservationIgnored
+    private var isPastingBack = false
+    // Awaiters that want to start a paste-back while one is already in flight.
+    @ObservationIgnored
+    private var pasteBackWaiters: [CheckedContinuation<Void, Never>] = []
+    // Monotonic token identifying the current paste-back. A restore only runs if
+    // it is still the latest paste-back; a superseded restore becomes a no-op so
+    // it can never overwrite a newer paste's clipboard write.
+    @ObservationIgnored
+    private var pasteBackGeneration: UInt64 = 0
+
     var activeProvider: any AIProvider {
         switch currentProvider {
         case "openai":
@@ -568,6 +591,23 @@ final class AppState {
         Task { @MainActor [weak self] in
             guard let self else { return }
 
+            // Serialize the entire paste-back lifecycle. If a previous paste-back
+            // is still in flight (mid-paste or mid-restore), wait for it to finish
+            // before starting this one. We never drop the user's pasted content:
+            // the caller has already written it to the pasteboard, and this flow
+            // runs in submission order once it acquires the lock.
+            await self.acquirePasteBack()
+
+            // Claim a fresh generation for this paste-back. Any restore that is
+            // not the latest generation must become a no-op, so a superseded
+            // restore can never clobber a newer paste's clipboard write.
+            self.pasteBackGeneration &+= 1
+            let generation = self.pasteBackGeneration
+
+            // Release the lock when this flow completes (whether it restores,
+            // skips, or returns early), waking the next waiting paste-back.
+            defer { self.releasePasteBack() }
+
             // If the target app is already frontmost, paste immediately.
             // Otherwise, wait for NSWorkspace activation notification with a timeout.
             let alreadyFrontmost =
@@ -599,6 +639,15 @@ final class AppState {
                 return  // Don't restore — cancellation means the flow was superseded
             }
 
+            // If another paste-back has begun since we claimed our generation,
+            // this restore is stale. Skip it so we don't overwrite the newer
+            // paste's clipboard contents. (Serialization makes this unlikely, but
+            // it is a defensive guard against any out-of-order resumption.)
+            guard generation == self.pasteBackGeneration else {
+                logger.debug("Clipboard restore skipped: superseded by a newer paste-back (generation \(generation) != \(self.pasteBackGeneration))")
+                return
+            }
+
             // Restore the original clipboard content, but only if no external
             // app has modified the clipboard since we wrote our text to it
             let restoreOutcome = NSPasteboard.general.restoreIfUnchanged(
@@ -619,6 +668,33 @@ final class AppState {
                 logger.error("Clipboard restore failed after paste")
                 self.showClipboardRestoreFailedAlert(targetApp: app)
             }
+        }
+    }
+
+    /// Acquires the paste-back lock, suspending until any in-flight paste-back
+    /// completes. Runs on the main actor, so the `isPastingBack` check and the
+    /// waiter queue are accessed without data races.
+    private func acquirePasteBack() async {
+        if !isPastingBack {
+            isPastingBack = true
+            return
+        }
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            pasteBackWaiters.append(continuation)
+        }
+        // Resumed by releasePasteBack(), which hands ownership directly to us;
+        // isPastingBack remains true so no other flow can start concurrently.
+    }
+
+    /// Releases the paste-back lock. If another flow is waiting, ownership is
+    /// handed directly to it (keeping `isPastingBack` true); otherwise the lock
+    /// is freed.
+    private func releasePasteBack() {
+        if !pasteBackWaiters.isEmpty {
+            let next = pasteBackWaiters.removeFirst()
+            next.resume()
+        } else {
+            isPastingBack = false
         }
     }
 

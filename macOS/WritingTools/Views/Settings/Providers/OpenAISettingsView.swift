@@ -10,7 +10,6 @@ import AppKit
 
 struct OpenAISettingsView: View {
     @Bindable var settings = AppSettings.shared
-    @Binding var needsSaving: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -21,28 +20,19 @@ struct OpenAISettingsView: View {
                         .foregroundStyle(.secondary)
                     
                     SecureAPIKeyField("API Key", text: $settings.openAIApiKey)
-                        .onChange(of: settings.openAIApiKey) { _, _ in
-                            needsSaving = true
-                        }
-                    
-                    TextField("Base URL", text: $settings.openAIBaseURL)
+
+                    TextField("Base URL (Optional)", text: $settings.openAIBaseURL)
                         .textFieldStyle(.roundedBorder)
-                        .onChange(of: settings.openAIBaseURL) { _, _ in
-                            needsSaving = true
-                        }
                 }
                 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Model Configuration")
+                    Text("Model Selection")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                     
                     TextField("Model Name", text: $settings.openAIModel)
                         .textFieldStyle(.roundedBorder)
-                        .onChange(of: settings.openAIModel) { _, _ in
-                            needsSaving = true
-                        }
-                    
+
                     Text("OpenAI models include: gpt-4o, gpt-4o-mini, etc.")
                         .font(.caption)
                         .foregroundStyle(.secondary)

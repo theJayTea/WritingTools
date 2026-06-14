@@ -9,9 +9,10 @@ final class MergeCommandsTests: XCTestCase {
         id: UUID = UUID(),
         name: String = "Test",
         prompt: String = "prompt",
-        icon: String = "pencil"
+        icon: String = "pencil",
+        updatedAt: Date = .distantPast
     ) -> CommandModel {
-        CommandModel(id: id, name: name, prompt: prompt, icon: icon)
+        CommandModel(id: id, name: name, prompt: prompt, icon: icon, updatedAt: updatedAt)
     }
 
     // MARK: - Tests
@@ -37,7 +38,8 @@ final class MergeCommandsTests: XCTestCase {
         XCTAssertEqual(result.first?.id, localCommand.id)
     }
 
-    func testSharedCommandUsesRemoteVersion() {
+    func testSharedCommandUsesRemoteVersionOnEqualTimestamps() {
+        // Both sides default to `.distantPast`, so timestamps tie -> remote wins.
         let sharedId = UUID()
         let localVersion = makeCommand(id: sharedId, name: "Local Name", prompt: "local prompt")
         let remoteVersion = makeCommand(id: sharedId, name: "Remote Name", prompt: "remote prompt")
@@ -47,6 +49,65 @@ final class MergeCommandsTests: XCTestCase {
         XCTAssertEqual(result.count, 1)
         XCTAssertEqual(result.first?.name, "Remote Name")
         XCTAssertEqual(result.first?.prompt, "remote prompt")
+    }
+
+    func testLocallyNewerCommandIsPreserved() {
+        // Local was edited offline more recently than remote -> local must win
+        // (this is the offline-edit data-loss fix).
+        let sharedId = UUID()
+        let localVersion = makeCommand(
+            id: sharedId,
+            name: "Local Name",
+            prompt: "local prompt",
+            updatedAt: Date(timeIntervalSince1970: 2_000)
+        )
+        let remoteVersion = makeCommand(
+            id: sharedId,
+            name: "Remote Name",
+            prompt: "remote prompt",
+            updatedAt: Date(timeIntervalSince1970: 1_000)
+        )
+
+        let result = CloudCommandsSync.mergeCommands(local: [localVersion], remote: [remoteVersion])
+
+        XCTAssertEqual(result.count, 1)
+        XCTAssertEqual(result.first?.name, "Local Name")
+        XCTAssertEqual(result.first?.prompt, "local prompt")
+    }
+
+    func testRemoteWinsWhenRemoteIsNewer() {
+        let sharedId = UUID()
+        let localVersion = makeCommand(
+            id: sharedId,
+            name: "Local Name",
+            prompt: "local prompt",
+            updatedAt: Date(timeIntervalSince1970: 1_000)
+        )
+        let remoteVersion = makeCommand(
+            id: sharedId,
+            name: "Remote Name",
+            prompt: "remote prompt",
+            updatedAt: Date(timeIntervalSince1970: 2_000)
+        )
+
+        let result = CloudCommandsSync.mergeCommands(local: [localVersion], remote: [remoteVersion])
+
+        XCTAssertEqual(result.count, 1)
+        XCTAssertEqual(result.first?.name, "Remote Name")
+        XCTAssertEqual(result.first?.prompt, "remote prompt")
+    }
+
+    func testEqualNonDefaultTimestampsPreferRemote() {
+        // Identical (non-distantPast) timestamps still tie -> remote wins.
+        let sharedId = UUID()
+        let stamp = Date(timeIntervalSince1970: 1_500)
+        let localVersion = makeCommand(id: sharedId, name: "Local Name", updatedAt: stamp)
+        let remoteVersion = makeCommand(id: sharedId, name: "Remote Name", updatedAt: stamp)
+
+        let result = CloudCommandsSync.mergeCommands(local: [localVersion], remote: [remoteVersion])
+
+        XCTAssertEqual(result.count, 1)
+        XCTAssertEqual(result.first?.name, "Remote Name")
     }
 
     func testRemoteOrderingIsPreserved() {

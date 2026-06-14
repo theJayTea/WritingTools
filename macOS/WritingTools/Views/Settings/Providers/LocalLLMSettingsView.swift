@@ -20,20 +20,15 @@ struct LocalLLMSettingsView: View {
     init(provider: LocalModelProvider) {
         _llmProvider = Bindable(wrappedValue: provider)
     }
-    
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        Group {
             if !llmProvider.isPlatformSupported {
                 platformNotSupportedView
-                    .accessibilityElement(children: .contain)
-                    .accessibilityAddTraits(.isHeader)
             } else {
                 supportedPlatformView
-                    .accessibilityElement(children: .contain)
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        // --- Delete Alert ---
         .alert("Delete Model", isPresented: $showingDeleteAlert, presenting: llmProvider.selectedModelType) { modelType in
             Button("Cancel", role: .cancel) { }
             Button("Delete \(modelType.displayName)") {
@@ -48,43 +43,116 @@ struct LocalLLMSettingsView: View {
         } message: { modelType in
             Text("Are you sure you want to delete the downloaded model \(modelType.displayName)? You'll need to download it again to use it.")
         }
-        // --- General Error Alert ---
         .alert("Local LLM Error", isPresented: $showingErrorAlert) {
             Button("OK", role: .cancel) { llmProvider.lastError = nil }
         } message: {
             Text(llmProvider.lastError ?? "An unknown error occurred.")
         }
         .onChange(of: llmProvider.lastError) { _, newValue in
-            // Show the alert if a new error is set by the provider
             if newValue != nil {
                 showingErrorAlert = true
             }
         }
     }
-    
+
     private var platformNotSupportedView: some View {
-        GroupBox {
-            VStack(alignment: .center, spacing: 12) {
-                Image(systemName: "xmark.octagon.fill")
-                    .font(.system(size: 36))
-                    .foregroundStyle(.red)
-                    .accessibilityHidden(true)
-                
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "xmark.octagon.fill")
+                .foregroundStyle(.red)
+                .accessibilityHidden(true)
+
+            VStack(alignment: .leading, spacing: 4) {
                 Text("Apple Silicon Required")
                     .font(.headline)
                     .accessibilityAddTraits(.isHeader)
-                
-                Text("Local LLM processing is only available on Apple Silicon (M-series) devices. Please select a different AI Provider.")
+
+                Text("Local LLM processing is only available on Apple Silicon (M-series) devices. Please select a different AI provider.")
                     .font(.callout)
-                    .multilineTextAlignment(.center)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    private var supportedPlatformView: some View {
+        Group {
+            LabeledContent("Filter") {
+                Picker("Filter", selection: $selectedModelCategory) {
+                    ForEach(ModelCategory.allCases) { category in
+                        Text(category.rawValue).tag(category)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .help("Filter between all, text-only, and vision-capable models.")
+            }
+
+            LabeledContent("Model") {
+                Picker("Model", selection: $settings.selectedLocalLLMId) {
+                    Text("None Selected").tag(String?.none)
+                    ForEach(filteredModels) { modelType in
+                        Text(modelType.displayName).tag(String?.some(modelType.id))
+                    }
+                }
+                .pickerStyle(.menu)
+                .labelsHidden()
+                .help("Select a local model. Vision-capable models can process images.")
+            }
+
+            if let selectedModel = llmProvider.selectedModelType {
+                LabeledContent("Capability") {
+                    if selectedModel.isVisionModel {
+                        Label("Vision-capable", systemImage: "camera.fill")
+                            .foregroundStyle(.tint)
+                    } else {
+                        Label("Text-only", systemImage: "text.justifyleft")
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+
+            if let selectedModelType = llmProvider.selectedModelType {
+                if !llmProvider.modelInfo.isEmpty {
+                    LabeledContent("Details") {
+                        Text(llmProvider.modelInfo)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(2)
+                    }
+                }
+
+                LabeledContent("Status") {
+                    modelActionView(for: selectedModelType)
+                }
+
+                if let error = llmProvider.lastError {
+                    HStack(alignment: .top, spacing: 6) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.red)
+                            .accessibilityHidden(true)
+                        Text(error)
+                            .foregroundStyle(.red)
+                            .font(.caption)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Error: \(error)")
+                }
+            } else {
+                Text("Select a model above to see its status.")
                     .foregroundStyle(.secondary)
             }
-            .padding(.vertical, 8)
-            .frame(maxWidth: .infinity)
+
+            Button {
+                llmProvider.revealModelsFolder()
+            } label: {
+                Label("Show Models in Finder", systemImage: "folder")
+            }
+            .buttonStyle(.borderless)
+            .help("Open the folder where local models are stored.")
         }
     }
-    
-    // Filter models based on the selected category
+
     private var filteredModels: [LocalModelType] {
         switch selectedModelCategory {
         case .all:
@@ -95,206 +163,98 @@ struct LocalLLMSettingsView: View {
             return LocalModelType.allCases.filter { $0.isVisionModel }
         }
     }
-    
-    private var supportedPlatformView: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            GroupBox("Model Configuration") {
-                VStack(alignment: .leading, spacing: 8) {
-                    // Filter picker - inline
-                    HStack {
-                        Text("Filter:")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                        Picker("Filter", selection: $selectedModelCategory) {
-                            ForEach(ModelCategory.allCases) { category in
-                                Text(category.rawValue).tag(category)
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                        .labelsHidden()
-                        .help("Filter between all, text-only, and vision-capable models.")
-                    }
-                    
-                    Divider()
-                    
-                    // Model selection
-                    HStack {
-                        Text("Model:")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                        Picker("Model", selection: $settings.selectedLocalLLMId) {
-                            Text("None Selected").tag(String?.none)
-                            ForEach(filteredModels) { modelType in
-                                HStack {
-                                    Text(modelType.displayName)
-                                    if modelType.isVisionModel {
-                                        Image(systemName: "camera.fill")
-                                            .foregroundStyle(.blue)
-                                    }
-                                }
-                                .tag(String?.some(modelType.id))
-                            }
-                        }
-                        .pickerStyle(.menu)
-                        .labelsHidden()
-                        .help("Select a local model. Vision-capable models can process images.")
-                    }
 
-                    if let selectedModel = llmProvider.selectedModelType {
-                        HStack(spacing: 6) {
-                            if selectedModel.isVisionModel {
-                                Label("Vision-capable", systemImage: "camera.fill")
-                                    .foregroundStyle(.blue)
-                                    .font(.caption)
-                            } else {
-                                Label("Text-only", systemImage: "text.justifyleft")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                    }
-                }
-            }
-
-            if let selectedModelType = llmProvider.selectedModelType {
-                GroupBox("Status") {
-                    VStack(alignment: .leading, spacing: 8) {
-                        if !llmProvider.modelInfo.isEmpty {
-                            Text(llmProvider.modelInfo)
-                                .font(.callout)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(2)
-                        }
-
-                        modelActionView(for: selectedModelType)
-
-                        if let error = llmProvider.lastError {
-                            HStack(alignment: .top, spacing: 6) {
-                                Image(systemName: "exclamationmark.triangle.fill")
-                                    .foregroundStyle(.red)
-                                Text(error)
-                                    .foregroundStyle(.red)
-                                    .font(.caption)
-                                    .lineLimit(2)
-                            }
-                            .accessibilityElement(children: .combine)
-                            .accessibilityLabel("Error: \(error)")
-                        }
-                    }
-                    .padding(.vertical, 4)
-                }
-            } else {
-                Text("Select a model above to see its status.")
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.vertical, 8)
-            }
-
-            Button {
-                llmProvider.revealModelsFolder()
-            } label: {
-                Label("Show Models in Finder", systemImage: "folder")
-                    .font(.caption)
-            }
-            .buttonStyle(.borderless)
-            .foregroundStyle(.secondary)
-            .help("Open the folder where local models are stored.")
-        }
-    }
-    
     @ViewBuilder
     private func modelActionView(for modelType: LocalModelType) -> some View {
-        switch llmProvider.loadState {
-        case .idle, .checking:
-            HStack(spacing: 8) {
-                ProgressView().controlSize(.small)
-                Text("Checking status...")
-                    .foregroundStyle(.secondary)
-            }
-            .accessibilityLabel("Checking model status")
-
-        case .needsDownload:
-            HStack(spacing: 8) {
-                Button("Download \(modelType.displayName)") {
-                    llmProvider.startDownload()
+        VStack(alignment: .trailing, spacing: 8) {
+            switch llmProvider.loadState {
+            case .idle, .checking:
+                HStack(spacing: 8) {
+                    ProgressView().controlSize(.small)
+                    Text("Checking status...")
+                        .foregroundStyle(.secondary)
                 }
-                .buttonStyle(.borderedProminent)
-                .disabled(llmProvider.isDownloading)
-                .help("Download the selected model for offline use.")
+                .accessibilityLabel("Checking model status")
 
-                if llmProvider.lastError != nil && llmProvider.retryCount < 3 {
+            case .needsDownload:
+                HStack(spacing: 8) {
+                    Button("Download \(modelType.displayName)") {
+                        llmProvider.startDownload()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(llmProvider.isDownloading)
+                    .help("Download the selected model for offline use.")
+
+                    if llmProvider.lastError != nil && llmProvider.retryCount < 3 {
+                        Button("Retry Download") {
+                            llmProvider.retryDownload()
+                        }
+                        .disabled(llmProvider.isDownloading)
+                        .buttonStyle(.bordered)
+                        .help("Try downloading again if the previous attempt failed.")
+                    }
+                }
+
+            case .downloaded, .loaded:
+                HStack(spacing: 8) {
+                    Label("\(modelType.displayName) Ready", systemImage: "checkmark.circle.fill")
+                        .foregroundStyle(.secondary)
+
+                    Button("Delete Model") {
+                        showingDeleteAlert = true
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.red)
+                    .help("Remove the downloaded model from disk.")
+                    .disabled(llmProvider.isDownloading || llmProvider.running)
+                }
+
+            case .loading:
+                HStack(spacing: 8) {
+                    ProgressView().controlSize(.small)
+                    Text("Loading \(modelType.displayName)...")
+                        .foregroundStyle(.secondary)
+                }
+                .accessibilityLabel("Loading model")
+
+            case .error:
+                if llmProvider.lastError?.contains("download") == true && llmProvider.retryCount < 3 {
                     Button("Retry Download") {
                         llmProvider.retryDownload()
                     }
                     .disabled(llmProvider.isDownloading)
                     .buttonStyle(.bordered)
                     .help("Try downloading again if the previous attempt failed.")
+                } else {
+                    Text("Cannot proceed due to error.")
+                        .foregroundStyle(.red)
                 }
             }
 
-        case .downloaded, .loaded:
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(.green)
-                    Text("\(modelType.displayName) Ready")
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                    Button("Delete Model") {
-                        showingDeleteAlert = true
+            if llmProvider.isDownloading {
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(spacing: 8) {
+                        ProgressView().controlSize(.small)
+                        Text("Downloading \(modelType.displayName)...")
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Button(action: { llmProvider.cancelDownload() }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundStyle(.secondary)
+                                .accessibilityLabel("Cancel download")
+                        }
+                        .buttonStyle(.plain)
+                        .help("Cancel the current download.")
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.red)
-                    .help("Remove the downloaded model from disk.")
-                    .disabled(llmProvider.isDownloading || llmProvider.running)
-                }
-            }
-
-        case .loading:
-            HStack(spacing: 8) {
-                ProgressView().controlSize(.small)
-                Text("Loading \(modelType.displayName)...")
-                    .foregroundStyle(.secondary)
-            }
-            .accessibilityLabel("Loading model")
-
-        case .error:
-            if llmProvider.lastError?.contains("download") == true && llmProvider.retryCount < 3 {
-                Button("Retry Download") {
-                    llmProvider.retryDownload()
-                }
-                .disabled(llmProvider.isDownloading)
-                .buttonStyle(.bordered)
-                .help("Try downloading again if the previous attempt failed.")
-            } else {
-                Text("Cannot proceed due to error.")
-                    .foregroundStyle(.red)
-            }
-        }
-
-        if llmProvider.isDownloading {
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(spacing: 8) {
-                    ProgressView().controlSize(.small)
-                    Text("Downloading \(modelType.displayName)...")
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                    Button(action: { llmProvider.cancelDownload() }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundStyle(.gray)
-                            .accessibilityLabel("Cancel download")
+                    ProgressView(value: llmProvider.downloadProgress) {
+                        Text("\(Int(llmProvider.downloadProgress * 100))%")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
-                    .buttonStyle(.plain)
-                    .help("Cancel the current download.")
+                    .animation(.linear, value: llmProvider.downloadProgress)
+                    .accessibilityLabel("Download progress")
                 }
-                ProgressView(value: llmProvider.downloadProgress) {
-                    Text("\(Int(llmProvider.downloadProgress * 100))%")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .animation(.linear, value: llmProvider.downloadProgress)
-                .accessibilityLabel("Download progress")
+                .frame(minWidth: 240)
             }
         }
     }

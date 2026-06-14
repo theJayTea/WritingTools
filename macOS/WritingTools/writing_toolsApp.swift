@@ -15,7 +15,7 @@ struct writing_toolsApp: App {
         
         // Settings scene for the preferences window
         Settings {
-            SettingsView(appState: appState, showOnlyApiSetup: false)
+            SettingsView(appState: appState)
         }
     }
 }
@@ -91,31 +91,7 @@ struct MenuBarMenu: View {
         .keyboardShortcut("q", modifiers: .command)
     }
     
-    @State private var aboutWindow: NSWindow?
-
     private func showAboutWindow() {
-        // Reuse existing window if it's still open
-        if let existing = aboutWindow, existing.isVisible {
-            WindowManager.shared.bringWindowToFront(existing)
-            return
-        }
-
-        let aboutView = AboutView()
-        let hostingView = NSHostingView(rootView: aboutView)
-
-        let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 400, height: 400),
-            styleMask: [.titled, .closable],
-            backing: .buffered,
-            defer: false
-        )
-        window.identifier = NSUserInterfaceItemIdentifier("AboutWindow")
-        window.isReleasedWhenClosed = false
-        window.contentView = hostingView
-        window.title = "About Writing Tools"
-        window.center()
-
-        WindowManager.shared.bringWindowToFront(window)
-        aboutWindow = window
+        WindowManager.shared.showAboutWindow()
     }
 }

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct OnboardingFinishStep: View {
   var appState: AppState
-  var onOpenCommandsManager: () -> Void
+  var onConfigureProvider: () -> Void
   var onFinish: () -> Void
 
   var body: some View {
@@ -59,8 +59,8 @@ struct OnboardingFinishStep: View {
       .foregroundStyle(.secondary)
 
       HStack {
-        Button("Open Commands Manager") {
-          onOpenCommandsManager()
+        Button("Configure AI Provider") {
+          onConfigureProvider()
         }
         .buttonStyle(.bordered)
 

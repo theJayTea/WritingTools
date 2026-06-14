@@ -9,7 +9,8 @@ import Foundation
 
 private let logger = AppLogger.logger("KeychainMigrationManager")
 
-class KeychainMigrationManager {
+@MainActor
+final class KeychainMigrationManager {
     static let shared = KeychainMigrationManager()
     
     private let keychain = KeychainManager.shared

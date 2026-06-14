@@ -157,18 +157,13 @@ struct CommandsView: View {
                 )
             }
             .onMove { source, destination in
-                // Filter to only get custom commands, then apply the move
-                var customCommands = commandManager.customCommands
-                customCommands.move(fromOffsets: source, toOffset: destination)
-                
-                // Get the built-in commands
-                let builtInCommands = commandManager.builtInCommands
-                
-                // Recreate the full commands array with the new order
-                let newCommands = builtInCommands + customCommands
-                
-                // Update the manager using the public method
-                commandManager.replaceAllCommands(with: newCommands)
+                // Reorder only the custom sublist; built-in command positions
+                // are preserved, and the full-list replacement, keychain GC,
+                // and order-flattening done by replaceAllCommands are avoided.
+                // An order-change push is still scheduled via
+                // notifyCommandsChanged() inside moveCustomCommand, which is
+                // the correct behaviour for keeping iCloud in sync.
+                commandManager.moveCustomCommand(fromOffsets: source, toOffset: destination)
             }
         }
         .listStyle(.inset)

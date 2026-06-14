@@ -11,6 +11,12 @@ struct CommandModel: Codable, Identifiable, Equatable {
     var hasShortcut: Bool
     var preserveFormatting: Bool
 
+    /// Timestamp of the last content edit to this command.
+    /// Used for timestamp-based iCloud merge so that the most recently edited
+    /// version of a command wins. Legacy data and built-ins without a stored
+    /// timestamp decode to `.distantPast`, so any real edit reliably wins a merge.
+    var updatedAt: Date
+
     // MARK: - Per-Command AI Provider Configuration
 
     /// Optional provider override (e.g., "openai", "gemini", "anthropic", "ollama", "mistral", "openrouter", "local", "custom")
@@ -46,6 +52,7 @@ struct CommandModel: Codable, Identifiable, Equatable {
         case modelOverride
         case customProviderBaseURL
         case customProviderModel
+        case updatedAt = "updated_at"
     }
 
     private enum LegacyCodingKeys: String, CodingKey {
@@ -69,6 +76,7 @@ struct CommandModel: Codable, Identifiable, Equatable {
         modelOverride = try c.decodeIfPresent(String.self, forKey: .modelOverride)
         customProviderBaseURL = try c.decodeIfPresent(String.self, forKey: .customProviderBaseURL)
         customProviderModel = try c.decodeIfPresent(String.self, forKey: .customProviderModel)
+        updatedAt = try c.decodeIfPresent(Date.self, forKey: .updatedAt) ?? .distantPast
 
         let legacyContainer = try decoder.container(keyedBy: LegacyCodingKeys.self)
         if let legacyKey = try legacyContainer.decodeIfPresent(String.self, forKey: .customProviderApiKey),
@@ -103,6 +111,8 @@ struct CommandModel: Codable, Identifiable, Equatable {
         if let customProviderModel = customProviderModel {
             try c.encode(customProviderModel, forKey: .customProviderModel)
         }
+        // Always encode the timestamp so timestamp-based merge stays reliable.
+        try c.encode(updatedAt, forKey: .updatedAt)
     }
 
     // MARK: – Stable UUIDs for built-in commands
@@ -132,7 +142,8 @@ struct CommandModel: Codable, Identifiable, Equatable {
          providerOverride: String? = nil,
          modelOverride: String? = nil,
          customProviderBaseURL: String? = nil,
-         customProviderModel: String? = nil) {
+         customProviderModel: String? = nil,
+         updatedAt: Date = .distantPast) {
         self.id = id
         self.name = name
         self.prompt = prompt
@@ -145,6 +156,7 @@ struct CommandModel: Codable, Identifiable, Equatable {
         self.modelOverride = modelOverride
         self.customProviderBaseURL = customProviderBaseURL
         self.customProviderModel = customProviderModel
+        self.updatedAt = updatedAt
     }
 
     // Helper to create from WritingOption for migration

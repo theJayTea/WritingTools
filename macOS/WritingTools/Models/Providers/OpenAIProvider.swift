@@ -1,4 +1,5 @@
 import Foundation
+import AppKit
 import AIProxy
 import Observation
 
@@ -72,10 +73,9 @@ final class OpenAIProvider: AIProvider {
             var parts: [OpenAIChatCompletionRequestBody.Message.ContentPart] = [.text(userPrompt)]
 
             for imageData in images {
-                let mimeType = detectImageMIMEType(imageData)
-                let dataString = "data:\(mimeType);base64," + imageData.base64EncodedString()
-                if let dataURL = URL(string: dataString) {
-                    parts.append(.imageURL(dataURL, detail: .auto))
+                if let nsImage = NSImage(data: imageData),
+                   let imageURL = AIProxy.encodeImageAsURL(image: nsImage, compressionQuality: 0.8) {
+                    parts.append(.imageURL(imageURL, detail: .auto))
                 }
             }
 
@@ -358,16 +358,15 @@ final class OpenAIProvider: AIProvider {
             var parts: [OpenAIChatCompletionRequestBody.Message.ContentPart] = [.text(userPrompt)]
             
             for imageData in images {
-                let mimeType = detectImageMIMEType(imageData)
-                let dataString = "data:\(mimeType);base64," + imageData.base64EncodedString()
-                if let dataURL = URL(string: dataString) {
-                    parts.append(.imageURL(dataURL, detail: .auto))
+                if let nsImage = NSImage(data: imageData),
+                   let imageURL = AIProxy.encodeImageAsURL(image: nsImage, compressionQuality: 0.8) {
+                    parts.append(.imageURL(imageURL, detail: .auto))
                 }
             }
-            
+
             messages.append(.user(content: .parts(parts)))
         }
-        
+
         // Wrap work in a stored task so cancel() can interrupt it
         let streamTask = Task { @MainActor in
             let stream = try await openAIService.streamingChatCompletionRequest(body: .init(

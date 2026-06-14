@@ -27,7 +27,7 @@ class ResponseWindow: NSWindow {
 
     super.init(
       contentRect: NSRect(x: 0, y: 0, width: 600, height: 500),
-      styleMask: [.titled, .closable, .resizable, .miniaturizable],
+      styleMask: [.titled, .closable, .resizable, .miniaturizable, .fullSizeContentView],
       backing: .buffered,
       defer: false
     )
@@ -35,6 +35,7 @@ class ResponseWindow: NSWindow {
     self.title = title
     self.minSize = NSSize(width: 400, height: 300)
     self.isReleasedWhenClosed = false
+    configureThemedChrome()
 
     self.contentViewController = controller
     configureFrameRestoration()
@@ -66,7 +67,7 @@ class ResponseWindow: NSWindow {
 
     super.init(
       contentRect: NSRect(x: 0, y: 0, width: 600, height: 500),
-      styleMask: [.titled, .closable, .resizable, .miniaturizable],
+      styleMask: [.titled, .closable, .resizable, .miniaturizable, .fullSizeContentView],
       backing: .buffered,
       defer: false
     )
@@ -74,9 +75,16 @@ class ResponseWindow: NSWindow {
     self.title = title
     self.minSize = NSSize(width: 400, height: 300)
     self.isReleasedWhenClosed = false
+    configureThemedChrome()
 
     self.contentViewController = controller
     configureFrameRestoration()
+  }
+
+  private func configureThemedChrome() {
+    titlebarAppearsTransparent = true
+    titlebarSeparatorStyle = .none
+    isMovableByWindowBackground = true
   }
 
   private func configureFrameRestoration() {

@@ -1,6 +1,6 @@
 import SwiftUI
 
-class PopupWindow: NSWindow {
+class PopupWindow: NSPanel {
   private var initialLocation: NSPoint?
   private var retainedHostingView: NSHostingView<PopupWindowContentView>?
   private var trackingArea: NSTrackingArea?
@@ -29,7 +29,8 @@ class PopupWindow: NSWindow {
   private func configureWindow() {
     backgroundColor = .clear
     isOpaque = false
-    level = .floating
+    level = .popUpMenu
+    hidesOnDeactivate = false
     collectionBehavior = [.transient, .ignoresCycle]
     hasShadow = false
 
@@ -186,13 +187,7 @@ class PopupWindow: NSWindow {
     self.contentView = nil
   }
 
-  override func close() {
-    cleanup()
-    super.close()
-  }
-
   override var canBecomeKey: Bool { true }
-  override var canBecomeMain: Bool { true }
 
   // Mouse Event Handling
   override func mouseDown(with event: NSEvent) {
@@ -284,7 +279,7 @@ class PopupWindow: NSWindow {
 }
 
 // Note: Window delegate is managed by WindowManager.
-// PopupWindow level is set to .popUpMenu when it becomes key (handled in WindowManager.windowDidBecomeKey).
+// PopupWindow level is set to .popUpMenu at init in configureWindow().
 
 class FirstResponderHostingView<Content: View>: NSHostingView<Content> {
   override var acceptsFirstResponder: Bool { true }

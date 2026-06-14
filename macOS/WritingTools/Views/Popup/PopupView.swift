@@ -15,6 +15,7 @@ struct PopupView: View {
   @Bindable var viewModel: PopupViewModel
   @Bindable private var settings = AppSettings.shared
   @Environment(\.colorScheme) var colorScheme
+  @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
   @State private var customText: String = ""
   @State private var isCustomLoading: Bool = false
@@ -40,6 +41,20 @@ struct PopupView: View {
     GridItem(.flexible(), spacing: 8),
     GridItem(.flexible(), spacing: 8),
   ]
+
+  /// True when the macOS 26 system glass material is rendering the background
+  /// AND transparency is permitted by the user's accessibility settings.
+  /// In that case the material supplies its own edges/shadow, so we must not
+  /// hand-draw a gray stroke + black shadow over it (HIG M7).
+  /// When Reduce Transparency is on, `.glassBackground` falls back to a solid
+  /// color that draws no border/shadow of its own, so we restore them by
+  /// returning false here.
+  private var isGlassThemeActive: Bool {
+    if #available(macOS 26, *) {
+      return settings.themeStyle == .glass && !reduceTransparency
+    }
+    return false
+  }
 
   var body: some View {
     VStack(spacing: 16) {
@@ -138,12 +153,21 @@ struct PopupView: View {
     }
     .padding(.bottom, 8)
     .windowBackground(useGradient: settings.useGradientTheme, cornerRadius: 20)
-    .overlay(
-      RoundedRectangle(cornerRadius: 20)
-        .strokeBorder(Color.gray.opacity(0.2), lineWidth: 1)
-    )
+    // On the macOS 26 glass theme the system material already draws its own
+    // edges/shadow, so the manual stroke + shadow would double up and look
+    // wrong over the material. Gate them to the non-glass path only.
+    .overlay {
+      if !isGlassThemeActive {
+        RoundedRectangle(cornerRadius: 20)
+          .strokeBorder(Color(.separatorColor), lineWidth: 1)
+      }
+    }
     .clipShape(.rect(cornerRadius: 20))
-    .shadow(color: Color.black.opacity(0.2), radius: 10, y: 5)
+    .shadow(
+      color: isGlassThemeActive ? .clear : Color(.shadowColor).opacity(0.2),
+      radius: 10,
+      y: 5
+    )
     // Sheet for editing individual command
     .sheet(item: $editingCommand) { command in
       let binding = Binding(

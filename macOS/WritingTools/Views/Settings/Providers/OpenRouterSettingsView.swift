@@ -10,31 +10,40 @@ import AppKit
 
 struct OpenRouterSettingsView: View {
     @Bindable var settings = AppSettings.shared
-    @Binding var needsSaving: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Configure OpenRouter")
-                .font(.headline)
-            SecureAPIKeyField("API Key", text: $settings.openRouterApiKey)
-                .onChange(of: settings.openRouterApiKey) { _, _ in needsSaving = true }
-            
-            Picker("Model", selection: $settings.openRouterModel) {
-                ForEach(OpenRouterModel.allCases, id: \.self) { model in
-                    Text(model.displayName).tag(model.rawValue)
+            Group {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("API Configuration")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+
+                    SecureAPIKeyField("API Key", text: $settings.openRouterApiKey)
+                }
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Model Selection")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+
+                    Picker("Model", selection: $settings.openRouterModel) {
+                        ForEach(OpenRouterModel.allCases, id: \.self) { model in
+                            Text(model.displayName).tag(model.rawValue)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                    if settings.openRouterModel == OpenRouterModel.custom.rawValue {
+                        TextField("Custom Model Name", text: $settings.openRouterCustomModel)
+                            .textFieldStyle(.roundedBorder)
+                            .padding(.top, 4)
+                    }
                 }
             }
-            .pickerStyle(.menu)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .onChange(of: settings.openRouterModel) { _, _ in needsSaving = true }
-            
-            if settings.openRouterModel == OpenRouterModel.custom.rawValue {
-                TextField("Custom Model Name", text: $settings.openRouterCustomModel)
-                    .textFieldStyle(.roundedBorder)
-                    .onChange(of: settings.openRouterCustomModel) { _, _ in needsSaving = true }
-                    .padding(.top, 4)
-            }
-            
+            .padding(.bottom, 4)
+
             Button("Get OpenRouter API Key") {
                 if let url = URL(string: "https://openrouter.ai/keys") {
                     NSWorkspace.shared.open(url)
