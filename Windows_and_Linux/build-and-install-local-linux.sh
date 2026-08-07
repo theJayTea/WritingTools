@@ -48,6 +48,15 @@ if ! command -v python3 >/dev/null 2>&1; then
   exit 1
 fi
 
+VENV_DIR="${SCRIPT_DIR}/.venv"
+if [[ ! -x "${VENV_DIR}/bin/python" ]]; then
+  echo "Creating virtual environment..."
+  python3 -m venv "${VENV_DIR}"
+fi
+source "${VENV_DIR}/bin/activate"
+python -m pip install --quiet --upgrade pip
+python -m pip install --quiet -r "${SCRIPT_DIR}/requirements.txt"
+
 INSTALL_SCRIPT="${SCRIPT_DIR}/install-local-linux.sh"
 if [[ ! -f "${INSTALL_SCRIPT}" ]]; then
   echo "ERROR: Missing installer script at ${INSTALL_SCRIPT}"

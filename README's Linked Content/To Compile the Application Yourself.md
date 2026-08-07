@@ -1,19 +1,44 @@
 # 👨‍💻 To compile the application yourself:
 
-### Windows and Linux Version build instructions:
+### Linux build instructions:
+
+1. Open Terminal and enter the Linux app folder:
+```bash
+cd Windows_and_Linux
+```
+
+2. Build and install locally (recommended, creates launcher and app menu entry):
+```bash
+bash build-and-install-local-linux.sh
+```
+
+This creates a virtual environment, installs dependencies, builds with PyInstaller, and installs:
+- `~/.local/bin/writing-tools`
+- `~/.local/share/applications/writing-tools.desktop`
+
+Optional autostart:
+```bash
+bash build-and-install-local-linux.sh --enable-autostart
+```
+
+After local install, you can launch Writing Tools with:
+```bash
+writing-tools
+```
+
+No daily recompilation is needed unless you changed source code and want a newer build.
+
+### Windows build instructions:
 Here's how to compile it with PyInstaller and a virtual environment:
 
-1. Open Terminal (or Command Prompt) and enter the Windows/Linux app folder:
+1. Open Command Prompt (or PowerShell) and enter the Windows app folder:
 ```bash
 cd /path/to/WritingTools/Windows_and_Linux
 ```
 
 2. Create and activate a virtual environment:
 ```bash
-python3 -m venv .venv
-
-# Linux:
-source .venv/bin/activate
+python -m venv .venv
 
 # Windows (PowerShell):
 .venv\Scripts\Activate.ps1
@@ -34,27 +59,6 @@ python pyinstaller-build-script.py
 ```
 
 The compiled binary is written to: ~/Windows_and_Linux/dist/Writing Tools
-
-5. Linux only (optional, recommended): install locally with launcher icon:
-```bash
-bash build-and-install-local-linux.sh
-```
-
-This creates:
-- `~/.local/bin/writing-tools`
-- `~/.local/share/applications/writing-tools.desktop`
-
-Optional autostart:
-```bash
-bash build-and-install-local-linux.sh --enable-autostart
-```
-
-After local install, you can launch Writing Tools with:
-```bash
-writing-tools
-```
-
-No daily recompilation is needed unless you changed source code and want a newer build.
 
 ### macOS Version (by [Aryamirsepasi](https://github.com/Aryamirsepasi)) build instructions:
 
