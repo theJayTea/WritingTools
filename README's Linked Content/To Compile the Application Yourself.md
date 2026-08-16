@@ -28,6 +28,42 @@ writing-tools
 
 No daily recompilation is needed unless you changed source code and want a newer build.
 
+#### Linux system dependencies
+
+The Python dependencies (in `requirements.txt`) are installed into the venv automatically. A few **system** packages are needed for the clipboard and keystroke-injection flow; which ones depend on your display server:
+
+**X11 (Xorg) session:**
+```bash
+# Clipboard backend (one of):
+sudo apt install xclip        # Debian/Ubuntu
+sudo pacman -S xclip          # Arch/CachyOS
+```
+pynput (bundled via pip) handles keystroke injection on X11 via the XTest extension — no extra system tool needed.
+
+**Wayland session (e.g. KDE Plasma Wayland, GNOME Wayland, Hyprland):**
+pynput's injection and pyperclip's clipboard calls are unreliable on native Wayland. Writing Tools auto-detects a Wayland session and switches to native tools. Install:
+```bash
+# Arch / CachyOS:
+sudo pacman -S wl-clipboard ydotool
+# Debian / Ubuntu:
+sudo apt install wl-clipboard ydotool
+# Fedora:
+sudo dnf install wl-clipboard ydotool
+```
+Then enable the ydotool daemon and grant input access:
+```bash
+# Enable the daemon (socket-activated; runs per-user)
+systemctl --user enable --now ydotool
+
+# Grant /dev/uinput access (required for keystroke injection)
+sudo usermod -aG input "$USER"
+# Log out and back in for the group change to take effect.
+```
+- `wl-clipboard` provides `wl-copy`/`wl-paste` for clipboard read/write.
+- `ydotool` injects Ctrl+C / Ctrl+V at the kernel uinput layer, reaching both native Wayland and XWayland windows (pynput only reaches XWayland).
+
+Without these tools on Wayland, the app falls back to the X11 path, which only works inside XWayland windows.
+
 ### Windows build instructions:
 Here's how to compile it with PyInstaller and a virtual environment:
 

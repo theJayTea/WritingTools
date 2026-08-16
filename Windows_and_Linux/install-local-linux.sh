@@ -172,5 +172,13 @@ if ! command -v xclip >/dev/null 2>&1 && ! command -v xsel >/dev/null 2>&1 && ! 
 fi
 
 if [[ "${XDG_SESSION_TYPE:-}" == "wayland" ]]; then
-  echo "NOTICE: Running in Wayland session; global hotkey/focus behavior may be limited."
+  echo "NOTICE: Wayland session detected."
+  if ! command -v wl-copy >/dev/null 2>&1 || ! command -v ydotool >/dev/null 2>&1; then
+    echo "         For full capture + paste-back support on Wayland, install:"
+    echo "           wl-clipboard  (provides wl-copy/wl-paste)"
+    echo "           ydotool       (keystroke injection; enable ydotoold service)"
+    echo "         and add your user to the 'input' group, then log out/in."
+    echo "         Without these, the app falls back to the X11 path which only"
+    echo "         works in XWayland windows."
+  fi
 fi
