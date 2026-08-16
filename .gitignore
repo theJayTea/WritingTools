@@ -11,3 +11,8 @@ Windows_and_Linux/config.json
 # Xcode user-specific data
 **/xcuserdata/
 **/project.xcworkspace/xcuserdata/
+
+Windows_and_Linux/.venv/
+Windows_and_Linux/packaging/
+Windows_and_Linux/dist/
+Windows_and_Linux/Writing Tools.spec

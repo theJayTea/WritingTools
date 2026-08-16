@@ -1,9 +1,42 @@
-import os
+import shutil
 import subprocess
 import sys
+from pathlib import Path
+
+
+ROOT_DIR = Path(__file__).resolve().parent
+DIST_DIR = ROOT_DIR / 'dist'
+BUILD_DIR = ROOT_DIR / 'build'
+PYCACHE_DIR = ROOT_DIR / '__pycache__'
+
+
+def remove_path(path: Path):
+    if path.is_dir():
+        shutil.rmtree(path)
+    elif path.exists():
+        path.unlink()
+
+
+def require_path(path: Path, description: str):
+    if not path.exists():
+        print(f"ERROR: Missing {description}: {path}")
+        sys.exit(1)
+
+
+def run_preflight_checks():
+    require_path(ROOT_DIR / 'main.py', 'entrypoint file')
+    require_path(ROOT_DIR / 'icons' / 'app_icon.ico', 'application icon')
+
+    if shutil.which('pyinstaller') is None:
+        print('ERROR: pyinstaller is not available in PATH.')
+        print('Install dependencies first, then re-run this build script.')
+        print('Example: pip install -r requirements.txt')
+        sys.exit(1)
 
 
 def run_pyinstaller_build():
+    run_preflight_checks()
+
     pyinstaller_command = [
         "pyinstaller",
         "--onefile",
@@ -77,28 +110,27 @@ def run_pyinstaller_build():
 
     try:
         # Remove previous build directories
-        if os.path.exists('dist'):
-            os.system("rmdir /s /q dist")
-        if os.path.exists('build'):
-            os.system("rmdir /s /q build")
-        if os.path.exists('__pycache__'):
-            os.system("rmdir /s /q __pycache__")
+        remove_path(DIST_DIR)
+        remove_path(BUILD_DIR)
+        remove_path(PYCACHE_DIR)
 
         # Run PyInstaller
-        subprocess.run(pyinstaller_command, check=True)
-        print("Build completed successfully!")
+        subprocess.run(pyinstaller_command, check=True, cwd=ROOT_DIR)
+        print(f"Build completed successfully! Output: {DIST_DIR / 'Writing Tools'}")
 
         # Clean up unnecessary files
-        if os.path.exists('build'):
-            os.system("rmdir /s /q build")
-        if os.path.exists('__pycache__'):
-            os.system("rmdir /s /q __pycache__")
+        remove_path(BUILD_DIR)
+        remove_path(PYCACHE_DIR)
 
         # No need to copy data files manually since they are included
         # in the executable using --add-data
 
     except subprocess.CalledProcessError as e:
         print(f"Build failed with error: {e}")
+        sys.exit(e.returncode or 1)
+
+    except OSError as e:
+        print(f"Build failed with OS error: {e}")
         sys.exit(1)
 
 if __name__ == "__main__":

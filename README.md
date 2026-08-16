@@ -90,6 +90,8 @@ Aside from being the only Windows/Linux program like Apple's Writing Tools, and 
 ### **🐧 Linux (work-in-progress)**:
 [Run it from the source code](https://github.com/theJayTea/WritingTools/blob/main/README's%20Linked%20Content/To%20Run%20Writing%20Tools%20Directly%20from%20the%20Source%20Code.md)
 
+[Compile and install locally with launcher icon](https://github.com/theJayTea/WritingTools/blob/main/README's%20Linked%20Content/To%20Compile%20the%20Application%20Yourself.md)
+
 Writing Tools works well on x11. On Wayland, there are a few caveats:
 - [it works on XWayland apps](https://github.com/theJayTea/WritingTools/issues/34#issuecomment-2461633556)
 - [and it works if you disable Wayland for individual Flatpaks with Flatseal.](https://github.com/theJayTea/WritingTools/issues/93#issuecomment-2576511041)
@@ -220,7 +222,7 @@ These instructions are for any Writing Tools version, using the OpenAI-Compatibl
 
 ## 👨‍💻 To Compile the Application Yourself:
 
-[Instructions here!](https://github.com/theJayTea/WritingTools/blob/8713e5a5de63a7892b05a43b9753172e692768fb/README's%20Linked%20Content/To%20Compile%20the%20Application%20Yourself.md)
+[Instructions here!](https://github.com/theJayTea/WritingTools/blob/main/README's%20Linked%20Content/To%20Compile%20the%20Application%20Yourself.md)
 
 ## 🌟 Contributors
 
