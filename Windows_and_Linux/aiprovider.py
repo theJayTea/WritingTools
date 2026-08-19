@@ -525,6 +525,26 @@ class OpenAICompatibleProvider(AIProvider):
             "• You must abide by the service's Terms of Service.",
             "openai", "Get OpenAI API Key", lambda: webbrowser.open("https://platform.openai.com/account/api-keys"))
 
+    @staticmethod
+    def _is_gpt5_model(model: str) -> bool:
+        return (model or "").strip().lower().startswith("gpt-5")
+
+    def _build_chat_completion_kwargs(self, messages: list) -> dict:
+        kwargs = {
+            "model": self.api_model,
+            "messages": messages,
+            "temperature": 0.5,
+            "stream": False,
+        }
+
+        # If the model is a GPT-5 family model, the only allowed temperature is 1.0.
+        # Also minimize reasoning effort for best performance with GPT-5 in text tasks.
+        if self._is_gpt5_model(self.api_model):
+            kwargs["temperature"] = 1.0
+            kwargs["reasoning_effort"] = "minimal"
+
+        return kwargs
+
     def get_response(self, system_instruction: str, prompt: str | list, return_response: bool = False) -> str:
         """
         Send a chat request to the OpenAI-compatible API.
@@ -545,12 +565,7 @@ class OpenAICompatibleProvider(AIProvider):
             ]
 
         try:
-            response = self.client.chat.completions.create(
-                model=self.api_model,
-                messages=messages,
-                temperature=0.5,
-                stream=False
-            )
+            response = self.client.chat.completions.create(**self._build_chat_completion_kwargs(messages))
             response_text = response.choices[0].message.content.strip()
 
             if not return_response and not hasattr(self.app, 'current_response_window'):
