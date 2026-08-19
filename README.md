@@ -20,7 +20,7 @@ Writing Tools is an **Apple Intelligence-inspired application for Windows, Linux
 
 With one hotkey press system-wide, it lets you fix grammar, optimize text according to your instructions, summarize content (webpages, YouTube videos, etc.), and more.
 
-It's currently the **world's most intelligent system-wide grammar assistant**, works in ~any language, and has been featured in 🔥 [**28+ global publications**](https://github.com/theJayTea/WritingTools/blob/main/Media%20Coverage.md) ([Beebom](https://beebom.com/high-schooler-app-brings-apple-inteligence-writing-tools-windows/), [XDA](https://www.xda-developers.com/windows-pc-can-now-deliver-instant-free-writing-help-across-all-apps/), [How-To Geek](https://www.howtogeek.com/if-you-like-apple-intelligences-writing-tool-try-this-open-source-app-as-its-windows-counterpart/), [Neowin](https://www.neowin.net/news/apple-intelligence-writing-tools-for-windows-get-new-summarization-features-and-more/), [Windows Central](https://www.windowscentral.com/software-apps/can-apple-catch-up-apple-intelligence-just-shipped-yet-free-apple-writing-tools-on-github-for-windows-and-linux-make-a-better-alternative)...).
+It's currently the **world's most intelligent system-wide grammar assistant**, works in ~any language, and has been featured in 🔥 [**30+ global publications**](https://github.com/theJayTea/WritingTools/blob/main/Media%20Coverage.md) ([Beebom](https://beebom.com/high-schooler-app-brings-apple-inteligence-writing-tools-windows/), [XDA](https://www.xda-developers.com/windows-pc-can-now-deliver-instant-free-writing-help-across-all-apps/), [How-To Geek](https://www.howtogeek.com/if-you-like-apple-intelligences-writing-tool-try-this-open-source-app-as-its-windows-counterpart/), [Neowin](https://www.neowin.net/news/apple-intelligence-writing-tools-for-windows-get-new-summarization-features-and-more/), [Windows Central](https://www.windowscentral.com/software-apps/can-apple-catch-up-apple-intelligence-just-shipped-yet-free-apple-writing-tools-on-github-for-windows-and-linux-make-a-better-alternative)...).
 
 Writing Tools was also among the 🔥 [**top 10 most trending AI programs in the world**](https://devface.ai/ranking/top_ai_developers/2024-10) on GitHub in October 2024.
 
@@ -207,11 +207,13 @@ These instructions are for any Writing Tools version, using the OpenAI-Compatibl
 5. That's it! **Enjoy Writing Tools with _absolute_ privacy and no internet connection!** 🎉 From now on, you'll simply need to launch Ollama and Writing Tools into the background for it to work.
 
 ## 🐞 Known Issues
-1. (Being investigated) On some devices, Writing Tools does not work correctly with the default hotkey.
+1. Some reported hotkey conflicts on the latest v9 build: will release a maintenance update when I get time!
+
+2. On some devices, Writing Tools does not work correctly with the default hotkey.
    
    To fix it, simply change the hotkey to **ctrl+`** or **ctrl+j** and restart Writing Tools. PS: If a hotkey is already in use by a program or background process, Writing Tools may not be able to intercept it. The above hotkeys are usually unused.
 
-2. The initial launch of the `Writing Tools.exe` might take unusually long — this seems to be because AV software extensively scans this new executable before letting it run. Once it launches into the background in RAM, it works instantly as usual.
+3. The initial launch of the `Writing Tools.exe` might take unusually long — this seems to be because AV software extensively scans this new executable before letting it run. Once it launches into the background in RAM, it works instantly as usual.
 
 ## 👨‍💻 To Run Writing Tools Directly from the Source Code
 
