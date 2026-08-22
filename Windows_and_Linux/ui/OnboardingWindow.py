@@ -44,7 +44,7 @@ class OnboardingWindow(QtWidgets.QWidget):
         self.content_layout.addWidget(title_label, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
 
         features_text = f"""
-        • {_('Instantly optimize your writing with AI by selecting your text and invoking Writing Tools with "ctrl+space", anywhere.')} 
+        • {_('Instantly optimize your writing with AI by selecting your text and invoking Writing Tools with "ctrl+space", anywhere.')}
 
         • {_('Get a summary you can chat with of articles, YouTube videos, or documents by select all text with "ctrl+a"')}
           {_('(or select the YouTube transcript from its description), invoking Writing Tools, and choosing Summary.')}
@@ -53,6 +53,7 @@ class OnboardingWindow(QtWidgets.QWidget):
 
         • {_('Supports an extensive range of AI models:')}
             - {_('Gemini 2.0')}
+            - {_('Ollama Cloud (free tier — no install needed)')}
             - {_('ANY OpenAI Compatible API — including local LLMs!')}
         """
         features_label = QtWidgets.QLabel(features_text)
