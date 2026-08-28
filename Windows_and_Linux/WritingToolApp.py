@@ -14,7 +14,8 @@ import ui.CustomPopupWindow
 import ui.OnboardingWindow
 import ui.ResponseWindow
 import ui.SettingsWindow
-from aiprovider import GeminiProvider, OllamaProvider, OpenAICompatibleProvider, obfuscate_api_key
+from aiprovider import GeminiProvider, OllamaCloudProvider, OllamaProvider, OpenAICompatibleProvider, obfuscate_api_key
+from history_manager import HistoryManager
 from pynput import keyboard as pykeyboard
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import QLocale, Signal, Slot
@@ -93,7 +94,18 @@ class WritingToolApp(QtWidgets.QApplication):
         self.setup_ctrl_c_listener()
 
         # Setup available AI providers
-        self.providers = [GeminiProvider(self), OpenAICompatibleProvider(self), OllamaProvider(self)]
+        # Order matters: the FIRST entry is the default for new installs and
+        # the order they're presented to the user in the Settings dropdown.
+        # 1) Gemini (Recommended)        — daily-quota free tier, very fast
+        # 2) Ollama Cloud (Recommended)  — weekly-quota free tier, no install
+        # 3) OpenAI Compatible           — for users with their own key
+        # 4) Ollama Local                — for users running Ollama themselves
+        self.providers = [
+            GeminiProvider(self),
+            OllamaCloudProvider(self),
+            OpenAICompatibleProvider(self),
+            OllamaProvider(self),
+        ]
 
         if not self.config:
             logging.debug('No config found, showing onboarding')
@@ -996,8 +1008,13 @@ class WritingToolApp(QtWidgets.QApplication):
                         return_response=True
                     )
 
-                elif isinstance(self.current_provider, OllamaProvider):  #
-                    # For Ollama, prepare messages with system instruction and history
+                elif isinstance(self.current_provider, (OllamaProvider, OllamaCloudProvider)):
+                    # For both Ollama variants (local server and Ollama Cloud),
+                    # prepare messages with system instruction + history. The
+                    # two providers share the same OpenAI-style message-array
+                    # contract, so they share a branch. The actual endpoint
+                    # (localhost vs ollama.com) and auth are encapsulated in
+                    # each provider's `after_load()`.
                     messages = [{"role": "system", "content": system_instruction}]
 
                     for msg in history:
@@ -1006,7 +1023,7 @@ class WritingToolApp(QtWidgets.QApplication):
                             "content": msg["content"]
                         })
 
-                    # Get response from Ollama
+                    # Get response from Ollama / Ollama Cloud
                     response_text = self.current_provider.get_response(
                         system_instruction,
                         messages,

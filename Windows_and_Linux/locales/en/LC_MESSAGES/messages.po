@@ -165,6 +165,10 @@ msgid "Gemini 2.0"
 msgstr ""
 
 #: ui/OnboardingWindow.py:54 ui/OnboardingWindow.py:56
+msgid "Ollama Cloud (free tier — no install needed)"
+msgstr ""
+
+#: ui/OnboardingWindow.py:55 ui/OnboardingWindow.py:57
 msgid "ANY OpenAI Compatible API — including local LLMs!"
 msgstr ""
 

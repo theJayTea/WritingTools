@@ -74,64 +74,47 @@ class SettingsWindow(QtWidgets.QWidget):
             description_label.setWordWrap(True)
             self.current_provider_layout.addWidget(description_label)
 
-        if hasattr(provider, 'ollama_button_text'):
-            # Create container for buttons
+        # The Settings panel supports up to TWO side-by-side CTA buttons under
+        # the provider description. We trigger the two-button layout in two
+        # ways, in order of preference:
+        #   1. The provider exposes a generic `secondary_button_text` +
+        #      `secondary_button_action` pair (Ollama Cloud uses this).
+        #   2. The provider exposes the legacy `ollama_button_text` pair
+        #      (kept for any external providers that may still use it).
+        # Providers that only expose a single `button_text` get the original
+        # single centred button — no behaviour change for Gemini, OpenAI, or
+        # the local Ollama provider.
+        secondary_text = getattr(provider, 'secondary_button_text', None)
+        secondary_action = getattr(provider, 'secondary_button_action', None)
+        if secondary_text and secondary_action:
+            # Generic two-button row (case 1) — preferred.
+            self._render_two_buttons(
+                provider.button_text, provider.button_action,
+                secondary_text, secondary_action,
+                self.current_provider_layout,
+            )
+        elif hasattr(provider, 'ollama_button_text'):
+            # Legacy two-button row (case 2) — backwards compatibility.
             button_layout = QtWidgets.QHBoxLayout()
-            
-            # Add Ollama setup button
+
+            # Add legacy Ollama setup button
             ollama_button = QtWidgets.QPushButton(provider.ollama_button_text)
-            ollama_button.setStyleSheet(f"""
-                QPushButton {{
-                    background-color: {'#4CAF50' if colorMode == 'dark' else '#008CBA'};
-                    color: white;
-                    padding: 10px;
-                    font-size: 16px;
-                    border: none;
-                    border-radius: 5px;
-                }}
-                QPushButton:hover {{
-                    background-color: {'#45a049' if colorMode == 'dark' else '#007095'};
-                }}
-            """)
+            ollama_button.setStyleSheet(self._button_stylesheet())
             ollama_button.clicked.connect(provider.ollama_button_action)
             button_layout.addWidget(ollama_button)
-            
+
             # Add original button
             main_button = QtWidgets.QPushButton(provider.button_text)
-            main_button.setStyleSheet(f"""
-                QPushButton {{
-                    background-color: {'#4CAF50' if colorMode == 'dark' else '#008CBA'};
-                    color: white;
-                    padding: 10px;
-                    font-size: 16px;
-                    border: none;
-                    border-radius: 5px;
-                }}
-                QPushButton:hover {{
-                    background-color: {'#45a049' if colorMode == 'dark' else '#007095'};
-                }}
-            """)
+            main_button.setStyleSheet(self._button_stylesheet())
             main_button.clicked.connect(provider.button_action)
             button_layout.addWidget(main_button)
-            
+
             self.current_provider_layout.addLayout(button_layout)
         else:
             # Original single button logic
             if provider.button_text:
                 button = QtWidgets.QPushButton(provider.button_text)
-                button.setStyleSheet(f"""
-                    QPushButton {{
-                        background-color: {'#4CAF50' if colorMode == 'dark' else '#008CBA'};
-                        color: white;
-                        padding: 10px;
-                        font-size: 16px;
-                        border: none;
-                        border-radius: 5px;
-                    }}
-                    QPushButton:hover {{
-                        background-color: {'#45a049' if colorMode == 'dark' else '#007095'};
-                    }}
-                """)
+                button.setStyleSheet(self._button_stylesheet())
                 button.clicked.connect(provider.button_action)
                 self.current_provider_layout.addWidget(button, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
 
@@ -343,6 +326,66 @@ class SettingsWindow(QtWidgets.QWidget):
         max_height = int(screen.height() * 0.85)  # 85% of screen height
         desired_height = min(720, max_height)  # Cap at 720px or 85% of screen height
         self.resize(592, desired_height)  # Use an exact width of 592px so stuff looks good!
+
+    @staticmethod
+    def _button_stylesheet():
+        """
+        Shared QSS for the primary/secondary CTA buttons rendered in a
+        provider's settings panel. Centralised here so both the single-button
+        and the two-button paths look identical, and so any future theme
+        tweak happens in one place.
+
+        The colour shifts slightly with the system theme via `colorMode`:
+          • dark  → green (#4CAF50 / #45a049)
+          • light → blue  (#008CBA / #007095)
+        """
+        return f"""
+            QPushButton {{
+                background-color: {'#4CAF50' if colorMode == 'dark' else '#008CBA'};
+                color: white;
+                padding: 10px;
+                font-size: 16px;
+                border: none;
+                border-radius: 5px;
+            }}
+            QPushButton:hover {{
+                background-color: {'#45a049' if colorMode == 'dark' else '#007095'};
+            }}
+        """
+
+    def _render_two_buttons(self,
+                             primary_text, primary_action,
+                             secondary_text, secondary_action,
+                             parent_layout):
+        """
+        Render the two-button CTA row used by providers that need more than
+        one action next to their description (currently only Ollama Cloud,
+        with "Get Free API Key" + "Open API Key Dashboard"). Buttons share
+        the row 50/50 via stretch factors so a long primary label doesn't
+        crowd the secondary one.
+
+        Caller is expected to have validated that all four arguments are
+        non-None before calling.
+        """
+        button_layout = QtWidgets.QHBoxLayout()
+        button_layout.setSpacing(10)
+
+        # Primary button (left) — e.g. "Get Free API Key". Treated as the
+        # visually dominant action.
+        primary_button = QtWidgets.QPushButton(primary_text)
+        primary_button.setStyleSheet(self._button_stylesheet())
+        primary_button.clicked.connect(primary_action)
+        button_layout.addWidget(primary_button, stretch=1)
+
+        # Secondary button (right) — e.g. "Open API Key Dashboard". Same
+        # styling; the 50/50 split is purely to make the two equal-weight
+        # CTAs feel balanced rather than to dim the secondary.
+        secondary_button = QtWidgets.QPushButton(secondary_text)
+        secondary_button.setStyleSheet(self._button_stylesheet())
+        secondary_button.clicked.connect(secondary_action)
+        button_layout.addWidget(secondary_button, stretch=1)
+
+        parent_layout.addLayout(button_layout)
 
     @staticmethod
     def toggle_autostart(state):
