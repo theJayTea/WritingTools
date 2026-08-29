@@ -15,6 +15,7 @@ import ui.OnboardingWindow
 import ui.ResponseWindow
 import ui.SettingsWindow
 from aiprovider import GeminiProvider, OllamaProvider, OpenAICompatibleProvider, obfuscate_api_key
+from history_manager import HistoryManager
 from pynput import keyboard as pykeyboard
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import QLocale, Signal, Slot
@@ -46,6 +47,7 @@ class WritingToolApp(QtWidgets.QApplication):
     show_message_signal = Signal(str, str)  # a signal for showing message boxes
     hotkey_triggered_signal = Signal()
     followup_response_signal = Signal(str)
+    history_updated_signal = Signal()
 
 
     def __init__(self, argv):
@@ -65,6 +67,11 @@ class WritingToolApp(QtWidgets.QApplication):
         self.options = None
         self.options_path = None
         self.load_options()
+        self.history_manager = HistoryManager(
+            os.path.dirname(sys.argv[0]),
+            on_updated=self.history_updated_signal.emit
+        )
+        self.history_updated_signal.connect(self.history_manager.refresh_window)
         self.onboarding_window = None
         self.popup_window = None
         self.tray_icon = None
@@ -149,6 +156,7 @@ class WritingToolApp(QtWidgets.QApplication):
         ui.ResponseWindow._ = self._
         ui.OnboardingWindow._ = self._
         ui.CustomPopupWindow._ = self._
+        self.history_manager.set_translation_function(self._)
 
     def retranslate_ui(self):
         self.update_tray_menu()
@@ -663,6 +671,8 @@ class WritingToolApp(QtWidgets.QApplication):
         if hasattr(self, 'current_response_window'):
             delattr(self, 'current_response_window')
 
+        self.history_manager.clear_pending_inline_history()
+
         threading.Thread(
             target=self.process_option_thread,
             args=(option, custom_change),
@@ -710,7 +720,8 @@ class WritingToolApp(QtWidgets.QApplication):
             self.show_message_signal.emit('Error', 'Please select text to use this option.')
             return
 
-        if self.options[option]['open_in_window']:
+        open_in_window = self.options[option]['open_in_window']
+        if open_in_window:
             QtCore.QMetaObject.invokeMethod(
                 self,
                 '_setup_response_window',
@@ -718,6 +729,8 @@ class WritingToolApp(QtWidgets.QApplication):
                 QtCore.Q_ARG(str, option),
                 QtCore.Q_ARG(str, selected_text)
             )
+        else:
+            self.history_manager.set_pending_inline_history(option, selected_text)
 
         try:
             selected_prompt = self.options.get(option, ('', ''))
@@ -732,10 +745,27 @@ class WritingToolApp(QtWidgets.QApplication):
 
             logging.debug(f'Getting response from provider for option: {option}')
 
-            if self.options[option]['open_in_window']:
+            if open_in_window:
                 logging.debug('Getting response for window display')
                 response = self.current_provider.get_response(system_instruction, prompt, return_response=True)
+                response = response or ''
                 logging.debug(f'Got response of length: {len(response) if response else 0}')
+
+                cleaned_response = response.rstrip('\n')
+                if cleaned_response.strip():
+                    history_entry_id = self.history_manager.record_entry(
+                        option=option,
+                        input_text=selected_text,
+                        output_text=cleaned_response,
+                        conversation=[
+                            {'role': 'user', 'content': selected_text},
+                            {'role': 'assistant', 'content': cleaned_response}
+                        ]
+                    )
+                    self.history_manager.attach_entry_to_response_window(
+                        getattr(self, 'current_response_window', None),
+                        history_entry_id
+                    )
 
                 if hasattr(self, 'current_response_window'):
                     # noinspection PyTypeChecker
@@ -753,6 +783,7 @@ class WritingToolApp(QtWidgets.QApplication):
 
         except Exception as e:
             logging.error(f'An error occurred: {e}', exc_info=True)
+            self.history_manager.clear_pending_inline_history()
 
             if "Resource has been exhausted" in str(e):
                 self.show_message_signal.emit('Error - Rate Limit Hit', 'Whoops! You\'ve hit the per-minute rate limit of the Gemini API. Please try again in a few moments.\n\nIf this happens often, simply switch to a Gemini model with a higher usage limit in Settings.')
@@ -788,6 +819,7 @@ class WritingToolApp(QtWidgets.QApplication):
 
             # If the new text is the error message, show a message box
             if current_output == error_message:
+                self.history_manager.clear_pending_inline_history()
                 self.show_message_signal.emit('Error', 'The text is incompatible with the requested change.')
                 return
 
@@ -826,12 +858,14 @@ class WritingToolApp(QtWidgets.QApplication):
                     press_ctrl_v()
                     time.sleep(0.2)
                     pyperclip.copy(clipboard_backup)
+                    self.history_manager.consume_pending_inline_history(cleaned_text)
 
                 if not hasattr(self, 'current_response_window'):
                     self.output_queue = ""
 
             except Exception as e:
                 logging.error(f'Error processing output: {e}')
+                self.history_manager.clear_pending_inline_history()
         else:
             logging.debug('No new text to process')
 
@@ -869,6 +903,10 @@ class WritingToolApp(QtWidgets.QApplication):
 
         # Apply dark mode styles using darkdetect
         self.apply_dark_mode_styles(self.tray_menu)
+
+        # History menu item
+        history_action = self.tray_menu.addAction(self._('History'))
+        history_action.triggered.connect(self.history_manager.show_window)
 
         # Settings menu item
         settings_action = self.tray_menu.addAction(self._('Settings'))
@@ -975,6 +1013,9 @@ class WritingToolApp(QtWidgets.QApplication):
                     "role": "user",
                     "content": question
                 })
+                history_entry_id = getattr(response_window, 'history_entry_id', None)
+                if history_entry_id:
+                    self.history_manager.append_turn(history_entry_id, 'user', question)
                 
                 # Get chat history
                 history = response_window.chat_history.copy()
@@ -1037,6 +1078,8 @@ class WritingToolApp(QtWidgets.QApplication):
                     "role": "assistant",
                     "content": response_text
                 })
+                if history_entry_id and response_text:
+                    self.history_manager.append_turn(history_entry_id, 'assistant', response_text)
                 
                 # Emit response via signal
                 self.followup_response_signal.emit(response_text)
