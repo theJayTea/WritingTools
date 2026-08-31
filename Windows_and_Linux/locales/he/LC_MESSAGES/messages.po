@@ -1,0 +1,266 @@
+# Hebrew translations for PACKAGE package.
+# Copyright (C) 2025 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#  <momos1796@gmail.com>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-28 19:44+0100\n"
+"PO-Revision-Date: 2025-03-21 02:36+0200\n"
+"Last-Translator: momos1796@gmail.com\n"
+"Language-Team: \n"
+"Language: he\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.5\n"
+
+# Language-Team: Hebrew <73753755@gmail.com>\n"
+#: ui/AboutWindow.py:44
+msgid "About Writing Tools"
+msgstr "על 'כלי כתיבה'"
+
+#: ui/AboutWindow.py:49
+msgid ""
+"Writing Tools is a free & lightweight tool that helps you improve your writing with "
+"AI, similar to Apple's new Apple Intelligence feature. It works with an extensive "
+"range of AI LLMs, both online and locally run."
+msgstr ""
+"'כלי כתיבה' הוא כלי חינמי וקל משקל שעוזר לך לשפר את הכתיבה שלך עם AI, בדומה לתכונת "
+"Apple Intelligence החדשה של אפל. זה עובד עם מגוון רחב של AI LLMs, הן מקוונות והן "
+"בהפעלה מקומית."
+
+#: ui/AboutWindow.py:54
+msgid "Created with care by Jesai, a high school student."
+msgstr "נוצר בקפידה על ידי ג'סאי, תלמיד תיכון."
+
+#: ui/AboutWindow.py:55
+msgid "Feel free to check out my other AI app"
+msgstr "אל תהסס לבדוק את אפליקציית ה-AI האחרת שלי"
+
+#: ui/AboutWindow.py:55
+msgid "It's a novel AI tutor that's free on the Google Play Store :)"
+msgstr "זהו מורה חדש לבינה מלאכותית, זמין בחינם בחנות Google Play :)"
+
+#: ui/AboutWindow.py:56
+msgid "Contact me"
+msgstr "צור קשר"
+
+#: ui/AboutWindow.py:60
+msgid ""
+"Writing Tools would not be where it is today without its <u>amazing</u> contributors"
+msgstr "'כלי כתיבה' לא היה במקום בו הוא נמצא כיום ללא התורמים <u>המדהימים</u> שלו"
+
+#: ui/AboutWindow.py:62
+msgid ""
+"Extensively refactored Writing Tools and added OpenAI Compatible API support, "
+"streamed responses, and the text generation mode when no text is selected."
+msgstr ""
+"'כלי כתיבה' שוחזר באופן נרחב והוספה בו תמיכה ב-API תואם OpenAI, תגובות זרימות ומצב "
+"יצירת טקסט כאשר לא נבחר טקסט."
+
+#: ui/AboutWindow.py:64
+msgid ""
+"Added Linux support, switched to the pynput API to improve Windows stability. Added "
+"Ollama API support, custom options and localization. Fixed misc. bugs and added "
+"graceful termination support by handling SIGINT signal."
+msgstr ""
+"נוספה תמיכה בלינוקס, והמעבר היה ל-API pynput כדי לשפר את היציבות של Windows. נוספה "
+"תמיכת Ollama API, נוספו אפשרויות מותאמות אישית ולוקליזציה, תוקנו באגים שונים, "
+"ונוספה תמיכת סיום חיננית על ידי טיפול באות SIGINT."
+
+#: ui/AboutWindow.py:66
+msgid "Helped add dark mode, the plain theme, tray menu fixes, and UI improvements."
+msgstr "עזר להוסיף מצב כהה, ערכת הנושא הפשוטה, תיקוני תפריטי מגש ושיפורי ממשק משתמש."
+
+#: ui/AboutWindow.py:68
+msgid "Helped improve the reliability of text selection."
+msgstr "עזר לשפר את האמינות של בחירת הטקסט."
+
+#: ui/AboutWindow.py:70
+msgid "Made the rounded corners anti-aliased & prettier."
+msgstr "הפך את הפינות המעוגלות לחלקות ויפות יותר."
+
+#: ui/AboutWindow.py:72
+msgid ""
+"Significantly improved the About window, making it scrollable and cleaning things "
+"up. Also improved our .gitignore & requirements.txt."
+msgstr ""
+"שיפר באופן משמעותי את חלון האודות, הפך אותו לניתן לגלילה וניקה דברים. שיפר גם את ה-."
+"gitignore & requirements.txt שלנו."
+
+#: ui/AboutWindow.py:74
+msgid "Helped add the start-on-boot setting."
+msgstr "עזר להוסיף את הגדרת ההפעלה בעת האתחול."
+
+#: ui/CustomPopupWindow.py:75 ui/CustomPopupWindow.py:74
+msgid "Describe your change..."
+msgstr "תאר את השינוי שלך..."
+
+#: ui/CustomPopupWindow.py:75 ui/CustomPopupWindow.py:74
+msgid "Ask your AI..."
+msgstr "שאל את ה-AI שלך..."
+
+#: ui/CustomPopupWindow.py:109
+msgid "Proofread"
+msgstr "הגהה"
+
+#: ui/CustomPopupWindow.py:110
+msgid "Rewrite"
+msgstr "שכתוב"
+
+#: ui/CustomPopupWindow.py:111
+msgid "Friendly"
+msgstr "ידידותי"
+
+#: ui/CustomPopupWindow.py:112
+msgid "Professional"
+msgstr "מקצועי"
+
+#: ui/CustomPopupWindow.py:113
+msgid "Concise"
+msgstr "תמציתי"
+
+#: ui/CustomPopupWindow.py:114
+msgid "Summary"
+msgstr "תקציר"
+
+#: ui/CustomPopupWindow.py:115
+msgid "Key Points"
+msgstr "נקודות מפתח"
+
+#: ui/CustomPopupWindow.py:116
+msgid "Table"
+msgstr "טבלה"
+
+#: ui/OnboardingWindow.py:24 ui/OnboardingWindow.py:40 ui/OnboardingWindow.py:26
+#: ui/OnboardingWindow.py:42
+msgid "Welcome to Writing Tools"
+msgstr "ברוכים הבאים לכלי כתיבה"
+
+#: ui/OnboardingWindow.py:45 ui/OnboardingWindow.py:47
+msgid ""
+"Instantly optimize your writing with AI by selecting your text and invoking Writing "
+"Tools with \"ctrl+space\", anywhere."
+msgstr ""
+"שפר מיד את הכתיבה שלך עם AI על ידי בחירת הטקסט שלך, והפעלת 'כלי כתיבה' עם "
+"\"ctrl+רווח\", בכל מקום."
+
+#: ui/OnboardingWindow.py:47 ui/OnboardingWindow.py:49
+msgid ""
+"Get a summary you can chat with of articles, YouTube videos, or documents by select "
+"all text with \"ctrl+a\""
+msgstr ""
+"קבל תקציר שניתן לשוחח איתו - של מאמרים, סרטוני YouTube או מסמכים על ידי בחירת כל "
+"הטקסט עם \"ctrl+a\""
+
+#: ui/OnboardingWindow.py:48 ui/OnboardingWindow.py:50
+msgid ""
+"(or select the YouTube transcript from its description), invoking Writing Tools, "
+"and choosing Summary."
+msgstr "(או בחר את תמליל YouTube מהתיאור שלו), הפעלת כלי כתיבה ובחר סיכום."
+
+#: ui/OnboardingWindow.py:50 ui/OnboardingWindow.py:52
+msgid "Chat with AI anytime by invoking Writing Tools without selecting any text."
+msgstr "שוחח עם AI בכל עת על ידי הפעלת כלי כתיבה מבלי לבחור טקסט."
+
+#: ui/OnboardingWindow.py:52 ui/OnboardingWindow.py:54
+msgid "Supports an extensive range of AI models:"
+msgstr "תומך במגוון רחב של דגמי AI:"
+
+#: ui/OnboardingWindow.py:53 ui/OnboardingWindow.py:55
+msgid "Gemini 2.0"
+msgstr "Gemini 2.0"
+
+#: ui/OnboardingWindow.py:54 ui/OnboardingWindow.py:56
+msgid "ANY OpenAI Compatible API — including local LLMs!"
+msgstr "כל API תואם OpenAI - כולל LLMs מקומיים!"
+
+#: ui/OnboardingWindow.py:75 ui/OnboardingWindow.py:77
+msgid "Choose your theme:"
+msgstr "בחר את ערכת הנושא שלך:"
+
+#: ui/OnboardingWindow.py:80 ui/OnboardingWindow.py:82
+msgid "Gradient"
+msgstr "מעבר צבע (Gradient)"
+
+#: ui/OnboardingWindow.py:81 ui/SettingsWindow.py:239 ui/OnboardingWindow.py:83
+#: ui/SettingsWindow.py:244
+msgid "Plain"
+msgstr "פשוט"
+
+#: ui/OnboardingWindow.py:90 ui/OnboardingWindow.py:92
+msgid "Next"
+msgstr "הבא"
+
+#: ui/ResponseWindow.py:301 ui/ResponseWindow.py:303
+msgid "Response"
+msgstr "תגובה"
+
+#: ui/ResponseWindow.py:379 ui/ResponseWindow.py:385
+msgid "Select to copy with formatting"
+msgstr "העתק עם עיצוב"
+
+#: ui/ResponseWindow.py:384 ui/ResponseWindow.py:390
+msgid "Copy as Markdown"
+msgstr "העתק כ- Markdown"
+
+#: ui/ResponseWindow.py:395 ui/ResponseWindow.py:507 ui/ResponseWindow.py:509
+#: ui/ResponseWindow.py:516 ui/ResponseWindow.py:520 ui/ResponseWindow.py:401
+#: ui/ResponseWindow.py:513 ui/ResponseWindow.py:515 ui/ResponseWindow.py:522
+#: ui/ResponseWindow.py:526
+msgid "Thinking"
+msgstr "חושב"
+
+#: ui/ResponseWindow.py:429 ui/ResponseWindow.py:530 ui/ResponseWindow.py:435
+#: ui/ResponseWindow.py:536
+msgid "Ask a follow-up question"
+msgstr "שאל שאלת המשך"
+
+#: ui/SettingsWindow.py:32 ui/SettingsWindow.py:151 ui/SettingsWindow.py:205
+#: WritingToolApp.py:568 ui/SettingsWindow.py:37 ui/SettingsWindow.py:156
+#: ui/SettingsWindow.py:210 WritingToolApp.py:569
+msgid "Settings"
+msgstr "הגדרות"
+
+#: ui/SettingsWindow.py:211 ui/SettingsWindow.py:216
+msgid "Start on Boot"
+msgstr "הפעל בעת האתחול"
+
+#: ui/SettingsWindow.py:218 ui/SettingsWindow.py:223
+msgid "Shortcut Key:"
+msgstr "מקש קיצור:"
+
+#: ui/SettingsWindow.py:233 ui/SettingsWindow.py:238
+msgid "Background Theme:"
+msgstr "ערכת נושא לרקע:"
+
+#: ui/SettingsWindow.py:238 ui/SettingsWindow.py:243
+msgid "Blurry Gradient"
+msgstr "מעבר צבעים מטושטש"
+
+#: ui/SettingsWindow.py:250 ui/SettingsWindow.py:255
+msgid "Choose AI Provider:"
+msgstr "בחר ספק AI:"
+
+#: ui/SettingsWindow.py:307 ui/SettingsWindow.py:312
+msgid "Finish AI Setup"
+msgstr "סיום הגדרת ה-AI"
+
+#: ui/SettingsWindow.py:307 ui/SettingsWindow.py:312
+msgid "Save"
+msgstr "שמור"
+
+#: ui/SettingsWindow.py:326 ui/SettingsWindow.py:331
+msgid "Please restart Writing Tools for changes to take effect."
+msgstr "נא להפעיל מחדש את כלי כתיבה כדי שהשינויים ייכנסו לתוקף."
+
+#: WritingToolApp.py:571 WritingToolApp.py:572
+msgid "About"
+msgstr "אודות"
+
+#: WritingToolApp.py:574 WritingToolApp.py:575
+msgid "Exit"
+msgstr "צא"
