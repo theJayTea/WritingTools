@@ -329,9 +329,10 @@ class GeminiProvider(AIProvider):
     System instruction is passed via `GenerateContentConfig.system_instruction`
     (not concatenated into `contents`, as the legacy SDK required).
 
-    Thinking is disabled (set to "minimal", the lowest level the API exposes)
-    on Gemini 3-family models. Gemma models don't have a thinking process, so
-    `thinking_config` is omitted for them — passing it could otherwise error.
+    Gemini's lowest broadly supported thinking level ("low") is used for
+    Gemini models to keep writing requests responsive. Gemma models don't have
+    a compatible shared thinking configuration, so `thinking_config` is omitted
+    for them — passing it could otherwise error.
     """
 
     # Disable safety filtering across all categories (best-effort; some models
@@ -360,6 +361,8 @@ class GeminiProvider(AIProvider):
                     # quality. Capped at 20 free requests/day per the model's free
                     # tier.
                     ("⭐ Gemini Flash Latest (very fast | only 20 free uses/day)", "gemini-flash-latest"),
+                    ("Gemini 3.6 Flash (fast)", "gemini-3.6-flash"),
+                    ("Gemini 3.5 Flash (fast)", "gemini-3.5-flash"),
                     # Gemma 4 models are unlimited on the free tier but noticeably
                     # slower (8–15s typical) since they run on different
                     # infrastructure.
@@ -387,25 +390,30 @@ class GeminiProvider(AIProvider):
         output on reasoning-heavy tasks). The old SDK code set it to 0.5; we drop
         that override here.
         """
-        # Thinking is disabled across the board for Writing Tools (latency matters
-        # more than reasoning depth for proofread/rewrite/summary flows).
+        # Keep thinking effort low for Writing Tools: latency matters more than
+        # deep reasoning for proofread/rewrite/summary flows.
         #
         # • Gemma 4 *is* capable of thinking, but is off by default. Per
         #   https://ai.google.dev/gemma/docs/core/gemma_on_gemini_api#thinking,
         #   thinking on Gemma 4 is binary and "you enable it in the API by setting
         #   the thinking level to 'high'". So omitting thinking_config keeps
         #   Gemma 4 in its default-off state.
-        # • Gemini 3 Flash / Flash-Lite cannot fully disable thinking. The
-        #   lowest exposed level is "minimal", which the docs say "matches the
-        #   'no thinking' setting for most queries".
-        is_gemma = "gemma" in (self.model_name or "").lower()
+        # • Gemini 3.5 Flash and 3.6 Flash explicitly support "minimal", so
+        #   use it for their lowest-latency setting. Do not use it for the
+        #   rolling gemini-flash-latest alias: it can resolve to a newer model
+        #   such as Gemini 3.7 Flash, which rejects "minimal". "low" remains
+        #   the safe default for all other Gemini and custom model choices.
+        model_name = (self.model_name or "").lower()
+        is_gemma = "gemma" in model_name
+        supports_minimal_thinking = model_name in {"gemini-3.5-flash", "gemini-3.6-flash"}
         kwargs = {
             "system_instruction": system_instruction,
             "safety_settings": self._SAFETY_SETTINGS,
             "max_output_tokens": 1000,
         }
         if not is_gemma:
-            kwargs["thinking_config"] = genai_types.ThinkingConfig(thinking_level="minimal")
+            thinking_level = "minimal" if supports_minimal_thinking else "low"
+            kwargs["thinking_config"] = genai_types.ThinkingConfig(thinking_level=thinking_level)
         return genai_types.GenerateContentConfig(**kwargs)
 
     @staticmethod
