@@ -9,6 +9,32 @@ import SwiftUI
 import ApplicationServices
 import CoreGraphics
 
+enum SystemSettingsOpener {
+  @MainActor
+  static func openPrivacyPane(anchor: String? = nil) {
+    let query = anchor.map { "?\($0)" } ?? ""
+    // System Settings still registers the x-apple.systempreferences URL scheme.
+    let urls = [
+      "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension\(query)",
+      "x-apple.systempreferences:com.apple.preference.security\(query)",
+      "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension",
+      "x-apple.systempreferences:com.apple.preference.security",
+    ]
+
+    for urlString in urls {
+      if let url = URL(string: urlString), NSWorkspace.shared.open(url) {
+        return
+      }
+    }
+
+    let settingsApp = URL(fileURLWithPath: "/System/Applications/System Settings.app")
+    NSWorkspace.shared.openApplication(
+      at: settingsApp,
+      configuration: NSWorkspace.OpenConfiguration()
+    )
+  }
+}
+
 struct OnboardingPermissionsStep: View {
   @Binding var isAccessibilityGranted: Bool
   @Binding var isScreenRecordingGranted: Bool
@@ -118,12 +144,7 @@ struct OnboardingPermissionsStep: View {
         Spacer()
 
         Button("Open Privacy & Security") {
-          if let url = URL(
-            string:
-              "x-apple.systemsettings:com.apple.settings.PrivacySecurity.extension"
-          ) {
-            NSWorkspace.shared.open(url)
-          }
+          SystemSettingsOpener.openPrivacyPane()
         }
         .buttonStyle(.link)
         .accessibilityLabel("Open Privacy and Security settings")
@@ -144,12 +165,7 @@ struct OnboardingPermissionsHelper {
 
     Task { @MainActor in
       try? await Task.sleep(for: .milliseconds(200))
-      if let url = URL(
-        string:
-          "x-apple.systemsettings:com.apple.settings.PrivacySecurity.extension?Privacy_Accessibility"
-      ) {
-        NSWorkspace.shared.open(url)
-      }
+      SystemSettingsOpener.openPrivacyPane(anchor: "Privacy_Accessibility")
     }
   }
 
