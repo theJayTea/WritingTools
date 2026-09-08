@@ -260,7 +260,10 @@ struct SettingsView: View {
                 return "Custom OpenRouter model name is required."
             }
         case "openai":
-            if settings.openAIApiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            let trimmedOpenAIBaseURL = settings.openAIBaseURL.trimmingCharacters(in: .whitespacesAndNewlines)
+            let isUsingDefaultOpenAIEndpoint = trimmedOpenAIBaseURL.isEmpty || trimmedOpenAIBaseURL == OpenAIConfig.defaultBaseURL
+            if isUsingDefaultOpenAIEndpoint &&
+                settings.openAIApiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 return "OpenAI API key is required."
             }
             if settings.openAIModel.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
