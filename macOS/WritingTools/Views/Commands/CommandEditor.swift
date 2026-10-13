@@ -214,6 +214,7 @@ struct CommandEditor: View {
                                 if LocalModelProvider.isAppleSilicon {
                                     Text("Local LLM").tag("local")
                                 }
+                                Text("Apple Intelligence").tag("apple")
                                 Text("Gemini AI").tag("gemini")
                                 Text("OpenAI").tag("openai")
                                 Text("Anthropic").tag("anthropic")

@@ -33,6 +33,7 @@ final class AppState {
     var ollamaProvider: OllamaProvider
     var localLLMProvider: LocalModelProvider
     var openRouterProvider: OpenRouterProvider
+    let appleIntelligenceProvider = AppleIntelligenceProvider()
 
     // Cache for providers with model overrides to prevent memory leaks
     // Key: "providerName:model" -> Provider instance
@@ -74,6 +75,8 @@ final class AppState {
             return mistralProvider
         case "openrouter":
             return openRouterProvider
+        case "apple":
+            return appleIntelligenceProvider
         default:
             return localLLMProvider
         }
@@ -134,6 +137,8 @@ final class AppState {
             return openRouterProvider
         case "local":
             return localLLMProvider
+        case "apple":
+            return appleIntelligenceProvider
         default:
             return activeProvider
         }
@@ -204,6 +209,9 @@ final class AppState {
 
         case "local":
             return localLLMProvider
+
+        case "apple":
+            return appleIntelligenceProvider
 
         default:
             return activeProvider

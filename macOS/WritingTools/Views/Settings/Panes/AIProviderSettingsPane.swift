@@ -31,6 +31,7 @@ struct AIProviderSettingsPane<SaveButton: View, CompleteSetupButton: View>: View
                     if LocalModelProvider.isAppleSilicon {
                         Text("Local LLM").tag("local")
                     }
+                    Text("Apple Intelligence (On-Device)").tag("apple")
                     Text("Gemini AI").tag("gemini")
                     Text("OpenAI").tag("openai")
                     Text("Anthropic").tag("anthropic")
@@ -68,6 +69,8 @@ struct AIProviderSettingsPane<SaveButton: View, CompleteSetupButton: View>: View
                         OllamaSettingsView(needsSaving: $needsSaving)
                     } else if settings.currentProvider == "openrouter" {
                         OpenRouterSettingsView(needsSaving: $needsSaving)
+                    } else if settings.currentProvider == "apple" {
+                        AppleIntelligenceSettingsView()
                     } else if settings.currentProvider == "local" {
                         LocalLLMSettingsView(provider: appState.localLLMProvider)
                     }

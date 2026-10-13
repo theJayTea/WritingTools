@@ -56,6 +56,7 @@ struct OnboardingCustomizationStep: View {
             if LocalModelProvider.isAppleSilicon {
               Text("Local LLM (On-Device)").tag("local")
             }
+            Text("Apple Intelligence (On-Device)").tag("apple")
             Text("Gemini AI (Google)").tag("gemini")
             Text("OpenAI (ChatGPT)").tag("openai")
             Text("Mistral AI").tag("mistral")

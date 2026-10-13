@@ -26,6 +26,8 @@ struct ProviderSettingsContainerView: View {
       OllamaProviderSettingsView(settings: settings)
     case "openrouter":
       OpenRouterProviderSettingsView(settings: settings)
+    case "apple":
+      AppleIntelligenceSettingsView()
     case "local":
       LocalLLMSettingsView(provider: appState.localLLMProvider)
     default:
