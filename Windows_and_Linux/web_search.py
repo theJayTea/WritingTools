@@ -1,6 +1,7 @@
 """Per-conversation, explicitly requested web grounding through Parallel MCP."""
 
 import asyncio
+import json
 import threading
 import uuid
 from urllib.parse import urlsplit
@@ -99,12 +100,41 @@ class WebSearchConversation:
                         raise SearchError(
                             "The web service could not complete this lookup. Please try again later."
                         )
-                    text = "\n\n".join(
-                        block.text for block in result.content if block.type == "text"
-                    ).strip()
-                    if not text:
-                        raise SearchError("The web service returned no sources. Please try another question.")
-                    return text[:25000]
+                    return source_text(result)
+
+
+def source_text(result):
+    """Accept useful sources, not just a successful MCP envelope or error text."""
+    payload = result.structuredContent
+    if payload is None:
+        try:
+            payload = json.loads("\n".join(
+                block.text for block in result.content if block.type == "text"
+            ))
+        except (TypeError, ValueError) as exc:
+            raise SearchError("The web service returned an invalid response. Please try again.") from exc
+    rows = payload.get("results") if isinstance(payload, dict) else None
+    sections = []
+    for row in rows if isinstance(rows, list) else []:
+        if not isinstance(row, dict) or not isinstance(row.get("url"), str):
+            continue
+        try:
+            url = urlsplit(row["url"])
+            valid_url = url.scheme in ("http", "https") and url.hostname and not url.username and not url.password
+        except ValueError:
+            valid_url = False
+        if not valid_url:
+            continue
+        excerpts = row.get("excerpts")
+        excerpts = [s.strip() for s in excerpts if isinstance(s, str) and s.strip()] if isinstance(excerpts, list) else []
+        if not excerpts and isinstance(row.get("full_content"), str) and row["full_content"].strip():
+            excerpts = [row["full_content"].strip()]
+        if excerpts:
+            title = row.get("title") if isinstance(row.get("title"), str) else "Web source"
+            sections.append("\n".join([title, row["url"], *excerpts]))
+    if not sections:
+        raise SearchError("No usable web sources were found. Please try another question or URL.")
+    return "\n\n".join(sections)[:25000]
 
 
 def grounded_history(history, sources):

@@ -99,13 +99,31 @@ class ChatSearchTests(unittest.TestCase):
                 return httpx.Response(503)
             if self.mode == "slow":
                 await asyncio.sleep(10)
+            sources = {
+                "results": [{"url": "https://example.com/source", "title": "Example source",
+                             "excerpts": ["A useful current factual excerpt."]}],
+            }
+            if self.mode in ("no_results", "fetch_failed", "structured_empty"):
+                sources["results"] = []
+            if self.mode == "fetch_failed":
+                sources["errors"] = [{"url": "https://example.com/missing",
+                                      "error_type": "fetch_failed", "http_status_code": 404,
+                                      "content": None}]
+            if self.mode == "no_excerpts":
+                sources["results"][0]["excerpts"] = []
+            if self.mode == "unsafe_source":
+                sources["results"][0]["url"] = "javascript:alert(1)"
+            text = json.dumps(sources)
+            if self.mode == "quota":
+                text = "Free anonymous tier quota exhausted"
+            if self.mode == "invalid_json":
+                text = "not a JSON search response"
             result = {
-                "content": [] if self.mode == "empty" else [{
-                    "type": "text",
-                    "text": "Free anonymous tier quota exhausted" if self.mode == "quota" else SOURCES,
-                }],
+                "content": [] if self.mode in ("empty", "structured") else [{"type": "text", "text": text}],
                 "isError": self.mode in ("error", "quota"),
             }
+            if self.mode in ("structured", "structured_empty"):
+                result["structuredContent"] = sources
         else:
             raise AssertionError(method)
         return httpx.Response(200, json={"jsonrpc": "2.0", "id": payload["id"], "result": result})
@@ -239,6 +257,22 @@ class ChatSearchTests(unittest.TestCase):
         self.mode = "normal"
         self.send(window, "Question to retry")
         self.assertEqual(self.calls()[-1]["arguments"]["session_id"], original_id)
+
+    def test_empty_or_failed_sources_do_not_reach_the_model(self):
+        window = self.window()
+        for mode in ("no_results", "fetch_failed", "structured_empty", "no_excerpts", "unsafe_source", "invalid_json"):
+            with self.subTest(mode=mode):
+                self.mode = mode
+                self.send(window, "https://example.com/missing" if mode == "fetch_failed" else "Question")
+                self.harness.current_provider.get_response.assert_not_called()
+                self.assertNotEqual(window.chat_history[-1]["content"], ANSWER)
+
+    def test_structured_sources_reach_the_model_without_text_blocks(self):
+        self.mode = "structured"
+        window = self.window()
+        self.send(window, "A public question")
+        self.harness.current_provider.get_response.assert_called_once()
+        self.assertIn(SOURCES, self.harness.current_provider.get_response.call_args.args[1][-2]["content"])
 
     def test_total_deadline_and_close_cancel_the_actual_lookup(self):
         window = self.window()
