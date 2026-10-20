@@ -58,6 +58,14 @@ If you find value in it, it would mean the world to me if you could support us a
 - Get a pop-up summary with clear and beautiful formatting (with Markdown rendering), saving you hours.
 - Chat with the summary if you'd like to learn more or have questions.
 
+### 🌐 Web-grounded chat (Windows/Linux)
+
+In a chat or summary window, check **Search web** before sending a question to get an answer grounded in web sources, with source links. Enter a full `https://...` or `http://...` URL as the question to read that page instead. Uncheck it to return to ordinary chat.
+
+Search uses [Parallel Search MCP](https://docs.parallel.ai/integrations/mcp/search-mcp), with Fast mode and no account or API key required. Your selected AI model still writes the answer. Search stays off in each new window until you enable it. Only your current question or URL goes to Parallel; selected text and prior chat messages are not sent to search. Retrieved sources are sent to your selected model along with the conversation. Enabling web search makes a network request even with a local model.
+
+If a lookup fails or times out, the window shows an error instead of generating an answer without sources. You can retry the question or uncheck **Search web**. The free service has usage limits. Closing the window cancels its pending lookup.
+
 ### 3️⃣ Go wild with your own buttons!
 - They're your own magic buttons. Dream, and it'll magically be done with AI.
 
@@ -170,7 +178,7 @@ https://github.com/user-attachments/assets/42a3d8c7-18ac-4282-9478-16aab935f35e
 I believe strongly in protecting your privacy. Writing Tools:
 - Does not collect or store any of your writing data by itself. It doesn't even collect general logs, so it's super light and privacy-friendly.
 - Lets you use local LLMs to process your text entirely on-device.
-- Only sends text to the chosen AI provider (encrypted) when you *explicitly* use one of the options.
+- Only sends text to the chosen AI provider (encrypted) when you *explicitly* use one of the options. If you enable **Search web** on Windows/Linux, your current question or URL is also sent to Parallel to retrieve web sources.
 - Only stores your API key locally on your device.
 
 Note: If you choose to use a cloud based LLM, refer to the AI provider's privacy policy and terms of service.

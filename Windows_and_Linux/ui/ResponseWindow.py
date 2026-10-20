@@ -8,6 +8,7 @@ from PySide6.QtCore import Qt, Slot
 from PySide6.QtWidgets import QScrollArea
 
 from ui.UIUtils import UIUtils, colorMode
+from web_search import WebSearchConversation
 
 _ = lambda x: x
 
@@ -299,6 +300,8 @@ class ChatContentScrollArea(QScrollArea):
 
 class ResponseWindow(QtWidgets.QWidget):
     """Enhanced response window with improved sizing and zoom handling"""
+
+    followup_ready = QtCore.Signal(str)
     
     def __init__(self, app, title=_("Response"), parent=None):
         super().__init__(parent)
@@ -312,6 +315,7 @@ class ResponseWindow(QtWidgets.QWidget):
         self.loading_container = None
         self.chat_area = None
         self.chat_history = []
+        self.web_search = WebSearchConversation()
 
         # Setup thinking animation with full range of dots
         self.thinking_timer = QtCore.QTimer(self)
@@ -322,7 +326,7 @@ class ResponseWindow(QtWidgets.QWidget):
 
         self.init_ui()
         logging.debug('Connecting response signals')
-        self.app.followup_response_signal.connect(self.handle_followup_response)
+        self.followup_ready.connect(self.handle_followup_response)
         logging.debug('Response signals connected')
 
         # Set initial size for "Thinking..." state
@@ -428,6 +432,15 @@ class ResponseWindow(QtWidgets.QWidget):
         self.chat_area = ChatContentScrollArea()
         content_layout.addWidget(self.chat_area)
         
+        # Search permission belongs to this window and is never persisted.
+        self.search_checkbox = QtWidgets.QCheckBox(_("Search web"))
+        self.search_checkbox.setToolTip(_(
+            "Send your next question to Parallel for web sources. "
+            "No account or API key needed. Selected text and chat history are not sent. "
+            "Enter a full HTTP/HTTPS URL to read that page."
+        ))
+        content_layout.addWidget(self.search_checkbox)
+
         # Input area with enhanced styling
         bottom_bar = QtWidgets.QHBoxLayout()
         
@@ -535,6 +548,7 @@ class ResponseWindow(QtWidgets.QWidget):
         self.loading_label.hide()
         self.input_field.setPlaceholderText(_("Ask a follow-up question"))
         self.input_field.setEnabled(True)
+        self.search_checkbox.setEnabled(True)
         
         # Force layout update
         if self.layout():
@@ -664,10 +678,11 @@ class ResponseWindow(QtWidgets.QWidget):
     def send_message(self):
         """Send a new message/question"""
         message = self.input_field.text().strip()
-        if not message:
+        if not message or not self.input_field.isEnabled():
             return
             
         self.input_field.setEnabled(False)
+        self.search_checkbox.setEnabled(False)
         self.input_field.clear()
         
         # Add user message and maintain zoom level
@@ -698,9 +713,11 @@ class ResponseWindow(QtWidgets.QWidget):
             self.app.config['response_window_zoom'] = self.current_text_display.zoom_factor
             self.app.save_config(self.app.config)
 
+        self.web_search.cancel()
+        self.thinking_timer.stop()
         self.chat_history = []
         
-        if hasattr(self.app, 'current_response_window'):
+        if getattr(self.app, 'current_response_window', None) is self:
             delattr(self.app, 'current_response_window')
         
 
