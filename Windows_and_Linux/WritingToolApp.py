@@ -21,6 +21,7 @@ from PySide6.QtCore import QLocale, Signal, Slot
 from PySide6.QtGui import QCursor, QGuiApplication
 from PySide6.QtWidgets import QApplication, QMessageBox
 from update_checker import UpdateChecker
+from web_search import GROUNDING_INSTRUCTION, SearchCancelled, SearchError, grounded_history
 
 _ = gettext.gettext
 
@@ -45,7 +46,6 @@ class WritingToolApp(QtWidgets.QApplication):
     output_ready_signal = Signal(str)
     show_message_signal = Signal(str, str)  # a signal for showing message boxes
     hotkey_triggered_signal = Signal()
-    followup_response_signal = Signal(str)
 
 
     def __init__(self, argv):
@@ -960,54 +960,57 @@ class WritingToolApp(QtWidgets.QApplication):
         """
         Process a follow-up question in the chat window.
         """
-        logging.debug(f'Processing follow-up question: {question}')
+        # Capture Qt state and the chosen provider before entering the worker.
+        use_web = response_window.search_checkbox.isChecked()
+        conversation = response_window.web_search
+        provider = self.current_provider
+        history = response_window.chat_history.copy()
         
         def process_thread():
             logging.debug('Starting follow-up processing thread')
             try:
-                if not response_window.chat_history:
+                if not history:
                     logging.error("No chat history found")
                     self.show_message_signal.emit('Error', 'Chat history not found')
                     return
 
-                # Add current question to chat history
-                response_window.chat_history.append({
-                    "role": "user",
-                    "content": question
-                })
-                
-                # Get chat history
-                history = response_window.chat_history.copy()
-                
                 # System instruction based on original option
                 system_instruction = "You are a helpful AI assistant. Provide clear and direct responses, maintaining the same format and style as your previous responses. If appropriate, use Markdown formatting to make your response more readable."
                 
+                request_history = history
+                if use_web:
+                    sources = conversation.lookup(question)
+                    request_history = grounded_history(history, sources)
+                    system_instruction += GROUNDING_INSTRUCTION
+                if conversation.cancelled.is_set():
+                    return
+
                 logging.debug('Sending request to AI provider')
-                
+
                 # Format conversation differently based on provider
-                if isinstance(self.current_provider, GeminiProvider):
+                if isinstance(provider, GeminiProvider):
                     # Gemini takes the system instruction via its config object,
                     # not as an in-history message. We pass the raw chat history
                     # (user/assistant turns); GeminiProvider handles role mapping
                     # and drops any "system" entries internally.
-                    response_text = self.current_provider.get_response(
+                    response_text = provider.get_response(
                         system_instruction,
-                        history,
+                        request_history,
                         return_response=True
                     )
 
-                elif isinstance(self.current_provider, OllamaProvider):  #
+                elif isinstance(provider, OllamaProvider):  #
                     # For Ollama, prepare messages with system instruction and history
                     messages = [{"role": "system", "content": system_instruction}]
 
-                    for msg in history:
+                    for msg in request_history:
                         messages.append({
                             "role": msg["role"],
                             "content": msg["content"]
                         })
 
                     # Get response from Ollama
-                    response_text = self.current_provider.get_response(
+                    response_text = provider.get_response(
                         system_instruction,
                         messages,
                         return_response=True
@@ -1018,13 +1021,13 @@ class WritingToolApp(QtWidgets.QApplication):
                     messages = [{"role": "system", "content": system_instruction}]
 
                     # Add history messages (including latest question)
-                    for msg in history:
+                    for msg in request_history:
                         # Convert 'assistant' role to 'assistant' for OpenAI
                         role = "assistant" if msg["role"] == "assistant" else "user"
                         messages.append({"role": role, "content": msg["content"]})
                     
                     # Get response by passing the full messages array
-                    response_text = self.current_provider.get_response(
+                    response_text = provider.get_response(
                         system_instruction,
                         messages,  # Pass messages array directly
                         return_response=True
@@ -1032,27 +1035,33 @@ class WritingToolApp(QtWidgets.QApplication):
 
                 logging.debug(f'Got response of length: {len(response_text)}')
                 
-                # Add response to chat history
-                response_window.chat_history.append({
-                    "role": "assistant",
-                    "content": response_text
-                })
-                
-                # Emit response via signal
-                self.followup_response_signal.emit(response_text)
+                if conversation.cancelled.is_set():
+                    return
 
+                # Emit response via signal
+                response_window.followup_ready.emit(response_text)
+
+            except SearchCancelled:
+                return
+            except SearchError as e:
+                if not conversation.cancelled.is_set():
+                    response_window.followup_ready.emit(str(e))
             except Exception as e:
+                if conversation.cancelled.is_set():
+                    return
                 logging.error(f'Error processing follow-up question: {e}', exc_info=True)
 
                 if "Resource has been exhausted" in str(e):
                     self.show_message_signal.emit('Error - Rate Limit Hit', 'Whoops! You\'ve hit the per-minute rate limit of the Gemini API. Please try again in a few moments.\n\nIf this happens often, simply switch to a Gemini model with a higher usage limit in Settings.')
-                    self.followup_response_signal.emit("Sorry, an error occurred while processing your question.")
+                    response_window.followup_ready.emit("Sorry, an error occurred while processing your question.")
                 else:
                     self.show_message_signal.emit('Error', f'An error occurred: {e}')
-                    self.followup_response_signal.emit("Sorry, an error occurred while processing your question.")
+                    response_window.followup_ready.emit("Sorry, an error occurred while processing your question.")
 
         # Start the thread
-        threading.Thread(target=process_thread, daemon=True).start()
+        thread = threading.Thread(target=process_thread, daemon=True)
+        thread.start()
+        return thread
 
     def show_settings(self, providers_only=False):
 
