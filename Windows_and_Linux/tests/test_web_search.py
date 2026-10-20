@@ -75,6 +75,13 @@ class ChatSearchTests(unittest.TestCase):
         if "id" not in payload:
             return httpx.Response(202)
         method = payload["method"]
+        if (self.mode == "initialize_quota" and method == "initialize") or (
+            self.mode == "rpc_quota" and method == "tools/call"
+        ):
+            return httpx.Response(200, json={
+                "jsonrpc": "2.0", "id": payload["id"],
+                "error": {"code": -32000, "message": "Free anonymous tier quota exhausted"},
+            })
         if method == "initialize":
             result = {
                 "protocolVersion": payload["params"]["protocolVersion"],
@@ -222,7 +229,7 @@ class ChatSearchTests(unittest.TestCase):
     def test_failed_lookup_does_not_generate_an_ungrounded_answer(self):
         window = self.window()
         original_id = window.web_search.session_id
-        for mode in ("error", "quota", "empty", "missing", "timeout", "http_error"):
+        for mode in ("error", "quota", "rpc_quota", "initialize_quota", "empty", "missing", "timeout", "http_error"):
             with self.subTest(mode=mode):
                 self.mode = mode
                 self.send(window, "Question to retry")
