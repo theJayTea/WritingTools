@@ -2,6 +2,7 @@
 
 .DS_Store
 Windows_and_Linux/config.json
+Windows_and_Linux/WritingTools.lock
 
 .idea
 **/__pycache__
