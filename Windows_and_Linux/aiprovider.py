@@ -39,6 +39,7 @@ from typing import List
 
 # External libraries
 from google import genai
+from google.genai import errors as genai_errors
 from google.genai import types as genai_types
 from ollama import Client as OllamaClient
 from openai import OpenAI
@@ -330,8 +331,9 @@ class GeminiProvider(AIProvider):
     (not concatenated into `contents`, as the legacy SDK required).
 
     Thinking is disabled (set to "minimal", the lowest level the API exposes)
-    on Gemini 3-family models. Gemma models don't have a thinking process, so
-    `thinking_config` is omitted for them — passing it could otherwise error.
+    on Gemini models that accept it; models that reject it are retried once
+    without `thinking_config` and remembered. Gemma models are always sent
+    without `thinking_config`.
     """
 
     # Disable safety filtering across all categories (best-effort; some models
@@ -355,8 +357,8 @@ class GeminiProvider(AIProvider):
                 default_value="gemini-flash-latest",
                 description="Select Gemini model to use",
                 options=[
-                    # `gemini-flash-latest` is a Google-managed alias that currently
-                    # points to Gemini 3 Flash Preview — fast (~1–2s) and high
+                    # `gemini-flash-latest` is a Google-managed alias that moves to
+                    # the newest Flash model — fast (~1–2s) and high
                     # quality. Capped at 20 free requests/day per the model's free
                     # tier.
                     ("⭐ Gemini Flash Latest (very fast | only 20 free uses/day)", "gemini-flash-latest"),
@@ -367,7 +369,7 @@ class GeminiProvider(AIProvider):
                     ("Gemma 4 26B A4B (slow | unlimited free use)", "gemma-4-26b-a4b-it"),
                 ],
                 allow_custom=True,
-                custom_placeholder="e.g., gemini-3.1-pro-preview"
+                custom_placeholder="e.g., gemini-3.5-flash"
             )
         ]
         super().__init__(app, "Gemini (Recommended)", settings,
@@ -377,6 +379,9 @@ class GeminiProvider(AIProvider):
             "gemini",
             "Get API Key",
             lambda: webbrowser.open("https://aistudio.google.com/app/apikey"))
+
+    # Models that rejected thinking_level="minimal" this session (Gemini 2.5, Pro, Flash 3.7+). See #282.
+    _no_minimal_thinking = set()
 
     def _build_config(self, system_instruction: str) -> "genai_types.GenerateContentConfig":
         """
@@ -398,13 +403,16 @@ class GeminiProvider(AIProvider):
         # • Gemini 3 Flash / Flash-Lite cannot fully disable thinking. The
         #   lowest exposed level is "minimal", which the docs say "matches the
         #   'no thinking' setting for most queries".
+        # • Models that reject "minimal" get no thinking_config and think at their
+        #   default level. Thinking tokens count against max_output_tokens, so the
+        #   cap leaves room for both; at 1000 a thinking model could return nothing.
         is_gemma = "gemma" in (self.model_name or "").lower()
         kwargs = {
             "system_instruction": system_instruction,
             "safety_settings": self._SAFETY_SETTINGS,
-            "max_output_tokens": 1000,
+            "max_output_tokens": 8192,
         }
-        if not is_gemma:
+        if not is_gemma and self.model_name not in self._no_minimal_thinking:
             kwargs["thinking_config"] = genai_types.ThinkingConfig(thinking_level="minimal")
         return genai_types.GenerateContentConfig(**kwargs)
 
@@ -440,26 +448,35 @@ class GeminiProvider(AIProvider):
         """
         self.close_requested = False
 
-        try:
-            contents = self._messages_to_contents(prompt) if isinstance(prompt, list) else prompt
+        contents = self._messages_to_contents(prompt) if isinstance(prompt, list) else prompt
 
-            response = self.client.models.generate_content(
+        def generate():
+            return self.client.models.generate_content(
                 model=self.model_name,
                 contents=contents,
                 config=self._build_config(system_instruction),
             )
 
+        # Errors propagate to the caller, which shows the real API message. Emitting an
+        # error string here used to paste it over the user's selected text.
+        try:
+            try:
+                response = generate()
+            except genai_errors.ClientError as e:
+                if "thinking" not in str(e).lower() or self.model_name in self._no_minimal_thinking:
+                    raise
+                logging.info(f'{self.model_name} rejected thinking_level="minimal"; retrying without it')
+                self._no_minimal_thinking.add(self.model_name)
+                response = generate()
+
             response_text = (response.text or "").rstrip('\n')
+            if not response_text:
+                raise RuntimeError("Gemini returned an empty response.")
 
             if not return_response and not hasattr(self.app, 'current_response_window'):
                 self.app.output_ready_signal.emit(response_text)
-                self.app.replace_text(True)
                 return ""
             return response_text
-        except Exception as e:
-            logging.error(f"Error processing Gemini response: {e}")
-            self.app.output_ready_signal.emit("An error occurred while processing the response.")
-            return ""
         finally:
             self.close_requested = False
 
@@ -623,16 +640,12 @@ class OllamaProvider(AIProvider):
                 {"role": "user", "content": prompt}
             ]
 
-        try:
-            response = self.client.chat(model=self.api_model, messages=messages)
-            response_text = response['message']['content'].strip()
-            if not return_response and not hasattr(self.app, 'current_response_window'):
-                self.app.output_ready_signal.emit(response_text)
-            return response_text
-        except Exception as e:
-            logging.error(f"Error during Ollama chat: {e}")
-            self.app.output_ready_signal.emit("An error occurred during Ollama chat.")
-            return ""
+        # Errors propagate to the caller, which shows them; emitting one would paste it over the user's text.
+        response = self.client.chat(model=self.api_model, messages=messages)
+        response_text = response['message']['content'].strip()
+        if not return_response and not hasattr(self.app, 'current_response_window'):
+            self.app.output_ready_signal.emit(response_text)
+        return response_text
 
     def after_load(self):
         self.client = OllamaClient(host=self.api_base)
