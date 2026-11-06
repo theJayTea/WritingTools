@@ -970,12 +970,7 @@ class WritingToolApp(QtWidgets.QApplication):
                     self.show_message_signal.emit('Error', 'Chat history not found')
                     return
 
-                # Add current question to chat history
-                response_window.chat_history.append({
-                    "role": "user",
-                    "content": question
-                })
-                
+                # The question is already in chat_history (ResponseWindow.send_message adds it).
                 # Get chat history
                 history = response_window.chat_history.copy()
                 
