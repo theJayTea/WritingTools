@@ -550,8 +550,9 @@ class WritingToolApp(QtWidgets.QApplication):
     @Slot()
     def _show_popup(self):
         """
-        Capture the user's selected text in the background and show the popup
-        as soon as the copy lands (at most 300 ms later). The old behaviour gated popup show on a 0.2-0.5s
+        Show the popup window the moment the hotkey fires, and capture the
+        user's selected text in parallel — popup display no longer waits on
+        the clipboard. The old behaviour gated popup show on a 0.2-0.5s
         clipboard read, which on slower systems would time out and
         incorrectly fall back to the chat-only "Ask your AI" UI even when
         text *was* selected. We now assume text is always selected;
@@ -563,20 +564,8 @@ class WritingToolApp(QtWidgets.QApplication):
         # Fresh holder per popup. Fire Ctrl+C *before* we create the popup
         # so the keystroke is queued while focus is still on the user's
         # source app — the actual clipboard read happens in the background.
-        holder = self.current_text_holder = _SelectedTextHolder()
-        self._fire_ctrl_c_and_capture_async(holder, self.registered_hotkey or '')
-
-        # Showing the popup takes focus. Apps that handle input asynchronously
-        # (browsers, WeChat) would then lose our Ctrl+C and copy nothing (#270, #275),
-        # so wait until the copy lands, at most 300 ms.
-        self._create_popup_when_copied(holder, time.monotonic() + 0.3)
-
-    def _create_popup_when_copied(self, holder, deadline):
-        if holder is not self.current_text_holder:
-            return  # a newer hotkey press took over
-        if not holder.ready.is_set() and time.monotonic() < deadline:
-            QtCore.QTimer.singleShot(20, lambda: self._create_popup_when_copied(holder, deadline))
-            return
+        self.current_text_holder = _SelectedTextHolder()
+        self._fire_ctrl_c_and_capture_async(self.current_text_holder, self.registered_hotkey or '')
 
         try:
             if self.popup_window is not None:
