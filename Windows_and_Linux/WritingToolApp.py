@@ -25,6 +25,27 @@ from update_checker import UpdateChecker
 _ = gettext.gettext
 
 
+def _press_ctrl_and(letter, hotkey=''):
+    """
+    Simulate Ctrl+<letter> ('c' or 'v').
+
+    Alt/Shift/Win from `hotkey` are released first: the user is usually still
+    holding them, which turns our Ctrl+C into Ctrl+Alt+C (AltGr+C types "₢" on
+    some layouts, #195) or Ctrl+Shift+C, so nothing gets copied (#275).
+    On Windows the letter is sent by virtual-key code so non-Latin keyboard
+    layouts still produce Ctrl+C / Ctrl+V (#270).
+    """
+    kbrd = pykeyboard.Controller()
+    for token in hotkey.split('+'):
+        if token.startswith(('alt', 'shift', 'cmd')) and hasattr(pykeyboard.Key, token):
+            kbrd.release(getattr(pykeyboard.Key, token))
+    key = pykeyboard.KeyCode.from_vk(ord(letter.upper())) if sys.platform == 'win32' else letter
+    kbrd.press(pykeyboard.Key.ctrl)
+    kbrd.press(key)
+    kbrd.release(key)
+    kbrd.release(pykeyboard.Key.ctrl)
+
+
 class _SelectedTextHolder:
     """
     Carries the result of an async clipboard capture from `_show_popup` to
@@ -50,6 +71,14 @@ class WritingToolApp(QtWidgets.QApplication):
 
     def __init__(self, argv):
         super().__init__(argv)
+
+        # One instance per install: a second one would also answer every hotkey and paste twice (#233).
+        # QLockFile clears a lock left behind by a crashed instance.
+        self._instance_lock = QtCore.QLockFile(os.path.join(os.path.dirname(sys.argv[0]), 'WritingTools.lock'))
+        if not self._instance_lock.tryLock(100):
+            QMessageBox.information(None, 'Writing Tools', 'Writing Tools is already running. Look for its icon in the system tray.')
+            sys.exit(0)
+
         self.current_response_window = None
         logging.debug('Initializing WritingToolApp')
         self.output_ready_signal.connect(self.replace_text)
@@ -482,7 +511,7 @@ class WritingToolApp(QtWidgets.QApplication):
             return
 
         self.current_text_holder = _SelectedTextHolder()
-        self._fire_ctrl_c_and_capture_async(self.current_text_holder)
+        self._fire_ctrl_c_and_capture_async(self.current_text_holder, self.options[button_name].get('hotkey') or '')
 
         # Same worker path as a popup-button click. process_option_thread
         # waits on the holder, surfaces "Please select text…" if empty,
@@ -521,9 +550,8 @@ class WritingToolApp(QtWidgets.QApplication):
     @Slot()
     def _show_popup(self):
         """
-        Show the popup window the moment the hotkey fires, and capture the
-        user's selected text in parallel — popup display no longer waits on
-        the clipboard. The old behaviour gated popup show on a 0.2-0.5s
+        Capture the user's selected text in the background and show the popup
+        as soon as the copy lands (at most 300 ms later). The old behaviour gated popup show on a 0.2-0.5s
         clipboard read, which on slower systems would time out and
         incorrectly fall back to the chat-only "Ask your AI" UI even when
         text *was* selected. We now assume text is always selected;
@@ -535,8 +563,20 @@ class WritingToolApp(QtWidgets.QApplication):
         # Fresh holder per popup. Fire Ctrl+C *before* we create the popup
         # so the keystroke is queued while focus is still on the user's
         # source app — the actual clipboard read happens in the background.
-        self.current_text_holder = _SelectedTextHolder()
-        self._fire_ctrl_c_and_capture_async(self.current_text_holder)
+        holder = self.current_text_holder = _SelectedTextHolder()
+        self._fire_ctrl_c_and_capture_async(holder, self.registered_hotkey or '')
+
+        # Showing the popup takes focus. Apps that handle input asynchronously
+        # (browsers, WeChat) would then lose our Ctrl+C and copy nothing (#270, #275),
+        # so wait until the copy lands, at most 300 ms.
+        self._create_popup_when_copied(holder, time.monotonic() + 0.3)
+
+    def _create_popup_when_copied(self, holder, deadline):
+        if holder is not self.current_text_holder:
+            return  # a newer hotkey press took over
+        if not holder.ready.is_set() and time.monotonic() < deadline:
+            QtCore.QTimer.singleShot(20, lambda: self._create_popup_when_copied(holder, deadline))
+            return
 
         try:
             if self.popup_window is not None:
@@ -582,7 +622,7 @@ class WritingToolApp(QtWidgets.QApplication):
         except Exception as e:
             logging.error(f'Error showing popup window: {e}', exc_info=True)
 
-    def _fire_ctrl_c_and_capture_async(self, holder):
+    def _fire_ctrl_c_and_capture_async(self, holder, hotkey=''):
         """
         Inject Ctrl+C now (must happen while focus is still on the user's
         source app, before the popup is shown), then poll the clipboard
@@ -595,19 +635,15 @@ class WritingToolApp(QtWidgets.QApplication):
         pressed the hotkey without actually selecting anything, which
         `process_option_thread` reports as a normal error.
         """
-        try:
-            clipboard_backup = pyperclip.paste()
-        except Exception:
-            clipboard_backup = ''
+        # Read the backup through Qt, not pyperclip: on Linux pyperclip runs `xclip -o`
+        # and waits for the clipboard owner, which deadlocks this GUI thread when the
+        # owner is Writing Tools itself (e.g. after copying from a response window, #288).
+        clipboard_backup = QApplication.clipboard().text()
 
         self.clear_clipboard()
 
-        kbrd = pykeyboard.Controller()
         try:
-            kbrd.press(pykeyboard.Key.ctrl.value)
-            kbrd.press('c')
-            kbrd.release('c')
-            kbrd.release(pykeyboard.Key.ctrl.value)
+            _press_ctrl_and('c', hotkey)
         except Exception as e:
             logging.error(f'Error simulating Ctrl+C: {e}')
 
@@ -754,7 +790,7 @@ class WritingToolApp(QtWidgets.QApplication):
         except Exception as e:
             logging.error(f'An error occurred: {e}', exc_info=True)
 
-            if "Resource has been exhausted" in str(e):
+            if "RESOURCE_EXHAUSTED" in str(e) or "Resource has been exhausted" in str(e):  # google-genai / legacy SDK wording
                 self.show_message_signal.emit('Error - Rate Limit Hit', 'Whoops! You\'ve hit the per-minute rate limit of the Gemini API. Please try again in a few moments.\n\nIf this happens often, simply switch to a Gemini model with a higher usage limit in Settings.')
             else:
                 self.show_message_signal.emit('Error', f'An error occurred: {e}')
@@ -812,18 +848,11 @@ class WritingToolApp(QtWidgets.QApplication):
                         })
                 else:
                     # For other options, use the original clipboard-based replacement
-                    clipboard_backup = pyperclip.paste()
+                    clipboard_backup = QApplication.clipboard().text()  # not pyperclip: see #288
                     cleaned_text = self.output_queue.rstrip('\n')
                     pyperclip.copy(cleaned_text)
-                    
-                    kbrd = pykeyboard.Controller()
-                    def press_ctrl_v():
-                        kbrd.press(pykeyboard.Key.ctrl.value)
-                        kbrd.press('v')
-                        kbrd.release('v')
-                        kbrd.release(pykeyboard.Key.ctrl.value)
 
-                    press_ctrl_v()
+                    _press_ctrl_and('v')
                     time.sleep(0.2)
                     pyperclip.copy(clipboard_backup)
 
@@ -1039,7 +1068,7 @@ class WritingToolApp(QtWidgets.QApplication):
             except Exception as e:
                 logging.error(f'Error processing follow-up question: {e}', exc_info=True)
 
-                if "Resource has been exhausted" in str(e):
+                if "RESOURCE_EXHAUSTED" in str(e) or "Resource has been exhausted" in str(e):  # google-genai / legacy SDK wording
                     self.show_message_signal.emit('Error - Rate Limit Hit', 'Whoops! You\'ve hit the per-minute rate limit of the Gemini API. Please try again in a few moments.\n\nIf this happens often, simply switch to a Gemini model with a higher usage limit in Settings.')
                     self.followup_response_signal.emit("Sorry, an error occurred while processing your question.")
                 else:
