@@ -156,7 +156,7 @@ class TransactionTests(unittest.TestCase):
     def test_second_capture_is_refused_while_first_runs(self):
         wi = self.make()
         gate = threading.Event()
-        wi.text_io.capture_selection.side_effect = lambda: (gate.wait(2), "text")[1]
+        wi.text_io.capture_selection.side_effect = lambda **kw: (gate.wait(2), "text")[1]
         first, second = self.holder(), self.holder()
         self.assertTrue(wi.capture_async(first))
         self.assertFalse(wi.capture_async(second))
@@ -193,11 +193,75 @@ class TransactionTests(unittest.TestCase):
     def test_held_modifiers_abort_the_capture(self):
         wi = self.make()
         wi._wait_for_hotkey_release = lambda: False
+        copied = []
+
+        def capture(before_copy=None):
+            before_copy()          # raises: keys still held
+            copied.append(True)    # Ctrl+C would go out here
+            return "text"
+
+        wi.text_io.capture_selection.side_effect = capture
         h = self.holder()
         wi.capture_async(h)
         self.assertTrue(h.ready.wait(2))
         self.assertEqual(h.text, "")
-        wi.text_io.capture_selection.assert_not_called()
+        self.assertEqual(copied, [], "no Ctrl+C while the hotkey is held")
+
+    def test_release_wait_happens_inside_capture(self):
+        # The clipboard is prepared while the user lets go of the hotkey.
+        wi = self.make()
+        wi.capture_async(self.holder())
+        for _ in range(50):
+            if wi.text_io.capture_selection.called:
+                break
+            time.sleep(0.02)
+        kwargs = wi.text_io.capture_selection.call_args.kwargs
+        self.assertEqual(kwargs["before_copy"], wi._require_hotkey_release)
+
+
+class KeyboardCacheTests(unittest.TestCase):
+    """Finding keyboards opens every input device; only redo it when devices change."""
+
+    def setUp(self):
+        integration._keyboard_cache = (None, ())
+        self.addCleanup(setattr, integration, "_keyboard_cache", (None, ()))
+        self.paths = ["/dev/input/event0", "/dev/input/event1"]
+        self.queried = []
+
+        test = self
+
+        class Device:
+            def __init__(self, path):
+                self.path = path
+
+            def capabilities(self):
+                test.queried.append(self.path)
+                return {1: [29, 30] if self.path.endswith("0") else [272]}  # event0 has Ctrl
+
+            def close(self):
+                pass
+
+        fake = types.SimpleNamespace(
+            list_devices=lambda: list(self.paths), InputDevice=Device,
+            ecodes=types.SimpleNamespace(EV_KEY=1),
+        )
+        patcher = mock.patch.dict("sys.modules", {"evdev": fake})
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def test_scans_once_then_reuses(self):
+        first = integration._open_keyboards()
+        self.assertEqual([d.path for d in first], ["/dev/input/event0"])
+        self.assertEqual(len(self.queried), 2)
+        again = integration._open_keyboards()
+        self.assertEqual([d.path for d in again], ["/dev/input/event0"])
+        self.assertEqual(len(self.queried), 2, "no rescan while the device list is unchanged")
+
+    def test_rescans_when_a_device_is_plugged_in(self):
+        integration._open_keyboards()
+        self.paths.append("/dev/input/event2")
+        integration._open_keyboards()
+        self.assertEqual(len(self.queried), 5)
 
 
 class FakeClipboard:
@@ -290,6 +354,34 @@ class CaptureTests(unittest.TestCase):
         self.assertEqual(io.capture_selection(timeout=0.3), "")
         self.assertLess(time.monotonic() - start, 1.0)
         self.assertEqual(clip.content, "user clipboard")
+
+    def test_before_copy_runs_after_sentinel_and_before_ctrl_c(self):
+        clip = FakeClipboard(selection="teh quick fox")
+        io = self.make_io(clip)
+        seen = []
+        before = lambda: seen.append((clip.content.startswith("writing-tools-capture-"), clip.copy_presses))
+        self.assertEqual(io.capture_selection(timeout=0.5, before_copy=before), "teh quick fox")
+        self.assertEqual(seen, [(True, 0)])
+
+    def test_failing_before_copy_sends_no_key_and_restores(self):
+        clip = FakeClipboard(selection="teh quick fox")
+        io = self.make_io(clip)
+
+        def before():
+            raise text_io.TextIOError("keys still held")
+
+        with self.assertRaises(text_io.TextIOError):
+            io.capture_selection(timeout=0.5, before_copy=before)
+        self.assertEqual(clip.copy_presses, 0)
+        self.assertEqual(clip.content, "user clipboard")
+
+    def test_nothing_selected_gives_up_within_a_second(self):
+        clip = FakeClipboard(selection="", copy_works=False)
+        io = self.make_io(clip)
+        start = time.monotonic()
+        self.assertEqual(io.capture_selection(), "")
+        self.assertLess(time.monotonic() - start, 1.0)
+        self.assertEqual(clip.copy_presses, 2)
 
     def test_empty_clipboard_is_left_empty(self):
         clip = FakeClipboard(selection="", copy_works=False, initial=None)

@@ -38,27 +38,43 @@ def button_shortcut_id(name):
     return f"button-{slug}"
 
 
+# (input device paths, the ones that are keyboards). Finding the keyboards
+# means opening and querying every input device, ~50 ms on a machine with 17;
+# listing the paths takes well under 1 ms, so rescan only when they change.
+_keyboard_cache = (None, ())
+
+
 def _open_keyboards():
     """
     Open the keyboards through evdev to read which keys are held right now.
     Returns None when that isn't possible (evdev missing, or the user is not
     in the 'input' group). Nothing is grabbed; this only reads key state.
     """
+    global _keyboard_cache
     try:
         import evdev
     except ImportError:
         return None
+    paths = tuple(evdev.list_devices())
+    if paths != _keyboard_cache[0]:
+        found = []
+        for path in paths:
+            try:
+                device = evdev.InputDevice(path)
+            except OSError:
+                continue
+            try:
+                if 29 in device.capabilities().get(evdev.ecodes.EV_KEY, []):
+                    found.append(path)  # has a Ctrl key: treat it as a keyboard
+            finally:
+                device.close()
+        _keyboard_cache = (paths, tuple(found))
     keyboards = []
-    for path in evdev.list_devices():
+    for path in _keyboard_cache[1]:
         try:
-            device = evdev.InputDevice(path)
+            keyboards.append(evdev.InputDevice(path))
         except OSError:
-            continue
-        keys = device.capabilities().get(evdev.ecodes.EV_KEY, [])
-        if 29 in keys:  # has a Ctrl key: treat it as a keyboard
-            keyboards.append(device)
-        else:
-            device.close()
+            _keyboard_cache = (None, ())  # rescan next time
     return keyboards or None
 
 
@@ -119,6 +135,9 @@ class WaylandIntegration:
         threading.Thread(target=self._start_portal, name="portal-start", daemon=True).start()
 
     def _start_portal(self):
+        # Find the keyboards now so the first hotkey press doesn't pay for it.
+        for device in _open_keyboards() or ():
+            device.close()
         try:
             if os.environ.get("WRITING_TOOLS_DISABLE_PORTAL"):
                 logging.info("Global shortcuts portal disabled by WRITING_TOOLS_DISABLE_PORTAL")
@@ -250,6 +269,10 @@ class WaylandIntegration:
 
     # -- text --------------------------------------------------------------
 
+    def _require_hotkey_release(self):
+        if not self._wait_for_hotkey_release():
+            raise TextIOError("the shortcut keys were still held down, so no text was copied")
+
     def _wait_for_hotkey_release(self):
         """
         Wait until the user has let go of the hotkey. Returns False if a
@@ -298,11 +321,11 @@ class WaylandIntegration:
                 if self.text_io is None:
                     raise TextIOError("text capture is not set up")
                 with self._io_lock:
-                    if not self._wait_for_hotkey_release():
-                        raise TextIOError(
-                            "the shortcut keys were still held down, so no text was copied"
-                        )
-                    text = self.text_io.capture_selection()
+                    # The clipboard is prepared while the user lets go of the
+                    # hotkey; Ctrl+C goes out once they have.
+                    text = self.text_io.capture_selection(
+                        before_copy=self._require_hotkey_release
+                    )
                 logging.debug(f"Captured selected text (len={len(text)})")
             except Exception as e:  # noqa: BLE001
                 logging.error(f"Capturing the selection failed: {e}")

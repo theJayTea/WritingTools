@@ -44,8 +44,13 @@ CLIPBOARD_TIMEOUT = 2.0  # seconds for one wl-paste/wl-copy call
 # captures succeeded with no gap, 12 of 12 with a 12 ms gap.
 KEY_DELAY_MS = 12
 
-# If the clipboard hasn't changed this long after Ctrl+C, press it once more.
-COPY_RETRY_AFTER = 0.35
+# Apps answer Ctrl+C quickly: in a nested KWin, a Qt text field, Chrome, Zen
+# (Firefox), VS Code and Kate all filled the clipboard within 140 ms of the key
+# press, 65 ms typically. Waiting longer only delays the popup when nothing is
+# selected, which is when the full timeout is spent.
+COPY_RETRY_AFTER = 0.25  # clipboard unchanged this long after Ctrl+C: press it again
+CAPTURE_TIMEOUT = 0.8    # then give up: nothing is selected
+POLL_INTERVAL = 0.015
 
 
 class TextIOError(Exception):
@@ -258,22 +263,29 @@ class WaylandTextIO:
                 f"Missing {', '.join(missing)}. Install the wl-clipboard package."
             )
 
-    def capture_selection(self, timeout=1.5):
+    def capture_selection(self, timeout=CAPTURE_TIMEOUT, before_copy=None):
         """
         Return the text selected in the focused app, or '' if nothing was
         copied within `timeout` seconds. The user's clipboard is restored.
+
+        before_copy, if given, runs once the clipboard is prepared, right
+        before Ctrl+C is sent (the caller waits there for the hotkey to be
+        released, so the preparation overlaps with that). If it raises, no
+        key is sent and the exception propagates.
         """
         backup = snapshot_clipboard()
         sentinel = f"writing-tools-capture-{secrets.token_hex(8)}"
         captured = None
         try:
             write_clipboard(sentinel, sensitive=True)
+            if before_copy is not None:
+                before_copy()
             self.injector.copy()
             start = time.monotonic()
             retried = False
             current = None
             while time.monotonic() - start < timeout:
-                time.sleep(0.04)
+                time.sleep(POLL_INTERVAL)
                 current = read_clipboard()
                 if current is not None and current != sentinel:
                     captured = current
