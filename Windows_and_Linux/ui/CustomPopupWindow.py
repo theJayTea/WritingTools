@@ -4,7 +4,7 @@ import os
 import sys
 from functools import partial
 
-from pynput import keyboard as pykeyboard
+from linux_wayland import is_wayland_session
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
@@ -20,6 +20,14 @@ from PySide6.QtWidgets import (
 )
 
 from ui.UIUtils import ThemeBackground, colorMode
+
+if is_wayland_session():
+    # pynput needs an X server; on Wayland hotkeys are checked with
+    # linux_wayland.hotkeys instead.
+    from linux_wayland.hotkeys import to_portal_trigger
+    pykeyboard = None
+else:
+    from pynput import keyboard as pykeyboard
 
 _ = lambda x: x
 
@@ -842,7 +850,10 @@ class CustomPopupWindow(QtWidgets.QWidget):
         # listener will. Catches typos, unknown key names, missing
         # modifiers, etc. without us having to maintain a regex.
         try:
-            pykeyboard.HotKey.parse(self.app._to_pynput_hotkey(hotkey))
+            if pykeyboard is None:
+                to_portal_trigger(hotkey)
+            else:
+                pykeyboard.HotKey.parse(self.app._to_pynput_hotkey(hotkey))
         except Exception as e:
             return False, (
                 f"'{hotkey}' isn't a valid hotkey.\n\n"
