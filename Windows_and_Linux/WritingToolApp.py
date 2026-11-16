@@ -8,14 +8,13 @@ import threading
 import time
 
 import darkdetect
-import pyperclip
 import ui.AboutWindow
 import ui.CustomPopupWindow
 import ui.OnboardingWindow
 import ui.ResponseWindow
 import ui.SettingsWindow
 from aiprovider import GeminiProvider, OllamaProvider, OpenAICompatibleProvider, obfuscate_api_key
-from pynput import keyboard as pykeyboard
+from linux_wayland import is_wayland_session
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import QLocale, Signal, Slot
 from PySide6.QtGui import QCursor, QGuiApplication
@@ -23,6 +22,16 @@ from PySide6.QtWidgets import QApplication, QMessageBox
 from update_checker import UpdateChecker
 
 _ = gettext.gettext
+
+# Wayland sessions use linux_wayland instead of pynput and pyperclip. pynput's
+# Linux backend needs an X server, so importing it there can fail outright.
+WAYLAND = is_wayland_session()
+if WAYLAND:
+    pykeyboard = None
+    pyperclip = None
+else:
+    import pyperclip
+    from pynput import keyboard as pykeyboard
 
 
 class _SelectedTextHolder:
@@ -75,6 +84,7 @@ class WritingToolApp(QtWidgets.QApplication):
         self.output_queue = ""
         self.last_replace = 0
         self.hotkey_listener = None
+        self.wayland = None  # linux_wayland.integration.WaylandIntegration
         self.paused = False
         self.toggle_action = None
 
@@ -112,6 +122,7 @@ class WritingToolApp(QtWidgets.QApplication):
             self.current_provider.load_config(self.config.get("providers", {}).get(provider_name, {}))
 
             self.create_tray_icon()
+            self.start_wayland_integration()
             self.register_hotkey()
 
             try:
@@ -481,8 +492,14 @@ class WritingToolApp(QtWidgets.QApplication):
             logging.warning(f'Button "{button_name}" no longer exists; ignoring hotkey')
             return
 
-        self.current_text_holder = _SelectedTextHolder()
-        self._fire_ctrl_c_and_capture_async(self.current_text_holder)
+        if WAYLAND:
+            holder = _SelectedTextHolder()
+            if not self.wayland.capture_async(holder):
+                return  # still capturing for the previous action
+            self.current_text_holder = holder
+        else:
+            self.current_text_holder = _SelectedTextHolder()
+            self._fire_ctrl_c_and_capture_async(self.current_text_holder)
 
         # Same worker path as a popup-button click. process_option_thread
         # waits on the holder, surfaces "Please select text…" if empty,
@@ -494,8 +511,49 @@ class WritingToolApp(QtWidgets.QApplication):
         Register the global hotkey for activating Writing Tools.
         """
         logging.debug('Registering hotkey')
-        self.start_hotkey_listener()
+        if WAYLAND:
+            self.register_wayland_hotkeys()
+        else:
+            self.start_hotkey_listener()
         logging.debug('Hotkey registered')
+
+    def start_wayland_integration(self):
+        """
+        Set up global shortcuts and text capture for Wayland sessions. Called
+        once, after onboarding, before the first `register_hotkey`.
+        """
+        if not WAYLAND or self.wayland is not None:
+            return
+        from linux_wayland.integration import WaylandIntegration
+        self.wayland = WaylandIntegration(
+            base_dir=os.path.dirname(os.path.abspath(sys.argv[0])),
+            notify=self.show_message_signal.emit,
+        )
+        self.wayland.start()
+
+    def register_wayland_hotkeys(self):
+        """
+        Wayland counterpart of `start_hotkey_listener`: hand the main hotkey
+        and per-button hotkeys to the desktop through the GlobalShortcuts
+        portal. Every option is also reachable with `main.py --trigger NAME`.
+        """
+        self.start_wayland_integration()
+        main_hotkey = self.config.get('shortcut', 'ctrl+space')
+        self.registered_hotkey = main_hotkey
+
+        def on_main():
+            if self.paused:
+                return
+            logging.debug('triggered global hotkey (Wayland)')
+            self.hotkey_triggered_signal.emit()
+
+        buttons = []
+        for button_name, button_cfg in (self.options or {}).items():
+            if button_name == 'Custom':
+                continue
+            hotkey = (button_cfg.get('hotkey') or '').strip()
+            buttons.append((button_name, hotkey, self._make_button_hotkey_callback(button_name)))
+        self.wayland.register(main_hotkey, on_main, buttons)
 
     def on_hotkey_pressed(self):
         """
@@ -535,9 +593,26 @@ class WritingToolApp(QtWidgets.QApplication):
         # Fresh holder per popup. Fire Ctrl+C *before* we create the popup
         # so the keystroke is queued while focus is still on the user's
         # source app — the actual clipboard read happens in the background.
+        if WAYLAND:
+            # Wayland can't send Ctrl+C to a window that has lost focus, so
+            # copy first and show the popup once the capture is done.
+            holder = _SelectedTextHolder()
+            started = self.wayland.capture_async(
+                holder,
+                on_done=lambda: QtCore.QMetaObject.invokeMethod(
+                    self, "_create_and_show_popup", QtCore.Qt.ConnectionType.QueuedConnection
+                ),
+            )
+            if started:
+                self.current_text_holder = holder
+            return
         self.current_text_holder = _SelectedTextHolder()
         self._fire_ctrl_c_and_capture_async(self.current_text_holder)
+        self._create_and_show_popup()
 
+    @Slot()
+    def _create_and_show_popup(self):
+        """Build the popup window and place it next to the cursor."""
         try:
             if self.popup_window is not None:
                 logging.debug('Existing popup window found')
@@ -643,6 +718,8 @@ class WritingToolApp(QtWidgets.QApplication):
         """
         Clear the system clipboard.
         """
+        if pyperclip is None:
+            return
         try:
             pyperclip.copy('')
         except Exception as e:
@@ -810,6 +887,8 @@ class WritingToolApp(QtWidgets.QApplication):
                             "role": "assistant",
                             "content": self.output_queue.rstrip('\n')
                         })
+                elif WAYLAND:
+                    self.wayland.paste_async(self.output_queue.rstrip('\n'))
                 else:
                     # For other options, use the original clipboard-based replacement
                     clipboard_backup = pyperclip.paste()
@@ -1102,5 +1181,7 @@ class WritingToolApp(QtWidgets.QApplication):
         logging.debug('Stopping the listener')
         if self.hotkey_listener is not None:
             self.hotkey_listener.stop()
+        if self.wayland is not None:
+            self.wayland.close()
         logging.debug('Exiting application')
         self.quit()
