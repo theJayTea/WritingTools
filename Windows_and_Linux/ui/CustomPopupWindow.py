@@ -7,6 +7,7 @@ from functools import partial
 from pynput import keyboard as pykeyboard
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import (
     QDialog,
     QHBoxLayout,
@@ -497,6 +498,34 @@ class CustomPopupWindow(QtWidgets.QWidget):
         top_bar.addWidget(self.close_button, 0, Qt.AlignRight)
         content_layout.addLayout(top_bar)
 
+        # Preview of the text that will actually be processed. This makes a
+        # stale capture obvious before an option is clicked: on Linux the
+        # PRIMARY selection keeps the last thing that was selected, so a
+        # user who copied logs (or copied anything else) minutes ago can end
+        # up processing that text by accident.
+        self.selection_label = QLabel()
+        self.selection_label.setTextFormat(Qt.PlainText)
+        self.selection_label.setWordWrap(False)
+        preview_font = self.selection_label.font()
+        preview_font.setPointSize(9)
+        self.selection_label.setFont(preview_font)
+        self.selection_label.setFixedWidth(250)
+        self.selection_label.setStyleSheet(f"""
+            color: {'#bbb' if colorMode == 'dark' else '#555'};
+            padding: 0px 2px;
+        """)
+        self.selection_label.hide()
+        content_layout.addWidget(self.selection_label)
+
+        self._selection_timer = QtCore.QTimer(self)
+        self._selection_timer.setInterval(100)
+        self._selection_timer.timeout.connect(self.update_selection_preview)
+        # Safety net so the poll can't run forever if the holder is never
+        # populated (e.g. a capture thread died before `ready.set()`).
+        self._preview_ticks = 0
+        self._selection_timer.start()
+        self.update_selection_preview()
+
         
         # Input area (hidden in edit mode)
         self.input_area = QWidget()
@@ -573,6 +602,60 @@ class CustomPopupWindow(QtWidgets.QWidget):
         options_path = os.path.join(os.path.dirname(sys.argv[0]), 'options.json')
         with open(options_path, 'w') as f:
             json.dump(options, f, indent=2)
+
+    def update_selection_preview(self):
+        """
+        Show what `process_option` is going to operate on.
+
+        The capture can land slightly after the popup appears (or before it,
+        now that the primary selection is read synchronously), so poll the
+        holder until it is ready, then stop. In edit mode the label is
+        hidden, so we don't re-show it on a later tick.
+        """
+        # Safety net: stop polling if the holder is never populated
+        # (e.g. capture thread died before `ready.set()`).
+        self._preview_ticks += 1
+        if self._preview_ticks > 100:  # ~10 s at 100 ms interval
+            self._selection_timer.stop()
+            return
+
+        holder = getattr(self.app, 'current_text_holder', None)
+        if holder is None or not holder.ready.is_set():
+            return
+
+        self._selection_timer.stop()
+        text = holder.text or ''
+        if not text.strip():
+            self.selection_label.setText(_("No text selected"))
+        else:
+            # Single-line snippet; the full text is available on hover.
+            metrics = QtGui.QFontMetrics(self.selection_label.font())
+            full = _("Selected: ") + ' '.join(text.split())
+            self.selection_label.setText(
+                metrics.elidedText(full, QtCore.Qt.TextElideMode.ElideRight, 246)
+            )
+            self.selection_label.setToolTip(text[:1000])
+
+        if not self.edit_mode:
+            self.selection_label.show()
+            self.adjustSize()
+            # Keep the popup on-screen now that it has grown to include the
+            # preview text. The popup was positioned before the label's
+            # content was known, so the bottom/right edges can overflow.
+            screen = QGuiApplication.screenAt(self.pos())
+            if screen is None:
+                screen = QGuiApplication.primaryScreen()
+            geom = screen.availableGeometry()
+            x, y = self.pos().x(), self.pos().y()
+            if x + self.width() > geom.right():
+                x = geom.right() - self.width()
+            if y + self.height() > geom.bottom():
+                y = geom.bottom() - self.height()
+            if x < geom.left():
+                x = geom.left()
+            if y < geom.top():
+                y = geom.top()
+            self.move(x, y)
 
     def build_buttons_list(self):
         """
@@ -772,6 +855,9 @@ class CustomPopupWindow(QtWidgets.QWidget):
 
         # Toggle the main input area
         self.input_area.setVisible(not self.edit_mode)
+        self.selection_label.setVisible(
+            not self.edit_mode and bool(self.selection_label.text())
+        )
 
         # Update button overlays
         for btn in self.button_widgets:

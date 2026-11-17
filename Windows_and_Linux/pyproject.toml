@@ -1,0 +1,24 @@
+[project]
+name = "windows-and-linux"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "hadoopchetan@gmail.com", email = "hadoopchetan@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "darkdetect>=0.8.0",
+    "google-genai>=3.4.0",
+    "markdown2>=2.5.5",
+    "ollama>=0.6.3",
+    "openai>=3.52.0",
+    "pyinstaller>=6.22.3",
+    "pynput>=1.8.2",
+    "pyperclip>=1.11.0",
+    "pyside6>=6.12.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.13.7,<0.14.0"]
+build-backend = "uv_build"
