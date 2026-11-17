@@ -451,7 +451,7 @@ class GeminiProvider(AIProvider):
 
             response_text = (response.text or "").rstrip('\n')
 
-            if not return_response and not hasattr(self.app, 'current_response_window'):
+            if not return_response and not getattr(self.app, 'current_response_window', None):
                 self.app.output_ready_signal.emit(response_text)
                 self.app.replace_text(True)
                 return ""
@@ -553,7 +553,7 @@ class OpenAICompatibleProvider(AIProvider):
             )
             response_text = response.choices[0].message.content.strip()
 
-            if not return_response and not hasattr(self.app, 'current_response_window'):
+            if not return_response and not getattr(self.app, 'current_response_window', None):
                 self.app.output_ready_signal.emit(response_text)
             return response_text
 
@@ -626,7 +626,7 @@ class OllamaProvider(AIProvider):
         try:
             response = self.client.chat(model=self.api_model, messages=messages)
             response_text = response['message']['content'].strip()
-            if not return_response and not hasattr(self.app, 'current_response_window'):
+            if not return_response and not getattr(self.app, 'current_response_window', None):
                 self.app.output_ready_signal.emit(response_text)
             return response_text
         except Exception as e:

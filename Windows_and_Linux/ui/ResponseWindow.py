@@ -239,8 +239,14 @@ class ChatContentScrollArea(QScrollArea):
         self.layout.addWidget(msg_container)
         self.layout.addStretch()
         
-        if hasattr(self.parent(), 'current_text_display'):
-            self.parent().current_text_display = text_display
+        # Track the newest message so zoom handling and close-time zoom
+        # persistence have something to work with. (The old `hasattr` guard
+        # checked for the attribute before it had ever been set, so this was
+        # never assigned. `parent()` is the background widget, not the
+        # window, hence `window()`.)
+        top_level = self.window()
+        if isinstance(top_level, ResponseWindow):
+            top_level.current_text_display = text_display
             
         QtCore.QTimer.singleShot(50, self.post_message_updates)
         
@@ -249,8 +255,9 @@ class ChatContentScrollArea(QScrollArea):
     def post_message_updates(self):
         """Handle updates after adding a message with proper timing"""
         self.scroll_to_bottom()
-        if isinstance(self.parent(), ResponseWindow):
-            self.parent()._adjust_window_height()
+        top_level = self.window()
+        if isinstance(top_level, ResponseWindow):
+            top_level._adjust_window_height()
 
     def update_content_height(self):
         """Recalculate total content height with improved spacing calculation"""
@@ -271,8 +278,9 @@ class ChatContentScrollArea(QScrollArea):
         self.content_widget.setMinimumHeight(total_height + 10)
         
         # Update window height if needed
-        if isinstance(self.parent(), ResponseWindow):
-            self.parent()._adjust_window_height()
+        top_level = self.window()
+        if isinstance(top_level, ResponseWindow):
+            top_level._adjust_window_height()
 
     def scroll_to_bottom(self):
         """Smooth scroll to bottom of content"""
@@ -312,6 +320,12 @@ class ResponseWindow(QtWidgets.QWidget):
         self.loading_container = None
         self.chat_area = None
         self.chat_history = []
+
+        # Legacy streaming support (`append_text`): tracks the bubble and
+        # text being built up so chunks update one message instead of
+        # creating a new bubble per chunk.
+        self._streaming_text_display = None
+        self._streaming_text = ""
 
         # Setup thinking animation with full range of dots
         self.thinking_timer = QtCore.QTimer(self)
@@ -489,6 +503,27 @@ class ResponseWindow(QtWidgets.QWidget):
         if response_text:
             QtWidgets.QApplication.clipboard().setText(response_text)
 
+    def bring_to_front(self):
+        """Show the window and force it above the app the user came from.
+
+        The response window is created in reply to a global hotkey, while
+        focus is still on the user's source application. A plain `show()`
+        is not enough on Windows or X11: the window manager's focus-stealing
+        prevention may keep the new window buried behind the source app,
+        so the request completes (`set_text` is invoked) and the user sees
+        nothing. On Wayland compositors (e.g. KDE Plasma) these calls are
+        best-effort — most compositors do not expose an activation
+        protocol and will not allow an app to steal focus — so `raise_()`
+        / `activateWindow()` are attempted but not guaranteed to work there.
+        The popup already activates itself; the response window
+        has to do the same. Mirrors `orderFrontRegardless()` on macOS.
+        """
+        if self.isMinimized():
+            self.showNormal()
+        self.show()
+        self.raise_()
+        self.activateWindow()
+
     def get_button_style(self):
         return f"""
             QPushButton {{
@@ -630,12 +665,40 @@ class ResponseWindow(QtWidgets.QWidget):
         self.stop_thinking_animation()
         text_display = self.chat_area.add_message(text)
         
-        # Update zoom state
-        if hasattr(self.app.config, 'response_window_zoom'):
-            text_display.zoom_factor = self.app.config['response_window_zoom']
+        # Restore the zoom level saved when the last response window closed.
+        # (`self.app.config` is a dict, so the old `hasattr` check never
+        # matched and the preference was silently ignored.)
+        config = getattr(self.app, 'config', None)
+        zoom = config.get('response_window_zoom') if isinstance(config, dict) else None
+        if isinstance(zoom, (int, float)):
+            text_display.zoom_factor = max(0.5, min(3.0, float(zoom)))
             text_display._apply_zoom()
-        
+            text_display._update_size()
+
+        # The window was created while the AI was still thinking, so it may
+        # have been buried by the time the answer lands. Put it back on top.
+        self.bring_to_front()
+
         QtCore.QTimer.singleShot(100, self._adjust_window_height)
+
+    def append_text(self, text):
+        """Append a streamed chunk to the current response bubble.
+
+        Legacy method — under current provider gating this is never called
+        while a response window is alive (providers guard `output_ready_signal`
+        with `not getattr(self.app, 'current_response_window', None)`). Kept for
+        backwards compatibility should streaming be re-enabled.
+        """
+        if not text:
+            return
+        if self._streaming_text_display is None:
+            self._streaming_text = text
+            self._streaming_text_display = self.chat_area.add_message(text)
+        else:
+            self._streaming_text += text
+            html = markdown2.markdown(self._streaming_text, extras=['tables', 'strike'])
+            self._streaming_text_display.setHtml(html)
+            self._streaming_text_display._update_size()
         
     @Slot(str)
     def handle_followup_response(self, response_text):
@@ -695,13 +758,18 @@ class ResponseWindow(QtWidgets.QWidget):
         """Handle window close event"""
         # Save zoom factor to main config
         if hasattr(self, 'current_text_display'):
-            self.app.config['response_window_zoom'] = self.current_text_display.zoom_factor
-            self.app.save_config(self.app.config)
+            config = getattr(self.app, 'config', None)
+            if isinstance(config, dict):
+                config['response_window_zoom'] = self.current_text_display.zoom_factor
+                self.app.save_config(config)
 
         self.chat_history = []
-        
-        if hasattr(self.app, 'current_response_window'):
-            delattr(self.app, 'current_response_window')
-        
+
+        # Only clear the app's pointer if it still refers to this window.
+        # A newer response window may already have replaced it (or its
+        # request may still be in flight); clearing unconditionally would
+        # make that response get dropped.
+        if getattr(self.app, 'current_response_window', None) is self:
+            self.app.current_response_window = None
 
         super().closeEvent(event)
